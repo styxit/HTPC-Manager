@@ -8,8 +8,8 @@ import base64
 import cherrypy
 import os
 import htpc
-import Image
-import ImageEnhance
+from PIL import Image
+from PIL import ImageEnhance
 
 def xbmcFetchDataFromUrl(url):
     try:
