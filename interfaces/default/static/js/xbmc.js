@@ -7,7 +7,7 @@ $(document).ready(function () {
         if (!loadingNowPlaying) {
             loadNowPlaying();
         }
-    }, 500);
+    }, 1000);
 
     // films inladen
     loadMovies();
