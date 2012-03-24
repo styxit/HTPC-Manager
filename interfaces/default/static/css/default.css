@@ -1,0 +1,53 @@
+html, body {
+    background-color: #eee;
+    background: url('../img/rough_diagonal.png')
+}
+body {
+    padding-top: 40px;
+}
+.maincontent {
+    background-color: #fff;
+    padding: 20px;
+    margin:  0 -10px 40px -10px;
+    -webkit-border-radius: 0 0 6px 6px;
+    -moz-border-radius: 0 0 6px 6px;
+    border-radius: 0 0 6px 6px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    box-shadow: 0 1px 2px rgba(0,0,0,.15);
+}
+.page-header.page-title {
+    background-color: #f5f5f5;
+    padding: 20px 20px 10px;
+    margin: -20px -20px 20px;
+}
+.progress {
+    margin-bottom: 0;
+    background: #eee;
+}
+
+#nowplaying li {
+    margin-bottom: 0;
+}
+
+.accordion-group {
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+}
+
+.thumbnail {
+    background: #fff;
+}
+#navbar .navbar-inner {
+    background: url('../img/darkdenim3.png');
+}
+.well {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+
+.table-main {
+    font-size: 12px;
+}
