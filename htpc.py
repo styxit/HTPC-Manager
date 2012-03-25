@@ -1,6 +1,5 @@
 import cherrypy
 import htpc
-import ConfigParser
 
 cherrypy.config.update({
     'server.environment': 'production',
@@ -9,24 +8,30 @@ cherrypy.config.update({
     'server.root' : htpc.root
 })
 
-userpassdict = {'admin' : 'admin'}
+rootConfig = {
+    'tools.staticdir.root': htpc.root,
+    'tools.encode.on': True,
+    'tools.encode.encoding': 'utf-8',
+    'tools.staticdir.dir' : '/',
+    'tools.staticfile.root' : htpc.root
+}
+
+authDict = {}
 config = htpc.settings.readSettings()
 if config.has_key('my_username') and config.get('my_username') != '' and config.has_key('my_password') and config.get('my_password') != '':
     userpassdict = {config.get('my_username') : config.get('my_password')}
-
-get_ha1 = cherrypy.lib.auth_digest.get_ha1_dict_plain(userpassdict)
-appConfig = {
-    '/': {
-        'tools.staticdir.root': htpc.root,
-        'tools.encode.on': True,
-        'tools.encode.encoding': 'utf-8',
-        'tools.staticdir.dir' : '/',
-        'tools.staticfile.root' : htpc.root,
+    get_ha1 = cherrypy.lib.auth_digest.get_ha1_dict_plain(userpassdict)
+    authDict = {
         'tools.auth_digest.on': True,
         'tools.auth_digest.realm': 'htpc',
         'tools.auth_digest.get_ha1': get_ha1,
         'tools.auth_digest.key': 'a565c27146791cfb'
-    },
+    }
+
+rootConfig.update(authDict)
+
+appConfig = {
+    '/':  rootConfig,
     '/favicon.ico' : {
         'tools.staticfile.on' : True,
         'tools.staticfile.filename' : "interfaces/default/static/favicon.ico"
