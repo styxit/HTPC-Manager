@@ -11,6 +11,10 @@ $(document).ready(function () {
         });
     });
 
+    $('#add_nzb_button').click(function() {
+        $('#add_nzb_form').submit();
+    })
+
     // nzb toevoegen
     $('#add_nzb_form').ajaxForm({
         url: '/json/?which=sabnzbd&action=addnzb',
@@ -29,23 +33,20 @@ $(document).ready(function () {
     setCategories('#nzb_category', '*');
 
     // Speed zetten
-    $('#set_speed').keypress(function() {
+    $('#nzb_set_speed').click(function() {
 
-        var speed = ($(this).val() * 10);
+        var speed = ($('#nzb_get_speed').val());
 
         $.ajax({
             url: '/json/?which=sabnzbd&action=speed&value=' + speed,
             type: 'post',
-            dataType: 'json',
-            success: function(data) {
-
-            }
+            dataType: 'json'
         });
     });
     // nzb actief inladen en elke seconde refreshen
-    loadQueue();
+    loadQueue(1);
     setInterval(function() {
-        loadQueue();
+        loadQueue(0);
     }, 5000);
 
     // nzb historie inladen

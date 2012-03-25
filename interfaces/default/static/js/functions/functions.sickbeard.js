@@ -82,10 +82,16 @@ function loadNextAired() {
         dataType: 'json',
         success: function (result) {
 
+            // If sickbeard not configured, return false (Dashboard)
+            if (result == null) {
+                return false;
+            }
+
             if (result.data.soon.legth == 0) {
                 var row = $('<tr>')
                 row.append($('<td>').html('No future episodes found'));
                 $('#nextaired_table_body').append(row);
+                return false;
             }
 
             $.each(result.data.soon, function (i, tvshow) {
@@ -112,6 +118,7 @@ function loadNextAired() {
 }
 
 function loadHistory(limit) {
+
     $.ajax({
         url: '/json/?which=sickbeard&action=history&limit=' + limit,
         type: 'get',

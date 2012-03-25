@@ -19,9 +19,10 @@
             <input class="span6" id="nzb_url" name="nzb_url" type="text" placeholder="Paste NZB url" />
             <select class="span2" name="nzb_category" id="nzb_category">
             </select>
-            <button class="btn btn-success" type="submit" id="add_nzb_button"><i class="icon-plus icon-white"></i> Add NZB</button>
-            <button class="btn" type="button" id="nzb_pause_button"><i class="icon-pause"></i> Pause</button>
-            <input type="text" class="span1" id="set_speed" placeholder="Kb/s" value="" />
+            <a class="btn btn-success" id="add_nzb_button"><i class="icon-plus icon-white"></i> Add NZB</a>
+            <a class="btn" id="nzb_pause_button"><i class="icon-pause"></i> Pause</a>
+            <input type="text" class="span1" id="nzb_get_speed" placeholder="Kb/s" value="" />
+            <a class="btn" id="nzb_set_speed"><i class="icon-cog"></i> Set speed</a>
         </form>
 
         <ul class="nav nav-tabs">

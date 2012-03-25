@@ -1,17 +1,9 @@
-var loadingNowPlaying = false;
 $(document).ready(function () {
-
-    // Wat nu afgespeeld wordt
-    loadNowPlaying();
-    setInterval(function() {
-        if (!loadingNowPlaying) {
-            loadNowPlaying();
-        }
-    }, 2000);
 
     // films inladen
     loadMovies();
     loadXbmcShows();
+    loadNowPlaying();
 
     // Button setten
     $('#back-to-shows').click(function () {

@@ -16,19 +16,19 @@ rootConfig = {
     'tools.staticfile.root' : htpc.root
 }
 
-authDict = {}
-config = htpc.settings.readSettings()
-if config.has_key('my_username') and config.get('my_username') != '' and config.has_key('my_password') and config.get('my_password') != '':
-    userpassdict = {config.get('my_username') : config.get('my_password')}
-    get_ha1 = cherrypy.lib.auth_digest.get_ha1_dict_plain(userpassdict)
-    authDict = {
-        'tools.auth_digest.on': True,
-        'tools.auth_digest.realm': 'htpc',
-        'tools.auth_digest.get_ha1': get_ha1,
-        'tools.auth_digest.key': 'a565c27146791cfb'
-    }
-
-rootConfig.update(authDict)
+#authDict = {}
+#config = htpc.settings.readSettings()
+#if config.has_key('my_username') and config.get('my_username') != '' and config.has_key('my_password') and config.get('my_password') != '':
+#    userpassdict = {config.get('my_username') : config.get('my_password')}
+#    get_ha1 = cherrypy.lib.auth_digest.get_ha1_dict_plain(userpassdict)
+#    authDict = {
+#        'tools.auth_digest.on': True,
+#        'tools.auth_digest.realm': 'htpc',
+#        'tools.auth_digest.get_ha1': get_ha1,
+#        'tools.auth_digest.key': 'a565c27146791cfb'
+#    }
+#
+#rootConfig.update(authDict)
 
 appConfig = {
     '/':  rootConfig,

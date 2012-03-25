@@ -209,10 +209,7 @@ function playItem(item) {
     $.ajax({
         url: 'json/?which=xbmc&action=play&item=' + item,
         type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            loadNowPlaying();
-        }
+        dataType: 'json'
     });
 }
 
@@ -223,6 +220,9 @@ function loadNowPlaying() {
         url: 'json/?which=xbmc&action=nowplaying',
         type: 'get',
         dataType: 'json',
+        complete: function() {
+            loadNowPlaying();
+        },
         success: function(data) {
 
             if (data == null) {

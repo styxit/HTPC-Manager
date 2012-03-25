@@ -15,8 +15,7 @@ function loadInfo() {
         url: '/json/?which=sabnzbd&action=status',
         type: 'get',
         dataType: 'json',
-        success: function (object) {
-
+        success: function (object, textStatus) {
             var data = object.queue;
 
             var i = 1;
@@ -53,12 +52,6 @@ function loadInfo() {
      */
 
 }
-/*
-<h5>HDD 1 <small>test</small></h5>
-<div class="progress">
-    <div class="bar" id="hdd1"></div>
-    </div>
-</div>*/
 
 function loadRecentMovies () {
     $.ajax({
@@ -157,7 +150,6 @@ function loadRecentAlbums () {
                 if (i > 3) {
                     return;
                 }
-                //var albumTitle = album.artist + ' - ' + album.label + ' ' + album.year
 
                 var itemImage = $('<img>');
                 itemImage.css({

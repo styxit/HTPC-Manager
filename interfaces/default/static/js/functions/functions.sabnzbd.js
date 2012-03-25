@@ -5,7 +5,7 @@ function removeHistoryItem(id) {
             type: 'get',
             dataType: 'json',
             success: function (data) {
-                loadQueue();
+                loadQueue(1);
                 loadHistory();
             }
         });
@@ -19,7 +19,7 @@ function retryHistoryItem(id) {
             type: 'get',
             dataType: 'json',
             success: function (data) {
-                loadQueue();
+                loadQueue(1);
                 loadHistory();
             }
         });
@@ -84,7 +84,7 @@ function removeQueueItem(id) {
             dataType: 'json',
             success: function (data) {
 
-                loadQueue();
+                loadQueue(1);
                 loadHistory();
             }
         });
@@ -101,7 +101,7 @@ function changeCategory(id, cat) {
 
 var queueToggleStatusAction = '';
 
-function loadQueue() {
+function loadQueue(once) {
     $.ajax({
         url: '/json/?which=sabnzbd&action=status',
         type: 'get',
@@ -115,6 +115,9 @@ function loadQueue() {
                 return false;
             }
             data = object.queue;
+            if (once == 1) {
+                $('#nzb_get_speed').val(data.speedlimit);
+            }
 
             $('#nzb_pause_button').button('reset');
             if (data.status == 'Paused') {
