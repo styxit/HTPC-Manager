@@ -22,7 +22,7 @@ def nzbMatrixSearch(query, catid):
         'catid' : catid
     }
     url = nzbMatrixMakeUrl(options)
-    data = searchFetchDataFromUrl(url)
+    data = searchFetchDataFromUrl(url).decode("cp1252").encode('utf-8')
     toReturn = {}
     itemCounter = 0;
     if data != 'error:nothing_found':
