@@ -55,7 +55,11 @@
                 </div>
 
                 <div id="shows" class="tab-pane">
+                    #if $getVar('xbmc_show_banners', 'no') == "yes"
+                    <ul id="show-grid" class="thumbnails banners"></ul>
+                    #else
                     <ul id="show-grid" class="thumbnails"></ul>
+                    #end if
                     <div id="show-details" style="display:none;">
                         <div class="well">
                             <a class="btn" id="back-to-shows" href="#">Back</a>

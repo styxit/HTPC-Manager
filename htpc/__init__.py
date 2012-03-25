@@ -82,18 +82,17 @@ class pageHandler:
 
         # Als er een POST is
         if kwargs:
-            if kwargs.has_key('my_port'):
+            if kwargs.has_key('save_settings'):
                 if not kwargs.has_key('use_nzb'):
                     kwargs['use_nzb'] = 'no'
                 if not kwargs.has_key('use_sb'):
                     kwargs['use_sb'] = 'no'
                 if not kwargs.has_key('use_xbmc'):
                     kwargs['use_xbmc'] = 'no'
-                htpc.settings.saveSettings(kwargs)
-
-            if kwargs.has_key('search-settings-hidden'):
                 if not kwargs.has_key('use_nzbmatrix'):
                     kwargs['use_nzbmatrix'] = 'no'
+                if not kwargs.has_key('xbmc_show_banners'):
+                    kwargs['xbmc_show_banners'] = 'no'
                 htpc.settings.saveSettings(kwargs)
 
             if kwargs.has_key('regenerate_thumbs'):

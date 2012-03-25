@@ -81,9 +81,15 @@ function loadXbmcShows() {
             $.each(data.tvshows, function (i, show) {
 
                 var showPicture = $('<img>');
-                showPicture.css('height', '150px');
-                showPicture.css('width', '100px');
-                showPicture.attr('src', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(show.thumbnail) + '&h=150&w=100');
+                if ($('#show-grid').hasClass('banners')) {
+                    showPicture.attr('src', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(show.thumbnail) + '&h=80&w=500');
+                    showPicture.css('height', '90px');
+                    showPicture.css('width', '500px');
+                } else {
+                    showPicture.attr('src', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(show.thumbnail) + '&h=150&w=100');
+                    showPicture.css('height', '150px');
+                    showPicture.css('width', '100px');
+                }
 
                 var showAnchor = $('<a>');
                 showAnchor.addClass('thumbnail');
