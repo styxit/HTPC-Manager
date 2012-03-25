@@ -88,12 +88,20 @@ function loadNextAired() {
                 $('#nextaired_table_body').append(row);
             }
 
-            $.each(result.data.soon, function (tvdbid, tvshow) {
+            $.each(result.data.soon, function (i, tvshow) {
+
+                var infoIcon = $('<i>');
+                infoIcon.addClass('icon-info-sign');
+                infoIcon.css('cursor', 'pointer');
+                infoIcon.click(function () {
+                    loadShow(tvshow.tvdbid);
+                });
 
                 var row = $('<tr>');
                 row.append($('<td>').html(tvshow.show_name));
                 row.append($('<td>').html(tvshow.season + 'x' + tvshow.episode + ' - ' + tvshow.ep_name));
                 row.append($('<td>').html(tvshow.airdate));
+                row.append($('<td>').append(infoIcon));
 
                 $('#nextaired_table_body').append(row);
 
