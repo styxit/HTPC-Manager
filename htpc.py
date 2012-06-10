@@ -1,6 +1,8 @@
 import cherrypy
 import htpc
 
+print htpc.port
+
 cherrypy.config.update({
     'server.environment': 'production',
     'server.socket_host': htpc.host,
@@ -16,10 +18,8 @@ rootConfig = {
     'tools.staticfile.root' : htpc.root
 }
 
-authDict = {}
-config = htpc.settings.readSettings()
-if config.has_key('my_username') and config.get('my_username') != '' and config.has_key('my_password') and config.get('my_password') != '':
-    userpassdict = {config.get('my_username') : config.get('my_password')}
+if htpc.username != '' and htpc.password != '':
+    userpassdict = {htpc.username : htpc.password}
     get_ha1 = cherrypy.lib.auth_digest.get_ha1_dict_plain(userpassdict)
     authDict = {
         'tools.auth_digest.on': True,
@@ -27,8 +27,7 @@ if config.has_key('my_username') and config.get('my_username') != '' and config.
         'tools.auth_digest.get_ha1': get_ha1,
         'tools.auth_digest.key': 'a565c27146791cfb'
     }
-
-rootConfig.update(authDict)
+    rootConfig.update(authDict)
 
 appConfig = {
     '/':  rootConfig,
@@ -50,12 +49,16 @@ appConfig = {
     }
 }
 
-# Page inladen
+# Load pagehandler
 page = htpc.pageHandler(htpc.root)
 
-# Root mounten
-cherrypy.tree.mount(page, "/", config=appConfig)
-
-# Cherrypy starten
+# Start CherryPy
 cherrypy.process.servers.check_port(htpc.host, htpc.port)
-cherrypy.server.start()
+if htpc.daemon :
+    cherrypy.process.plugins.Daemonizer(cherrypy.engine).subscribe()
+    cherrypy.tree.mount(page, "/", config=appConfig)
+    cherrypy.engine.start()
+    cherrypy.engine.block()    
+else :
+    cherrypy.tree.mount(page, "/", config=appConfig)
+    cherrypy.server.start()

@@ -40,24 +40,22 @@ from htpc.xbmc import xbmcGetRecentAlbums
 
 from htpc.nzbsearch import searchNZBs
 
-# Standaard variabelen
-host = "0.0.0.0"
-port = 8084
 root = os.path.dirname(os.path.abspath(sys.argv[0]))
-password = ''
 
-# Userdata folder maken
+# Create userdata folder if it doesnt exist
 userdata = os.path.join(root, 'userdata/')
 if not os.path.isdir(userdata):
     os.makedirs(userdata)
 
-# Settings file
+# Settings
 settingsfile = os.path.join(userdata, 'config.cfg')
 config = htpc.settings.readSettings()
 
-if config.has_key('my_port') and config.get('my_port') != '':
-    configPort = config.get('my_port')
-    port = int(configPort)
+host = config.get('my_host','0.0.0.0')
+port = int(config.get('my_port',8084))
+daemon = config.get('daemon',0)
+username = config.get('my_username','')
+password = config.get('my_password','')
 
 class pageHandler:
     def __init__(self, root):
