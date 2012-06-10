@@ -93,6 +93,7 @@
                 <h6>Now playing</h6>
                 <div id="playing-info"></div>
                 <h6>Now downloading</h6>
+                <div id="download-info"></div>
             </div>
             #end if
 

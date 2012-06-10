@@ -7,7 +7,6 @@ $(document).ready(function () {
 });
 
 function loadInfo() {
-
     /**
      * DISK Info
      */
@@ -36,7 +35,6 @@ function loadInfo() {
                     var progress = $('<div>').addClass('progress');
                     var progressBar = $('<div>').addClass('bar').width(diskspace + '%');
                     progress.append(progressBar);
-
                     $('#hdd-info').append(progress);
 
                     i++;
@@ -50,6 +48,57 @@ function loadInfo() {
     /**
      * Now Playing Info
      */
+    $.ajax({
+        url: '/json/?which=xbmc&action=nowplaying',
+        type: 'get',
+        dataType: 'json',
+        success: function (data) {
+            if (data == null) {
+                return false;
+            }
+            var nowPlaying = $('<h5>');
+            var label = data.itemInfo.item.label;
+            var episode = data.itemInfo.item.episode;
+            if (episode == -1) {
+                nowPlaying.html(data.itemInfo.item.label);
+            } else {
+                var show = data.itemInfo.item.showtitle;
+                var season = data.itemInfo.item.season;
+                nowPlaying.html(show + ' - ' + season + 'x' + episode + ' ' + label);
+            }
+            $('#playing-info').append(nowPlaying);
+            var progress = $('<div>').addClass('progress');
+            var progressBar = $('<div>').addClass('bar').width(data.playerInfo.percentage + '%');
+            progress.append(progressBar);
+            $('#playing-info').append(progress);
+
+        }
+    });
+
+    /**
+     * Now Downloading Info
+     */
+    $.ajax({
+        url: '/json/?which=sabnzbd&action=status',
+        type: 'get',
+        dataType: 'json',
+        success: function (data) {
+            if (data == null) {
+                return false;
+            }
+            var nowDownloading = $('<h5>');
+            $.each(data.queue.slots, function (i, job) {
+                if (job.status == 'Downloading') {
+                    nowDownloading.html(job.filename);
+                    $('#download-info').append(nowDownloading);
+                    var progress = $('<div>').addClass('progress');
+                    var progressBar = $('<div>').addClass('bar').width(job.percentage + '%');
+                    progress.append(progressBar);
+                    $('#download-info').append(progress);
+                }
+            });
+        }
+    });
 
 }
 

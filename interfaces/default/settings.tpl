@@ -45,11 +45,18 @@
                             <div class="control-group">
                                 <label class="control-label">Daemonize</label>
                                 <div class="controls">
-                                    <label class="checkbox">
-                                        #if $getVar('daemonize', 'no') == 'yes'
-                                        <input type="checkbox" checked="checked" value="yes" name="daemonize" />
+                                    <label class="radio">
+                                        #if $getVar('daemonize', 'no') == "no"
+                                        <input type="radio" checked="checked" value="no" name="daemonize" /> No
                                         #else
-                                        <input type="checkbox" value="yes" name="daemonize" />
+                                        <input type="radio" checked="" value="no" name="daemonize" /> No
+                                        #end if
+                                    </label>
+                                    <label class="radio">
+                                        #if $getVar('daemonize', 'no') == "yes"
+                                        <input type="radio" checked="checked" value="yes" name="daemonize" /> Yes
+                                        #else
+                                        <input type="radio" value="yes" name="daemonize" /> Yes
                                         #end if
                                     </label>
                                 </div>
