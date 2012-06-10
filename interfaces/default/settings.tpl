@@ -14,6 +14,7 @@
             <li class="active"><a href="#data" data-toggle="tab">General setting</a></li>
             <li><a href="#miscellaneous" data-toggle="tab">Miscellaneous</a></li>
             <li><a href="#search" data-toggle="tab">NZB Search</a></li>
+            <li><a href="#shutdown" data-toggle="tab">Shutdown</a></li>
         </ul>
 
         <form action="" id="base-settings-form" name="base-settings-form" method="post" class="form-horizontal">
@@ -39,6 +40,18 @@
                                 <label class="control-label" for="my_password">Password</label>
                                 <div class="controls">
                                     <input class="span3" autocomplete="off" id="my_password" name="my_password" type="password" value="$getVar('my_password', '')" />
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Daemonize</label>
+                                <div class="controls">
+                                    <label class="checkbox">
+                                        #if $getVar('daemonize', 'no') == 'yes'
+                                        <input type="checkbox" checked="checked" value="yes" name="daemonize" />
+                                        #else
+                                        <input type="checkbox" value="yes" name="daemonize" />
+                                        #end if
+                                    </label>
                                 </div>
                             </div>
                         </fieldset>
@@ -259,6 +272,15 @@
                         </div>
 
                 </div>
+
+                <div id="shutdown" class="tab-pane" >
+                        <fieldset>
+                            <legend>Shutdown</legend>
+                            <div class="control-group">
+                                <a href="/shutdown">Shutdown</a>
+                            </div>
+                        </fieldset>
+                 </div>
 
             </div>
 

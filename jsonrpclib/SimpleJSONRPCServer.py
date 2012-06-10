@@ -174,7 +174,7 @@ class SimpleJSONRPCRequestHandler(
             response = fault.response()
         if response == None:
             response = ''
-        self.send_header("Content-type", "application/json-rpc")
+        self.send_header("Content-type", "application/json")
         self.send_header("Content-length", str(len(response)))
         self.end_headers()
         self.wfile.write(response)
@@ -221,7 +221,7 @@ class CGIJSONRPCRequestHandler(SimpleJSONRPCDispatcher):
 
     def handle_jsonrpc(self, request_text):
         response = self._marshaled_dispatch(request_text)
-        print 'Content-Type: application/json-rpc'
+        print 'Content-Type: application/json'
         print 'Content-Length: %d' % len(response)
         print
         sys.stdout.write(response)

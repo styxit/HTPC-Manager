@@ -10,17 +10,17 @@ function loadShows() {
                 row.append($('<td>').html('No shows found'));
                 $('#tvshows_table_body').append(row);
             }
-            $.each(result.data, function (tvdbid, tvshow) {
+            $.each(result.data, function (show_name, tvshow) {
 
                 var infoIcon = $('<i>');
                 infoIcon.addClass('icon-info-sign');
                 infoIcon.css('cursor', 'pointer');
                 infoIcon.click(function () {
-                    loadShow(tvdbid);
+                    loadShow(tvshow.tvdbid);
                 });
 
                 var row = $('<tr>')
-                row.append($('<td>').html(tvshow.show_name));
+                row.append($('<td>').html(show_name));
                 row.append($('<td>').html(tvshow.status));
                 row.append($('<td>').html(tvshow.next_ep_airdate));
                 row.append($('<td>').html(tvshow.network));

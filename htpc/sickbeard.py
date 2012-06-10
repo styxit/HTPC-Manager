@@ -16,7 +16,7 @@ def sbMakeUrl(command):
         return url
 
 def sbGetShowList():
-    data = sbFetchDataFromUrl(sbMakeUrl('shows'))
+    data = sbFetchDataFromUrl(sbMakeUrl('shows&sort=name'))
     return data
 
 def sbGetNextAired():

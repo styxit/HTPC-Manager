@@ -1,8 +1,6 @@
 import cherrypy
 import htpc
 
-print htpc.port
-
 cherrypy.config.update({
     'server.environment': 'production',
     'server.socket_host': htpc.host,
@@ -23,7 +21,7 @@ if htpc.username != '' and htpc.password != '':
     get_ha1 = cherrypy.lib.auth_digest.get_ha1_dict_plain(userpassdict)
     authDict = {
         'tools.auth_digest.on': True,
-        'tools.auth_digest.realm': 'htpc',
+        'tools.auth_digest.realm': htpc.appname,
         'tools.auth_digest.get_ha1': get_ha1,
         'tools.auth_digest.key': 'a565c27146791cfb'
     }
@@ -54,7 +52,7 @@ page = htpc.pageHandler(htpc.root)
 
 # Start CherryPy
 cherrypy.process.servers.check_port(htpc.host, htpc.port)
-if htpc.daemon :
+if htpc.daemonize == 'yes' :
     cherrypy.process.plugins.Daemonizer(cherrypy.engine).subscribe()
     cherrypy.tree.mount(page, "/", config=appConfig)
     cherrypy.engine.start()

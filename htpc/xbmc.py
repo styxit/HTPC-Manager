@@ -29,15 +29,18 @@ def xbmcGetThumb(thumb, thumbWidth, thumbHeight, thumbOpacity):
 
     thumbOnDisk = os.path.join(xbmc_thumbs, thumbFile)
     if not os.path.isfile(thumbOnDisk + '_' + thumbWidth + '_' + thumbHeight + '.png'):
+	# Hack when using nightly
+        if thumb[:5]== "image" :
+            url = urllib2.unquote(thumb[8:])
+            request = urllib2.Request(url)
+        else :
+            config = readSettings()
+            url = 'http://' + config.get('xbmc_ip') + ':' + str(config.get('xbmc_port')) + '/vfs/' + thumb
+            request = urllib2.Request(url)
+            base64string = base64.encodestring('%s:%s' % (config.get('xbmc_username'), config.get('xbmc_password'))).replace('\n', '')
+            request.add_header("Authorization", "Basic %s" % base64string)
 
-        config = readSettings()
-        url = 'http://' + config.get('xbmc_ip') + ':' + str(config.get('xbmc_port')) + '/vfs/' + thumb
-
-        request = urllib2.Request(url)
-        base64string = base64.encodestring('%s:%s' % (config.get('xbmc_username'), config.get('xbmc_password'))).replace('\n', '')
-        request.add_header("Authorization", "Basic %s" % base64string)
         fileObject = urllib2.urlopen(request)
-
         fileData = fileObject.read()
 
         # Thumbnail opslaan

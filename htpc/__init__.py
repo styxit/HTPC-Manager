@@ -51,18 +51,18 @@ if not os.path.isdir(userdata):
 settingsfile = os.path.join(userdata, 'config.cfg')
 config = htpc.settings.readSettings()
 
+appname = 'HTPC Manager'
 host = config.get('my_host','0.0.0.0')
 port = int(config.get('my_port',8084))
-daemon = config.get('daemon',0)
+daemonize = config.get('daemonize','no')
 username = config.get('my_username','')
 password = config.get('my_password','')
 
 class pageHandler:
     def __init__(self, root):
-
         self.root = root
         self.webdir = os.path.join(self.root, 'interfaces/default/')
-        self.appname = 'HTPC Manager'
+        self.appname = appname
 
     @cherrypy.expose()
     def index(self):
@@ -76,8 +76,11 @@ class pageHandler:
         return template.respond()
 
     @cherrypy.expose()
-    def settings(self, **kwargs):
+    def shutdown(self):
+         cherrypy.engine.exit()
 
+    @cherrypy.expose()
+    def settings(self, **kwargs):
         # Als er een POST is
         if kwargs:
             if kwargs.has_key('save_settings'):
@@ -98,7 +101,6 @@ class pageHandler:
 
             raise cherrypy.HTTPRedirect('')
 
-
         # Searchlist voor template ophalen
         searchList = htpc.settings.readSettings()
 
@@ -113,7 +115,6 @@ class pageHandler:
 
     @cherrypy.expose()
     def sabnzbd(self, **kwargs):
-
         # Searchlist voor template ophalen
         searchList = htpc.settings.readSettings()
 
@@ -128,7 +129,6 @@ class pageHandler:
 
     @cherrypy.expose()
     def sickbeard(self, **args):
-
         # Searchlist voor template ophalen
         searchList = htpc.settings.readSettings()
 
@@ -144,7 +144,6 @@ class pageHandler:
 
     @cherrypy.expose()
     def xbmc(self, **args):
-
         # Searchlist voor template ophalen
         searchList = htpc.settings.readSettings()
 
@@ -160,7 +159,6 @@ class pageHandler:
 
     @cherrypy.expose()
     def nzbsearch(self, **kwargs):
-
         # Searchlist voor template ophalen
         searchList = htpc.settings.readSettings()
 
