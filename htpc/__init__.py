@@ -40,7 +40,7 @@ from htpc.xbmc import xbmcGetRecentAlbums
 
 from htpc.nzbsearch import searchNZBs
 
-root = os.path.dirname(os.path.abspath(sys.argv[0]))
+root = os.getcwd()
 
 # Create userdata folder if it doesnt exist
 userdata = os.path.join(root, 'userdata/')
@@ -53,60 +53,61 @@ config = htpc.settings.readSettings()
 
 appname = 'HTPC Manager'
 host = config.get('my_host','0.0.0.0')
-port = int(config.get('my_port',8084))
-daemonize = config.get('daemonize','no')
+port = config.get('my_port',8084)
+daemonize = config.get('daemonize',0)
 username = config.get('my_username','')
 password = config.get('my_password','')
 
 class pageHandler:
-    def __init__(self, root):
-        self.root = root
-        self.webdir = os.path.join(self.root, 'interfaces/default/')
-        self.appname = appname
+    def __init__(self):
+        self.template = config.get('template','default')
+        self.webdir = os.path.join(root, 'interfaces/', self.template)
 
+    # Frontpage
     @cherrypy.expose()
     def index(self):
-        # Searchlist voor template ophalen
-        searchList = htpc.settings.readSettings()
-        template = Template(file=os.path.join(self.webdir, 'main.tpl'), searchList=[searchList]);
-        template.appname = self.appname
+        template = Template(file=os.path.join(self.webdir, 'main.tpl'), searchList=[config]);
+        template.appname = appname
         template.webdir = self.webdir
         template.submenu = ''
         template.jsfile = 'main.js'
         return template.respond()
 
     @cherrypy.expose()
+    def test(self):
+        return "True"
+
+    @cherrypy.expose()
     def shutdown(self):
          cherrypy.engine.exit()
+         return "Shutdown complete"
 
     @cherrypy.expose()
     def settings(self, **kwargs):
-        # Als er een POST is
+        global config
         if kwargs:
             if kwargs.has_key('save_settings'):
+                del kwargs['save_settings']
+                if not kwargs.has_key('daemonize'):
+                    kwargs['daemonize'] = 0
                 if not kwargs.has_key('use_nzb'):
-                    kwargs['use_nzb'] = 'no'
+                    kwargs['use_nzb'] = 0
                 if not kwargs.has_key('use_sb'):
-                    kwargs['use_sb'] = 'no'
+                    kwargs['use_sb'] = 0
                 if not kwargs.has_key('use_xbmc'):
-                    kwargs['use_xbmc'] = 'no'
+                    kwargs['use_xbmc'] = 0
                 if not kwargs.has_key('use_nzbmatrix'):
-                    kwargs['use_nzbmatrix'] = 'no'
+                    kwargs['use_nzbmatrix'] = 0
                 if not kwargs.has_key('xbmc_show_banners'):
-                    kwargs['xbmc_show_banners'] = 'no'
+                    kwargs['xbmc_show_banners'] = 0
                 htpc.settings.saveSettings(kwargs)
+                config = htpc.settings.readSettings()
 
             if kwargs.has_key('regenerate_thumbs'):
                 htpc.settings.removeThumbs()
 
-            raise cherrypy.HTTPRedirect('')
-
-        # Searchlist voor template ophalen
-        searchList = htpc.settings.readSettings()
-
-        # Template vullen
-        template = Template(file=os.path.join(self.webdir, 'settings.tpl'), searchList=[searchList])
-        template.appname = self.appname
+        template = Template(file=os.path.join(self.webdir, 'settings.tpl'), searchList=[config])
+        template.appname = appname
         template.webdir = self.webdir
         template.jsfile = 'settings.js'
         template.submenu = 'settings'
@@ -115,12 +116,8 @@ class pageHandler:
 
     @cherrypy.expose()
     def sabnzbd(self, **kwargs):
-        # Searchlist voor template ophalen
-        searchList = htpc.settings.readSettings()
-
-        # Template vullen
-        template = Template(file=os.path.join(self.webdir, 'sabnzbd.tpl'), searchList=[searchList])
-        template.appname = self.appname
+        template = Template(file=os.path.join(self.webdir, 'sabnzbd.tpl'), searchList=[config])
+        template.appname = appname
         template.jsfile = 'sabnzbd.js'
         template.webdir = self.webdir
         template.submenu = 'sabnzbd'
@@ -129,14 +126,10 @@ class pageHandler:
 
     @cherrypy.expose()
     def sickbeard(self, **args):
-        # Searchlist voor template ophalen
-        searchList = htpc.settings.readSettings()
-
-        # Template vullen
-        template = Template(file=os.path.join(self.webdir, 'sickbeard.tpl'), searchList=[searchList])
+        template = Template(file=os.path.join(self.webdir, 'sickbeard.tpl'), searchList=[config])
         template.jsfile = 'sickbeard.js'
 
-        template.appname = self.appname
+        template.appname = appname
         template.webdir = self.webdir
         template.submenu = 'sickbeard'
 
@@ -144,14 +137,10 @@ class pageHandler:
 
     @cherrypy.expose()
     def xbmc(self, **args):
-        # Searchlist voor template ophalen
-        searchList = htpc.settings.readSettings()
-
-        # Template vullen
-        template = Template(file=os.path.join(self.webdir, 'xbmc.tpl'), searchList=[searchList])
+        template = Template(file=os.path.join(self.webdir, 'xbmc.tpl'), searchList=[config])
         template.jsfile = 'xbmc.js'
 
-        template.appname = self.appname
+        template.appname = appname
         template.webdir = self.webdir
         template.submenu = 'xbmc'
 
@@ -159,12 +148,8 @@ class pageHandler:
 
     @cherrypy.expose()
     def nzbsearch(self, **kwargs):
-        # Searchlist voor template ophalen
-        searchList = htpc.settings.readSettings()
-
-        # Template vullen
-        template = Template(file=os.path.join(self.webdir, 'nzbsearch.tpl'), searchList=[searchList])
-        template.appname = self.appname
+        template = Template(file=os.path.join(self.webdir, 'nzbsearch.tpl'), searchList=[config])
+        template.appname = appname
         template.jsfile = 'nzbsearch.js'
         template.webdir = self.webdir
         template.submenu = 'nzbsearch'

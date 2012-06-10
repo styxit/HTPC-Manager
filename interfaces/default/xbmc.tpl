@@ -55,7 +55,7 @@
                 </div>
 
                 <div id="shows" class="tab-pane">
-                    #if $getVar('xbmc_show_banners', 'no') == "yes"
+                    #if $getVar('xbmc_show_banners', 0)
                     <ul id="show-grid" class="thumbnails banners"></ul>
                     #else
                     <ul id="show-grid" class="thumbnails"></ul>

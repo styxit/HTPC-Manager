@@ -41,7 +41,7 @@
             <div class="nav-collapse">
                 <ul class="nav">
 
-                    #if $getVar('use_nzb', 'no') == "yes"
+                    #if $getVar('use_nzb', 0)
                         #if $submenu == "sabnzbd"
                         <li class="active">
                         #else
@@ -51,7 +51,7 @@
                         </li>
                     #end if
 
-                    #if $getVar('use_sb', 'no') == "yes"
+                    #if $getVar('use_sb', 0)
                         #if $submenu == "sickbeard"
                         <li class="active">
                         #else
@@ -61,7 +61,7 @@
                         </li>
                     #end if
 
-                    #if $getVar('use_xbmc', 'no') == "yes"
+                    #if $getVar('use_xbmc', 0)
                         #if $submenu == "xbmc"
                         <li class="active">
                         #else
@@ -71,7 +71,7 @@
                         </li>
                     #end if
 
-                    #if $getVar('use_nzbmatrix', 'no') == "yes"
+                    #if $getVar('use_nzbmatrix', 0)
                         #if $submenu == "nzbsearch"
                         <li class="active">
                         #else

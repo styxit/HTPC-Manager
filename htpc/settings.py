@@ -29,7 +29,10 @@ def readSettings():
 
         toReturn = {}
         for key, val in items:
-            toReturn[key] = val
+            try:
+                toReturn[key] = int(val)
+            except ValueError:
+                toReturn[key] = val
         return toReturn
 
 def removeThumbs():

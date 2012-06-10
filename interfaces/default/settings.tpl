@@ -27,7 +27,7 @@
                             <div class="control-group">
                                 <label class="control-label" for="my_port">Port</label>
                                 <div class="controls">
-                                    <input class="span1" id="my_port" name="my_port" type="text" value="$getVar('my_port', '8084')" />
+                                    <input class="span1" id="my_port" name="my_port" type="text" value="$getVar('my_port', '')" />
                                 </div>
                             </div>
                             <div class="control-group">
@@ -45,22 +45,14 @@
                             <div class="control-group">
                                 <label class="control-label">Daemonize</label>
                                 <div class="controls">
-                                    <label class="radio">
-                                        #if $getVar('daemonize', 'no') == "no"
-                                        <input type="radio" checked="checked" value="no" name="daemonize" /> No
+                                    <label class="checkbox">
+                                        #if $getVar('daemonize', 0)
+                                        <input type="checkbox" checked="checked" value="1" name="daemonize" />
                                         #else
-                                        <input type="radio" checked="" value="no" name="daemonize" /> No
-                                        #end if
-                                    </label>
-                                    <label class="radio">
-                                        #if $getVar('daemonize', 'no') == "yes"
-                                        <input type="radio" checked="checked" value="yes" name="daemonize" /> Yes
-                                        #else
-                                        <input type="radio" value="yes" name="daemonize" /> Yes
+                                        <input type="checkbox" value="1" name="daemonize" />
                                         #end if
                                     </label>
                                 </div>
-                            </div>
                         </fieldset>
 
                         <fieldset>
@@ -69,8 +61,8 @@
                                 <label class="control-label">Enable</label>
                                 <div class="controls">
                                     <label class="checkbox enable-module">
-                                        #if $getVar('use_nzb', 'no') == "yes"
-                                        <input type="checkbox" checked="checked" value="yes" name="use_nzb" />
+                                        #if $getVar('use_nzb', 0)
+                                        <input type="checkbox" checked="checked" value="1" name="use_nzb" />
                                         #else
                                         <input type="checkbox" value="yes" name="use_nzb" />
                                         #end if
@@ -111,17 +103,17 @@
                                 <label class="control-label">SSL</label>
                                 <div class="controls">
                                     <label class="radio">
-                                        #if $getVar('nzb_ssl', 'no') == "no"
-                                        <input type="radio" checked="checked" value="no" name="nzb_ssl" /> No
+                                        #if $getVar('nzb_ssl', 0) == 0
+                                        <input type="radio" checked="checked" value="0" name="nzb_ssl" /> No
                                         #else
-                                        <input type="radio" checked="" value="no" name="nzb_ssl" /> No
+                                        <input type="radio" checked="" value="0" name="nzb_ssl" /> No
                                         #end if
                                     </label>
                                     <label class="radio">
-                                        #if $getVar('nzb_ssl', 'no') == "yes"
-                                        <input type="radio" checked="checked" value="yes" name="nzb_ssl" /> Yes
+                                        #if $getVar('nzb_ssl', 0)
+                                        <input type="radio" checked="checked" value="1" name="nzb_ssl" /> Yes
                                         #else
-                                        <input type="radio" value="yes" name="nzb_ssl" /> Yes
+                                        <input type="radio" value="1" name="nzb_ssl" /> Yes
                                         #end if
                                     </label>
                                 </div>
@@ -134,10 +126,10 @@
                                 <label class="control-label">Enable</label>
                                 <div class="controls">
                                     <label class="checkbox enable-module">
-                                        #if $getVar('use_sb', 'no') == "yes"
-                                        <input type="checkbox" checked="checked" value="yes" name="use_sb" />
+                                        #if $getVar('use_sb', 0)
+                                        <input type="checkbox" checked="checked" value="1" name="use_sb" />
                                         #else
-                                        <input type="checkbox" value="yes" name="use_sb" />
+                                        <input type="checkbox" value="1" name="use_sb" />
                                         #end if
                                     </label>
                                 </div>
@@ -180,10 +172,10 @@
                                 <label class="control-label">Enable</label>
                                 <div class="controls">
                                     <label class="checkbox enable-module">
-                                        #if $getVar('use_xbmc', 'no') == "yes"
-                                        <input type="checkbox" checked="checked" value="yes" name="use_xbmc" />
+                                        #if $getVar('use_xbmc', 0)
+                                        <input type="checkbox" checked="checked" value="1" name="use_xbmc" />
                                         #else
-                                        <input type="checkbox" value="yes" name="use_xbmc" />
+                                        <input type="checkbox" value="1" name="use_xbmc" />
                                         #end if
                                     </label>
                                 </div>

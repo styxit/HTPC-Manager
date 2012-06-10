@@ -12,7 +12,7 @@
 
         <div class="row-fluid">
 
-            #if $getVar('use_xbmc', 'no') == "yes"
+            #if $getVar('use_xbmc', 0)
             <div class="span4">
                 <h3>Recently added Movies</h3>
 
@@ -66,7 +66,7 @@
         </div>
         <div class="row-fluid">
 
-            #if $getVar('use_sb', 'no') == "yes"
+            #if $getVar('use_sb', 0)
             <div class="span6">
                 <h3>Next aired</h3>
                 <table class="table table-striped table-main">
@@ -85,7 +85,7 @@
             </div>
             #end if
 
-            #if $getVar('use_nzb', 'no') == "yes"
+            #if $getVar('use_nzb', 0)
             <div class="span6">
                 <h3>Info</h3>
                 <h6>HDD Info</h6>
