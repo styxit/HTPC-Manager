@@ -1,41 +1,38 @@
 import ConfigParser
-import htpc
-import os
-import shutil
+import os, shutil
 
-def saveSettings(data, section = 'htpc'):
-
+def saveSettings(configfile, data, section = 'htpc'):
     config = ConfigParser.ConfigParser()
-    config.read(htpc.settingsfile)
+    config.read(configfile)
 
     if not config.has_section(section):
         config.add_section(section)
 
-    for key in data:
-        val = data.get(key)
+    for key, val in data.items():
         config.set(section, key, val)
 
-    with open(htpc.settingsfile, 'w') as configfile:
-        config.write(configfile)
+    with open(configfile, 'w') as f:
+        config.write(f)
 
-def readSettings():
-    if not os.path.isfile(htpc.settingsfile):
+    return readSettings(configfile)
+
+def readSettings(configfile, section = 'htpc'):
+    if not os.path.isfile(configfile):
         return {}
-    else:
 
-        config = ConfigParser.ConfigParser()
-        config.read(htpc.settingsfile)
-        items = config.items('htpc')
+    config = ConfigParser.ConfigParser()
+    config.read(configfile)
+    items = config.items(section)
 
-        toReturn = {}
-        for key, val in items:
-            try:
-                toReturn[key] = int(val)
-            except ValueError:
-                toReturn[key] = val
-        return toReturn
+    configDict = {}
+    for key, val in items:
+        try:
+            configDict[key] = int(val)
+        except ValueError:
+            configDict[key] = val
+    return configDict
 
-def removeThumbs():
-    xbmc_thumbs = os.path.join(htpc.userdata, 'xbmc_thumbs/')
+def removeThumbs(userdata):
+    xbmc_thumbs = os.path.join(userdata, 'xbmc_thumbs/')
     if os.path.isdir(xbmc_thumbs):
         shutil.rmtree(xbmc_thumbs)

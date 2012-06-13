@@ -1,49 +1,121 @@
-import urllib2
-import urllib
-from settings import readSettings
+from urllib import urlencode
+from re import findall
 from json import dumps
+from htpc.tools import SafeFetchFromUrl
 
-def searchFetchDataFromUrl(url):
-    try:
-        data = urllib2.urlopen(url)
-        return data.read()
-    except:
-        return ''
+class nzbsearch:
+    def __init__(self, apikey):
+        self.url = 'http://api.nzbmatrix.com/v1.1/'
+        self.apikey = apikey
 
-def nzbMatrixMakeUrl(options):
-    config = readSettings()
-    if config.has_key('nzbmatrix_apikey'):
-        url = 'http://api.nzbmatrix.com/v1.1/search.php?apikey=' + config.get('nzbmatrix_apikey') + '&' + urllib.urlencode(options)
-        return url
+    def sendRequest(self, args):
+        if args.get('get_cat') == 'nzbmatrix':
+            return self.getNzbMatrixCategories()
 
-def nzbMatrixSearch(query, catid):
-    options = {
-        'search': query,
-        'catid' : catid
-    }
-    url = nzbMatrixMakeUrl(options)
-    data = searchFetchDataFromUrl(url).decode("cp1252").encode('utf-8')
-    toReturn = {}
-    itemCounter = 0;
-    if data != 'error:nothing_found':
-        items = data.split('|')
-        for item in items:
-            item = item.strip()
-            if not toReturn.has_key(itemCounter):
-                toReturn[itemCounter] = {}
+        if args.has_key('query'):
+	    options = {
+	        'search': args.get('query',''),
+	        'catid' : args.get('catid','')
+	    }
+	    return self.nzbMatrixSearch('search.php',options)
 
-            itemparts = item.split(';')
-            for itempart in itemparts:
-                itemdata = itempart.split(':', 1)
-                try:
-                    toReturn[itemCounter][itemdata[0].strip()] = itemdata[1].strip()
-                except:
-                    pass
-            itemCounter = itemCounter + 1
-        return toReturn
+        if args.has_key('nzbid'):
+            options = {
+                'id': args.get('nzbid','')
+            }
+	    return self.nzbMatrixSearch('details.php',options)
 
+    def nzbMatrixSearch(self, page, options):
+        url = self.url + page + '?apikey='+self.apikey+'&'
+	source = SafeFetchFromUrl(url+urlencode(options)).decode("cp1252").encode('utf-8')
 
-def searchNZBs(query):
-    # Eventuele andere search providers hier aanroepen en resultatne dan samenvoegen
-    searchTerm = query.encode('utf-8')
-    return dumps(nzbMatrixSearch(searchTerm, ''))
+        if source.startswith('error'):
+            return source
+
+        data = {}
+        for index, text in enumerate(source[:-2].split('\n|\n')):
+            data[index] = {}
+            for item in findall("(.*?):(.*?);", text):
+                data[index][item[0]] = item[1]
+
+        return dumps(data)
+
+    def getNzbMatrixCategories(self):
+        return dumps([
+	    {'id': 0, 'name': 'Everything'},
+	    {'label': 'Movies', 'value': [
+		{'id': 1, 'name': 'Movies: DVD'},
+		{'id': 2, 'name': 'Movies: Divx/Xvid'},
+		{'id': 54, 'name': 'Movies: BRRip'},
+		{'id': 42, 'name': 'Movies: HD (x264)'},
+		{'id': 50, 'name': 'Movies: HD (Image)'},
+		{'id': 48, 'name': 'Movies: WMV-HD'},
+		{'id': 3, 'name': 'Movies: SVCD/VCD'},
+		{'id': 4, 'name': 'Movies: Other'},
+	      ]
+	    },
+	    {'label': 'TV', 'value': [
+		{'id': 5, 'name': 'TV: DVD'},
+		{'id': 6, 'name': 'TV: Divx/Xvid'},
+		{'id': 41, 'name': 'TV: HD'},
+		{'id': 7, 'name': 'TV: Sport/Ent'},
+		{'id': 8, 'name': 'TV: Other'},
+	      ]
+	    },
+	    {'label': 'Documentaries', 'value': [
+		{'id': 9, 'name': 'Documentaries: STD'},
+		{'id': 53, 'name': 'Documentaries: HD'},
+	      ]
+	    },
+	    {'label': 'Games', 'value': [
+		{'id': 10, 'name': 'Games: PC'},
+		{'id': 11, 'name': 'Games: PS2'},
+		{'id': 43, 'name': 'Games: PS3'},
+		{'id': 12, 'name': 'Games: PSP'},
+		{'id': 13, 'name': 'Games: Xbox'},
+		{'id': 14, 'name': 'Games: Xbox360'},
+		{'id': 56, 'name': 'Games: Xbox360 (Other)'},
+		{'id': 15, 'name': 'Games: PS1'},
+		{'id': 16, 'name': 'Games: Dreamcast'},
+		{'id': 44, 'name': 'Games: Wii'},
+		{'id': 51, 'name': 'Games: Wii VC'},
+		{'id': 45, 'name': 'Games: DS'},
+		{'id': 46, 'name': 'Games: GameCube'},
+		{'id': 17, 'name': 'Games: Other'},
+	      ]
+	    },
+	    {'label': 'Apps', 'value': [
+		{'id': 18, 'name': 'Apps: PC'},
+		{'id': 19, 'name': 'Apps: Mac'},
+		{'id': 52, 'name': 'Apps: Portable'},
+		{'id': 20, 'name': 'Apps: Linux'},
+		{'id': 55, 'name': 'Apps: Phone'},
+		{'id': 21, 'name': 'Apps: Other'},
+	      ]
+	    },
+	    {'label': 'Music', 'value': [
+		{'id': 22, 'name': 'Music: MP3 Albums'},
+		{'id': 47, 'name': 'Music: MP3 Singles'},
+		{'id': 23, 'name': 'Music: Lossless'},
+		{'id': 24, 'name': 'Music: DVD'},
+		{'id': 25, 'name': 'Music: Video'},
+		{'id': 27, 'name': 'Music: Other'},
+	      ]
+	    },
+	    {'label': 'Anime', 'value': [
+		{'id': 28, 'name': 'Anime: ALL'},
+	      ]
+	    },
+	    {'label': 'Other', 'value': [
+		{'id': 49, 'name': 'Other: Audio Books'},
+		{'id': 33, 'name': 'Other: Emulation'},
+		{'id': 34, 'name': 'Other: PPC/PDA'},
+		{'id': 26, 'name': 'Other: Radio'},
+		{'id': 36, 'name': 'Other: E-Books'},
+		{'id': 37, 'name': 'Other: Images'},
+		{'id': 38, 'name': 'Other: Mobile Phone'},
+		{'id': 39, 'name': 'Other: Extra Pars/Fills'},
+		{'id': 40, 'name': 'Other: Other'},
+	      ]
+	    }
+        ])

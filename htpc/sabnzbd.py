@@ -1,66 +1,70 @@
-import urllib2
-from settings import readSettings
 from urllib import quote
+from htpc.tools import SafeFetchFromUrl
 
-def sabnzbdFetchDataFromUrl(url):
-    data = urllib2.urlopen(url)
-    return data
+class sabnzbd:
+    def __init__(self, host, port, apikey, ssl = 0):
+        useSSL = ''
+        if int(ssl):
+            useSSL = 's'
+        self.url = 'http' + useSSL + '://' + host + ':' + str(port) + '/sabnzbd/api?output=json&apikey=' + apikey
+        print self.url
 
-def sabnzbdMakeUrl(extrapart):
-    config = readSettings();
-    useSSL = '';
-    if config.get('nzb_ssl') == 'yes':
-        useSSL = 's';
-    url = 'http' + useSSL + '://' + config.get('nzb_ip') + ':' + str(config.get('nzb_port')) + '/sabnzbd/api?' + extrapart + '&output=json&apikey=' + config.get('nzb_apikey') + '&ma_username=' + config.get('nzb_username') + '&ma_password=' + config.get('nzb_password');
-    return url
+    def sendRequest(self,args):
+	if args.get('action') == 'history':
+	    return self.GetHistory(args.get('limit'))
+	if args.get('action') == 'status':
+	    return self.GetStatus()
+	if args.get('action') == 'warnings':
+	    return self.GetWarnings()
+	if args.get('action') == 'pause' or args.get('action') == 'resume':
+	    return self.TogglePause(args.get('action'))
+	if args.get('action') == 'addnzb':
+	    return self.AddNzbFromUrl(args.get('nzb_url'), args.get('nzb_category'))
+	if args.get('action') == 'delete':
+	    return self.DeleteNzb(args.get('id'))
+	if args.get('action') == 'deletehistory':
+	    return self.DeleteHistory(args.get('id'))
+	if args.get('action') == 'retry':
+	    return self.Retry(args.get('id'))
+	if args.get('action') == 'categories':
+	    return self.GetCategories()
+	if args.get('action') == 'change_cat':
+	    return self.ChangeCategory(args.get('id'), args.get('value'))
+	if args.get('action') == 'speed':
+	    return self.SetSpeed(args.get('value'))
 
-def sabnzbdGetHistory(limit):
-    data = sabnzbdFetchDataFromUrl(sabnzbdMakeUrl('mode=history&limit=' + str(limit)))
-    return data
+    def GetHistory(self,limit):
+	return SafeFetchFromUrl(self.url + '&mode=history&limit=' + str(limit))
 
-def sabnzbdGetStatus():
-    data = sabnzbdFetchDataFromUrl(sabnzbdMakeUrl('mode=queue'))
-    return data
+    def GetStatus(self):
+	return SafeFetchFromUrl(self.url + '&mode=queue')
 
-def sabnzbdGetWarnings():
-    data = sabnzbdFetchDataFromUrl(sabnzbdMakeUrl('mode=warnings'))
-    return data
+    def GetWarnings(self):
+	return SafeFetchFromUrl(self.url + '&mode=warnings')
 
-def sabnzbdTogglePause(mode):
-    data = sabnzbdFetchDataFromUrl(sabnzbdMakeUrl('mode=' + mode))
-    return data
+    def TogglePause(self,mode):
+	return SafeFetchFromUrl(self.url + '&mode=' + mode)
 
-def sabnzbdAddNzbFromUrl(url, cat):
-    
-    if url != '':
-        category = ''
-        if cat != '':
-            category = '&cat=' + str(cat)
-        nzburl = quote(url)
+    def AddNzbFromUrl(self,url, cat):
+	category = ''
+	if cat:
+	    category = '&cat=' + str(cat)
+	return SafeFetchFromUrl(self.url + '&mode=addurl&name=' + quote(url) + category)
 
-        data = sabnzbdFetchDataFromUrl(sabnzbdMakeUrl('mode=addurl&name=' + nzburl + category))
-        return data
+    def DeleteNzb(self,id):
+	return SafeFetchFromUrl(self.url + '&mode=queue&name=delete&value=' + id)
 
-def sabnzbdDeleteNzb(id):
-    data = sabnzbdFetchDataFromUrl(sabnzbdMakeUrl('mode=queue&name=delete&value=' + id))
-    return data
+    def DeleteHistory(self,id):
+	return SafeFetchFromUrl(self.url + '&mode=history&name=delete&value=' + id)
 
-def sabnzbdDeleteHistory(id):
-    data = sabnzbdFetchDataFromUrl(sabnzbdMakeUrl('mode=history&name=delete&value=' + id))
-    return data
+    def Retry(self,id):
+	return SafeFetchFromUrl(self.url + '&mode=retry&value=' + id)
 
-def sabnzbdRetry(id):
-    data = sabnzbdFetchDataFromUrl(sabnzbdMakeUrl('mode=retry&value=' + id))
-    return data
+    def GetCategories(self):
+	return SafeFetchFromUrl(self.url + '&mode=get_cats')
 
-def sabnzbdGetCategories():
-    data = sabnzbdFetchDataFromUrl(sabnzbdMakeUrl('mode=get_cats'))
-    return data
+    def ChangeCategory(self,id, cat):
+	return SafeFetchFromUrl(self.url + '&mode=change_cat&value=' + id + '&value2=' + cat)
 
-def sabnzbdChangeCategory(id, cat):
-    data = sabnzbdFetchDataFromUrl(sabnzbdMakeUrl('mode=change_cat&value=' + id + '&value2=' + cat))
-    return data
-
-def sabnzbdSetSpeed(speed):
-    data = sabnzbdFetchDataFromUrl(sabnzbdMakeUrl('mode=config&name=speedlimit&value=' + str(speed)))
-    return data
+    def SetSpeed(self,speed):
+	return SafeFetchFromUrl(self.url + '&mode=config&name=speedlimit&value=' + str(speed))

@@ -1,51 +1,49 @@
-import urllib2
-import urllib
-from settings import readSettings
+from urllib import quote
+from htpc.tools import SafeFetchFromUrl
 
-def sbFetchDataFromUrl(url):
-    try:
-        data = urllib2.urlopen(url)
-        return data
-    except:
-        return ''
+class sickbeard:
+    def __init__(self,host,port,apikey):
+	self.url = 'http://' + host + ':' + str(port) + '/api/' + apikey + '/?cmd=';
 
-def sbMakeUrl(command):
-    config = readSettings()
-    if config.has_key('sb_port') and config.has_key('sb_ip') and config.has_key('sb_apikey'):
-        url = 'http://' + config.get('sb_ip') + ':' + str(config.get('sb_port')) + '/api/' + config.get('sb_apikey') + '/?cmd=' + command;
-        return url
+    def sendRequest(self,args):
+        if args.get('action') == 'showlist':
+            return self.GetShowList()
+        if args.get('action') == 'nextaired':
+            return self.GetNextAired()
+        if args.get('action') == 'getposter':
+            return self.GetPoster(args.get('tvdbid'))
+        if args.get('action') == 'history':
+            return self.GetHistory(args.get('limit'))
+        if args.get('action') == 'searchtvdb':
+            return self.SearchShow(args.get('query'))
+        if args.get('action') == 'logs':
+            return self.GetLogs()
+        if args.get('action') == 'addshow':
+            return self.AddShow(args.get('tvdbid'))
+        if args.get('action') == 'getshow':
+            return self.GetShow(args.get('tvdbid'))
 
-def sbGetShowList():
-    data = sbFetchDataFromUrl(sbMakeUrl('shows&sort=name'))
-    return data
+    def GetShowList(self):
+	return SafeFetchFromUrl(self.url + 'shows&sort=name')
 
-def sbGetNextAired():
-    data = sbFetchDataFromUrl(sbMakeUrl('future'))
-    return data
+    def GetNextAired(self):
+	return SafeFetchFromUrl(self.url + 'future')
 
-def sbGetPoster(tvdbid):
-    data = sbFetchDataFromUrl(sbMakeUrl('show.getposter&tvdbid=' + str(tvdbid)))
-    return data
+    def GetPoster(self,tvdbid):
+	return SafeFetchFromUrl(self.url + 'show.getposter&tvdbid=' + str(tvdbid))
 
-def sbGetHistory(limit):
-    data = sbFetchDataFromUrl(sbMakeUrl('history&limit=' + limit))
-    return data
+    def GetHistory(self,limit):
+	return SafeFetchFromUrl(self.url + 'history&limit=' + limit)
 
-def sbGetLogs():
-    data = sbFetchDataFromUrl(sbMakeUrl('logs&min_level=info'))
-    return data
+    def GetLogs(self):
+	return SafeFetchFromUrl(self.url + 'logs&min_level=info')
 
-def sbSearchShow(seriename):
-    print seriename
-    seriename = urllib.quote(seriename)
-    print seriename
-    xmlData = sbFetchDataFromUrl('http://www.thetvdb.com/api/GetSeries.php?seriesname=' + seriename)
-    return xmlData
+    def AddShow(self,tvdbid):
+	return SafeFetchFromUrl(self.url + 'show.addnew&tvdbid=' + tvdbid)
 
-def sbAddShow(tvdbid):
-    data = sbFetchDataFromUrl(sbMakeUrl('show.addnew&tvdbid=' + tvdbid))
-    return data
+    def GetShow(self,tvdbdid):
+	return SafeFetchFromUrl(self.url + 'show&tvdbid=' + tvdbdid)
 
-def sbGetShow(tvdbdid):
-    data = sbFetchDataFromUrl(sbMakeUrl('show&tvdbid=' + tvdbdid))
-    return data
+    def SearchShow(self,seriename):
+	seriename = quote(seriename)
+	return SafeFetchFromUrl('http://www.thetvdb.com/api/GetSeries.php?seriesname=' + seriename)
