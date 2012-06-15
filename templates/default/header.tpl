@@ -70,7 +70,17 @@
                         </li>
                     #end if
 
-                    #if $getVar('use_nzbmatrix', 0)
+                    #if $getVar('use_squeezebox', 0)
+                        #if $submenu == "squeezebox"
+                        <li class="active">
+                        #else
+                        <li>
+                        #end if
+                        <a href="squeezebox">Squeezebox</a>
+                        </li>
+                    #end if
+
+                    #if $getVar('use_nzbsearch', 0)
                         #if $submenu == "nzbsearch"
                         <li class="active">
                         #else

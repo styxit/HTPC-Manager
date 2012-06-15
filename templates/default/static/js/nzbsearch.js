@@ -111,7 +111,7 @@ function getDetails(nzbid) {
 
             //showModal(el, title, content, buttons)
             showModal(null, modalTitle, modalTable, {
-                'Link' : function () {
+                'IMDb' : function () {
                     window.open(data[0].LINK,'IMDb')
                 },
                 'Download' : function () {

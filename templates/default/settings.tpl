@@ -123,6 +123,41 @@
                         </fieldset>
 
                         <fieldset>
+                            <legend>Squeezebox</legend>
+                            <div class="control-group">
+                                <label class="control-label">Enable</label>
+                                <div class="controls">
+                                    <label class="checkbox enable-module">
+                                        #if $getVar('use_squeezebox', 0)
+                                        <input type="checkbox" checked="checked" value="1" name="use_squeezebox" />
+                                        #else
+                                        <input type="checkbox" value="1" name="use_squeezebox" />
+                                        #end if
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="squeezebox_host">IP / Host : Port</label>
+                                <div class="controls">
+                                    <input class="span3" id="squeezebox_host" name="squeezebox_host" type="text" value="$getVar('squeezebox_host', '')" />
+                                    <input class="span1" id="squeezebox_port" name="squeezebox_port" type="text" value="$getVar('squeezebox_port', '')" />
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="squeezebox_username">Username</label>
+                                <div class="controls">
+                                    <input class="span3" id="squeezebox_username" name="squeezebox_username" type="text" value="$getVar('squeezebox_username', '')" />
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="squeezebox_password">Password</label>
+                                <div class="controls">
+                                    <input class="span3" id="squeezebox_password" name="squeezebox_password" type="password" value="$getVar('squeezebox_password', '')" />
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
                             <legend>XBMC</legend>
                             <div class="control-group">
                                 <label class="control-label">Enable</label>
@@ -212,10 +247,10 @@
                                 <label class="control-label">Enable</label>
                                 <div class="controls">
                                     <label class="checkbox enable-module">
-                                        #if $getVar('use_nzbmatrix', 0)
-                                        <input type="checkbox" checked="checked" value="1" name="use_nzbmatrix" />
+                                        #if $getVar('use_nzbsearch', 0)
+                                        <input type="checkbox" checked="checked" value="1" name="use_nzbsearch" />
                                         #else
-                                        <input type="checkbox" value="1" name="use_nzbmatrix" />
+                                        <input type="checkbox" value="1" name="use_nzbsearch" />
                                         #end if
                                     </label>
                                 </div>
