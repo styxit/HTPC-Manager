@@ -3,6 +3,6 @@
 ehthumbs.db
 Icon?
 Thumbs.db
-logs
-userdata
+logs/*
+userdata/*
 config.cfg
