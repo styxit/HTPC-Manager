@@ -6,8 +6,10 @@ function sendCommand(player, command) {
 	dataType: 'json',
 	success: function(data) {
 	    if (data == null) return;
+	},
+        complete: function() {
             refreshPlayer(player);
-	}
+        }
     });
 }
 
