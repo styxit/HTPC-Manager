@@ -22,7 +22,7 @@ class serve:
 	    'server.socket_host': self.host,
 	    'server.socket_port': self.port,
 	    'server.root': self.root,
-            'log.error_file': self.root + '/logs/error.log'
+            'log.error_file': self.root + '/userdata/error.log'
 	})
 
 	# Genereate a root configuration
