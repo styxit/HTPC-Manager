@@ -54,10 +54,16 @@
 	    </div>
 	</div>
 
+        <div class="btn-group pull-right">
+            <a class="btn" href="#" data-player-control="SavePlaylist"><i class="icon-file"></i></a>
+            <a class="btn" href="#" data-player-control="ClearPlaylist"><i class="icon-remove"></i></a>
+        </div>
+
         <ul class="nav nav-tabs">
             <li class="active"><a href="#playlist" data-toggle="tab">Playlist</a></li>
-            <li><a href="#artist" data-toggle="tab">Artist</a></li>
-            <li><a href="#album" data-toggle="tab">Album</a></li>
+            <li><a href="#artists" data-toggle="tab">Artists</a></li>
+            <li><a href="#albums" data-toggle="tab">Albums</a></li>
+            <li><a href="#playlists" data-toggle="tab">Playlists</a></li>
         </ul>
 
         <div class="tab-content">
@@ -76,10 +82,13 @@
 		</table>
             </div>
 
-            <div id="artist" class="tab-pane">
+            <div id="artists" class="tab-pane">
             </div>
 
-            <div id="album" class="tab-pane">
+            <div id="albums" class="tab-pane">
+            </div>
+
+            <div id="playlists" class="tab-pane">
             </div>
 
         </div>

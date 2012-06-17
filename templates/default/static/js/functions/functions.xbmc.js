@@ -141,7 +141,7 @@ function loadXBMCShow(show) {
                     episodeArray[episodesCounter] = episode;
                     episodesCounter++;
                 });
-                episodeArray = episodeArray.reverse();
+                //episodeArray = episodeArray.reverse();
 
                 $.each(episodeArray, function (episodeCounter, episode) {
                     var row = $('<tr>');

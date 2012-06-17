@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.join(os.getcwd(), 'libs'))
 from htpc.serve import serve
 
 # Default configuration file
-config = os.path.join(os.getcwd(), '/userdata/config.cfg')
+config = os.path.join(os.getcwd(), 'userdata/config.cfg')
 
 # Get variables from commandline
 parser = argparse.ArgumentParser()
