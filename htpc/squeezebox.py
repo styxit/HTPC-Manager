@@ -63,7 +63,7 @@ class squeezebox:
 
     def getAlbum(self, album):
         songs = self.request("songs 0 999 album_id:%s" % album)
-        songs = [i.split(":", 1) for i in songs[4:]]
+        songs = [i.split(":", 1) for i in songs[4:]][:-1]
         songs = [dict(songs[start : start + 6]) for start in range(0, len(songs), 6)]
         return dumps(songs)
 
@@ -79,7 +79,7 @@ class squeezebox:
 
     def getArtist(self, artist):
         songs = self.request("songs 0 999 artist_id:%s" % artist)
-        songs = [i.split(":", 1) for i in songs[4:]]
+        songs = [i.split(":", 1) for i in songs[4:]][:-1]
         songs = [dict(songs[start : start + 6]) for start in range(0, len(songs), 6)]
         return dumps(songs)
 
@@ -98,7 +98,7 @@ class squeezebox:
         return int(self.request("player count ?")[2])
 
     def getPlayers(self):
-        players = self.request("players 0 2")
+        players = self.request("players 0 999")
         players = [i.split(":", 1) for i in players[4:]]
         players = [dict(players[start : start + 10]) for start in range(0, len(players), 10)]
         return dumps(players)
@@ -106,17 +106,14 @@ class squeezebox:
     def getPlayer(self, player):
         status = self.request("%s status 0" % player)
         status = [i.split(":", 1) for i in status[3:]]
-        player = dict(status[:18])
+        try:
+            index = status.index(['playlist index','0'])
+        except ValueError:
+            return dumps(dict(status))
 
-        status = status[18:]
-        playlist = []
-        for i in range(int(player['playlist_tracks'])):
-            track = dict(status[:7])
-            playlist.append(track)
-            status = status[7:]
-
-        player['playlist'] = playlist
-
+        player = dict(status[:index])
+        status = status[index:]
+        player['playlist'] = [dict(status[start : start + 7]) for start in range(0, len(status), 7)]
         return dumps(player)
 
     def request(self, command):

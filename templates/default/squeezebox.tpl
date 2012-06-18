@@ -57,12 +57,15 @@
         <div class="btn-group pull-right">
             <a class="btn" href="#" data-player-control="SavePlaylist"><i class="icon-file"></i></a>
             <a class="btn" href="#" data-player-control="ClearPlaylist"><i class="icon-remove"></i></a>
+            <a class="btn" href="#" data-player-control="PlayNow">Play Now</a>
+            <a class="btn" href="#" data-player-control="AddPlaylist">Add to Playlist</a>
         </div>
 
         <ul class="nav nav-tabs">
             <li class="active"><a href="#playlist" data-toggle="tab">Playlist</a></li>
             <li><a href="#artists" data-toggle="tab">Artists</a></li>
             <li><a href="#albums" data-toggle="tab">Albums</a></li>
+            <li><a href="#songs" data-toggle="tab">Songs</a></li>
             <li><a href="#playlists" data-toggle="tab">Playlists</a></li>
         </ul>
 
@@ -72,6 +75,7 @@
 		<table class="table table-striped">
 		    <thead>
 		    <tr>
+			<th style="width:15px">&nbsp;</th>
 			<th>Track</th>
 			<th>Artist</th>
 			<th>Album</th>
@@ -86,6 +90,21 @@
             </div>
 
             <div id="albums" class="tab-pane">
+            </div>
+
+            <div id="songs" class="tab-pane">
+
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Track</th>
+                        <th>Artist</th>
+                        <th>Album</th>
+                        <th class="right">Duration</th>
+                    </tr>
+                    </thead>
+                    <tbody id="song_table"></tbody>
+                </table>
             </div>
 
             <div id="playlists" class="tab-pane">

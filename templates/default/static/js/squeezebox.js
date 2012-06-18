@@ -1,5 +1,4 @@
 var refresh, currentPlayer, nowPlayingThumb;
-var songTable;
 var artist_id = {}
 var album_id = {}
 
@@ -30,8 +29,9 @@ function refreshPlayer(player) {
         dataType: 'json',
         success: function (item) {
             if (item == null) return false;
-            if(item.playlist=='') {
+            if(item.playlist==undefined) {
                 nowPlaying = "Playlist empty"
+                item.playlist = []
             } else {
                 current = item.playlist[item.playlist_cur_index]
                 nowPlaying = current.artist + ': ' + current.title;
@@ -62,19 +62,22 @@ function refreshPlayer(player) {
             $('#playlist_table').html('');
             $.each(item.playlist, function (t, track) {
                 var row = $('<tr>')
+                var remove = $('<a>').attr('href','#').click(function() {
+                    sendCommand(player, 'playlist delete '+t);
+                    return false;
+                }).append($('<i>').addClass('icon-remove'));
+                row.append($('<td>').append(remove));
                 var title = $('<a>').attr('href','#').text(track.title).click(function() {
                     sendCommand(player, 'playlist jump '+t);
                     return false;
                 });
                 row.append($('<td>').append(title));
                 var artist = $('<a>').attr('href','#').text(track.artist).click(function() {
-                    $('[href=#artists]').trigger('click');
                     getArtist(artist_id[track.artist]);
                     return false;
                 });
                 row.append($('<td>').append(artist));
                 var album = $('<a>').attr('href','#').text(track.album).click(function() {
-                    $('[href=#albums]').trigger('click');
                     getAlbum(album_id[track.album]);
                     return false;
                 });
@@ -182,22 +185,17 @@ function getArtist(artist){
         dataType: 'json',
         success: function (data) {
             if (data == null) return false;
-            var buttons = $('<div>').addClass('btn-group pull-right');
-            buttons.append($('<a>').attr('href','#').text('Play Now').addClass('btn').click());
-            buttons.append($('<a>').attr('href','#').text('Add to playlist').addClass('btn').click());
-
-            $('#artists').html($('<a>').attr('href','#').text('Back').addClass('btn').click(function() {
-                getArtists();
-            }));
-            $('#artists').append(buttons)
-            var artistSongTable = songTable.clone()
-            $(artistSongTable).find('tbody').attr('id','artistSongTable');
-            $('#artists').append(artistSongTable);
+            $('[data-player-control=PlayNow]').unbind("click").click(function(){
+                sendCommand(currentPlayer, 'playlistcontrol cmd:load artist_id:'+artist);
+            });
+            $('[data-player-control=AddPlaylist]').unbind("click").click(function(){
+                sendCommand(currentPlayer, 'playlistcontrol cmd:add artist_id:'+artist);
+            });
+            $('#song_table').html('')
             $.each(data, function (i, item) {
-                var row = $('<tr>')
+                var row = $('<tr>');
                 var title = $('<a>').attr('href','#').text(item.title).click(function() {
-                    alert(item.id)
-                    sendCommand(currentPlayer, 'playlist play '+item.id);
+                    sendCommand(currentPlayer, 'playlistcontrol cmd:add track_id:'+item.id);
                     return false;
                 });
                 row.append($('<td>').append(title));
@@ -206,14 +204,16 @@ function getArtist(artist){
                 });
                 row.append($('<td>').append(artist));
                 var album = $('<a>').attr('href','#').text(item.album).click(function() {
-                    $('[href=#albums]').trigger('click');
                     getAlbum(album_id[item.album]);
                     return false;
                 });
                 row.append($('<td>').append(album));
                 row.append($('<td>').text(parseSec(item.duration)).addClass('right'));
-                $('#artistSongTable').append(row);
+                $('#song_table').append(row);
             });
+        },
+        complete: function() {
+            $('[href=#songs]').trigger('click');
         }
     });
 }
@@ -245,20 +245,18 @@ function getAlbum(album){
         dataType: 'json',
         success: function (data) {
             if (data == null) return false;
-            var buttons = $('<div>').addClass('btn-group pull-right');
-            buttons.append($('<a>').attr('href','#').text('Play Now').addClass('btn').click());
-            buttons.append($('<a>').attr('href','#').text('Add to playlist').addClass('btn').click());
 
-            $('#albums').html($('<a>').attr('href','#').text('Back').addClass('btn').click(function() {
-                getAlbums();
-            }));
-            $('#albums').append(buttons)
-            var albumSongTable = songTable.clone()
-            $(albumSongTable).find('tbody').attr('id','albumSongTable');
-            $('#albums').append(albumSongTable);
+            $('[data-player-control=PlayNow]').unbind("click").click(function(){
+                sendCommand(currentPlayer, 'playlistcontrol cmd:load album_id:'+album);
+            });
+            $('[data-player-control=AddPlaylist]').unbind("click").click(function(){
+                sendCommand(currentPlayer, 'playlistcontrol cmd:add album_id:'+album);
+            });
+            $('#song_table').html('')
             $.each(data, function (i, item) {
                 var row = $('<tr>')
                 var title = $('<a>').attr('href','#').text(item.title).click(function() {
+                    sendCommand(currentPlayer, 'playlistcontrol cmd:add track_id:'+item.id);
                     return false;
                 });
                 row.append($('<td>').append(title));
@@ -273,8 +271,11 @@ function getAlbum(album){
                 });
                 row.append($('<td>').append(album));
                 row.append($('<td>').text(parseSec(item.duration)).addClass('right'));
-                $('#albumSongTable').append(row);
+                $('#song_table').append(row);
             });
+        },
+        complete: function() {
+            $('[href=#songs]').trigger('click');
         }
     });
 }
@@ -290,7 +291,7 @@ function getPlaylists() {
             $('#playlists').html($('<ul>'));
             $.each(data.playlists, function (i, item) {
                 var playlist = $('<li>').addClass('btn').css('width','195px').css('margin','6px').text(item.playlist).click(function() {
-                    sendCommand('','');
+                    sendCommand(currentPlayer, 'playlistcontrol cmd:load playlist_id:'+item.id)
                 });
                 $('#playlists').append(playlist);
             });
@@ -299,7 +300,6 @@ function getPlaylists() {
 }
 
 $(document).ready(function () {
-    songTable = $('#playlist_table').parent().clone();
     $('#players').change(function() {
         togglePlayer($(this).val());
     });
