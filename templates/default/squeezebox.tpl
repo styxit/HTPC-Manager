@@ -55,10 +55,10 @@
 	</div>
 
         <div class="btn-group pull-right">
-            <a class="btn" href="#" data-player-control="SavePlaylist"><i class="icon-file"></i></a>
-            <a class="btn" href="#" data-player-control="ClearPlaylist"><i class="icon-remove"></i></a>
-            <a class="btn" href="#" data-player-control="PlayNow">Play Now</a>
-            <a class="btn" href="#" data-player-control="AddPlaylist">Add to Playlist</a>
+            <a class="btn" href="#" data-player-control="SavePlaylist" title="Save Playlist"><i class="icon-file"></i></a>
+            <a class="btn" href="#" data-player-control="ClearPlaylist" title="Clear Playlist"><i class="icon-remove"></i></a>
+            <a class="btn" href="#" data-player-control="PlayNow" title="Play Now"><i class="icon-play"></i></a>
+            <a class="btn" href="#" data-player-control="AddPlaylist" title="Add to Playlist"><i class="icon-plus"></i></a>
         </div>
 
         <ul class="nav nav-tabs">

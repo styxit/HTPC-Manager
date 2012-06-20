@@ -61,6 +61,7 @@ function refreshPlayer(player) {
             powerIcon.toggleClass('active',(item.power=='1'));
             $('#playlist_table').html('');
             $.each(item.playlist, function (t, track) {
+                if (track.album == undefined) track.album = '';
                 var row = $('<tr>')
                 var remove = $('<a>').attr('href','#').click(function() {
                     sendCommand(player, 'playlist delete '+t);
@@ -169,7 +170,7 @@ function getArtists() {
             $('#artists').html($('<ul>'));
             $.each(data.artists, function (i, item) {
                 artist_id[item.artist] = item.id
-                var artist = $('<li>').addClass('btn').css('width','195px').css('margin','6px').text(item.artist).click(function() {
+                var artist = $('<li>').text(item.artist).click(function() {
                     getArtist(item.id);
                 });
                 $('#artists').append(artist);
@@ -229,7 +230,7 @@ function getAlbums() {
             $('#albums').html($('<ul>'));
             $.each(data.albums, function (i, item) {
                 album_id[item.album] = item.id
-                var album = $('<li>').addClass('btn').css('width','195px').css('margin','6px').text(item.album).click(function() {
+                var album = $('<li>').text(item.album).click(function() {
                     getAlbum(item.id);
                 });
                 $('#albums').append(album);
