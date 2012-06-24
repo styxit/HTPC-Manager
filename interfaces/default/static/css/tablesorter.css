@@ -1,0 +1,6 @@
+table th.tablesorter-header {
+    cursor: pointer;
+}
+table th.tablesorter-headerSortUp div, table th.tablesorter-headerSortDown div {
+    color: #FAA732;
+}

@@ -1,0 +1,136 @@
+html, body {
+    background-color: #eee;
+    background: url('/img/rough_diagonal.png');
+}
+body {
+    padding-top: 40px;
+}
+.maincontent {
+    background-color: #fff;
+    padding: 20px;
+    margin:  0 -10px 40px -10px;
+    -webkit-border-radius: 0 0 6px 6px;
+    -moz-border-radius: 0 0 6px 6px;
+    border-radius: 0 0 6px 6px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    box-shadow: 0 1px 2px rgba(0,0,0,.15);
+}
+.page-header.page-title {
+    background-color: #f5f5f5;
+    padding: 20px 20px 10px;
+    margin: -20px -20px 20px;
+}
+.progress {
+    margin-bottom: 0;
+    background: #eee;
+}
+
+#nowplaying li {
+    margin-bottom: 0;
+}
+
+.accordion-group {
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+}
+
+.thumbnail {
+    background: #fff;
+}
+#navbar .navbar-inner {
+    background: url('/img/darkdenim3.png');
+}
+.well {
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+.table-main {
+    font-size: 12px;
+}
+
+.table-modal {
+    margin-bottom: 0;
+}
+
+.table-modal tr td,
+.table-modal tr th {
+    border: 0;
+}
+
+.table-modal tr:hover td,
+.table-modal tr:hover th {
+    background: none !important;
+}
+
+.table-now-playing {
+    margin-bottom: 0;
+}
+
+.table-now-playing tr td,
+.table-now-playing tr th {
+    border: 0;
+}
+
+.table-now-playing tr:hover td,
+.table-now-playing tr:hover th {
+    background: none !important;
+}
+
+h6.movie-title, h6.show-title {
+    color: #555555;
+    text-align: center;
+    padding-top: 4px;
+}
+
+.table-modal h6 {
+    margin-top: 2px;
+    color: #555555;
+}
+
+.gif-loader {
+    text-align: center;
+    display: none;
+}
+
+#notify-user {
+    position: fixed;
+    width: 450px;
+    margin-left: -225px;
+    left: 50%;
+    top: 35px;
+    z-index: 3;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    padding: 20px;
+    display: none;
+}
+#notify-user .close {
+    right: 0;
+}
+.active-sortmethod i, .active-sortorder i {
+    margin-right: 5px;
+}
+
+#modal_dialog.modal {
+    width: 700px;
+    margin-left: -350px;
+}
+
+.popover-inner {
+    width: 550px;
+}
+
+.carousel-fanart {
+    height:240px;
+}
+
+.trans {
+    background: transparent;
+    background-color : rgba(255,255,255,0.8);
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#CCFFFFFF,endColorstr=#CCFFFFFF)"; /* IE8 */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#CCFFFFFF,endColorstr=#CCFFFFFF);   /* IE6 & 7 */
+    zoom: 1;
+}
+
