@@ -66,6 +66,15 @@
                     	<a href="/sabnzbd">SABnzbd</a>
                     </li>
                 #end if
+                #if $getVar('use_couchpotato', 0)
+                	#if $submenu == "couchpotato"
+                	<li class="active">
+                	#else
+                	<li>
+                    #end if
+                    	<a href="/couchpotato">CouchPotato</a>
+                	</li>
+            	#end if
                 #if $getVar('use_sickbeard', 0)
                     #if $submenu == "sickbeard"
                     <li class="active">

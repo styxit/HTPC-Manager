@@ -3,8 +3,9 @@ import os, cherrypy
 from Cheetah.Template import Template
 
 from htpc.sabnzbd import sabnzbd
-from htpc.nzbsearch import nzbsearch
+from htpc.couchpotato import couchpotato
 from htpc.sickbeard import sickbeard
+from htpc.nzbsearch import nzbsearch
 from htpc.xbmc import xbmc
 from htpc.squeezebox import squeezebox
 from htpc.tools import *
@@ -15,7 +16,6 @@ class pageHandler:
         self.config = readSettings(configfile)
         self.webdir = os.path.join(os.getcwd(), 'interfaces', self.config['template'])
 
-    # Frontpage
     @cherrypy.expose()
     def index(self):
         template = Template(file=os.path.join(self.webdir, 'main.tpl'), searchList=[self.config]);
@@ -44,6 +44,15 @@ class pageHandler:
         template.webdir = self.webdir
         template.jsfile = 'sabnzbd.js'
         template.submenu = 'sabnzbd'
+        return template.respond()
+    
+    @cherrypy.expose()
+    def couchpotato(self, **kwargs):
+        template = Template(file=os.path.join(self.webdir, 'couchpotato.tpl'), searchList=[self.config])
+        template.appname = self.config['app_name']
+        template.webdir = self.webdir
+        template.jsfile = 'couchpotato.js'
+        template.submenu = 'couchpotato'
         return template.respond()
 
     @cherrypy.expose()
@@ -102,6 +111,12 @@ class pageHandler:
             apikey = self.config.get('sabnzbd_apikey')
             ssl = self.config.get('sabnzbd_ssl')
             return sabnzbd(host,port,apikey,ssl).sendRequest(args)
+        
+        if args.get('which') == 'couchpotato' and self.config.get('use_couchpotato'):
+            host = self.config.get('couchpotato_host')
+            port = self.config.get('couchpotato_port')
+            apikey = self.config.get('couchpotato_apikey')
+            return couchpotato(host,port,apikey).sendRequest(args)
 
         if args.get('which') == 'sickbeard' and self.config.get('use_sickbeard'):
             host = self.config.get('sickbeard_host')

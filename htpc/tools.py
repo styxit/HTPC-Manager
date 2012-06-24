@@ -29,7 +29,9 @@ def saveSettings(configfile, data, section = 'htpc'):
     # Set unchecked checkboxes to 0
     if not data.has_key('use_sabnzbd'):
         data['use_sabnzbd'] = 0
-    if not data.has_key('use_sickbeard'):
+    if not data.has_key('use_couchpotato'):
+        data['use_sickbeard'] = 0
+    if not data.has_key('use_couchpotato'):
         data['use_sickbeard'] = 0
     if not data.has_key('use_squeezebox'):
         data['use_squeezebox'] = 0
