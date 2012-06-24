@@ -3,7 +3,7 @@ from htpc.tools import SafeFetchFromUrl
 
 class sickbeard:
     def __init__(self,host,port,apikey):
-	self.url = 'http://' + host + ':' + str(port) + '/api/' + apikey + '/?cmd=';
+        self.url = 'http://' + host + ':' + str(port) + '/api/' + apikey + '/?cmd=';
 
     def sendRequest(self,args):
         if args.get('action') == 'showlist':
@@ -24,26 +24,26 @@ class sickbeard:
             return self.GetShow(args.get('tvdbid'))
 
     def GetShowList(self):
-	return SafeFetchFromUrl(self.url + 'shows&sort=name')
+        return SafeFetchFromUrl(self.url + 'shows&sort=name')
 
     def GetNextAired(self):
-	return SafeFetchFromUrl(self.url + 'future')
+        return SafeFetchFromUrl(self.url + 'future')
 
-    def GetPoster(self,tvdbid):
-	return SafeFetchFromUrl(self.url + 'show.getposter&tvdbid=' + str(tvdbid))
+    def GetPoster(self, tvdbid):
+        return SafeFetchFromUrl(self.url + 'show.getposter&tvdbid=' + str(tvdbid))
 
-    def GetHistory(self,limit):
-	return SafeFetchFromUrl(self.url + 'history&limit=' + limit)
+    def GetHistory(self, limit):
+        return SafeFetchFromUrl(self.url + 'history&limit=' + limit)
 
     def GetLogs(self):
-	return SafeFetchFromUrl(self.url + 'logs&min_level=info')
+        return SafeFetchFromUrl(self.url + 'logs&min_level=info')
 
     def AddShow(self,tvdbid):
-	return SafeFetchFromUrl(self.url + 'show.addnew&tvdbid=' + tvdbid)
+        return SafeFetchFromUrl(self.url + 'show.addnew&tvdbid=' + tvdbid)
 
     def GetShow(self,tvdbdid):
-	return SafeFetchFromUrl(self.url + 'show&tvdbid=' + tvdbdid)
+        return SafeFetchFromUrl(self.url + 'show&tvdbid=' + tvdbdid)
 
     def SearchShow(self,seriename):
-	seriename = quote(seriename)
-	return SafeFetchFromUrl('http://www.thetvdb.com/api/GetSeries.php?seriesname=' + seriename)
+        seriename = quote(seriename)
+        return SafeFetchFromUrl('http://www.thetvdb.com/api/GetSeries.php?seriesname=' + seriename)

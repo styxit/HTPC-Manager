@@ -55,7 +55,7 @@ class sabnzbd:
 	return SafeFetchFromUrl(self.url + '&mode=queue&name=delete&value=' + id)
 
     def DeleteHistory(self,id):
-	return SafeFetchFromUrl(self.url + '&mode=history&name=delete&value=' + id)
+	return tools.tchFromUrl(self.url + '&mode=history&name=delete&value=' + id)
 
     def Retry(self,id):
 	return SafeFetchFromUrl(self.url + '&mode=retry&value=' + id)

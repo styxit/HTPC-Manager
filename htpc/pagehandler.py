@@ -1,5 +1,4 @@
-import os
-import cherrypy
+import os, cherrypy
 
 from Cheetah.Template import Template
 
@@ -7,17 +6,14 @@ from htpc.sabnzbd import sabnzbd
 from htpc.nzbsearch import nzbsearch
 from htpc.sickbeard import sickbeard
 from htpc.xbmc import xbmc
-from htpc.settings import readSettings, saveSettings, removeThumbs
 from htpc.squeezebox import squeezebox
-
-import ConfigParser
+from htpc.tools import *
 
 class pageHandler:
     def __init__(self, configfile):
         self.configfile = configfile
-        self.root = os.getcwd()
         self.config = readSettings(configfile)
-        self.webdir = os.path.join(os.getcwd(), 'templates', self.config['template'])
+        self.webdir = os.path.join(os.getcwd(), 'interfaces', self.config['template'])
 
     # Frontpage
     @cherrypy.expose()
@@ -30,33 +26,9 @@ class pageHandler:
         return template.respond()
 
     @cherrypy.expose()
-    def shutdown(self):
-         cherrypy.engine.exit()
-         return "Shutdown complete!"
-
-    @cherrypy.expose()
     def settings(self, **kwargs):
         if kwargs:
-            if kwargs.has_key('save_settings'):
-                del kwargs['save_settings']
-                if not kwargs.has_key('use_sabnzbd'):
-                    kwargs['use_sabnzbd'] = 0
-                if not kwargs.has_key('use_sickbeard'):
-                    kwargs['use_sickbeard'] = 0
-                if not kwargs.has_key('use_squeezebox'):
-                    kwargs['use_squeezebox'] = 0
-                if not kwargs.has_key('use_xbmc'):
-                    kwargs['use_xbmc'] = 0
-                if not kwargs.has_key('use_nzbsearch'):
-                    kwargs['use_nzbsearch'] = 0
-                if not kwargs.has_key('xbmc_show_banners'):
-                    kwargs['xbmc_show_banners'] = 0
-                if not kwargs.has_key('xbmc_hide_watched'):
-                    kwargs['xbmc_hide_watched'] = 0
-                self.config = saveSettings(self.configfile,kwargs)
-
-            if kwargs.has_key('regenerate_thumbs'):
-                removeThumbs(self.config['userdir'])
+            self.config = saveSettings(self.configfile,kwargs)
 
         template = Template(file=os.path.join(self.webdir, 'settings.tpl'), searchList=[self.config])
         template.appname = self.config['app_name']
@@ -112,6 +84,18 @@ class pageHandler:
 
     @cherrypy.expose()
     def json(self, **args):
+        if args.get('which') == 'system':
+            if args.get('action') == 'shutdown':
+                return shutdown()
+            if args.get('action') == 'restart':
+                return restart()
+            if args.get('action') == 'update':
+                return update()
+            if args.get('action') == 'checkupdate':
+                return checkUpdate()
+            if args.get('action') == 'diskspace':
+                return getDiskspace()
+                    
         if args.get('which') == 'sabnzbd' and self.config.get('use_sabnzbd'):
             host = self.config.get('sabnzbd_host')
             port = self.config.get('sabnzbd_port')
@@ -142,5 +126,5 @@ class pageHandler:
             username = self.config.get('xbmc_username')
             password = self.config.get('xbmc_password')
             hidewatched = self.config.get('xbmc_hide_watched')
-            userdir = os.path.join(self.root, self.config.get('userdir'))
-            return xbmc(host,port,username,password,userdir,hidewatched).sendRequest(args)
+            return xbmc(host,port,username,password,hidewatched).sendRequest(args)
+
