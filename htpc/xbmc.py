@@ -10,6 +10,7 @@ from json import dumps
 
 class xbmc:
     def __init__(self, host, port, username, password, hidewatched, ignorearticle=1):
+        self.root = os.getcwd()
         self.url = 'http://' + username + ':' + password + '@' + host + ':' + str(port)
         self.req_url ='http://' + host + ':' + str(port) 
         self.auth = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
@@ -55,7 +56,7 @@ class xbmc:
         thumbParts = thumb.split('/')
         thumbFile = thumbParts.pop()
         
-        thumbs = os.path.join('userdata', 'xbmc_thumbs/')
+        thumbs = os.path.join(self.root, 'userdata/', 'xbmc_thumbs/')
         if not os.path.isdir(thumbs):
             os.makedirs(thumbs)
         
@@ -130,7 +131,7 @@ class xbmc:
         for episode in episodes:
             if not seasons.has_key(episode[u'season']):
                 seasons[episode[u'season']] = {}
-                seasons[episode[u'season']][episode[u'episode']] = episode
+            seasons[episode[u'season']][episode[u'episode']] = episode
         return dumps({'show' : showinfo, 'seasons' : seasons})
 
     def PlayItem(self, file):
@@ -173,9 +174,8 @@ class xbmc:
         return dumps(data)
 
     def Notify(self, text):
-        text = urllib2.unquote(text)
+        text = urllib2.unquote(text).encode('utf-8')
         command = {'command': 'ExecBuiltIn', 'parameter': 'Notification(\'HTPC Manager\', \'' + text + '\')' }
-        command = [command[i].encode('utf-8') for i in command]
         request = urllib2.Request(self.req_url + '/xbmcCmds/xbmcHttp/?' + urllib.urlencode(command))
         request.add_header("Authorization", "Basic %s" % self.auth)
         result = urllib2.urlopen(request)

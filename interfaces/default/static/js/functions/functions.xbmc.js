@@ -294,12 +294,9 @@ function loadXBMCShow(show) {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-
             $('#show-title').html(show.title)
-
             var accordion = $('<div>').addClass('accordion').attr('id', 'show-accordion');
 
-            // Even reverse, nieuwe bovenaan
             var seasonsArray = [];
             var seasonsCounter = 0;
             $.each(data.seasons, function(seasonNumber, episodes) {
@@ -310,25 +307,20 @@ function loadXBMCShow(show) {
                 seasonsArray[seasonsCounter].episodes = episodes;
                 seasonsCounter ++;
             });
-            seasonsArray = seasonsArray.reverse();
 
             $.each(seasonsArray, function(seasonCounter, season) {
-
                 var episodesTable = $('<table>').addClass('accordion-inner');
                 episodesTable.addClass('table');
                 episodesTable.addClass('table-striped');
 
-                // Even reverse, nieuwe bovenaan
                 var episodeArray = [];
                 var episodesCounter = 0;
                 $.each(season.episodes, function (episodeid, episode) {
                     episodeArray[episodesCounter] = episode;
                     episodesCounter++;
                 });
-                episodeArray = episodeArray.reverse();
 
                 $.each(episodeArray, function (episodeCounter, episode) {
-
                     var row = $('<tr>');
 
                     var episodeImage = $('<img>');
@@ -357,7 +349,6 @@ function loadXBMCShow(show) {
                     episodesTable.append(row);
                 });
 
-
                 var accordionToggle = $('<span>').addClass('accordion-toggle').html('<h3>Season ' + season.season + '</h3>');
                 accordionToggle.attr('data-toggle', 'collapse');
                 accordionToggle.attr('data-parent', 'show-accordion');
@@ -372,15 +363,12 @@ function loadXBMCShow(show) {
                 var accordionGroup = $('<div>').addClass('accordion-group').append(accordionHeading);
                 accordionGroup.append(accordionBody);
                 accordion.append(accordionGroup);
-
             });
 
             $('#show-seasons').html('').append(accordion);
 
             $('#show-grid').fadeOut();
             $('#show-details').show();
-
-
         }
     });
 }
@@ -408,7 +396,6 @@ function loadNowPlaying() {
             }, 1000);
         },
         success: function(data) {
-
             if (data == null) {
                 $('#nowplaying').hide();
                 return false;
@@ -553,7 +540,6 @@ function filterMovies(key) {
 
 function enablePlayerControls() {
     $('[data-player-control]').click(function () {
-
         var clickItem = $(this);
         var playerDo = clickItem.attr('data-player-control');
 

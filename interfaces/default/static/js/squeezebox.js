@@ -34,7 +34,11 @@ function refreshPlayer(player) {
                 item.playlist = []
             } else {
                 current = item.playlist[item.playlist_cur_index]
-                nowPlaying = current.artist + ': ' + current.title;
+                if (current.artist) {
+                    nowPlaying = current.artist + ': ' + current.title;
+                } else {
+                    nowPlaying = current.title;
+                }
             }
             if (player != currentPlayer) {
                 clearInterval(refresh)
@@ -97,11 +101,11 @@ function togglePlayer(player) {
     }
     var volUpButton = $('[data-player-control=VolUp]');
     volUpButton.unbind("click").click(function(){
-	sendCommand(player, 'mixer volume +5')
+	sendCommand(player, 'mixer volume +2.5')
     });
     var volDownButton = $('[data-player-control=VolDown]');
     volDownButton.unbind("click").click(function(){
-	sendCommand(player, 'mixer volume -5')
+	sendCommand(player, 'mixer volume -2.5')
     });
     var powerButton = $('[data-player-control=Power]');
     powerButton.unbind("click").click(function(){
@@ -170,7 +174,7 @@ function getArtists() {
             $('#artists').html($('<ul>'));
             $.each(data.artists, function (i, item) {
                 artist_id[item.artist] = item.id
-                var artist = $('<li>').text(item.artist).click(function() {
+                var artist = $('<li>').addClass('btn span3').css({'clear':'both','margin':'0 0 10px 0'}).text(item.artist).click(function() {
                     getArtist(item.id);
                 });
                 $('#artists').append(artist);

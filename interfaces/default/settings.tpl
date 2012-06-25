@@ -11,8 +11,8 @@
         <div id="notification-area"></div>
 
         <ul class="nav nav-tabs">
-            <li><a href="#server" data-toggle="tab">General</a></li>
-            <li class="dropdown active">
+            <li class="active"><a href="#server" data-toggle="tab">General</a></li>
+            <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Services <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                     <li><a href="#xbmc" data-toggle="tab">XBMC</a></li>
@@ -118,18 +118,6 @@
                         <div class="controls">
                             <input class="span3" id="couchpotato_host" name="couchpotato_host" type="text" value="$getVar('couchpotato_host', '127.0.0.1')" />
                             <input class="span1" id="couchpotato_port" name="couchpotato_port" type="text" value="$getVar('couchpotato_port', '5050')" />
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="couchpotato_username">Username</label>
-                        <div class="controls">
-                            <input class="span3" id="couchpotato_username" name="couchpotato_username" type="text" value="$getVar('couchpotato_username', '')" />
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="couchpotato_password">Password</label>
-                        <div class="controls">
-                            <input class="span3" id="couchpotato_password" name="couchpotato_password" type="password" value="$getVar('couchpotato_password', '')" />
                         </div>
                     </div>
                     <div class="control-group">
