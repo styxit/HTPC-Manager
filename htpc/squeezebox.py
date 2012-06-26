@@ -4,7 +4,6 @@ from json import dumps
 class squeezebox:
     def __init__(self, host, port, username='', password=''):
         self.webhost = 'http://' + host + ':'+ str(port)
-        self.json = self.webhost + '/jsonrpc.js'
         self.auth = ''
         if username and password:
             self.auth = base64.encodestring('%s:%s' % (username, password)).strip()
@@ -72,7 +71,7 @@ class squeezebox:
 
     def jsonRequest(self, player, params):
         data = dumps({"id":1,"method":"slim.request","params":[player,params]})
-        request = urllib2.Request(self.json, data)
+        request = urllib2.Request(self.webhost + '/jsonrpc.js', data)
         if self.auth:
             request.add_header("Authorization", "Basic %s" % self.auth)
         return urllib2.urlopen(request, timeout=5).read()
