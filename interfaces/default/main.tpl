@@ -137,7 +137,7 @@
             </div>
             #end if
 
-            #if $getVar('use_dash_nzb', 0)
+            #if $getVar('use_dash_nzb', 1)
             <div class="span4">
                 <h3>Info</h3>
                 <div id="hdd-info"></div>

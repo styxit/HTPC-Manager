@@ -12,6 +12,7 @@
 
         <ul class="nav nav-tabs">
             <li class="active"><a href="#server" data-toggle="tab">General</a></li>
+            <li><a href="#dashboard" data-toggle="tab">Dashboard</a></li>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Services <b class="caret"></b></a>
                 <ul class="dropdown-menu">
@@ -50,7 +51,81 @@
                         </div>
                     </div>
                 </fieldset>
-
+                <fieldset id="dashboard" class="tab-pane fade">
+                    <legend>Dashboard</legend>
+                    <div class="control-group">
+                        <label class="control-label">Show Recent Movies</label>
+                        <div class="controls">
+                            <label class="checkbox">
+                                #if $getVar('use_dash_rec_movies', 0)
+                                <input type="checkbox" checked="checked" value="1" name="use_dash_rec_movies" />
+                                #else
+                                <input type="checkbox" value="1" name="use_dash_rec_movies" />
+                                #end if
+                            </label>
+                        </div>
+                    </div>                    
+                    <div class="control-group">
+                        <label class="control-label">Show Recent TV</label>
+                        <div class="controls">
+                            <label class="checkbox">
+                                #if $getVar('use_dash_rec_tv', 0)
+                                <input type="checkbox" checked="checked" value="1" name="use_dash_rec_tv" />
+                                #else
+                                <input type="checkbox" value="1" name="use_dash_rec_tv" />
+                                #end if
+                            </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Show Recent Music</label>
+                        <div class="controls">
+                            <label class="checkbox">
+                                #if $getVar('use_dash_rec_music', 0)
+                                <input type="checkbox" checked="checked" value="1" name="use_dash_rec_music" />
+                                #else
+                                <input type="checkbox" value="1" name="use_dash_rec_music" />
+                                #end if
+                            </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Show Sickbeard</label>
+                        <div class="controls">
+                            <label class="checkbox">
+                                #if $getVar('use_dash_sickbeard', 0)
+                                <input type="checkbox" checked="checked" value="1" name="use_dash_sickbeard" />
+                                #else
+                                <input type="checkbox" value="1" name="use_dash_sickbeard" />
+                                #end if
+                            </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Show Couch Potato</label>
+                        <div class="controls">
+                            <label class="checkbox">
+                                #if $getVar('use_dash_couchpotato', 0)
+                                <input type="checkbox" checked="checked" value="1" name="use_dash_couchpotato" />
+                                #else
+                                <input type="checkbox" value="1" name="use_dash_couchpotato" />
+                                #end if
+                            </label>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Show SabNzbd</label>
+                        <div class="controls">
+                            <label class="checkbox">
+                                #if $getVar('use_dash_nzb', 0)
+                                <input type="checkbox" checked="checked" value="1" name="use_dash_nzb" />
+                                #else
+                                <input type="checkbox" value="1" name="use_dash_nzb" />
+                                #end if
+                            </label>
+                        </div>
+                    </div>                 
+                </fieldset>
                 <fieldset id="sabnzbd" class="tab-pane fade">
                     <legend>SABnzbd</legend>
                     <div class="control-group">

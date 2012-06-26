@@ -43,7 +43,19 @@ def saveSettings(configfile, data, section = 'htpc'):
         data['xbmc_show_banners'] = 0
     if not data.has_key('xbmc_hide_watched'):
         data['xbmc_hide_watched'] = 0
-
+    if not data.has_key('use_dash_rec_movies'):
+        data['use_dash_rec_movies'] = 0
+    if not data.has_key('use_dash_rec_tv'):
+        data['use_dash_rec_tv'] = 0
+    if not data.has_key('use_dash_rec_music'):
+        data['use_dash_rec_music'] = 0
+    if not data.has_key('use_dash_sickbeard'):
+        data['use_dash_sickbeard'] = 0
+    if not data.has_key('use_dash_couchpotato'):
+        data['use_dash_couchpotato'] = 0 
+    if not data.has_key('use_dash_nzb'):
+        data['use_dash_nzb'] = 0
+        
     config = ConfigParser.ConfigParser()
     config.read(configfile)
 
