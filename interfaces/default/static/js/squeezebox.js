@@ -1,23 +1,92 @@
-var refresh, currentPlayer, nowPlayingThumb;
+var currentPlayer, nowPlayingThumb;
 var artist_id = {}
 var album_id = {}
 
-function parseSec(sec) {
-    if (sec==undefined) sec=0;
-    min = pad(Math.floor(sec / 60), 2);
-    sec = pad(Math.floor(sec % 60), 2);
-    return min + ':' + sec;
-}
+$(document).ready(function () {
+    $('#players').change(function() {
+        togglePlayer($(this).val());
+    });
+    getPlayers();
+    getArtists();
+    getAlbums();
+    // Hide stations since its unfinished
+    //getStationGroups();
+    $('[href=#stations]').remove();
+    getPlaylists();
+    setInterval("refreshPlayer()", 1000)
+});
 
 function sendCommand(player, command) {
-    command = encodeURIComponent(command); 
     $.ajax({
-	url: '/json/?which=squeezebox&action=control&player='+player+'&command='+command,
-	type: 'get',
-	dataType: 'json',
+        url: '/json/?which=squeezebox&action=control',
+        type: 'get',
+        dataType: 'json',
+        data: {
+            'player': player,
+            'command': encodeURIComponent(command)
+        },	
         complete: function() {
             refreshPlayer(player);
         }
+    });
+}
+
+function getPlayers() {
+    $.ajax({
+        url: '/json/?which=squeezebox&action=getplayers',
+        type: 'get',
+        dataType: 'json',
+        success: function (data) {
+            if (data == null) return false;
+
+            $('#players').html('');
+            $.each(data.result.players_loop, function (i, item) {
+                var player = $('<option>').text(item.name).val(item.playerid);
+                $('#players').append(player);
+            });
+        },
+        complete: function () {
+            togglePlayer($('#players').val());
+        }
+    });
+}
+
+function togglePlayer(player) {
+    currentPlayer = player;
+    refreshPlayer(player);
+    if (!$('#nowplaying').is(':visible')) {
+        $('#nowplaying').fadeIn();
+    }
+    $('[data-player-control=VolUp]').unbind("click").click(function() {
+        sendCommand(player, 'mixer volume +2.5')
+    });
+    $('[data-player-control=VolDown]').unbind("click").click(function() {
+        sendCommand(player, 'mixer volume -2.5')
+    });
+    $('[data-player-control=Power]').unbind("click").click(function() {
+        sendCommand(player, 'power')
+    });
+    $('[data-player-control=PlayPause]').unbind("click").click(function(){
+        sendCommand(player, 'pause') 
+    });
+    $('[data-player-control=MoveLeft]').unbind("click").click(function() {
+        sendCommand(player, 'playlist jump -1')
+    });
+    $('[data-player-control=MoveRight]').unbind("click").click(function() {
+        sendCommand(player, 'playlist jump +1')
+    });
+    $('[data-player-control=Shuffle]').unbind("click").click(function() {
+        sendCommand(player, 'playlist shuffle')
+    });
+    $('[data-player-control=Repeat]').unbind("click").click(function() {
+        sendCommand(player, 'playlist repeat')
+    });
+    $('[data-player-control=SavePlaylist]').unbind("click").click(function() {
+        name = prompt("Save as:","");
+        sendCommand(player, 'playlist save '+name)
+    });
+    $('[data-player-control=ClearPlaylist]').unbind("click").click(function() {
+        sendCommand(player, 'playlist clear')
     });
 }
 
@@ -29,21 +98,17 @@ function refreshPlayer(player) {
         dataType: 'json',
         success: function (item) {
             if (item == null) return false;
-            if(item.playlist==undefined) {
+            item = item.result;
+            if(item.playlist_loop==undefined) {
                 nowPlaying = "Playlist empty"
-                item.playlist = []
+                item.playlist_loop = []
             } else {
-                current = item.playlist[item.playlist_cur_index]
+                current = item.playlist_loop[item.playlist_cur_index]
                 if (current.artist) {
                     nowPlaying = current.artist + ': ' + current.title;
                 } else {
                     nowPlaying = current.title;
                 }
-            }
-            if (player != currentPlayer) {
-                clearInterval(refresh)
-                currentPlayer = player;
-                refresh = setInterval("refreshPlayer()", 1000)
             }
             if (nowPlayingThumb != nowPlaying) {
                 nowPlayingThumb = nowPlaying;
@@ -64,7 +129,7 @@ function refreshPlayer(player) {
             var powerIcon = $('[data-player-control=Power]');
             powerIcon.toggleClass('active',(item.power=='1'));
             $('#playlist_table').html('');
-            $.each(item.playlist, function (t, track) {
+            $.each(item.playlist_loop, function (t, track) {
                 if (track.album == undefined) track.album = '';
                 var row = $('<tr>')
                 var remove = $('<a>').attr('href','#').click(function() {
@@ -78,87 +143,18 @@ function refreshPlayer(player) {
                 });
                 row.append($('<td>').append(title));
                 var artist = $('<a>').attr('href','#').text(track.artist).click(function() {
-                    getArtist(artist_id[track.artist]);
+                    getSongs('artist_id:'+artist_id[track.artist]);
                     return false;
                 });
                 row.append($('<td>').append(artist));
                 var album = $('<a>').attr('href','#').text(track.album).click(function() {
-                    getAlbum(album_id[track.album]);
+                    getSongs('album_id:'+album_id[track.album]);
                     return false;
                 });
                 row.append($('<td>').append(album));
                 row.append($('<td>').append(parseSec(track.duration)).addClass('right'));
                 $('#playlist_table').append(row);
             });
-        }
-    });
-}
-
-function togglePlayer(player) {
-    refreshPlayer(player);
-    if (!$('#nowplaying').is(':visible')) {
-	$('#nowplaying').fadeIn();
-    }
-    var volUpButton = $('[data-player-control=VolUp]');
-    volUpButton.unbind("click").click(function(){
-	sendCommand(player, 'mixer volume +2.5')
-    });
-    var volDownButton = $('[data-player-control=VolDown]');
-    volDownButton.unbind("click").click(function(){
-	sendCommand(player, 'mixer volume -2.5')
-    });
-    var powerButton = $('[data-player-control=Power]');
-    powerButton.unbind("click").click(function(){
-	sendCommand(player, 'power')
-    });
-    var playPauseButton = $('[data-player-control=PlayPause]');
-    playPauseButton.unbind("click").click(function(){
-	 sendCommand(player, 'pause')
-    });
-    var leftButton = $('[data-player-control=MoveLeft]');
-    leftButton.unbind("click").click(function(){
-	sendCommand(player, 'playlist jump -1')
-    });
-    var rightButton = $('[data-player-control=MoveRight]');
-    rightButton.unbind("click").click(function(){
-	sendCommand(player, 'playlist jump +1')
-    });
-    var shuffleButton = $('[data-player-control=Shuffle]');
-    shuffleButton.unbind("click").click(function(){
-	sendCommand(player, 'playlist shuffle')
-    });
-    var repeatButton = $('[data-player-control=Repeat]');
-    repeatButton.unbind("click").click(function(){
-	sendCommand(player, 'playlist repeat')
-    });
-    var savePlaylistButton = $('[data-player-control=SavePlaylist]');
-    savePlaylistButton.unbind("click").click(function(){
-        name = prompt("Save as:","");
-	sendCommand(player, 'playlist save '+name)
-    });
-    var clearPlaylistButton = $('[data-player-control=ClearPlaylist]');
-    clearPlaylistButton.unbind("click").click(function(){
-	sendCommand(player, 'playlist clear')
-    });
-}
-
-function getPlayers() {
-    $.ajax({
-        url: '/json/?which=squeezebox&action=getplayers',
-        type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            if (data == null) return false;
-
-            $('#players').html('');
-            $.each(data, function (i, item) {
-                var player = $('<option>').text(item.name).val(item.playerid);
-                $('#players').append(player);
-            });
-        },
-        complete: function () {
-            player = $('#players').val()
-            togglePlayer(player);
         }
     });
 }
@@ -171,94 +167,73 @@ function getArtists() {
         success: function (data) {
             if (data == null) return false;
 
-            $('#artists').html($('<ul>'));
-            $.each(data.artists, function (i, item) {
-                artist_id[item.artist] = item.id
-                var artist = $('<li>').addClass('btn span3').css({'clear':'both','margin':'0 0 10px 0'}).text(item.artist).click(function() {
-                    getArtist(item.id);
+            var list = $('<ul>').addClass('nav nav-list')
+            $.each(data.result.artists_loop, function (i, item) {
+                artist_id[item.artist] = item.id;
+                var link = $('<a>').attr('href','#').append(item.artist).click(function(e) {
+                	e.preventDefault();
+                	var albumlist = $('<div>');
+                	$(this).append(albumlist).unbind().click(function(e) {
+                		e.preventDefault();
+                		albumlist.toggleClass('hide');
+                	})
+                	getAlbums(albumlist, item.id);
                 });
-                $('#artists').append(artist);
+                list.append($('<li>').append(link));
             });
+            $('#artists').html(list);
         }
     });
 }
 
-function getArtist(artist){
+function getAlbums(e, artist) {
+    if (e==undefined) e = $('#albums');
+    filter = (artist==undefined) ? '' : '&artist='+artist
     $.ajax({
-        url: '/json/?which=squeezebox&action=getartist&artist='+artist,
-        type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            if (data == null) return false;
-            $('[data-player-control=PlayNow]').unbind("click").click(function(){
-                sendCommand(currentPlayer, 'playlistcontrol cmd:load artist_id:'+artist);
-            });
-            $('[data-player-control=AddPlaylist]').unbind("click").click(function(){
-                sendCommand(currentPlayer, 'playlistcontrol cmd:add artist_id:'+artist);
-            });
-            $('#song_table').html('')
-            $.each(data, function (i, item) {
-                var row = $('<tr>');
-                var title = $('<a>').attr('href','#').text(item.title).click(function() {
-                    sendCommand(currentPlayer, 'playlistcontrol cmd:add track_id:'+item.id);
-                    return false;
-                });
-                row.append($('<td>').append(title));
-                var artist = $('<a>').attr('href','#').text(item.artist).click(function() {
-                    return false;
-                });
-                row.append($('<td>').append(artist));
-                var album = $('<a>').attr('href','#').text(item.album).click(function() {
-                    getAlbum(album_id[item.album]);
-                    return false;
-                });
-                row.append($('<td>').append(album));
-                row.append($('<td>').text(parseSec(item.duration)).addClass('right'));
-                $('#song_table').append(row);
-            });
-        },
-        complete: function() {
-            $('[href=#songs]').trigger('click');
-        }
-    });
-}
-
-function getAlbums() {
-    $.ajax({
-        url: '/json/?which=squeezebox&action=getalbums',
+        url: '/json/?which=squeezebox&action=getalbums'+filter,
         type: 'get',
         dataType: 'json',
         success: function (data) {
             if (data == null) return false;
 
-            $('#albums').html($('<ul>'));
-            $.each(data.albums, function (i, item) {
-                album_id[item.album] = item.id
-                var album = $('<li>').text(item.album).click(function() {
-                    getAlbum(item.id);
+            var list = $('<ul>')
+            if (artist) {
+            	var link = $('<a>').attr('href','#').text('All albums').click(function() {
+                    getSongs('artist_id:'+artist);
                 });
-                $('#albums').append(album);
+                list.append($('<li>').append(link));
+            } else {
+            	list.addClass('nav nav-list')
+            }
+            $.each(data.result.albums_loop, function (i, item) {
+                album_id[item.album] = item.id;
+                var link = $('<a>').attr('href','#').text(item.album).click(function() {
+                    getSongs('album_id:'+item.id);
+                });
+                list.append($('<li>').append(link));
             });
+            e.html(list);
         }
     });
 }
 
-function getAlbum(album){
+function getSongs(filter){
     $.ajax({
-        url: '/json/?which=squeezebox&action=getalbum&album='+album,
+        url: '/json/?which=squeezebox&action=getsongs',
         type: 'get',
         dataType: 'json',
+        data: { 'filter': filter },
         success: function (data) {
             if (data == null) return false;
 
             $('[data-player-control=PlayNow]').unbind("click").click(function(){
-                sendCommand(currentPlayer, 'playlistcontrol cmd:load album_id:'+album);
+                sendCommand(currentPlayer, 'playlistcontrol cmd:load ' + filter);
             });
             $('[data-player-control=AddPlaylist]').unbind("click").click(function(){
-                sendCommand(currentPlayer, 'playlistcontrol cmd:add album_id:'+album);
+                sendCommand(currentPlayer, 'playlistcontrol cmd:add ' + filter);
             });
             $('#song_table').html('')
-            $.each(data, function (i, item) {
+            $.each(data.result.titles_loop, function (i, item) {
                 var row = $('<tr>')
                 var title = $('<a>').attr('href','#').text(item.title).click(function() {
                     sendCommand(currentPlayer, 'playlistcontrol cmd:add track_id:'+item.id);
@@ -266,12 +241,12 @@ function getAlbum(album){
                 });
                 row.append($('<td>').append(title));
                 var artist = $('<a>').attr('href','#').text(item.artist).click(function() {
-                    $('[href=#artists]').trigger('click');
-                    getArtist(artist_id[item.artist]);
+                    getSongs('artist_id:'+artist_id[item.artist]);
                     return false;
                 });
                 row.append($('<td>').append(artist));
                 var album = $('<a>').attr('href','#').text(item.album).click(function() {
+                	getSongs('album_id:'+album_id[item.album]);
                     return false;
                 });
                 row.append($('<td>').append(album));
@@ -281,6 +256,57 @@ function getAlbum(album){
         },
         complete: function() {
             $('[href=#songs]').trigger('click');
+        }
+    });
+}
+
+function getStationGroups() {
+    $.ajax({
+        url: '/json/?which=squeezebox&action=getstationgroups',
+        type: 'get',
+        dataType: 'json',
+        success: function (data) {
+            if (data == null) return false;
+
+            var list = $('<ul>').addClass('nav nav-list')
+            $.each(data.result.radioss_loop, function (i, item) {
+                var link = $('<a>').attr('href','#').text(item.name).click(function(e) {
+                	e.preventDefault();
+                	var stationlist = $('<div>');
+                	$(this).append(stationlist).unbind().click(function(e) {
+                		e.preventDefault();
+                		stationlist.toggleClass('hide');
+                	})
+                	getStations(stationlist, item.cmd);
+                });
+                list.append($('<li>').append(link));
+            });
+            $('#stations').html(list);
+        }
+    });
+}
+
+function getStations(e, group) {
+    $.ajax({
+        url: '/json/?which=squeezebox&action=getstations',
+        type: 'get',
+        dataType: 'json',
+        data: {
+        	'group': group,
+        	'player': currentPlayer
+        },
+        success: function (data) {
+            if (data == null) return false;
+
+            var list = $('<ul>')
+            $.each(data.result.loop_loop, function (i, item) {
+                album_id[item.album] = item.id;
+                var link = $('<a>').attr('href','#').text(item.name).click(function() {
+                   sendCommand(currentPlayer, 'playlistcontrol cmd:add track_id:'+item.id);
+                });
+                list.append($('<li>').append(link));
+            });
+            e.html(list);
         }
     });
 }
@@ -293,23 +319,14 @@ function getPlaylists() {
         success: function (data) {
             if (data == null) return false;
 
-            $('#playlists').html($('<ul>'));
-            $.each(data.playlists, function (i, item) {
-                var playlist = $('<li>').addClass('btn').css('width','195px').css('margin','6px').text(item.playlist).click(function() {
+            var list = $('<ul>').addClass('nav nav-list')
+            $.each(data.result.playlists_loop, function (i, item) {
+                var link = $('<a>').attr('href','#').text(item.playlist).click(function() {
                     sendCommand(currentPlayer, 'playlistcontrol cmd:load playlist_id:'+item.id)
                 });
-                $('#playlists').append(playlist);
+                list.append($('<li>').append(link));
             });
+            $('#playlists').html(list);
         }
     });
 }
-
-$(document).ready(function () {
-    $('#players').change(function() {
-        togglePlayer($(this).val());
-    });
-    getPlayers();
-    getArtists();
-    getAlbums();
-    getPlaylists();
-});

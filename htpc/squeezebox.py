@@ -1,24 +1,20 @@
-from telnetlib import Telnet
-from json import dumps
 import urllib2, base64, cherrypy
+from json import dumps
 
 class squeezebox:
-    def __init__(self, host, port, username='', password='', charset='utf-8'):
-        self.telnet = Telnet(host, port)
-        self.webhost = 'http://musik.mbw.dk'
-        self.auth = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
-        self.charset = charset
-
+    def __init__(self, host, port, username='', password=''):
+        self.webhost = 'http://' + host + ':'+ str(port)
+        self.auth = ''
         if username and password:
-            self.request("login %s %s" % (username, password))
+            self.auth = base64.encodestring('%s:%s' % (username, password)).strip()
 
     def sendRequest(self, args):
         if args.get('action') == 'control':
             command = urllib2.unquote(args.get('command'))
             return self.playerControl(args.get('player'), command)
 
-	if args.get('action') == 'getplayers':
-	    return self.getPlayers()
+        if args.get('action') == 'getplayers':
+            return self.getPlayers()
 
         if args.get('action') == 'getplayer':
             return self.getPlayer(args.get('player'))
@@ -29,95 +25,63 @@ class squeezebox:
         if args.get('action') == 'getartists':
             return self.getArtists()
 
-        if args.get('action') == 'getartist':
-            return self.getArtist(args.get('artist'))
-
         if args.get('action') == 'getalbums':
-            return self.getAlbums()
+            return self.getAlbums(args.get('artist',''))
 
-        if args.get('action') == 'getalbum':
-            return self.getAlbum(args.get('album'))
+        if args.get('action') == 'getsongs':
+            return self.getSongs(args.get('filter'))
+
+        if args.get('action') == 'getstationgroups':
+            return self.getStationGroups()
+       
+        if args.get('action') == 'getstations':
+            player = urllib2.unquote(args.get('player'))
+            return self.getStations(player, args.get('group'))
 
         if args.get('action') == 'getplaylists':
             return self.getPlaylists()
 
-    def getPlaylists(self):
-        playlists = self.request("playlists 0")
-        playlists = [i.split(":", 1) for i in playlists[2:]]
-        playlists = [dict(playlists[start : start + 2]) for start in range(0, len(playlists), 2)]
-        playlists = {
-            'count': playlists.pop(),
-            'playlists': playlists
-        }
-        return dumps(playlists)
+    def playerControl(self, player, command):
+        return self.jsonRequest(player, command.split())
 
-    def getAlbums(self):
-        albums = self.request("albums 0")
-        albums = [i.split(":", 1) for i in albums[2:]]
-        albums = [dict(albums[start : start + 2]) for start in range(0, len(albums), 2)]
-        albums = {
-            'count': albums.pop(),
-            'albums': albums
-        }
-        return dumps(albums)
+    def getPlayers(self, start=0, end=999):
+        return self.jsonRequest("", ["players", start, end])
 
-    def getAlbum(self, album):
-        songs = self.request("songs 0 999 album_id:%s" % album)
-        songs = [i.split(":", 1) for i in songs[4:]][:-1]
-        songs = [dict(songs[start : start + 6]) for start in range(0, len(songs), 6)]
-        return dumps(songs)
-
-    def getArtists(self):
-        artists = self.request("artists 0")
-        artists = [i.split(":", 1) for i in artists[2:]]
-        artists = [dict(artists[start : start + 2]) for start in range(0, len(artists), 2)]
-        artists = {
-            'count': artists.pop(),
-            'artists': artists
-        }
-        return dumps(artists)
-
-    def getArtist(self, artist):
-        songs = self.request("songs 0 999 artist_id:%s" % artist)
-        songs = [i.split(":", 1) for i in songs[4:]][:-1]
-        songs = [dict(songs[start : start + 6]) for start in range(0, len(songs), 6)]
-        return dumps(songs)
+    def getPlayer(self, player):
+        return self.jsonRequest(player, ["status","0"])
 
     def getCover(self, player):
         url = self.webhost+'/music/current/cover.jpg?player='+player
         request = urllib2.Request(url)
-        request.add_header("Authorization", "Basic %s" % self.auth)
+        if self.auth:
+            request.add_header("Authorization", "Basic %s" % self.auth)
         cherrypy.response.headers['Content-Type'] = "image/jpeg"
         return urllib2.urlopen(request).read()
 
-    def playerControl(self, player, command):
-        self.request("%s %s" % (player, command))
-        return "Success"
+    def getArtists(self):
+        return self.jsonRequest("", ["artists","0"])
 
-    def getPlayerCount(self):
-        return int(self.request("player count ?")[2])
+    def getAlbums(self, artist="", start=0, end=999):
+        if artist:
+            return self.jsonRequest("", ["albums", start, end, "artist_id:%s"%artist])
+        else:
+            return self.jsonRequest("", ["albums","0"])
 
-    def getPlayers(self):
-        players = self.request("players 0 999")
-        players = [i.split(":", 1) for i in players[4:]]
-        players = [dict(players[start : start + 10]) for start in range(0, len(players), 10)]
-        return dumps(players)
+    def getSongs(self, filter, start=0, end=999):
+        return self.jsonRequest("", ["songs", start, end, filter])
 
-    def getPlayer(self, player):
-        status = self.request("%s status 0" % player)
-        status = [i.split(":", 1) for i in status[3:]]
-        try:
-            index = status.index(['playlist index','0'])
-        except ValueError:
-            return dumps(dict(status))
+    def getStationGroups(self, start=0, end=999):
+        return self.jsonRequest("", ["radios", start, end])
 
-        player = dict(status[:index])
-        status = status[index:]
-        player['playlist'] = [dict(status[start : start + 7]) for start in range(0, len(status), 7)]
-        return dumps(player)
+    def getStations(self, player, group='local', start=0, end=999):
+        return self.jsonRequest(player, [group, 'items', start, end])
 
-    def request(self, command):
-        self.telnet.write(command.encode('utf-8') + "\n")
-        response = self.telnet.read_until("\n")[:-1]
-        response = [urllib2.unquote(i) for i in response.split()]
-        return response
+    def getPlaylists(self):
+        return self.jsonRequest("", ["playlists","0"])
+
+    def jsonRequest(self, player, params):
+        data = dumps({"id":1,"method":"slim.request","params":[player,params]})
+        request = urllib2.Request(self.webhost + '/jsonrpc.js', data)
+        if self.auth:
+            request.add_header("Authorization", "Basic %s" % self.auth)
+        return urllib2.urlopen(request, timeout=5).read()

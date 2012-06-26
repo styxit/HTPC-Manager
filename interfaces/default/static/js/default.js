@@ -135,6 +135,7 @@ function offerToUpdate() {
 
 // Text inkorten
 function shortenText(text, length) {
+	if (text == null) return '';
     var shorten_text = text;
     if (text.length > length) {
         shorten_text = shorten_text.substr(0, length);
@@ -258,6 +259,13 @@ function bytesToSize(bytes, precision) {
     } else {
         return bytes + ' B';
     }
+}
+
+function parseSec(sec) {
+    if (sec==undefined) sec=0;
+    min = pad(Math.floor(sec / 60), 2);
+    sec = pad(Math.floor(sec % 60), 2);
+    return min + ':' + sec;
 }
 
 function blockPage(title, content) {
