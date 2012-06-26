@@ -1,6 +1,11 @@
 $(document).ready(function() {
     getMovieList();
     getNotificationList();
+    $('#search_movie_name').keydown(function(e){
+        if(e.which == 13){
+            searchMovie($('#search_movie_name').val());
+        }
+    }).focus();
     $('#search_movie_button').click(function() {
         searchMovie($('#search_movie_name').val());
     });
@@ -15,7 +20,6 @@ $(document).ready(function() {
 function getMovieList() {
     $('.tooltip').remove();
     $('#movies_table_body').children().remove();
-
     $.ajax({
         url: 'json/?which=couchpotato&action=movielist',
         type: 'get',
@@ -81,14 +85,11 @@ function getMovieList() {
     });
 }
 
-
 function deleteMovie(id, name) {
     $('.tooltip').remove();
     $.ajax({
         url: '/json/?which=couchpotato&action=moviedelete',
-        data: {
-            id: id
-        },
+        data: {id: id},
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -103,9 +104,7 @@ function deleteMovie(id, name) {
 function refreshMovie(id, name) {
     $.ajax({
         url: '/json/?which=couchpotato&action=movierefresh',
-        data: {
-            id: id
-        },
+        data: {id: id},
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -120,9 +119,7 @@ function searchMovie(q) {
     $('.tooltip').remove();
     $.ajax({
         url: '/json/?which=couchpotato&action=moviesearch',
-        data: {
-            q: encodeURIComponent(q)
-        },
+        data: {q: encodeURIComponent(q)},
         type: 'get',
         dataType: 'json',
         beforeSend: function () {
@@ -181,11 +178,9 @@ function addMovie(profile, id, title) {
         dataType: 'json',
         success: function (result) {
             notifyInfo('CouchPotato', title + ' successfully added!');
-            getMovieList();
+            $('#search_movie_name').popover('hide');
+            setTimeout(getMovieList, 1000);
         },
-        complete: function() {
-        	$('#search_movie_name').popover('hide');
-        }
     });
 }
 

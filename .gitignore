@@ -1,8 +1,6 @@
 .idea*
 .DS_Store*
 *.pyc
-.project
-.pydevproject
 ehthumbs.db
 Icon?
 Thumbs.db

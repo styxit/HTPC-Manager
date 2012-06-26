@@ -135,6 +135,7 @@ function offerToUpdate() {
 
 // Text inkorten
 function shortenText(text, length) {
+	if (text == null) return '';
     var shorten_text = text;
     if (text.length > length) {
         shorten_text = shorten_text.substr(0, length);

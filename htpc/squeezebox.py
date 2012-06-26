@@ -1,11 +1,11 @@
 from telnetlib import Telnet
 from json import dumps
-import urllib2, base64, cherrypy
+import urllib, urllib2, base64, cherrypy
 
 class squeezebox:
     def __init__(self, host, port, username='', password='', charset='utf-8'):
         self.telnet = Telnet(host, port)
-        self.webhost = 'http://musik.mbw.dk'
+        self.webhost = 'http://10.0.1.10:9000' #'http://musik.mbw.dk'
         self.auth = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
         self.charset = charset
 
@@ -13,12 +13,27 @@ class squeezebox:
             self.request("login %s %s" % (username, password))
 
     def sendRequest(self, args):
+        if args.get('action') == 'test':
+            print "Start"
+            url = self.webhost+'/jsonrpc.js'
+            values  = {"id":1,"method":"slim.request","params":["00:04:20:29:e1:a8",["play"]]}
+            data = urllib.urlencode(values)
+            print "Prep request"
+            request = urllib2.Request(url, data)
+            print "Add headers"
+            request.add_header("Authorization", "Basic %s" % self.auth)
+            request.add_header("Content-type", "application/json")
+            print "Send request"
+            req = urllib2.urlopen(request, timeout=2)
+            print "Read data"
+            return req.read()
+            
         if args.get('action') == 'control':
             command = urllib2.unquote(args.get('command'))
             return self.playerControl(args.get('player'), command)
 
-	if args.get('action') == 'getplayers':
-	    return self.getPlayers()
+        if args.get('action') == 'getplayers':
+            return self.getPlayers()
 
         if args.get('action') == 'getplayer':
             return self.getPlayer(args.get('player'))

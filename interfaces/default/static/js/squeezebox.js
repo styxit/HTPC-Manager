@@ -171,14 +171,16 @@ function getArtists() {
         success: function (data) {
             if (data == null) return false;
 
-            $('#artists').html($('<ul>'));
+			$('#artists').addClass('sidebar-nav');
+            var list = $('<ul>').addClass('nav nav-list')
             $.each(data.artists, function (i, item) {
-                artist_id[item.artist] = item.id
-                var artist = $('<li>').addClass('btn span3').css({'clear':'both','margin':'0 0 10px 0'}).text(item.artist).click(function() {
+                artist_id[item.artist] = item.id;
+                var link = $('<a>').attr('href','#').text(item.artist).click(function() {
                     getArtist(item.id);
                 });
-                $('#artists').append(artist);
+                list.append($('<li>').append(link));
             });
+            $('#artists').html(list);
         }
     });
 }
@@ -231,14 +233,16 @@ function getAlbums() {
         success: function (data) {
             if (data == null) return false;
 
-            $('#albums').html($('<ul>'));
+			$('#albums').addClass('sidebar-nav');
+            var list = $('<ul>').addClass('nav nav-list')
             $.each(data.albums, function (i, item) {
-                album_id[item.album] = item.id
-                var album = $('<li>').text(item.album).click(function() {
+                album_id[item.album] = item.id;
+                var link = $('<a>').attr('href','#').text(item.album).click(function() {
                     getAlbum(item.id);
                 });
-                $('#albums').append(album);
+                list.append($('<li>').append(link));
             });
+            $('#albums').html(list);
         }
     });
 }
