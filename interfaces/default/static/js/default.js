@@ -261,6 +261,13 @@ function bytesToSize(bytes, precision) {
     }
 }
 
+function parseSec(sec) {
+    if (sec==undefined) sec=0;
+    min = pad(Math.floor(sec / 60), 2);
+    sec = pad(Math.floor(sec % 60), 2);
+    return min + ':' + sec;
+}
+
 function blockPage(title, content) {
     $('#block_dialog').modal({
         show: true,

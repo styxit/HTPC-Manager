@@ -2,22 +2,101 @@ var refresh, currentPlayer, nowPlayingThumb;
 var artist_id = {}
 var album_id = {}
 
-function parseSec(sec) {
-    if (sec==undefined) sec=0;
-    min = pad(Math.floor(sec / 60), 2);
-    sec = pad(Math.floor(sec % 60), 2);
-    return min + ':' + sec;
-}
+$(document).ready(function () {
+    $('#players').change(function() {
+        togglePlayer($(this).val());
+    });
+    getPlayers();
+    getArtists();
+    getAlbums();
+    getPlaylists();
+});
 
 function sendCommand(player, command) {
     command = encodeURIComponent(command); 
     $.ajax({
-	url: '/json/?which=squeezebox&action=control&player='+player+'&command='+command,
-	type: 'get',
-	dataType: 'json',
+        url: '/json/?which=squeezebox&action=control',
+        type: 'get',
+        dataType: 'json',
+        data: {
+            'player': player,
+            'command': command
+        },	
         complete: function() {
             refreshPlayer(player);
         }
+    });
+}
+
+function getPlayers() {
+    $.ajax({
+        url: '/json/?which=squeezebox&action=getplayers',
+        type: 'get',
+        dataType: 'json',
+        success: function (data) {
+            if (data == null) return false;
+
+            $('#players').html('');
+            $.each(data.result.players_loop, function (i, item) {
+                var player = $('<option>').text(item.name).val(item.playerid);
+                $('#players').append(player);
+            });
+        },
+        complete: function () {
+            player = $('#players').val()
+            togglePlayer(player);
+        }
+    });
+}
+
+function togglePlayer(player) {
+    currentPlayer = player;
+    clearInterval(refresh)
+    refresh = setInterval("refreshPlayer()", 1000)
+    refreshPlayer(player);
+    if (!$('#nowplaying').is(':visible')) {
+        $('#nowplaying').fadeIn();
+    }
+    var volUpButton = $('[data-player-control=VolUp]');
+    volUpButton.unbind("click").click(function(){
+        sendCommand(player, 'mixer volume +2.5')
+    });
+    var volDownButton = $('[data-player-control=VolDown]');
+    volDownButton.unbind("click").click(function(){
+        sendCommand(player, 'mixer volume -2.5')
+    });
+    var powerButton = $('[data-player-control=Power]');
+    powerButton.unbind("click").click(function(){
+        sendCommand(player, 'power')
+    });
+    var playPauseButton = $('[data-player-control=PlayPause]');
+    playPauseButton.unbind("click").click(function(){
+        sendCommand(player, 'pause')
+    });
+    var leftButton = $('[data-player-control=MoveLeft]');
+    leftButton.unbind("click").click(function(){
+        sendCommand(player, 'playlist jump -1')
+    });
+    var rightButton = $('[data-player-control=MoveRight]');
+    rightButton.unbind("click").click(function(){
+        sendCommand(player, 'playlist jump +1')
+    });
+    var shuffleButton = $('[data-player-control=Shuffle]');
+    shuffleButton.unbind("click").click(function(){
+        sendCommand(player, 'playlist shuffle')
+    });
+    var repeatButton = $('[data-player-control=Repeat]');
+    repeatButton.unbind("click").click(function(){
+        sendCommand(player, 'playlist repeat')
+    });
+    var savePlaylistButton = $('[data-player-control=SavePlaylist]');
+    savePlaylistButton.unbind("click").click(function(){
+        name = prompt("Save as:","");
+        sendCommand(player, 'playlist save '+name)
+    });
+    var clearPlaylistButton = $('[data-player-control=ClearPlaylist]');
+    clearPlaylistButton.unbind("click").click(function(){
+        sendCommand(player, 'playlist clear')
     });
 }
 
@@ -29,21 +108,17 @@ function refreshPlayer(player) {
         dataType: 'json',
         success: function (item) {
             if (item == null) return false;
-            if(item.playlist==undefined) {
+            item = item.result;
+            if(item.playlist_loop==undefined) {
                 nowPlaying = "Playlist empty"
                 item.playlist = []
             } else {
-                current = item.playlist[item.playlist_cur_index]
+                current = item.playlist_loop[item.playlist_cur_index]
                 if (current.artist) {
                     nowPlaying = current.artist + ': ' + current.title;
                 } else {
                     nowPlaying = current.title;
                 }
-            }
-            if (player != currentPlayer) {
-                clearInterval(refresh)
-                currentPlayer = player;
-                refresh = setInterval("refreshPlayer()", 1000)
             }
             if (nowPlayingThumb != nowPlaying) {
                 nowPlayingThumb = nowPlaying;
@@ -64,7 +139,7 @@ function refreshPlayer(player) {
             var powerIcon = $('[data-player-control=Power]');
             powerIcon.toggleClass('active',(item.power=='1'));
             $('#playlist_table').html('');
-            $.each(item.playlist, function (t, track) {
+            $.each(item.playlist_loop, function (t, track) {
                 if (track.album == undefined) track.album = '';
                 var row = $('<tr>')
                 var remove = $('<a>').attr('href','#').click(function() {
@@ -94,75 +169,6 @@ function refreshPlayer(player) {
     });
 }
 
-function togglePlayer(player) {
-    refreshPlayer(player);
-    if (!$('#nowplaying').is(':visible')) {
-	$('#nowplaying').fadeIn();
-    }
-    var volUpButton = $('[data-player-control=VolUp]');
-    volUpButton.unbind("click").click(function(){
-	sendCommand(player, 'mixer volume +2.5')
-    });
-    var volDownButton = $('[data-player-control=VolDown]');
-    volDownButton.unbind("click").click(function(){
-	sendCommand(player, 'mixer volume -2.5')
-    });
-    var powerButton = $('[data-player-control=Power]');
-    powerButton.unbind("click").click(function(){
-	sendCommand(player, 'power')
-    });
-    var playPauseButton = $('[data-player-control=PlayPause]');
-    playPauseButton.unbind("click").click(function(){
-	 sendCommand(player, 'pause')
-    });
-    var leftButton = $('[data-player-control=MoveLeft]');
-    leftButton.unbind("click").click(function(){
-	sendCommand(player, 'playlist jump -1')
-    });
-    var rightButton = $('[data-player-control=MoveRight]');
-    rightButton.unbind("click").click(function(){
-	sendCommand(player, 'playlist jump +1')
-    });
-    var shuffleButton = $('[data-player-control=Shuffle]');
-    shuffleButton.unbind("click").click(function(){
-	sendCommand(player, 'playlist shuffle')
-    });
-    var repeatButton = $('[data-player-control=Repeat]');
-    repeatButton.unbind("click").click(function(){
-	sendCommand(player, 'playlist repeat')
-    });
-    var savePlaylistButton = $('[data-player-control=SavePlaylist]');
-    savePlaylistButton.unbind("click").click(function(){
-        name = prompt("Save as:","");
-	sendCommand(player, 'playlist save '+name)
-    });
-    var clearPlaylistButton = $('[data-player-control=ClearPlaylist]');
-    clearPlaylistButton.unbind("click").click(function(){
-	sendCommand(player, 'playlist clear')
-    });
-}
-
-function getPlayers() {
-    $.ajax({
-        url: '/json/?which=squeezebox&action=getplayers',
-        type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            if (data == null) return false;
-
-            $('#players').html('');
-            $.each(data, function (i, item) {
-                var player = $('<option>').text(item.name).val(item.playerid);
-                $('#players').append(player);
-            });
-        },
-        complete: function () {
-            player = $('#players').val()
-            togglePlayer(player);
-        }
-    });
-}
-
 function getArtists() {
     $.ajax({
         url: '/json/?which=squeezebox&action=getartists',
@@ -171,9 +177,9 @@ function getArtists() {
         success: function (data) {
             if (data == null) return false;
 
-			$('#artists').addClass('sidebar-nav');
+            $('#artists').addClass('sidebar-nav');
             var list = $('<ul>').addClass('nav nav-list')
-            $.each(data.artists, function (i, item) {
+            $.each(data.result.artists_loop, function (i, item) {
                 artist_id[item.artist] = item.id;
                 var link = $('<a>').attr('href','#').text(item.artist).click(function() {
                     getArtist(item.id);
@@ -199,7 +205,7 @@ function getArtist(artist){
                 sendCommand(currentPlayer, 'playlistcontrol cmd:add artist_id:'+artist);
             });
             $('#song_table').html('')
-            $.each(data, function (i, item) {
+            $.each(data.result.titles_loop, function (i, item) {
                 var row = $('<tr>');
                 var title = $('<a>').attr('href','#').text(item.title).click(function() {
                     sendCommand(currentPlayer, 'playlistcontrol cmd:add track_id:'+item.id);
@@ -233,9 +239,9 @@ function getAlbums() {
         success: function (data) {
             if (data == null) return false;
 
-			$('#albums').addClass('sidebar-nav');
+            $('#albums').addClass('sidebar-nav');
             var list = $('<ul>').addClass('nav nav-list')
-            $.each(data.albums, function (i, item) {
+            $.each(data.result.albums_loop, function (i, item) {
                 album_id[item.album] = item.id;
                 var link = $('<a>').attr('href','#').text(item.album).click(function() {
                     getAlbum(item.id);
@@ -262,7 +268,7 @@ function getAlbum(album){
                 sendCommand(currentPlayer, 'playlistcontrol cmd:add album_id:'+album);
             });
             $('#song_table').html('')
-            $.each(data, function (i, item) {
+            $.each(data.result.titles_loop, function (i, item) {
                 var row = $('<tr>')
                 var title = $('<a>').attr('href','#').text(item.title).click(function() {
                     sendCommand(currentPlayer, 'playlistcontrol cmd:add track_id:'+item.id);
@@ -297,23 +303,15 @@ function getPlaylists() {
         success: function (data) {
             if (data == null) return false;
 
-            $('#playlists').html($('<ul>'));
-            $.each(data.playlists, function (i, item) {
-                var playlist = $('<li>').addClass('btn').css('width','195px').css('margin','6px').text(item.playlist).click(function() {
+            $('#playlists').addClass('sidebar-nav');
+            var list = $('<ul>').addClass('nav nav-list')
+            $.each(data.result.playlists_loop, function (i, item) {
+                var link = $('<a>').attr('href','#').text(item.playlist).click(function() {
                     sendCommand(currentPlayer, 'playlistcontrol cmd:load playlist_id:'+item.id)
                 });
-                $('#playlists').append(playlist);
+                list.append($('<li>').append(link));
             });
+            $('#playlists').html(list);
         }
     });
 }
-
-$(document).ready(function () {
-    $('#players').change(function() {
-        togglePlayer($(this).val());
-    });
-    getPlayers();
-    getArtists();
-    getAlbums();
-    getPlaylists();
-});
