@@ -9,11 +9,15 @@ $(document).ready(function () {
     getPlayers();
     getArtists();
     getAlbums();
+<<<<<<< HEAD
     // Hide stations since its unfinished
     //getStationGroups();
     $('[href=#stations]').remove();
     getPlaylists();
     setInterval("refreshPlayer()", 1000)
+=======
+    getPlaylists();
+>>>>>>> 3073dcdd96f274fe6e10fdaac5c5aac66c0bc8d8
 });
 
 function sendCommand(player, command) {
@@ -23,7 +27,11 @@ function sendCommand(player, command) {
         dataType: 'json',
         data: {
             'player': player,
+<<<<<<< HEAD
             'command': encodeURIComponent(command)
+=======
+            'command': command
+>>>>>>> 3073dcdd96f274fe6e10fdaac5c5aac66c0bc8d8
         },	
         complete: function() {
             refreshPlayer(player);
@@ -46,17 +54,28 @@ function getPlayers() {
             });
         },
         complete: function () {
+<<<<<<< HEAD
             togglePlayer($('#players').val());
+=======
+            player = $('#players').val()
+            togglePlayer(player);
+>>>>>>> 3073dcdd96f274fe6e10fdaac5c5aac66c0bc8d8
         }
     });
 }
 
 function togglePlayer(player) {
     currentPlayer = player;
+<<<<<<< HEAD
+=======
+    clearInterval(refresh)
+    refresh = setInterval("refreshPlayer()", 1000)
+>>>>>>> 3073dcdd96f274fe6e10fdaac5c5aac66c0bc8d8
     refreshPlayer(player);
     if (!$('#nowplaying').is(':visible')) {
         $('#nowplaying').fadeIn();
     }
+<<<<<<< HEAD
     $('[data-player-control=VolUp]').unbind("click").click(function() {
         sendCommand(player, 'mixer volume +2.5')
     });
@@ -86,6 +105,47 @@ function togglePlayer(player) {
         sendCommand(player, 'playlist save '+name)
     });
     $('[data-player-control=ClearPlaylist]').unbind("click").click(function() {
+=======
+    var volUpButton = $('[data-player-control=VolUp]');
+    volUpButton.unbind("click").click(function(){
+        sendCommand(player, 'mixer volume +2.5')
+    });
+    var volDownButton = $('[data-player-control=VolDown]');
+    volDownButton.unbind("click").click(function(){
+        sendCommand(player, 'mixer volume -2.5')
+    });
+    var powerButton = $('[data-player-control=Power]');
+    powerButton.unbind("click").click(function(){
+        sendCommand(player, 'power')
+    });
+    var playPauseButton = $('[data-player-control=PlayPause]');
+    playPauseButton.unbind("click").click(function(){
+        sendCommand(player, 'pause')
+    });
+    var leftButton = $('[data-player-control=MoveLeft]');
+    leftButton.unbind("click").click(function(){
+        sendCommand(player, 'playlist jump -1')
+    });
+    var rightButton = $('[data-player-control=MoveRight]');
+    rightButton.unbind("click").click(function(){
+        sendCommand(player, 'playlist jump +1')
+    });
+    var shuffleButton = $('[data-player-control=Shuffle]');
+    shuffleButton.unbind("click").click(function(){
+        sendCommand(player, 'playlist shuffle')
+    });
+    var repeatButton = $('[data-player-control=Repeat]');
+    repeatButton.unbind("click").click(function(){
+        sendCommand(player, 'playlist repeat')
+    });
+    var savePlaylistButton = $('[data-player-control=SavePlaylist]');
+    savePlaylistButton.unbind("click").click(function(){
+        name = prompt("Save as:","");
+        sendCommand(player, 'playlist save '+name)
+    });
+    var clearPlaylistButton = $('[data-player-control=ClearPlaylist]');
+    clearPlaylistButton.unbind("click").click(function(){
+>>>>>>> 3073dcdd96f274fe6e10fdaac5c5aac66c0bc8d8
         sendCommand(player, 'playlist clear')
     });
 }
@@ -160,6 +220,7 @@ function refreshPlayer(player) {
 }
 
 function getArtists() {
+<<<<<<< HEAD
     $.ajax({
         url: '/json/?which=squeezebox&action=getartists',
         type: 'get',
@@ -189,6 +250,8 @@ function getArtists() {
 function getAlbums(e, artist) {
     if (e==undefined) e = $('#albums');
     filter = (artist==undefined) ? '' : '&artist='+artist
+=======
+>>>>>>> 3073dcdd96f274fe6e10fdaac5c5aac66c0bc8d8
     $.ajax({
         url: '/json/?which=squeezebox&action=getalbums'+filter,
         type: 'get',
@@ -196,6 +259,7 @@ function getAlbums(e, artist) {
         success: function (data) {
             if (data == null) return false;
 
+<<<<<<< HEAD
             var list = $('<ul>')
             if (artist) {
             	var link = $('<a>').attr('href','#').text('All albums').click(function() {
@@ -213,6 +277,18 @@ function getAlbums(e, artist) {
                 list.append($('<li>').append(link));
             });
             e.html(list);
+=======
+            $('#artists').addClass('sidebar-nav');
+            var list = $('<ul>').addClass('nav nav-list')
+            $.each(data.result.artists_loop, function (i, item) {
+                artist_id[item.artist] = item.id;
+                var link = $('<a>').attr('href','#').text(item.artist).click(function() {
+                    getArtist(item.id);
+                });
+                list.append($('<li>').append(link));
+            });
+            $('#artists').html(list);
+>>>>>>> 3073dcdd96f274fe6e10fdaac5c5aac66c0bc8d8
         }
     });
 }
@@ -234,7 +310,11 @@ function getSongs(filter){
             });
             $('#song_table').html('')
             $.each(data.result.titles_loop, function (i, item) {
+<<<<<<< HEAD
                 var row = $('<tr>')
+=======
+                var row = $('<tr>');
+>>>>>>> 3073dcdd96f274fe6e10fdaac5c5aac66c0bc8d8
                 var title = $('<a>').attr('href','#').text(item.title).click(function() {
                     sendCommand(currentPlayer, 'playlistcontrol cmd:add track_id:'+item.id);
                     return false;
@@ -268,6 +348,7 @@ function getStationGroups() {
         success: function (data) {
             if (data == null) return false;
 
+<<<<<<< HEAD
             var list = $('<ul>').addClass('nav nav-list')
             $.each(data.result.radioss_loop, function (i, item) {
                 var link = $('<a>').attr('href','#').text(item.name).click(function(e) {
@@ -282,6 +363,18 @@ function getStationGroups() {
                 list.append($('<li>').append(link));
             });
             $('#stations').html(list);
+=======
+            $('#albums').addClass('sidebar-nav');
+            var list = $('<ul>').addClass('nav nav-list')
+            $.each(data.result.albums_loop, function (i, item) {
+                album_id[item.album] = item.id;
+                var link = $('<a>').attr('href','#').text(item.album).click(function() {
+                    getAlbum(item.id);
+                });
+                list.append($('<li>').append(link));
+            });
+            $('#albums').html(list);
+>>>>>>> 3073dcdd96f274fe6e10fdaac5c5aac66c0bc8d8
         }
     });
 }
@@ -298,11 +391,32 @@ function getStations(e, group) {
         success: function (data) {
             if (data == null) return false;
 
+<<<<<<< HEAD
             var list = $('<ul>')
             $.each(data.result.loop_loop, function (i, item) {
                 album_id[item.album] = item.id;
                 var link = $('<a>').attr('href','#').text(item.name).click(function() {
                    sendCommand(currentPlayer, 'playlistcontrol cmd:add track_id:'+item.id);
+=======
+            $('[data-player-control=PlayNow]').unbind("click").click(function(){
+                sendCommand(currentPlayer, 'playlistcontrol cmd:load album_id:'+album);
+            });
+            $('[data-player-control=AddPlaylist]').unbind("click").click(function(){
+                sendCommand(currentPlayer, 'playlistcontrol cmd:add album_id:'+album);
+            });
+            $('#song_table').html('')
+            $.each(data.result.titles_loop, function (i, item) {
+                var row = $('<tr>')
+                var title = $('<a>').attr('href','#').text(item.title).click(function() {
+                    sendCommand(currentPlayer, 'playlistcontrol cmd:add track_id:'+item.id);
+                    return false;
+                });
+                row.append($('<td>').append(title));
+                var artist = $('<a>').attr('href','#').text(item.artist).click(function() {
+                    $('[href=#artists]').trigger('click');
+                    getArtist(artist_id[item.artist]);
+                    return false;
+>>>>>>> 3073dcdd96f274fe6e10fdaac5c5aac66c0bc8d8
                 });
                 list.append($('<li>').append(link));
             });
@@ -319,6 +433,10 @@ function getPlaylists() {
         success: function (data) {
             if (data == null) return false;
 
+<<<<<<< HEAD
+=======
+            $('#playlists').addClass('sidebar-nav');
+>>>>>>> 3073dcdd96f274fe6e10fdaac5c5aac66c0bc8d8
             var list = $('<ul>').addClass('nav nav-list')
             $.each(data.result.playlists_loop, function (i, item) {
                 var link = $('<a>').attr('href','#').text(item.playlist).click(function() {

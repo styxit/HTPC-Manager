@@ -63,7 +63,11 @@
             <li class="active"><a href="#playlist" data-toggle="tab">Playlist</a></li>
             <li><a href="#artists" data-toggle="tab">Artists</a></li>
             <li><a href="#albums" data-toggle="tab">Albums</a></li>
+<<<<<<< HEAD
             <li><a href="#stations" data-toggle="tab">Radio</a></li>
+=======
+            <li><a href="#radio" data-toggle="tab">Radio</a></li>
+>>>>>>> 3073dcdd96f274fe6e10fdaac5c5aac66c0bc8d8
             <li><a href="#songs" data-toggle="tab">Songs</a></li>
             <li><a href="#playlists" data-toggle="tab">Playlists</a></li>
         </ul>
@@ -91,7 +95,11 @@
             <div id="albums" class="tab-pane sidebar-nav">
             </div>
 
+<<<<<<< HEAD
             <div id="stations" class="tab-pane sidebar-nav">
+=======
+            <div id="radio" class="tab-pane">
+>>>>>>> 3073dcdd96f274fe6e10fdaac5c5aac66c0bc8d8
             </div>
 
             <div id="songs" class="tab-pane">
