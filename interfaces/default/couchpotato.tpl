@@ -6,7 +6,7 @@
 
         <div class="page-header page-title">
             <h1>
-                $getVar('cp_name', 'CouchPotato')
+                <a href="http:\/\/$getVar('couchpotato_host', ''):$getVar('couchpotato_port', '')" target="_blank">$getVar('cp_name', 'CouchPotato')</a>
             </h1>
         </div>
 

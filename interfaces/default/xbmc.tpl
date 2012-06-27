@@ -6,7 +6,7 @@
 
     <div class="page-header page-title">
         <h1>
-            $getVar('xbmc_name', 'XBMC')
+            <a href="http:\/\/$getVar('xbmc_host', ''):$getVar('xbmc_port', '')" target="_blank">$getVar('xbmc_name', 'XBMC')</a>            
         </h1>
     </div>
 
