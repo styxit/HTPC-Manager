@@ -30,8 +30,8 @@ def saveSettings(configfile, data, section = 'htpc'):
     if not data.has_key('use_sabnzbd'):
         data['use_sabnzbd'] = 0
     if not data.has_key('use_couchpotato'):
-        data['use_sickbeard'] = 0
-    if not data.has_key('use_couchpotato'):
+        data['use_couchpotato'] = 0
+    if not data.has_key('use_sickbeard'):
         data['use_sickbeard'] = 0
     if not data.has_key('use_squeezebox'):
         data['use_squeezebox'] = 0
