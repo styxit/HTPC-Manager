@@ -6,7 +6,9 @@
 
         <div class="page-header page-title">
             <select id="players" class="pull-right"></select>
-            <h1>Squeezebox</h1>
+            <h1>
+                <a href="http:\/\/$getVar('squeezebox_host', ''):$getVar('squeezebox_port', '')" target="_blank">$getVar('sqb_name', 'SqueezeBox')</a>
+            </h1>
         </div>
 
         <div id="notification_area"></div>
