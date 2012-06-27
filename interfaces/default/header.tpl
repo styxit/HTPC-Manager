@@ -57,33 +57,6 @@
             <a class="brand" href="/">$appname</a>
             <div class="nav-collapse">
                 <ul class="nav">
-                #if $getVar('use_sabnzbd', 0)
-                    #if $submenu == "sabnzbd"
-                    <li class="active">
-                    #else
-                    <li>
-                    #end if
-                    	<a href="/sabnzbd">$getVar('nzb_name', 'SABnzbd')</a>
-                    </li>
-                #end if
-                #if $getVar('use_couchpotato', 0)
-                	#if $submenu == "couchpotato"
-                	<li class="active">
-                	#else
-                	<li>
-                    #end if
-                    	<a href="/couchpotato">$getVar('cp_name', 'CouchPotato')</a>
-                	</li>
-            	#end if
-                #if $getVar('use_sickbeard', 0)
-                    #if $submenu == "sickbeard"
-                    <li class="active">
-                    #else
-                    <li>
-                    #end if
-                    	<a href="/sickbeard">$getVar('sb_name', 'SickBeard')</a>
-                    </li>
-                #end if
                 #if $getVar('use_xbmc', 0)
                     #if $submenu == "xbmc"
                     <li class="active">
@@ -93,13 +66,40 @@
                     	<a href="/xbmc">$getVar('xbmc_name', 'XBMC')</a>
                     </li>
                 #end if
+                #if $getVar('use_sabnzbd', 0)
+                    #if $submenu == "sabnzbd"
+                    <li class="active">
+                    #else
+                    <li>
+                    #end if
+                    	<a href="/sabnzbd">$getVar('sabnzbd_name', 'SABnzbd')</a>
+                    </li>
+                #end if
+                #if $getVar('use_couchpotato', 0)
+                	#if $submenu == "couchpotato"
+                	<li class="active">
+                	#else
+                	<li>
+                    #end if
+                    	<a href="/couchpotato">$getVar('couchpotato_name', 'CouchPotato')</a>
+                	</li>
+            	#end if
+                #if $getVar('use_sickbeard', 0)
+                    #if $submenu == "sickbeard"
+                    <li class="active">
+                    #else
+                    <li>
+                    #end if
+                    	<a href="/sickbeard">$getVar('sickbeard_name', 'SickBeard')</a>
+                    </li>
+                #end if
                 #if $getVar('use_squeezebox', 0)
                     #if $submenu == "squeezebox"
                     <li class="active">
                     #else
                     <li>
                     #end if
-                    	<a href="squeezebox">$getVar('sqb_name', 'SqueezeBox')</a>
+                    	<a href="squeezebox">$getVar('squeezebox_name', 'Squeezebox')</a>
                     </li>
                 #end if
                 #if $getVar('use_nzbsearch', 0)
@@ -108,7 +108,7 @@
                     #else
                     <li>
                     #end if
-                        <a href="/nzbsearch">$getVar('nzbmatrix_name', 'NZB Search')</a>
+                        <a href="/nzbsearch">$getVar('nzbsearch_name', 'NZB Search')</a>
                     </li>
                 #end if
                 </ul>

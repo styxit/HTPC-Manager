@@ -6,7 +6,7 @@
 
         <div class="page-header page-title">
             <h1>
-                <a href="http:\/\/$getVar('sickbeard_host', ''):$getVar('sickbeard_port', '')" target="_blank">$getVar('sb_name', 'Sickbeard')</a>                
+                <a href="http:\/\/$getVar('sickbeard_host', ''):$getVar('sickbeard_port', '')" target="_blank">$getVar('sickbeard_name', 'Sickbeard')</a>
             </h1>
         </div>
 

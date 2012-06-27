@@ -34,8 +34,8 @@
                     <div class="control-group">
                         <label class="control-label" for="app_port">IP / Host : Port</label>
                         <div class="controls">
-                            <input class="span3" id="app_host" name="app_host" type="text" value="$getVar('app_host', '')" /> : 
-                            <input class="span1" id="app_port" name="app_port" type="text" value="$getVar('app_port', '')" />
+                            <input class="span3" id="app_host" name="app_host" type="text" value="$getVar('app_host', '0.0.0.0')" /> : 
+                            <input class="span1" id="app_port" name="app_port" type="text" value="$getVar('app_port', '8085')" />
                         </div>
                     </div>
                     <div class="control-group">
@@ -57,7 +57,7 @@
                         <label class="control-label">Show Recent Movies</label>
                         <div class="controls">
                             <label class="checkbox">
-                                #if $getVar('use_dash_rec_movies', 0)
+                                #if $getVar('use_dash_rec_movies', 1)
                                 <input type="checkbox" checked="checked" value="1" name="use_dash_rec_movies" />
                                 #else
                                 <input type="checkbox" value="1" name="use_dash_rec_movies" />
@@ -69,7 +69,7 @@
                         <label class="control-label">Show Recent TV</label>
                         <div class="controls">
                             <label class="checkbox">
-                                #if $getVar('use_dash_rec_tv', 0)
+                                #if $getVar('use_dash_rec_tv', 1)
                                 <input type="checkbox" checked="checked" value="1" name="use_dash_rec_tv" />
                                 #else
                                 <input type="checkbox" value="1" name="use_dash_rec_tv" />
@@ -81,7 +81,7 @@
                         <label class="control-label">Show Recent Music</label>
                         <div class="controls">
                             <label class="checkbox">
-                                #if $getVar('use_dash_rec_music', 0)
+                                #if $getVar('use_dash_rec_music', 1)
                                 <input type="checkbox" checked="checked" value="1" name="use_dash_rec_music" />
                                 #else
                                 <input type="checkbox" value="1" name="use_dash_rec_music" />
@@ -93,7 +93,7 @@
                         <label class="control-label">Show Sickbeard</label>
                         <div class="controls">
                             <label class="checkbox">
-                                #if $getVar('use_dash_sickbeard', 0)
+                                #if $getVar('use_dash_sickbeard', 1)
                                 <input type="checkbox" checked="checked" value="1" name="use_dash_sickbeard" />
                                 #else
                                 <input type="checkbox" value="1" name="use_dash_sickbeard" />
@@ -102,10 +102,10 @@
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label">Show Couch Potato</label>
+                        <label class="control-label">Show CouchPotato</label>
                         <div class="controls">
                             <label class="checkbox">
-                                #if $getVar('use_dash_couchpotato', 0)
+                                #if $getVar('use_dash_couchpotato', 1)
                                 <input type="checkbox" checked="checked" value="1" name="use_dash_couchpotato" />
                                 #else
                                 <input type="checkbox" value="1" name="use_dash_couchpotato" />
@@ -114,13 +114,13 @@
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label">Show SabNzbd</label>
+                        <label class="control-label">Show Sabnzbd</label>
                         <div class="controls">
                             <label class="checkbox">
-                                #if $getVar('use_dash_nzb', 0)
-                                <input type="checkbox" checked="checked" value="1" name="use_dash_nzb" />
+                                #if $getVar('use_dash_sabnzbd', 1)
+                                <input type="checkbox" checked="checked" value="1" name="use_dash_sabnzbd" />
                                 #else
-                                <input type="checkbox" value="1" name="use_dash_nzb" />
+                                <input type="checkbox" value="1" name="use_dash_sabnzbd" />
                                 #end if
                             </label>
                         </div>
@@ -141,16 +141,16 @@
                         </div>
                     </div>       
                     <div class="control-group">
-                        <label class="control-label" for="nzb_name">Menu Name</label>
+                        <label class="control-label" for="sabnzbd_name">Menu Name</label>
                             <div class="controls">
-                                <input class="span3" id="nzb_name" name="nzb_name" type="text" value="$getVar('nzb_name', 'SABnzbd')" />
+                                <input class="span3" id="sabnzbd_name" name="sabnzbd_name" type="text" value="$getVar('sabnzbd_name', 'SABnzbd')" />
                             </div>
                     </div>
                     <div class="control-group">
                         <label class="control-label" for="sabnzbd_host">IP / Host : Port</label>
                         <div class="controls">
-                            <input class="span3" id="sabnzbd_host" name="sabnzbd_host" type="text" value="$getVar('sabnzbd_host', '')" /> : 
-                            <input class="span1" id="sabnzbd_port" name="sabnzbd_port" type="text" value="$getVar('sabnzbd_port', '')" />
+                            <input class="span3" id="sabnzbd_host" name="sabnzbd_host" type="text" value="$getVar('sabnzbd_host', '127.0.0.1')" /> : 
+                            <input class="span1" id="sabnzbd_port" name="sabnzbd_port" type="text" value="$getVar('sabnzbd_port', '8080')" />
                         </div>
                     </div>
                     <div class="control-group">
@@ -195,9 +195,9 @@
                         </div>
                     </div>           
                     <div class="control-group">
-                        <label class="control-label" for="cp_name">Menu Name</label>
+                        <label class="control-label" for="couchpotato_name">Menu Name</label>
                             <div class="controls">
-                                <input class="span3" id="cp_name" name="cp_name" type="text" value="$getVar('cp_name', 'CouchPotato')" />
+                                <input class="span3" id="couchpotato_name" name="couchpotato_name" type="text" value="$getVar('couchpotato_name', 'CouchPotato')" />
                             </div>
                     </div>      
                     <div class="control-group">
@@ -230,15 +230,15 @@
                         </div>
                     </div>
                     <div class="control-group">
-                        <label class="control-label" for="sb_name">Menu Name</label>
+                        <label class="control-label" for="sickbeard_name">Menu Name</label>
                             <div class="controls">
-                                <input class="span3" id="sb_name" name="sb_name" type="text" value="$getVar('sb_name', 'SickBeard')" />
+                                <input class="span3" id="sickbeard_name" name="sickbeard_name" type="text" value="$getVar('sickbeard_name', 'Sickbeard')" />
                             </div>
                     </div>
                     <div class="control-group">
                         <label class="control-label" for="sickbeard_host">IP / Host : Port</label>
                         <div class="controls">
-                            <input class="span3" id="sickbeard_host" name="sickbeard_host" type="text" value="$getVar('sickbeard_host', '')" />
+                            <input class="span3" id="sickbeard_host" name="sickbeard_host" type="text" value="$getVar('sickbeard_host', '127.0.0.1')" />
                             <input class="span1" id="sickbeard_port" name="sickbeard_port" type="text" value="$getVar('sickbeard_port', '')" />
                         </div>
                     </div>
@@ -265,16 +265,16 @@
                         </div>
                     </div>                   
                     <div class="control-group">
-                        <label class="control-label" for="sqb_name">Menu Name</label>
+                        <label class="control-label" for="squeezebox_name">Menu Name</label>
                             <div class="controls">
-                                <input class="span3" id="sqb_name" name="sqb_name" type="text" value="$getVar('sqb_name', 'SqueezeBox')" />
+                                <input class="span3" id="squeezebox_name" name="squeezebox_name" type="text" value="$getVar('squeezebox_name', 'Squeezebox')" />
                             </div>
                     </div>                
                     <div class="control-group">
                         <label class="control-label" for="squeezebox_host">IP / Host : Port</label>
                         <div class="controls">
-                            <input class="span3" id="squeezebox_host" name="squeezebox_host" type="text" value="$getVar('squeezebox_host', '')" />
-                            <input class="span1" id="squeezebox_port" name="squeezebox_port" type="text" value="$getVar('squeezebox_port', '')" />
+                            <input class="span3" id="squeezebox_host" name="squeezebox_host" type="text" value="$getVar('squeezebox_host', '127.0.0.1')" />
+                            <input class="span1" id="squeezebox_port" name="squeezebox_port" type="text" value="$getVar('squeezebox_port', '9000')" />
                         </div>
                     </div>
                     <div class="control-group">
@@ -314,14 +314,14 @@
                     <div class="control-group">
                         <label class="control-label" for="xbmc_host">IP / Host : Port</label>
                         <div class="controls">
-                            <input class="span3" id="xbmc_host" name="xbmc_host" type="text" value="$getVar('xbmc_host', '')" /> :
-                            <input class="span1" id="xbmc_port" name="xbmc_port" type="text" value="$getVar('xbmc_port', '')" />
+                            <input class="span3" id="xbmc_host" name="xbmc_host" type="text" value="$getVar('xbmc_host', '127.0.0.1')" /> :
+                            <input class="span1" id="xbmc_port" name="xbmc_port" type="text" value="$getVar('xbmc_port', '80')" />
                         </div>
                     </div>
                     <div class="control-group">
                         <label class="control-label" for="xbmc_username">Username</label>
                         <div class="controls">
-                            <input class="span3" id="xbmc_username" name="xbmc_username" type="text" value="$getVar('xbmc_username', '')" />
+                            <input class="span3" id="xbmc_username" name="xbmc_username" type="text" value="$getVar('xbmc_username', 'xbmc')" />
                         </div>
                     </div>
                     <div class="control-group">
@@ -371,9 +371,9 @@
                         </div>
                     </div>                    
                     <div class="control-group">
-                        <label class="control-label" for="nzbmatrix_name">Menu Name</label>
+                        <label class="control-label" for="nzbsearch_name">Menu Name</label>
                             <div class="controls">
-                                <input class="span3" id="nzbmatrix_name" name="nzbmatrix_name" type="text" value="$getVar('nzbmatrix_name', 'NZB Search')" />
+                                <input class="span3" id="nzbsearch_name" name="nzbsearch_name" type="text" value="$getVar('nzbsearch_name', 'NZBSearch')" />
                             </div>
                     </div>
                     <div class="control-group">

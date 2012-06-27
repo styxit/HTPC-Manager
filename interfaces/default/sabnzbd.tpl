@@ -5,7 +5,7 @@
     <div class="content maincontent">
         
         <div class="page-header page-title">
-            <h1><a href="http:\/\/$getVar('sabnzbd_host', ''):$getVar('sabnzbd_port', '')" target="_blank">$getVar('nzb_name', 'SABnzbd')</a>
+            <h1><a href="http:\/\/$getVar('sabnzbd_host', ''):$getVar('sabnzbd_port', '')" target="_blank">$getVar('sabnzbd_name', 'SABnzbd')</a>
                 <small>
                     <strong>Speed:</strong> <span id="queue_speed"></span>
                     <strong>Status:</strong> <span id="queue_state"></span>

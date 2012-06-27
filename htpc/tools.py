@@ -53,8 +53,8 @@ def saveSettings(configfile, data, section = 'htpc'):
         data['use_dash_sickbeard'] = 0
     if not data.has_key('use_dash_couchpotato'):
         data['use_dash_couchpotato'] = 0 
-    if not data.has_key('use_dash_nzb'):
-        data['use_dash_nzb'] = 0
+    if not data.has_key('use_dash_sabnzbd'):
+        data['use_dash_sabnzbd'] = 0
         
     config = ConfigParser.ConfigParser()
     config.read(configfile)
