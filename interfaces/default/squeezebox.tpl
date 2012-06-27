@@ -6,7 +6,7 @@
 
         <div class="page-header page-title">
             <select id="players" class="pull-right"></select>
-            <h1>Squeezebox</h1>
+            <h1>$getVar('sqb_name', 'SqueezeBox')</h1>
         </div>
 
         <div id="notification_area"></div>
