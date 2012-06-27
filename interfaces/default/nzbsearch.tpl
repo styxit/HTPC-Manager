@@ -6,7 +6,7 @@
 
         <div class="page-header page-title">
             <h1>
-                NZB Search
+                <a href="http://nzbmatrix.com" target="_blank">$getVar('nzbsearch_name', 'NZB Search')</a>
             </h1>
         </div>
 
