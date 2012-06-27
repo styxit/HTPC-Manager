@@ -21,6 +21,10 @@ body {
     padding: 20px 20px 10px;
     margin: -20px -20px 20px;
 }
+.page-header.page-title a{
+    color: #000;
+    text-decoration: none;
+}
 .progress {
     margin-bottom: 0;
     background: #eee;
