@@ -25,14 +25,18 @@ class squeezebox:
         if args.get('action') == 'getartists':
             return self.getArtists()
 
-        if args.get('action') == 'getartist':
-            return self.getArtist(args.get('artist'))
-
         if args.get('action') == 'getalbums':
-            return self.getAlbums()
+            return self.getAlbums(args.get('artist',''))
 
-        if args.get('action') == 'getalbum':
-            return self.getAlbum(args.get('album'))
+        if args.get('action') == 'getsongs':
+            return self.getSongs(args.get('filter'))
+
+        if args.get('action') == 'getstationgroups':
+            return self.getStationGroups()
+       
+        if args.get('action') == 'getstations':
+            player = urllib2.unquote(args.get('player'))
+            return self.getStations(player, args.get('group'))
 
         if args.get('action') == 'getplaylists':
             return self.getPlaylists()
@@ -40,8 +44,8 @@ class squeezebox:
     def playerControl(self, player, command):
         return self.jsonRequest(player, command.split())
 
-    def getPlayers(self):
-        return self.jsonRequest("", ["players","0","999"])
+    def getPlayers(self, start=0, end=999):
+        return self.jsonRequest("", ["players", start, end])
 
     def getPlayer(self, player):
         return self.jsonRequest(player, ["status","0"])
@@ -57,15 +61,21 @@ class squeezebox:
     def getArtists(self):
         return self.jsonRequest("", ["artists","0"])
 
-    def getArtist(self, artist):
-        return self.jsonRequest("", ["songs", "0", "999", "artist_id:%s"%artist])
-    
-    def getAlbums(self):
-        return self.jsonRequest("", ["albums","0"])
+    def getAlbums(self, artist="", start=0, end=999):
+        if artist:
+            return self.jsonRequest("", ["albums", start, end, "artist_id:%s"%artist])
+        else:
+            return self.jsonRequest("", ["albums","0"])
 
-    def getAlbum(self, album):
-        return self.jsonRequest("", ["songs", "0", "999", "album_id:%s"%album])
-    
+    def getSongs(self, filter, start=0, end=999):
+        return self.jsonRequest("", ["songs", start, end, filter])
+
+    def getStationGroups(self, start=0, end=999):
+        return self.jsonRequest("", ["radios", start, end])
+
+    def getStations(self, player, group='local', start=0, end=999):
+        return self.jsonRequest(player, [group, 'items', start, end])
+
     def getPlaylists(self):
         return self.jsonRequest("", ["playlists","0"])
 

@@ -9,8 +9,8 @@ from jsonrpclib import Server
 from json import dumps
 
 class xbmc:
-    def __init__(self, host, port, username, password, hidewatched, ignorearticle=1):
-        self.root = os.getcwd()
+    def __init__(self, host, port, username, password, root, hidewatched, ignorearticle):
+        self.root = root
         self.url = 'http://' + username + ':' + password + '@' + host + ':' + str(port)
         self.req_url ='http://' + host + ':' + str(port) 
         self.auth = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
@@ -59,7 +59,7 @@ class xbmc:
         thumbs = os.path.join(self.root, 'userdata/', 'xbmc_thumbs/')
         if not os.path.isdir(thumbs):
             os.makedirs(thumbs)
-        
+
         thumbOnDisk = os.path.join(thumbs, thumbFile)
         if not os.path.isfile(thumbOnDisk + '_' + thumbWidth + '_' + thumbHeight + '.png'):
             # Hack when using nightly

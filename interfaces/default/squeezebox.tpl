@@ -63,7 +63,7 @@
             <li class="active"><a href="#playlist" data-toggle="tab">Playlist</a></li>
             <li><a href="#artists" data-toggle="tab">Artists</a></li>
             <li><a href="#albums" data-toggle="tab">Albums</a></li>
-            <li><a href="#radio" data-toggle="tab">Radio</a></li>
+            <li><a href="#stations" data-toggle="tab">Radio</a></li>
             <li><a href="#songs" data-toggle="tab">Songs</a></li>
             <li><a href="#playlists" data-toggle="tab">Playlists</a></li>
         </ul>
@@ -85,13 +85,13 @@
                 </table>
             </div>
 
-            <div id="artists" class="tab-pane">
+            <div id="artists" class="tab-pane sidebar-nav">
             </div>
 
-            <div id="albums" class="tab-pane">
+            <div id="albums" class="tab-pane sidebar-nav">
             </div>
 
-            <div id="radio" class="tab-pane">
+            <div id="stations" class="tab-pane sidebar-nav">
             </div>
 
             <div id="songs" class="tab-pane">
@@ -108,7 +108,7 @@
                 </table>
             </div>
 
-            <div id="playlists" class="tab-pane">
+            <div id="playlists" class="tab-pane sidebar-nav">
             </div>
 
         </div>

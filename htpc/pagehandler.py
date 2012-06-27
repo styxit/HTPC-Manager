@@ -12,9 +12,10 @@ from htpc.tools import *
 
 class pageHandler:
     def __init__(self, configfile):
+        self.root = os.getcwd()
         self.configfile = configfile
         self.config = readSettings(configfile)
-        self.webdir = os.path.join(os.getcwd(), 'interfaces', self.config['template'])
+        self.webdir = os.path.join(self.root, 'interfaces', self.config['template'])
 
     @cherrypy.expose()
     def index(self):
@@ -141,5 +142,6 @@ class pageHandler:
             username = self.config.get('xbmc_username')
             password = self.config.get('xbmc_password')
             hidewatched = self.config.get('xbmc_hide_watched')
-            return xbmc(host,port,username,password,hidewatched).sendRequest(args)
+            ignorearticle = self.config.get('xbmc_ignore_articles',1)
+            return xbmc(host,port,username,password,self.root,hidewatched,ignorearticle).sendRequest(args)
 
