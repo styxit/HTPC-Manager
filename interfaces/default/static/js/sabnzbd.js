@@ -5,7 +5,7 @@ $(document).ready(function () {
         var clickItem = $(this);
         clickItem.button('loading');
         $.ajax({
-            url: '/json/?which=sabnzbd&action=' + queueToggleStatusAction,
+            url: '/json/sabnzbd/?action=' + queueToggleStatusAction,
             dataType: 'json',
             type: 'get'
         });
@@ -17,7 +17,7 @@ $(document).ready(function () {
 
     // nzb toevoegen
     $('#add_nzb_form').ajaxForm({
-        url: '/json/?which=sabnzbd&action=addnzb',
+        url: '/json/sabnzbd/?action=addnzb',
         type: 'post',
         dataType: 'json',
         success: function (result) {
@@ -38,7 +38,7 @@ $(document).ready(function () {
         var speed = ($('#nzb_get_speed').val());
 
         $.ajax({
-            url: '/json/?which=sabnzbd&action=speed&value=' + speed,
+            url: '/json/sabnzbd/?action=speed&value=' + speed,
             type: 'post',
             dataType: 'json'
         });

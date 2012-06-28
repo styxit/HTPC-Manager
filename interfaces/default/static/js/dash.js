@@ -13,7 +13,7 @@ $(document).ready(function () {
 
 function loadDiskSpace() {
     $.ajax({
-        url: 'json/?which=system&action=diskspace',
+        url: 'json/diskspace',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -40,7 +40,7 @@ function loadDiskSpace() {
 
 function loadRecentMovies () {
     $.ajax({
-        url: 'json/?which=xbmc&action=recentmovies',
+        url: 'json/xbmc/?action=recentmovies',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -56,7 +56,7 @@ function loadRecentMovies () {
                 var itemImage = $('<img>');
                 itemImage.addClass('lazy');
                 itemImage.attr('src', 'img/white5x5.png');
-                itemImage.attr('data-original', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(movie.fanart) + '&h=240&w=430');
+                itemImage.attr('data-original', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(movie.fanart) + '&h=240&w=430');
                 itemImage.attr('alt', movie.title);
                 itemImage.css({
                     width: '430px',
@@ -94,7 +94,7 @@ function loadRecentMovies () {
 
 function loadRecentTVshows () {
     $.ajax({
-        url: 'json/?which=xbmc&action=recentshows',
+        url: 'json/xbmc/?action=recentshows',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -112,7 +112,7 @@ function loadRecentTVshows () {
                 var itemImage = $('<img>');
                 itemImage.addClass('lazy');
                 itemImage.attr('src', 'img/white5x5.png');
-                itemImage.attr('data-original', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(episode.fanart) + '&h=240&w=430');
+                itemImage.attr('data-original', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(episode.fanart) + '&h=240&w=430');
                 itemImage.attr('alt', epTitle);
                 itemImage.css({
                     width: '430px',
@@ -149,7 +149,7 @@ function loadRecentTVshows () {
 
 function loadRecentAlbums () {
     $.ajax({
-        url: 'json/?which=xbmc&action=recentalbums',
+        url: 'json/xbmc/?action=recentalbums',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -167,7 +167,7 @@ function loadRecentAlbums () {
                 if (album.thumbnail == '') {
                     itemImage.attr('src', 'img/white5x5.png');
                 } else {
-                    itemImage.attr('src', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(album.thumbnail) + '&h=30&w=30');
+                    itemImage.attr('src', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(album.thumbnail) + '&h=30&w=30');
                 }
 
                 var row = $('<tr>')
@@ -184,7 +184,7 @@ function loadRecentAlbums () {
 
 function loadWantedMovies() {
     $.ajax({
-        url: '/json/?which=couchpotato&action=movielist',
+        url: '/json/couchpotato/?action=movielist',
         type: 'get',
         dataType: 'json',
         success: function (result) {

@@ -21,7 +21,7 @@ function getMovieList() {
     $('.tooltip').remove();
     $('#movies_table_body').children().remove();
     $.ajax({
-        url: 'json/?which=couchpotato&action=movielist',
+        url: 'json/couchpotato/?action=movielist',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -88,7 +88,7 @@ function getMovieList() {
 function deleteMovie(id, name) {
     $('.tooltip').remove();
     $.ajax({
-        url: '/json/?which=couchpotato&action=moviedelete',
+        url: '/json/couchpotato/?action=moviedelete',
         data: {id: id},
         type: 'get',
         dataType: 'json',
@@ -103,7 +103,7 @@ function deleteMovie(id, name) {
 
 function refreshMovie(id, name) {
     $.ajax({
-        url: '/json/?which=couchpotato&action=movierefresh',
+        url: '/json/couchpotato/?action=movierefresh',
         data: {id: id},
         type: 'get',
         dataType: 'json',
@@ -118,7 +118,7 @@ function refreshMovie(id, name) {
 function searchMovie(q) {
     $('.tooltip').remove();
     $.ajax({
-        url: '/json/?which=couchpotato&action=moviesearch',
+        url: '/json/couchpotato/?action=moviesearch',
         data: {q: encodeURIComponent(q)},
         type: 'get',
         dataType: 'json',
@@ -168,7 +168,7 @@ function addMovie(profile, id, title) {
     var row = $('<td>').attr('colspan', 3).append(loader);
     $('[data-imdb=' + id + ']').append(row);
     $.ajax({
-        url: '/json/?which=couchpotato&action=movieadd',
+        url: '/json/couchpotato/?action=movieadd',
         data: {
             profile_id : profile,
             identifier : id,
@@ -186,7 +186,7 @@ function addMovie(profile, id, title) {
 
 function getNotificationList() {
     $.ajax({
-        url: '/json/?which=couchpotato&action=notificationlist',
+        url: '/json/couchpotato/?action=notificationlist',
         type: 'get',
         dataType: 'json',
         success: function (result) {

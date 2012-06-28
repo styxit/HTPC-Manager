@@ -1,6 +1,6 @@
 function getCategories(provider) {
     $.ajax({
-        url: '/json/?which=nzbsearch&get_cat=' + provider,
+        url: '/json/nzbsearch/?get_cat=' + provider,
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -43,7 +43,7 @@ function sendToSab(nzbid) {
 
 function getDetails(nzbid) {
     $.ajax({
-        url: '/json/?which=nzbsearch&nzbid='+nzbid,
+        url: '/json/nzbsearch/?nzbid='+nzbid,
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -105,7 +105,7 @@ function getDetails(nzbid) {
 
 function searchNzbs(query, catid) {
     $.ajax({
-        url: '/json/?which=nzbsearch&query='+query+'&catid='+catid,
+        url: '/json/nzbsearch/?query='+query+'&catid='+catid,
         type: 'get',
         dataType: 'json',
         success: function (data) {

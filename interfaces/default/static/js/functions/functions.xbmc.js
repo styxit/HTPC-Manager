@@ -33,7 +33,7 @@ function loadMovies(options) {
     }
 
     movieRequest = $.ajax({
-        url: 'json/?which=xbmc&action=movies',
+        url: 'json/xbmc/?action=movies',
         type: 'get',
         data: sendData,
         beforeSend: function() {
@@ -55,7 +55,7 @@ function loadMovies(options) {
                 moviePicture.css('height', '150px');
                 moviePicture.css('width', '100px');
                 moviePicture.attr('src', 'img/white5x5.png');
-                moviePicture.attr('data-original', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(movie.thumbnail) + '&w=100&h=150');
+                moviePicture.attr('data-original', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(movie.thumbnail) + '&w=100&h=150');
                 moviePicture.addClass('lazy');
 
                 var movieAnchor = $('<a>');
@@ -88,7 +88,7 @@ function xbmcShowMovie(movie) {
     var modalMoviePicture = $('<img>');
     modalMoviePicture.css('height', '300px');
     modalMoviePicture.css('width', '200px');
-    modalMoviePicture.attr('src', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(movie.thumbnail) + '&w=200&h=300');
+    modalMoviePicture.attr('src', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(movie.thumbnail) + '&w=200&h=300');
 
     var modalMovieAnchor = $('<div>');
     modalMovieAnchor.addClass('thumbnail');
@@ -139,7 +139,7 @@ function xbmcShowMovie(movie) {
 
     // Achtergrondje maken
     $('.modal-fanart').css({
-        'background' : '#ffffff url(json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(movie.fanart) + '&w=675&h=400&o=15) top center no-repeat',
+        'background' : '#ffffff url(json/xbmc/?action=thumb&thumb=' + encodeURIComponent(movie.fanart) + '&w=675&h=400&o=15) top center no-repeat',
         'background-size' : '100%'
     });
     table.parent().addClass('trans');
@@ -177,7 +177,7 @@ function loadXbmcShows(options) {
     }
 
     showRequest = $.ajax({
-        url: 'json/?which=xbmc&action=shows',
+        url: 'json/xbmc/?action=shows',
         type: 'get',
         dataType: 'json',
         data: sendData,
@@ -202,11 +202,11 @@ function loadXbmcShows(options) {
                 showPicture.attr('src', 'img/white5x5.png');
                 showPicture.addClass('lazy');
                 if ($('#show-grid').hasClass('banners')) {
-                    showPicture.attr('data-original', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(show.thumbnail) + '&h=80&w=500');
+                    showPicture.attr('data-original', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(show.thumbnail) + '&h=80&w=500');
                     showPicture.css('height', '90px');
                     showPicture.css('width', '500px');
                 } else {
-                    showPicture.attr('data-original', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(show.thumbnail) + '&h=150&w=100');
+                    showPicture.attr('data-original', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(show.thumbnail) + '&h=150&w=100');
                     showPicture.css('height', '150px');
                     showPicture.css('width', '100px');
                 }
@@ -250,7 +250,7 @@ function xbmcShowEpisode(episode) {
     var modalshowPicture = $('<img>');
     modalshowPicture.css('height', '125px');
     modalshowPicture.css('width', '200px');
-    modalshowPicture.attr('src', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(episode.thumbnail) + '&w=200&h=125');
+    modalshowPicture.attr('src', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(episode.thumbnail) + '&w=200&h=125');
 
     var modalshowAnchor = $('<div>');
     modalshowAnchor.addClass('thumbnail');
@@ -282,7 +282,7 @@ function xbmcShowEpisode(episode) {
 
     // Achtergrondje maken
     $('.modal-fanart').css({
-        'background' : '#ffffff url(json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(episode.fanart) + '&w=675&h=400&o=15) top center',
+        'background' : '#ffffff url(json/xbmc/?action=thumb&thumb=' + encodeURIComponent(episode.fanart) + '&w=675&h=400&o=15) top center',
         'background-size' : '100%;'
     });
     table.parent().addClass('trans');
@@ -290,7 +290,7 @@ function xbmcShowEpisode(episode) {
 
 function loadXBMCShow(show) {
     $.ajax({
-        url: 'json/?which=xbmc&action=getshow&item=' + show.tvshowid,
+        url: 'json/xbmc/?action=getshow&item=' + show.tvshowid,
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -328,7 +328,7 @@ function loadXBMCShow(show) {
                     episodeImage.attr('src', 'img/white5x5.png');
                     episodeImage.css('height', '50px');
                     episodeImage.css('width', '100px');
-                    episodeImage.attr('data-original', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(episode.thumbnail) + '&w=100&h=50');
+                    episodeImage.attr('data-original', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(episode.thumbnail) + '&w=100&h=50');
 
                     var episodeThumb = $('<a>').addClass('thumbnail');
                     episodeThumb.append(episodeImage);
@@ -375,7 +375,7 @@ function loadXBMCShow(show) {
 
 function playItem(item) {
     $.ajax({
-        url: 'json/?which=xbmc&action=play&item=' + item,
+        url: 'json/xbmc/?action=play&item=' + item,
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -387,7 +387,7 @@ function playItem(item) {
 var nowPlayingThumb = '';
 function loadNowPlaying() {
     $.ajax({
-        url: 'json/?which=xbmc&action=nowplaying',
+        url: 'json/xbmc/?action=nowplaying',
         type: 'get',
         dataType: 'json',
         complete: function() {
@@ -413,14 +413,14 @@ function loadNowPlaying() {
                 var thumbContainer = $('#nowplaying .thumbnail');
 
                 if (data.itemInfo.item.type == 'episode') {
-                    thumbnail.attr('src', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(data.itemInfo.item.thumbnail) + '&w=150&h=75');
+                    thumbnail.attr('src', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(data.itemInfo.item.thumbnail) + '&w=150&h=75');
                     thumbnail.css('height', '75px');
                     thumbnail.css('width', '150px');
                     thumbContainer.css('height', '75px');
                     thumbContainer.css('width', '150px');
                 }
                 if (data.itemInfo.item.type == 'movie') {
-                    thumbnail.attr('src', 'json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(data.itemInfo.item.thumbnail) + '&w=100&h=150');
+                    thumbnail.attr('src', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(data.itemInfo.item.thumbnail) + '&w=100&h=150');
                     thumbnail.css('height', '150px');
                     thumbnail.css('width', '100px');
                     thumbContainer.css('height', '150px');
@@ -433,7 +433,7 @@ function loadNowPlaying() {
 
                 // Achtergrondje maken
                 $('#nowplaying').css({
-                    'background' : 'url(json/?which=xbmc&action=thumb&thumb=' + encodeURIComponent(data.itemInfo.item.fanart) + '&w=1150&h=640&o=10) top center',
+                    'background' : 'url(json/xbmc/?action=thumb&thumb=' + encodeURIComponent(data.itemInfo.item.fanart) + '&w=1150&h=640&o=10) top center',
                     'background-size' : '100%;',
                     'background-position' : '50% 20%',
                     'margin-bottom' : '10px'
@@ -489,7 +489,7 @@ function loadNowPlaying() {
 
 function sendNotification(text) {
     $.ajax({
-        url: 'json/?which=xbmc&action=notify&text=' + text,
+        url: 'json/xbmc/?action=notify&text=' + text,
         type: 'get',
         dataType: 'html',
         success: function(data) {
@@ -500,7 +500,7 @@ function sendNotification(text) {
 
 function xbmcClean() {
     $.ajax({
-        url: 'json/?which=xbmc&action=clean',
+        url: 'json/xbmc/?action=clean',
         type: 'get',
         dataType: 'json',
         success: function(data) {
@@ -511,7 +511,7 @@ function xbmcClean() {
 
 function xbmcScan() {
     $.ajax({
-        url: 'json/?which=xbmc&action=scan',
+        url: 'json/xbmc/?action=scan',
         type: 'get',
         dataType: 'json',
         success: function(data) {
@@ -547,7 +547,7 @@ function enablePlayerControls() {
         clickItem.attr('disabled', true);
 
         $.ajax({
-            url: 'json/?which=xbmc&action=controlplayer&do=' + playerDo,
+            url: 'json/xbmc/?action=controlplayer&do=' + playerDo,
             type: 'get',
             dataType: 'json',
             success: function(data) {

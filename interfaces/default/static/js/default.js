@@ -1,11 +1,11 @@
 var scriptArray = [
-    'js/jquery.lazyload.min.js',
-    'js/jquery.form.js',
-    'js/jquery.cookie.js',
+    'js/jquery/jquery.lazyload.min.js',
+    'js/jquery/jquery.form.js',
+    'js/jquery/jquery.cookie.js',
     'js/bootstrap.min.js',
-    'js/jquery.metadata.js',
-    'js/jquery.tablesorter.min.js',
-    'js/jquery.raty.min.js',
+    'js/jquery/jquery.metadata.js',
+    'js/jquery/jquery.tablesorter.min.js',
+    'js/jquery/jquery.raty.min.js',
     'js/functions/functions.xbmc.js',
     'js/functions/functions.sickbeard.js',
     'js/functions/functions.sabnzbd.js'
@@ -62,7 +62,7 @@ $(document).ready(function () {
     
     $('#btn-check-update').click(function () {
         $.ajax({
-            url: 'json/?which=system&action=checkupdate',
+            url: 'json/checkupdate',
             type: 'get',
             dataType: 'json',
             beforeSend: function() {
@@ -70,10 +70,10 @@ $(document).ready(function () {
             },
             success: function (update) {
                 unblockPage();
-                if (update.available) {
-                    offerToUpdate();
+                if (update.behind == 0) {
+                	notifySuccess('Update','Already running latest version.');
                 } else {
-                    alert('No new version available.');
+                    offerToUpdate();
                 }
             },
             complete: function (){
@@ -84,7 +84,7 @@ $(document).ready(function () {
     $('#btn-restart').click(function () {
         if (confirm('Restart?')) {
             $.ajax({
-                url: 'json/?which=system&action=restart',
+                url: 'json/restart',
                 type: 'get',
                 dataType: 'json',
                 beforeSend: function() {
@@ -96,7 +96,7 @@ $(document).ready(function () {
     $('#btn-shutdown').click(function () {
         if (confirm('Shutdown?')) {
             $.ajax({
-                url: 'json/?which=system&action=shutdown',
+                url: 'json/shutdown',
                 type: 'get',
                 dataType: 'json',
                 beforeSend: function() {
@@ -113,9 +113,9 @@ $(document).ready(function () {
 });
 
 function offerToUpdate() {
-    if (confirm('Install new version of HTPC-Manager?')) {
+    if (confirm('Update to latest version?')) {
         $.ajax({
-            url: 'json/?which=system&action=update',
+            url: 'json/update',
             type: 'get',
             dataType: 'json',
             beforeSend: function() {

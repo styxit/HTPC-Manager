@@ -1,6 +1,6 @@
 function loadShows() {
     $.ajax({
-        url: '/json/?which=sickbeard&action=showlist',
+        url: '/json/sickbeard/?action=showlist',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -36,7 +36,7 @@ function loadShows() {
 
 function loadShow(tvdbid) {
     $.ajax({
-        url: '/json/?which=sickbeard&action=getshow&tvdbid=' + tvdbid,
+        url: '/json/sickbeard/?action=getshow&tvdbid=' + tvdbid,
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -82,7 +82,7 @@ function loadNextAired(options) {
     $.extend(defaults, options);
 
     $.ajax({
-        url: '/json/?which=sickbeard&action=nextaired',
+        url: '/json/sickbeard/?action=nextaired',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -130,7 +130,7 @@ function loadNextAired(options) {
 
 function loadSickbeardHistory(limit) {
     $.ajax({
-        url: '/json/?which=sickbeard&action=history&limit=' + limit,
+        url: '/json/sickbeard/?action=history&limit=' + limit,
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -158,7 +158,7 @@ function loadSickbeardHistory(limit) {
 
 function loadLogs() {
     $.ajax({
-        url: '/json/?which=sickbeard&action=logs',
+        url: '/json/sickbeard/?action=logs',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -178,7 +178,7 @@ function loadLogs() {
 
 function searchTvDb(query) {
     $.ajax({
-        url: '/json/?which=sickbeard&action=searchtvdb&query=' + query,
+        url: '/json/sickbeard/?action=searchtvdb&query=' + query,
         type: 'get',
         dataType: 'xml',
         success: function (result) {
@@ -211,7 +211,7 @@ function searchTvDb(query) {
 
 function addShow(tvdbid) {
     $.ajax({
-        url: '/json/?which=sickbeard&action=addshow&tvdbid=' + tvdbid,
+        url: '/json/sickbeard/?action=addshow&tvdbid=' + tvdbid,
         type: 'get',
         dataType: 'json',
         success: function (data) {

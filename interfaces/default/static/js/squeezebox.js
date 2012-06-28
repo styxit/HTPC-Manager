@@ -18,7 +18,7 @@ $(document).ready(function () {
 
 function sendCommand(player, command) {
     $.ajax({
-        url: '/json/?which=squeezebox&action=control',
+        url: '/json/squeezebox/?action=control',
         type: 'get',
         dataType: 'json',
         data: {
@@ -33,7 +33,7 @@ function sendCommand(player, command) {
 
 function getPlayers() {
     $.ajax({
-        url: '/json/?which=squeezebox&action=getplayers',
+        url: '/json/squeezebox/?action=getplayers',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -93,7 +93,7 @@ function togglePlayer(player) {
 function refreshPlayer(player) {
     if (player == undefined) player = currentPlayer;
     $.ajax({
-        url: '/json/?which=squeezebox&action=getplayer&player='+player,
+        url: '/json/squeezebox/?action=getplayer&player='+player,
         type: 'get',
         dataType: 'json',
         success: function (item) {
@@ -113,7 +113,7 @@ function refreshPlayer(player) {
             if (nowPlayingThumb != nowPlaying) {
                 nowPlayingThumb = nowPlaying;
                 var thumbnail = $('<img>');
-                thumbnail.attr('src', '/json/?which=squeezebox&action=getcover&player='+player);
+                thumbnail.attr('src', '/json/squeezebox/?action=getcover&player='+player);
                 thumbnail.css('height', '140px');
                 thumbnail.css('width', '140px');
                 var thumbContainer = $('#nowplaying .thumbnail');
@@ -161,7 +161,7 @@ function refreshPlayer(player) {
 
 function getArtists() {
     $.ajax({
-        url: '/json/?which=squeezebox&action=getartists',
+        url: '/json/squeezebox/?action=getartists',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -190,7 +190,7 @@ function getAlbums(e, artist) {
     if (e==undefined) e = $('#albums');
     filter = (artist==undefined) ? '' : '&artist='+artist
     $.ajax({
-        url: '/json/?which=squeezebox&action=getalbums'+filter,
+        url: '/json/squeezebox/?action=getalbums'+filter,
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -219,7 +219,7 @@ function getAlbums(e, artist) {
 
 function getSongs(filter){
     $.ajax({
-        url: '/json/?which=squeezebox&action=getsongs',
+        url: '/json/squeezebox/?action=getsongs',
         type: 'get',
         dataType: 'json',
         data: { 'filter': filter },
@@ -262,7 +262,7 @@ function getSongs(filter){
 
 function getStationGroups() {
     $.ajax({
-        url: '/json/?which=squeezebox&action=getstationgroups',
+        url: '/json/squeezebox/?action=getstationgroups',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -288,7 +288,7 @@ function getStationGroups() {
 
 function getStations(e, group) {
     $.ajax({
-        url: '/json/?which=squeezebox&action=getstations',
+        url: '/json/squeezebox/?action=getstations',
         type: 'get',
         dataType: 'json',
         data: {
@@ -313,7 +313,7 @@ function getStations(e, group) {
 
 function getPlaylists() {
     $.ajax({
-        url: '/json/?which=squeezebox&action=getplaylists',
+        url: '/json/squeezebox/?action=getplaylists',
         type: 'get',
         dataType: 'json',
         success: function (data) {

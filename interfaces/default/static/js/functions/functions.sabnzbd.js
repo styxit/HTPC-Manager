@@ -1,7 +1,7 @@
 function removeHistoryItem(id) {
     if (confirm('Are you sure?')) {
         $.ajax({
-            url: '/json/?which=sabnzbd&action=deletehistory&id=' + id,
+            url: '/json/sabnzbd/?action=deletehistory&id=' + id,
             type: 'get',
             dataType: 'json',
             success: function (data) {
@@ -15,7 +15,7 @@ function removeHistoryItem(id) {
 function retryHistoryItem(id) {
     if (confirm('Are you sure?')) {
         $.ajax({
-            url: '/json/?which=sabnzbd&action=retry&id=' + id,
+            url: '/json/sabnzbd/?action=retry&id=' + id,
             type: 'get',
             dataType: 'json',
             success: function (data) {
@@ -28,7 +28,7 @@ function retryHistoryItem(id) {
 
 function loadHistory() {
     $.ajax({
-        url: '/json/?which=sabnzbd&action=history&limit=25',
+        url: '/json/sabnzbd/?action=history&limit=25',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -79,7 +79,7 @@ function loadHistory() {
 function removeQueueItem(id) {
     if (confirm('Are you sure?')) {
         $.ajax({
-            url: '/json/?which=sabnzbd&action=delete&id=' + id,
+            url: '/json/sabnzbd/?action=delete&id=' + id,
             type: 'get',
             dataType: 'json',
             success: function (data) {
@@ -93,7 +93,7 @@ function removeQueueItem(id) {
 
 function changeCategory(id, cat) {
     $.ajax({
-        url: '/json/?which=sabnzbd&action=change_cat&id=' + id + '&value=' + cat,
+        url: '/json/sabnzbd/?action=change_cat&id=' + id + '&value=' + cat,
         type: 'get',
         dataType: 'json'
     });
@@ -103,7 +103,7 @@ var queueToggleStatusAction = '';
 
 function loadQueue(once) {
     $.ajax({
-        url: '/json/?which=sabnzbd&action=status',
+        url: '/json/sabnzbd/?action=status',
         type: 'get',
         dataType: 'json',
         success: function (object) {
@@ -189,7 +189,7 @@ function loadQueue(once) {
 
 function loadWarnings() {
     $.ajax({
-        url: '/json/?which=sabnzbd&action=warnings',
+        url: '/json/sabnzbd/?action=warnings',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -213,7 +213,7 @@ function loadWarnings() {
 // Haal categorieen op
 function setCategories(selector, select) {
     $.ajax({
-        url: '/json/?which=sabnzbd&action=categories',
+        url: '/json/sabnzbd/?action=categories',
         type: 'post',
         dataType: 'json',
         success: function (data) {

@@ -1,7 +1,7 @@
 # Original code by Mikie (https://github.com/Mikie-Ghost/)
 import os, urllib2, tarfile, os, shutil, platform, subprocess, re, json
 
-RUNDIR = '/var/www/htpc'
+RUNDIR = os.getcwd()
 user = 'mbw2001'
 repo = 'htpc-manager'
 branch = 'master'
@@ -49,6 +49,7 @@ def checkGithub():
     except:
         print('UPDATER :: Could not get commits behind from github', 'WARNING')
 
+    commits_compare_url = ''
     if behind == 0:
         print('UPDATER :: Up to date', 'INFO')
     elif behind >= 1:
@@ -57,9 +58,9 @@ def checkGithub():
     elif behind == -1:
         print('UPDATER :: Uknown version. Please run the updater', 'INFO')
 
-    return behind
+    return (behind, commits_compare_url)
 
-def Update():
+def update():
     if gitUpdate():
         return True
     else:

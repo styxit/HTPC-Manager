@@ -1,5 +1,6 @@
 import sys, os, shutil
 import ConfigParser, cherrypy
+import htpc.updater as updater
 from urllib2 import urlopen
 from json import dumps
 
@@ -92,12 +93,14 @@ def restart():
     os.execv(sys.executable, arguments)
 
 def checkUpdate():
-    return dumps({'available' : 0})
+    behind, url = updater.checkGithub()
+    if behind == 0:
+        return dumps({'behind':behind})
+    elif behind > 0:
+        return dumps({'behind':behind, 'url':url})
 
 def update():
     cherrypy.engine.exit()
-    '''
-    Do update stuff...
-    '''
+    status = updater.update()
     cherrypy.server.start()
-    return dumps({'update' : 'success'})
+    return dumps({'update':'success'})

@@ -1,4 +1,5 @@
 import os, cherrypy
+import htpc.tools as tools
 
 from Cheetah.Template import Template
 
@@ -8,28 +9,27 @@ from htpc.sickbeard import sickbeard
 from htpc.nzbsearch import nzbsearch
 from htpc.xbmc import xbmc
 from htpc.squeezebox import squeezebox
-from htpc.tools import *
 
 class pageHandler:
     def __init__(self, configfile):
         self.root = os.getcwd()
         self.configfile = configfile
-        self.config = readSettings(configfile)
+        self.config = tools.readSettings(configfile)
         self.webdir = os.path.join(self.root, 'interfaces', self.config['template'])
 
     @cherrypy.expose()
     def index(self):
-        template = Template(file=os.path.join(self.webdir, 'main.tpl'), searchList=[self.config]);
+        template = Template(file=os.path.join(self.webdir, 'dash.tpl'), searchList=[self.config]);
         template.appname = self.config['app_name']
         template.webdir = self.webdir
         template.submenu = ''
-        template.jsfile = 'main.js'
+        template.jsfile = 'dash.js'
         return template.respond()
 
     @cherrypy.expose()
     def settings(self, **kwargs):
         if kwargs:
-            self.config = saveSettings(self.configfile,kwargs)
+            self.config = tools.saveSettings(self.configfile,kwargs)
 
         template = Template(file=os.path.join(self.webdir, 'settings.tpl'), searchList=[self.config])
         template.appname = self.config['app_name']
@@ -93,55 +93,62 @@ class pageHandler:
         return template.respond()
 
     @cherrypy.expose()
-    def json(self, **args):
-        if args.get('which') == 'system':
-            if args.get('action') == 'shutdown':
-                return shutdown()
-            if args.get('action') == 'restart':
-                return restart()
-            if args.get('action') == 'update':
-                return update()
-            if args.get('action') == 'checkupdate':
-                return checkUpdate()
-            if args.get('action') == 'diskspace':
-                return getDiskspace()
+    def json(self, *args, **kwargs):
+        if len(args) == 0:
+            return 'JSON error'
+
+        page = args[0]
+
+        if page == 'shutdown':
+            return tools.shutdown()
+
+        elif page == 'restart':
+            return tools.restart()
+
+        elif page == 'update':
+            return tools.update()
+
+        elif page == 'checkupdate':
+            return tools.checkUpdate()
+
+        elif page == 'diskspace':
+            return tools.getDiskspace()
                     
-        if args.get('which') == 'sabnzbd' and self.config.get('use_sabnzbd'):
+        elif page == 'sabnzbd' and self.config.get('use_sabnzbd'):
             host = self.config.get('sabnzbd_host')
             port = self.config.get('sabnzbd_port')
             apikey = self.config.get('sabnzbd_apikey')
             ssl = self.config.get('sabnzbd_ssl')
-            return sabnzbd(host,port,apikey,ssl).sendRequest(args)
+            return sabnzbd(host,port,apikey,ssl).sendRequest(kwargs)
         
-        if args.get('which') == 'couchpotato' and self.config.get('use_couchpotato'):
+        elif page == 'couchpotato' and self.config.get('use_couchpotato'):
             host = self.config.get('couchpotato_host')
             port = self.config.get('couchpotato_port')
             apikey = self.config.get('couchpotato_apikey')
-            return couchpotato(host,port,apikey).sendRequest(args)
+            return couchpotato(host,port,apikey).sendRequest(kwargs)
 
-        if args.get('which') == 'sickbeard' and self.config.get('use_sickbeard'):
+        elif page == 'sickbeard' and self.config.get('use_sickbeard'):
             host = self.config.get('sickbeard_host')
             port = self.config.get('sickbeard_port')
             apikey = self.config.get('sickbeard_apikey')
-            return sickbeard(host,port,apikey).sendRequest(args)
+            return sickbeard(host,port,apikey).sendRequest(kwargs)
 
-        if args.get('which') == 'squeezebox' and self.config.get('use_squeezebox'):
+        elif page == 'squeezebox' and self.config.get('use_squeezebox'):
             host = self.config.get('squeezebox_host')
             port = self.config.get('squeezebox_port')
             username = self.config.get('squeezebox_username','')
             password = self.config.get('squeezebox_password','')
-            return squeezebox(host,port,username,password).sendRequest(args)
+            return squeezebox(host,port,username,password).sendRequest(kwargs)
 
-        if args.get('which') == 'nzbsearch' and self.config.get('use_nzbsearch'):
+        elif page == 'nzbsearch' and self.config.get('use_nzbsearch'):
             apikey = self.config.get('nzbmatrix_apikey')
-            return nzbsearch(apikey).sendRequest(args)
+            return nzbsearch(apikey).sendRequest(kwargs)
 
-        if args.get('which') == 'xbmc' and self.config.get('use_xbmc'):
+        elif page == 'xbmc' and self.config.get('use_xbmc'):
             host = self.config.get('xbmc_host')
             port = self.config.get('xbmc_port')
             username = self.config.get('xbmc_username')
             password = self.config.get('xbmc_password')
             hidewatched = self.config.get('xbmc_hide_watched')
             ignorearticle = self.config.get('xbmc_ignore_articles',1)
-            return xbmc(host,port,username,password,self.root,hidewatched,ignorearticle).sendRequest(args)
-
+            return xbmc(host,port,username,password,self.root,hidewatched,ignorearticle).sendRequest(kwargs)
