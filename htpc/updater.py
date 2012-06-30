@@ -1,8 +1,6 @@
 # Original code by Mikie (https://github.com/Mikie-Ghost/)
 import os, urllib2, tarfile, os, shutil, platform, subprocess, re, json
 
-# Fake push 
-
 user = 'mbw2001'
 repo = 'htpc-manager'
 branch = 'master'
