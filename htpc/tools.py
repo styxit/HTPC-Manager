@@ -99,7 +99,7 @@ def checkUpdate():
     elif behind > 0:
         return dumps({'behind':behind, 'url':url})
     
-    return behind, url
+    return dumps({'behind':behind, 'error':url})
 
 def update():
     cherrypy.engine.exit()
