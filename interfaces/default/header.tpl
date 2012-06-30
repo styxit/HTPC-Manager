@@ -114,7 +114,9 @@
                 </ul>
                 <ul class="nav pull-right">
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-cog icon-white"></i></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Settings <i class="caret icon-white"></i>
+                        </a>
                         <ul class="dropdown-menu">
                             <li>
                                 <a href="#" id="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a>

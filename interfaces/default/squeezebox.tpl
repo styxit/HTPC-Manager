@@ -23,15 +23,15 @@
                     </ul>
                 </div>
                 <div class="span9">
-                    <div class="btn-group pull-right">
-                        <span>
+                    <div class="btn-toolbar pull-right">
+                        <div class="btn-group">
                             <b class="btn" id="volume">&nbsp;</b>
                             <a class="btn" href="#" data-player-control="VolDown"><i class="icon-volume-down"></i></a>
                             <a class="btn" href="#" data-player-control="VolUp"><i class="icon-volume-up"></i></a>
-                        </span>
-                        <span>
+                        </div>
+                        <div class="btn-group">
                             <a class="btn" href="#" data-player-control="Power"><i class="icon-off"></i></a>
-                        </span>
+                        </div>
                     </div>
                     <h2 id="player-item-title"></h2>
                     <h2><small id="player-item-time"></small></h2>
@@ -39,26 +39,19 @@
                         <div class="bar active" style="width: 0%"></div>
                     </div>
                     <br />
-                    <div class="btn-group">
-                        <span>
+                    <div class="btn-toolbar">
+                        <div class="btn-group">
                             <a class="btn" href="#" data-player-control="MoveLeft"><i class="icon-backward"></i></a>
                             <a class="btn" href="#" data-player-control="PlayPause"><i class="icon-pause"></i></a>
                             <a class="btn" href="#" data-player-control="MoveRight"><i class="icon-forward"></i></a>
-                        </span>
-                        <span>
+                        </div>
+                        <div class="btn-group">
                             <a class="btn" href="#" data-player-control="Shuffle"><i class="icon-align-right"></i></a>
                             <a class="btn" href="#" data-player-control="Repeat"><i class="icon-repeat"></i></a>
-                        </span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="btn-group pull-right">
-            <a class="btn" href="#" data-player-control="SavePlaylist" title="Save Playlist"><i class="icon-file"></i></a>
-            <a class="btn" href="#" data-player-control="ClearPlaylist" title="Clear Playlist"><i class="icon-remove"></i></a>
-            <a class="btn" href="#" data-player-control="PlayNow" title="Play Now"><i class="icon-play"></i></a>
-            <a class="btn" href="#" data-player-control="AddPlaylist" title="Add to Playlist"><i class="icon-plus"></i></a>
         </div>
 
         <ul class="nav nav-tabs">
@@ -72,7 +65,11 @@
 
         <div class="tab-content">
 
-            <div class="tab-pane active" id="playlist">
+            <div id="playlist" class="tab-pane active">
+	        	<div class="btn-group pull-right">
+		            <a class="btn btn-mini" href="#" data-player-control="SavePlaylist" title="Save Playlist"><i class="icon-file"></i></a>
+		            <a class="btn btn-mini" href="#" data-player-control="ClearPlaylist" title="Clear Playlist"><i class="icon-remove"></i></a>
+		        </div>
                 <table class="table table-striped">
                     <thead>
                     <tr>
@@ -97,6 +94,10 @@
             </div>
 
             <div id="songs" class="tab-pane">
+		        <div class="btn-group pull-right">
+		            <a class="btn btn-mini" href="#" data-player-control="PlayNow" title="Play Now"><i class="icon-play"></i></a>
+		            <a class="btn btn-mini" href="#" data-player-control="AddPlaylist" title="Add to Playlist"><i class="icon-plus"></i></a>
+		        </div>
                 <table class="table table-striped">
                     <thead>
                     <tr>
