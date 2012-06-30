@@ -68,9 +68,9 @@ def runGit(args):
             continue
 
         if 'not found' in output or "not recognized as an internal or external command" in output:
-            return False
+            return ('','Invalid command')
         elif 'fatal:' in output or err:
-            return False
+            return ('','Fatal Error')
         elif output:
             break
 
