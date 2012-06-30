@@ -6,7 +6,7 @@
 
         <div class="page-header page-title">
             <h1>
-                Dashboard
+                Update test
             </h1>
         </div>
 
