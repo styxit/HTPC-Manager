@@ -7,7 +7,8 @@ branch = 'master'
 
 def currentCommit():
     output, err = runGit('rev-parse HEAD')
-    if not re.match('^[a-z0-9]+$', output.strip()):
+    output = output.strip()
+    if not re.match('^[a-z0-9]+$', output):
         return None
     return output
 
@@ -16,11 +17,13 @@ def latestCommit():
         url = 'https://api.github.com/repos/%s/%s/commits/%s' % (user, repo, branch)
         result = urllib2.urlopen(url).read()
         git = json.loads(result)
-        return git['sha']
+        return git['sha'].strip()
     except:
         return None
 
 def commitsBehind(current, latest):
+    if not current or not latest:
+        return -1
     try:
         url = 'https://api.github.com/repos/%s/%s/compare/%s...%s' % (user, repo, current, latest)
         result = urllib2.urlopen(url).read()
@@ -39,7 +42,7 @@ def checkGithub():
     elif behind > 0:
         return (behind, 'https://github.com/%s/%s/compare/%s...%s' % (user, repo, current, latest))
 
-    return None
+    return ('Invalid version','')
 
 def update():
     if gitUpdate():
