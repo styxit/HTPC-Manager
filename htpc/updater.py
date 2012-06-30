@@ -108,7 +108,7 @@ def tarUpdate():
 
     try:
         tar = tarfile.open(tar_file)
-        #tar.extractall(update_folder)
+        tar.extractall(update_folder)
         tar.close()
     except:
         print('Failed to extract update file', 'WARNING')
