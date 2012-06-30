@@ -29,7 +29,7 @@ def commitsBehind(current, latest):
         url = 'https://api.github.com/repos/%s/%s/compare/%s...%s' % (user, repo, current, latest)
         result = urllib2.urlopen(url).read()
         git = json.loads(result)
-        return git['total_commits']
+        return int(git['total_commits'])
     except:
         return -1
 
