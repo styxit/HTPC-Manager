@@ -42,7 +42,7 @@ def checkGithub():
     elif behind > 0:
         return (behind, 'https://github.com/%s/%s/compare/%s...%s' % (user, repo, current, latest))
 
-    return ('Invalid version','')
+    return (behind, 'Invalid version')
 
 def update():
     if gitUpdate():

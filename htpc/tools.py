@@ -98,6 +98,8 @@ def checkUpdate():
         return dumps({'behind':behind})
     elif behind > 0:
         return dumps({'behind':behind, 'url':url})
+    
+    return behind, url
 
 def update():
     cherrypy.engine.exit()
