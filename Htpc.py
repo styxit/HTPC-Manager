@@ -66,6 +66,12 @@ if username and password:
 
 # Set template and static directories
 template = os.path.join('interfaces/',config.get('template','default'))
+
+#templates = os.listdir("interfaces/")
+#config.set('htpc', 'availabletemplates', templates)
+#themes = os.listdir(os.path.join(template, "static/css/themes"))
+#config.set('htpc', 'availablethemes', themes)
+
 appConfig = {
     '/':  rootConfig,
     '/favicon.ico': {

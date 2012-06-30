@@ -24,6 +24,7 @@
                 </ul>
             </li>
             <li><a href="#nzbsearch" data-toggle="tab">NZB Search</a></li>
+            <li><a href="#style" data-toggle="tab">Style</a></li>            
         </ul>
 
         <form action="" id="base-settings-form" name="base-settings-form" method="post" class="form-horizontal">
@@ -384,6 +385,41 @@
                     </div>
                 </fieldset>
 
+                <fieldset id="style" class="tab-pane">
+                            <legend>Styling</legend>
+                            <div class="control-group">
+                                <label class="control-label" for="theme">Select Template *</label>
+                                <div class="controls">
+                                    <select id="template" name="template">
+                                    
+                                        #for $templates in eval($getVar('availabletemplates' ''))
+                                            #if $getVar('template', 'default') == $templates
+                                                <option selected="selected" value="$templates">$templates</option>
+                                            #else
+                                                <option value="$templates">$templates</option>
+                                            #end if
+                                        #end for                                                                   
+                                    </select>
+                                </div>
+                            </div>       
+                            <div class="control-group">
+                                <label class="control-label" for="theme">Select Theme</label>
+                                <div class="controls">
+                                    <select id="theme" name="theme">                                  
+                                        #for $themes in eval($getVar('availablethemes' ''))
+                                            #if $getVar('theme', 'default') == $themes
+                                                <option selected="selected" value="$themes">$theme</option>
+                                            #else
+                                                <option value="$themes">$themes</option>
+                                            #end if
+                                        #end for                                                  
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            * Requires restart 
+                </fieldset>
+                
                 <div class="form-actions">
                     <input class="btn btn-primary" type="submit" value="Save changes" />
                     <input class="btn" type="reset" value="Clear" />

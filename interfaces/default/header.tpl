@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <title>$appname</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/default.css" rel="stylesheet">
+    <link href="/css/themes/$getVar('theme', 'default')/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/themes/$getVar('theme', 'default')/default.css" rel="stylesheet">
     <link href="/css/bootstrap-responsive.min.css" rel="stylesheet">
     <link href="/css/responsive.css" rel="stylesheet">
     <link href="/css/tablesorter.css" rel="stylesheet">
