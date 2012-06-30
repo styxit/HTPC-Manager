@@ -36,7 +36,7 @@ def commitsBehind(current, latest):
 def checkGithub():
     current = currentCommit()
     latest = latestCommit()
-    behind = commitsBehind(latest, current)
+    behind = commitsBehind(current, latest)
 
     if behind == 0:
         return (behind, '')
