@@ -4,12 +4,13 @@ import os, urllib2, tarfile, os, shutil, platform, subprocess, re, json
 user = 'mbw2001'
 repo = 'htpc-manager'
 branch = 'master'
+rundir = os.getcwd()
 
 def currentCommit():
     output, err = runGit('rev-parse HEAD')
     output = output.strip()
     if not re.match('^[a-z0-9]+$', output):
-        return None
+        return err
     return output
 
 def latestCommit():
@@ -53,7 +54,6 @@ def update():
     return False
 
 def runGit(args):
-    rundir = os.getcwd()
     git_locations = ['git']
 
     if platform.system().lower() == 'darwin':
@@ -71,9 +71,9 @@ def runGit(args):
             continue
 
         if 'not found' in output or "not recognized as an internal or external command" in output:
-            return ('','Invalid command')
+            return ('', output)
         elif 'fatal:' in output or err:
-            return ('','Fatal Error')
+            return ('', output)
         elif output:
             break
 
@@ -94,7 +94,6 @@ def gitUpdate():
     return True
 
 def tarUpdate():
-    rundir = os.getcwd()
     tar_file = os.path.join(rundir, '%s.tar.gz' % repo)
     update_folder = os.path.join(rundir, 'update')
 
@@ -138,7 +137,6 @@ def tarUpdate():
     return True
 
 def RemoveUpdateFiles():
-    rundir = os.getcwd()
     tar_file = os.path.join(rundir,'%s.tar.gz' % repo)
     update_folder = os.path.join(rundir, 'update')
 
