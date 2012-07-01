@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.join(root, 'libs'))
 # Import the bundled CherryPy
 import cherrypy
 from htpc.pagehandler import pageHandler
-from htpc.tools import readSettings
+from htpc.tools import readSettings , setStyleSettings
 
 # Set default conf file and copy sample if it doesnt exist
 config = os.path.join(root, 'userdata/config.cfg')
@@ -67,10 +67,7 @@ if username and password:
 # Set template and static directories
 template = os.path.join('interfaces/',config.get('template','default'))
 
-#templates = os.listdir("interfaces/")
-#config.set('htpc', 'availabletemplates', templates)
-#themes = os.listdir(os.path.join(template, "static/css/themes"))
-#config.set('htpc', 'availablethemes', themes)
+setStyleSettings(args.config, template)
 
 appConfig = {
     '/':  rootConfig,
