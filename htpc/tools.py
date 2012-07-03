@@ -26,6 +26,24 @@ def readSettings(configfile, section = 'htpc'):
             configDict[key] = val
     return configDict
 
+def setStyleSettings(configfile, template, section = 'htpc'):
+
+    config = ConfigParser.ConfigParser()
+    config.read(configfile)
+
+    if not config.has_section(section):
+	    config.add_section(section)    
+   
+    #Set the available templates and interfaces
+    templates = os.listdir("interfaces/")
+    config.set(section, 'availabletemplates', templates)
+    
+    themes = os.listdir(os.path.join(template, "static/css/themes"))
+    config.set(section, 'availablethemes', themes)
+    
+    with open(configfile, 'w') as f:
+	    config.write(f)
+        
 def saveSettings(configfile, data, section = 'htpc'):
     # Set unchecked checkboxes to 0
     if not data.has_key('use_sabnzbd'):
