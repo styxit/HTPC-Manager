@@ -7,7 +7,7 @@
         <div class="page-header page-title">
             <select id="players" class="pull-right"></select>
             <h1>
-                <a href="http:\/\/$getVar('squeezebox_host', ''):$getVar('squeezebox_port', '')" target="_blank">$getVar('squeezebox_name', 'Squeezebox')</a>
+                <a href="http://$getVar('squeezebox_host', ''):$getVar('squeezebox_port', '')" target="_blank">$getVar('squeezebox_name', 'Squeezebox')</a>
             </h1>
         </div>
 
@@ -66,10 +66,10 @@
         <div class="tab-content">
 
             <div id="playlist" class="tab-pane active">
-	        	<div class="btn-group pull-right">
-		            <a class="btn btn-mini" href="#" data-player-control="SavePlaylist" title="Save Playlist"><i class="icon-file"></i></a>
-		            <a class="btn btn-mini" href="#" data-player-control="ClearPlaylist" title="Clear Playlist"><i class="icon-remove"></i></a>
-		        </div>
+                <div class="btn-group pull-right">
+                    <a class="btn btn-mini" href="#" data-player-control="SavePlaylist" title="Save Playlist"><i class="icon-file"></i></a>
+                    <a class="btn btn-mini" href="#" data-player-control="ClearPlaylist" title="Clear Playlist"><i class="icon-remove"></i></a>
+                </div>
                 <table class="table table-striped">
                     <thead>
                     <tr>
@@ -94,10 +94,10 @@
             </div>
 
             <div id="songs" class="tab-pane">
-		        <div class="btn-group pull-right">
-		            <a class="btn btn-mini" href="#" data-player-control="PlayNow" title="Play Now"><i class="icon-play"></i></a>
-		            <a class="btn btn-mini" href="#" data-player-control="AddPlaylist" title="Add to Playlist"><i class="icon-plus"></i></a>
-		        </div>
+                <div class="btn-group pull-right">
+                    <a class="btn btn-mini" href="#" data-player-control="PlayNow" title="Play Now"><i class="icon-play"></i></a>
+                    <a class="btn btn-mini" href="#" data-player-control="AddPlaylist" title="Add to Playlist"><i class="icon-plus"></i></a>
+                </div>
                 <table class="table table-striped">
                     <thead>
                     <tr>

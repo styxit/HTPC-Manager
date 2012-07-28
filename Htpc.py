@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.join(root, 'libs'))
 # Import the bundled CherryPy
 import cherrypy
 from htpc.pagehandler import pageHandler
-from htpc.tools import readSettings , setStyleSettings
+from htpc.tools import readSettings, updateAvailableThemes
 
 # Set default conf file and copy sample if it doesnt exist
 config = os.path.join(root, 'userdata/config.cfg')
@@ -67,25 +67,25 @@ if username and password:
 # Set template and static directories
 template = os.path.join('interfaces/',config.get('template','default'))
 
-setStyleSettings(args.config, template)
+updateAvailableThemes(args.config, template)
 
 appConfig = {
     '/':  rootConfig,
     '/favicon.ico': {
         'tools.staticfile.on': True,
-        'tools.staticfile.filename': template + "/static/img/favicon.ico"
+        'tools.staticfile.filename': template + "/img/favicon.ico"
     },
     '/css': {
         'tools.staticdir.on': True,
-        'tools.staticdir.dir': template + "/static/css"
+        'tools.staticdir.dir': template + "/css"
     },
     '/js': {
         'tools.staticdir.on': True,
-        'tools.staticdir.dir': template + "/static/js"
+        'tools.staticdir.dir': template + "/js"
     },
     '/img': {
         'tools.staticdir.on': True,
-        'tools.staticdir.dir': template + "/static/img"
+        'tools.staticdir.dir': template + "/img"
     }
 }
 

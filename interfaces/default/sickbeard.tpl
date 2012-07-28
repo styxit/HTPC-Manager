@@ -36,7 +36,6 @@
                         <th>Next ep</th>
                         <th>Network</th>
                         <th>Quality</th>
-                        <th class="{sorter: false}">&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody id="tvshows_table_body"></tbody>
@@ -50,7 +49,6 @@
                         <th>Showname</th>
                         <th>Episode</th>
                         <th>Airdate</th>
-                        <th class="{sorter: false}">&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody id="nextaired_table_body"></tbody>

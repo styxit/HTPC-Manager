@@ -4,11 +4,10 @@
     <meta charset="utf-8" />
     <title>$appname</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
-    <link href="/css/themes/$getVar('theme', 'default')/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/themes/$getVar('theme', 'default')/default.css" rel="stylesheet">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/bootstrap-responsive.min.css" rel="stylesheet">
-    <link href="/css/responsive.css" rel="stylesheet">
-    <link href="/css/tablesorter.css" rel="stylesheet">
+    <link href="/css/base.css" rel="stylesheet">
+    <link href="/css/themes/$getVar('theme','default.css')" rel="stylesheet">
     <script src="/js/jquery/jquery-1.7.2.min.js"></script>
     <script src="/js/jquery/jquery-ui-1.8.18.custom.min.js"></script>
     <script src="/js/default.js"></script>
@@ -18,34 +17,20 @@
 </head>
 <body>
 
-<div id="notify-user" class="alert alert-block">
-    <a class="close">&times;</a>
+<div id="notify-user" class="hide">
+    <button class="close" data-dismiss="alert">&times;</button>
     <h4 class="alert-heading"></h4>
-    <span></span>
 </div>
 
 <div id="modal_dialog" class="modal hide">
     <div class="modal-header">
-        <a href="javascript:void(0);" class="close" data-dismiss="modal">&times;</a>
+        <button class="close" data-dismiss="modal">&times;</button>
         <h3 class="modal-h3"></h3>
     </div>
     <div class="modal-fanart">
-        <div class="modal-body">
-
-        </div>
+        <div class="modal-body"></div>
     </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0);" class="btn secondary">Close</a>
-    </div>
-</div>
-
-<div id="block_dialog" class="modal hide">
-    <div class="modal-header">
-        <h3 class="modal-h3"></h3>
-    </div>
-    <div class="modal-body">
-
-    </div>
+    <div class="modal-footer"></div>
 </div>
 
 <div class="navbar navbar-fixed-top" id="navbar">

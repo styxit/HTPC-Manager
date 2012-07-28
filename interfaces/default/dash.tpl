@@ -110,7 +110,6 @@
                         <th>Showname</th>
                         <th>Episode</th>
                         <th>Airdate</th>
-                        <th>&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody id="nextaired_table_body">

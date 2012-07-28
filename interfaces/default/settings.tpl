@@ -417,7 +417,7 @@
                                 </div>
                             </div>
                             
-                            * Requires restart 
+                            <p>* Requires restart</p> 
                 </fieldset>
                 
                 <div class="form-actions">

@@ -10,20 +10,16 @@ function loadShows() {
                 $('#tvshows_table_body').append(row);
             }
             $.each(result.data, function (showname, tvshow) {
-                var infoIcon = $('<i>');
-                infoIcon.addClass('icon-info-sign');
-                infoIcon.css('cursor', 'pointer');
-                infoIcon.click(function () {
+                var name = $('<a>').attr('href','#').html(showname).click(function(e){
                     loadShow(tvshow.tvdbid);
                 });
 
                 var row = $('<tr>')
-                row.append($('<td>').html(showname));
+                row.append($('<td>').html(name));
                 row.append($('<td>').html(tvshow.status));
                 row.append($('<td>').html(tvshow.next_ep_airdate));
                 row.append($('<td>').html(tvshow.network));
                 row.append($('<td>').html(tvshow.quality));
-                row.append($('<td>').append(infoIcon));
 
                 $('#tvshows_table_body').append(row);
             });
@@ -106,18 +102,15 @@ function loadNextAired(options) {
                     return false;
                 }
 
-                var infoIcon = $('<i>');
-                infoIcon.addClass('icon-info-sign');
-                infoIcon.css('cursor', 'pointer');
-                infoIcon.click(function () {
+                var label = tvshow.season + 'x' + tvshow.episode + ' - ' + tvshow.ep_name;
+                var episode = $('<a>').attr('href','#').html(label).click(function(e){
                     loadShow(tvshow.tvdbid);
                 });
 
                 var row = $('<tr>');
                 row.append($('<td>').html(tvshow.show_name));
-                row.append($('<td>').html(tvshow.season + 'x' + tvshow.episode + ' - ' + tvshow.ep_name));
+                row.append($('<td>').append(episode));
                 row.append($('<td>').html(tvshow.airdate));
-                row.append($('<td>').append(infoIcon));
 
                 $('#nextaired_table_body').append(row);
 
