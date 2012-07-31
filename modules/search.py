@@ -119,3 +119,5 @@ class Search:
                 {'id': 40, 'name': 'Other: Other'},
             ]}
         ])
+
+cherrypy.tree.mount(Search(), "/search/")

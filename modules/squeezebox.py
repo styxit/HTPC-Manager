@@ -93,3 +93,5 @@ class Squeezebox:
             request.add_header("Authorization", "Basic %s" % self.auth)
         result = urllib2.urlopen(request, timeout=5).read()
         return result.decode('utf-8')
+
+cherrypy.tree.mount(Squeezebox(), "/squeezebox/")

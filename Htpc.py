@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import os, sys, shutil, argparse
 import htpc
+from htpc.tools import readSettings
 
 # Set root and insert bundled libraies into path
 htpc.root = os.getcwd()
@@ -9,9 +10,6 @@ sys.path.insert(0, os.path.join(htpc.root, 'libs'))
 def main():
     # Import the bundled CherryPy and tools
     import cherrypy
-    from htpc.index import Root
-    from htpc.system import System
-    from htpc.tools import readSettings
 
     # Set default conf file and copy sample if it doesnt exist
     htpc.config = os.path.join(htpc.root, 'userdata/config.cfg')
@@ -90,21 +88,11 @@ def main():
     }
 
     # Import modules
-    from modules.xbmc import Xbmc
-    cherrypy.tree.mount(Xbmc(), "/xbmc/")
-    from modules.sabnzbd import Sabnzbd
-    cherrypy.tree.mount(Sabnzbd(), "/sabnzbd/")
-    from modules.sickbeard import Sickbeard
-    cherrypy.tree.mount(Sickbeard(), "/sickbeard/")
-    from modules.couchpotato import CouchPotato
-    cherrypy.tree.mount(CouchPotato(), "/couchpotato/")
-    from modules.squeezebox import Squeezebox
-    cherrypy.tree.mount(Squeezebox(), "/squeezebox/")
-    from modules.search import Search
-    cherrypy.tree.mount(Search(), "/search/")
+    import modules
 
     # System modules
-    cherrypy.tree.mount(System(), "/system/")
+    from htpc.index import Root
+    from htpc.system import System
 
     # Daemonize if wanted
     if args.daemon:

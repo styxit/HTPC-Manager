@@ -243,3 +243,4 @@ class Xbmc:
         data = server.VideoLibrary.Scan()
         return dumps(data)
 
+cherrypy.tree.mount(Xbmc(), "/xbmc/")

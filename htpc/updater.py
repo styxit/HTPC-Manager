@@ -1,5 +1,6 @@
 # Original code by Mikie (https://github.com/Mikie-Ghost/)
-import os, urllib2, tarfile, os, shutil, platform, subprocess, re, json
+import os, urllib2, tarfile, os, shutil
+import platform, subprocess, re, json
 
 user = 'mbw2001'
 repo = 'htpc-manager'

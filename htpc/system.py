@@ -35,3 +35,5 @@ class System:
         status = updater.update()
         cherrypy.server.start()
         return dumps({'update':'success'})
+
+cherrypy.tree.mount(System(), "/system/")
