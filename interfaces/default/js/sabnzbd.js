@@ -1,11 +1,9 @@
 $(document).ready(function () {
-
-    // pauze / resume
     $('#nzb_pause_button').click(function () {
         var clickItem = $(this);
         clickItem.button('loading');
         $.ajax({
-            url: '/json/sabnzbd/?action=' + queueToggleStatusAction,
+            url: '/sabnzbd/TogglePause?mode='+queueToggleStatusAction,
             dataType: 'json',
             type: 'get'
         });
@@ -15,9 +13,8 @@ $(document).ready(function () {
         $('#add_nzb_form').submit();
     })
 
-    // nzb toevoegen
     $('#add_nzb_form').ajaxForm({
-        url: '/json/sabnzbd/?action=addnzb',
+        url: '/sabnzbd/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
         success: function (result) {
@@ -29,29 +26,20 @@ $(document).ready(function () {
         }
     });
 
-    // Categroeien inladen
     setCategories('#nzb_category', '*');
 
-    // Speed zetten
     $('#nzb_set_speed').click(function() {
-
         var speed = ($('#nzb_get_speed').val());
-
         $.ajax({
-            url: '/json/sabnzbd/?action=speed&value=' + speed,
+            url: '/sabnzbd/SetSpeed?speed=' + speed,
             type: 'post',
             dataType: 'json'
         });
     });
-    // nzb actief inladen en elke seconde refreshen
     loadQueue(1);
     setInterval(function() {
         loadQueue(0);
     }, 5000);
-
-    // nzb historie inladen
     loadHistory();
-
-    // Waarschuwingen inladen
     loadWarnings();
 });

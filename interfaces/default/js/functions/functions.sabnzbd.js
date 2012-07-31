@@ -1,7 +1,7 @@
 function removeHistoryItem(id) {
     if (confirm('Are you sure?')) {
         $.ajax({
-            url: '/json/sabnzbd/?action=deletehistory&id=' + id,
+            url: '/sabnzbd/DeleteHistory?id=' + id,
             type: 'get',
             dataType: 'json',
             success: function (data) {
@@ -15,7 +15,7 @@ function removeHistoryItem(id) {
 function retryHistoryItem(id) {
     if (confirm('Are you sure?')) {
         $.ajax({
-            url: '/json/sabnzbd/?action=retry&id=' + id,
+            url: '/sabnzbd/Retry?id=' + id,
             type: 'get',
             dataType: 'json',
             success: function (data) {
@@ -28,7 +28,7 @@ function retryHistoryItem(id) {
 
 function loadHistory() {
     $.ajax({
-        url: '/json/sabnzbd/?action=history&limit=25',
+        url: '/sabnzbd/GetHistory?limit=25',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -39,7 +39,6 @@ function loadHistory() {
             }
             $('#history_table_body').html('');
             $.each(data.history.slots, function (i, slot) {
-
                 var deleteImage = makeIcon('icon-remove', 'Delete');
                 deleteImage.click(function () {
                     removeHistoryItem(slot.nzo_id);
@@ -71,7 +70,6 @@ function loadHistory() {
 
                 $('#history_table_body').append(row);
             });
-
         }
     });
 }
@@ -79,11 +77,10 @@ function loadHistory() {
 function removeQueueItem(id) {
     if (confirm('Are you sure?')) {
         $.ajax({
-            url: '/json/sabnzbd/?action=delete&id=' + id,
+            url: '/sabnzbd/DeleteNzb?id=' + id,
             type: 'get',
             dataType: 'json',
             success: function (data) {
-
                 loadQueue(1);
                 loadHistory();
             }
@@ -93,7 +90,7 @@ function removeQueueItem(id) {
 
 function changeCategory(id, cat) {
     $.ajax({
-        url: '/json/sabnzbd/?action=change_cat&id=' + id + '&value=' + cat,
+        url: '/sabnzbd/ChangeCategory?id=' + id + '&cat=' + cat,
         type: 'get',
         dataType: 'json'
     });
@@ -103,13 +100,11 @@ var queueToggleStatusAction = '';
 
 function loadQueue(once) {
     $.ajax({
-        url: '/json/sabnzbd/?action=status',
+        url: '/sabnzbd/GetStatus',
         type: 'get',
         dataType: 'json',
         success: function (object) {
-
             if (object.status == false) {
-
                 $('#notification_area').addClass('alert alert-error');
                 $('#notification_area').html('<strong>Error</strong> Could not connect to SABnzbd, go to <a href="/settings">settings</a>');
                 return false;
@@ -143,7 +138,6 @@ function loadQueue(once) {
             }
 
             $.each(data.slots, function (i, job) {
-
                 var progressBar = $('<div>');
                 progressBar.addClass('bar');
                 progressBar.css('width', job.percentage + '%');
@@ -182,30 +176,26 @@ function loadQueue(once) {
 
                 $('#active_table_body').append(row);
             });
-
         }
     });
 }
 
 function loadWarnings() {
     $.ajax({
-        url: '/json/sabnzbd/?action=warnings',
+        url: '/sabnzbd/GetWarnings',
         type: 'get',
         dataType: 'json',
         success: function (data) {
-
             if (data.warnings == 0) {
                 var row = $('<tr>')
                 row.append($('<td>').html('No warnings'));
                 $('#warning_table_body').append(row);
             }
-
             $.each(data.warnings, function (i, warning) {
                 var row = $('<tr>')
                 row.append($('<td>').html(warning));
                 $('#warning_table_body').append(row);
             });
-
         }
     });
 }
@@ -213,14 +203,11 @@ function loadWarnings() {
 // Haal categorieen op
 function setCategories(selector, select) {
     $.ajax({
-        url: '/json/sabnzbd/?action=categories',
+        url: '/sabnzbd/GetCategories',
         type: 'post',
         dataType: 'json',
         success: function (data) {
-
-            // return false;
             $.each(data.categories, function (i, cat) {
-
                 var option = $('<option>');
                 if (select == cat) {
                     option.attr('selected', true);

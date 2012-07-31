@@ -21,7 +21,7 @@ function getMovieList() {
     $('.tooltip').remove();
     $('#movies_table_body').children().remove();
     $.ajax({
-        url: 'json/couchpotato/?action=movielist',
+        url: '/couchpotato/GetMovieList',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -54,8 +54,8 @@ function getMovieList() {
                 var info = $('<td>');
                 row.append(info.html(movieHtml));
 
-				/*
-				 * List accepted profiles. Removed for now.
+                /*
+                 * List accepted profiles. Removed for now.
                 $.each(item.profile.types, function(i, item) {
                     var profile = $('<span>');
                     profile.addClass('label');
@@ -88,14 +88,14 @@ function getMovieList() {
 function deleteMovie(id, name) {
     $('.tooltip').remove();
     $.ajax({
-        url: '/json/couchpotato/?action=moviedelete',
+        url: '/couchpotato/DeleteMovie',
         data: {id: id},
         type: 'get',
         dataType: 'json',
         success: function (result) {
             if (result.success) {
                 $('#' + id).fadeOut();
-                notifyInfo('CouchPotato', name + ' successfully deleted!');
+                notify('CouchPotato', name + ' successfully deleted!', 'info');
             }
         }
     });
@@ -103,13 +103,13 @@ function deleteMovie(id, name) {
 
 function refreshMovie(id, name) {
     $.ajax({
-        url: '/json/couchpotato/?action=movierefresh',
+        url: '/couchpotato/RefreshMovie',
         data: {id: id},
         type: 'get',
         dataType: 'json',
         success: function (result) {
             if (result.success) {
-                notifyInfo('CouchPotato', name + ' successfully refreshed!');
+                notify('CouchPotato', name + ' successfully refreshed!', 'info');
             }
         }
     });
@@ -118,7 +118,7 @@ function refreshMovie(id, name) {
 function searchMovie(q) {
     $('.tooltip').remove();
     $.ajax({
-        url: '/json/couchpotato/?action=moviesearch',
+        url: '/couchpotato/SearchMovie',
         data: {q: encodeURIComponent(q)},
         type: 'get',
         dataType: 'json',
@@ -168,7 +168,7 @@ function addMovie(profile, id, title) {
     var row = $('<td>').attr('colspan', 3).append(loader);
     $('[data-imdb=' + id + ']').append(row);
     $.ajax({
-        url: '/json/couchpotato/?action=movieadd',
+        url: '/couchpotato/AddMovie',
         data: {
             profile_id : profile,
             identifier : id,
@@ -177,7 +177,7 @@ function addMovie(profile, id, title) {
         type: 'get',
         dataType: 'json',
         success: function (result) {
-            notifyInfo('CouchPotato', title + ' successfully added!');
+            notify('CouchPotato', title + ' successfully added!', 'info');
             $('#search_movie_name').popover('hide');
             setTimeout(getMovieList, 1000);
         },
@@ -186,7 +186,7 @@ function addMovie(profile, id, title) {
 
 function getNotificationList() {
     $.ajax({
-        url: '/json/couchpotato/?action=notificationlist',
+        url: '/couchpotato/GetNotificationList',
         type: 'get',
         dataType: 'json',
         success: function (result) {

@@ -1,11 +1,8 @@
-// films inladen
-
 var lastMovieLoaded = 0;
 var allMoviesLoaded = false;
 var moviesLoading = false;
 var movieRequest = null;
 var movieLimit = 99999;
-
 function loadMovies(options) {
     if ($('#movie-grid').attr('data-scroll-limit') !== 0) {
         movieLimit = parseInt($('#movie-grid').attr('data-scroll-limit'));
@@ -25,15 +22,11 @@ function loadMovies(options) {
     };
     $.extend(sendData, options);
 
-    if (allMoviesLoaded) {
-        return true;
-    }
-    if (moviesLoading) {
-        return true;
-    }
+    if (allMoviesLoaded) return;
+    if (moviesLoading) return;
 
     movieRequest = $.ajax({
-        url: 'json/xbmc/?action=movies',
+        url: '/xbmc/GetMovies',
         type: 'get',
         data: sendData,
         beforeSend: function() {
@@ -42,9 +35,13 @@ function loadMovies(options) {
         },
         dataType: 'json',
         success: function (data) {
+            $('#movie-loader').hide();
             lastMovieLoaded += movieLimit;
 
-            if (data == null) return false;
+            if (data == null) {;
+                notify('Error','Cannot connect to XBMC','error');
+                $('#xbmc-wake').show();
+            }
 
             if (data.limits.end == data.limits.total) {
                 allMoviesLoaded = true;
@@ -54,9 +51,7 @@ function loadMovies(options) {
                 var moviePicture = $('<img>');
                 moviePicture.css('height', '150px');
                 moviePicture.css('width', '100px');
-                moviePicture.attr('src', 'img/white5x5.png');
-                moviePicture.attr('data-original', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(movie.thumbnail) + '&w=100&h=150');
-                moviePicture.addClass('lazy');
+                moviePicture.attr('src', '/xbmc/GetThumb?thumb='+encodeURIComponent(movie.thumbnail)+'&w=100&h=150');
 
                 var movieAnchor = $('<a>');
                 movieAnchor.addClass('thumbnail');
@@ -75,78 +70,54 @@ function loadMovies(options) {
                 movieItem.append($('<h6>').addClass('movie-title').html(shortenText(movie.title, 12)));
 
                 $('#movie-grid').append(movieItem);
-                $('#movie-loader').hide();
 
                 moviesLoading = false;
             });
+        },
+        error: function() {
+            notify('Error','An error occurred','error');
         }
     });
 }
 
 function xbmcShowMovie(movie) {
-    // Maak inhoud van modal
     var modalMoviePicture = $('<img>');
-    modalMoviePicture.css('height', '300px');
-    modalMoviePicture.css('width', '200px');
-    modalMoviePicture.attr('src', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(movie.thumbnail) + '&w=200&h=300');
+    modalMoviePicture.attr('src', '/xbmc/GetThumb?thumb='+encodeURIComponent(movie.thumbnail)+'&w=200&h=300');
 
     var modalMovieAnchor = $('<div>');
-    modalMovieAnchor.addClass('thumbnail');
+    modalMovieAnchor.addClass('thumbnail pull-left');
+    modalMovieAnchor.css('margin-right', '20px')
     modalMovieAnchor.append(modalMoviePicture);
 
-    var modalMoviePoster = $('<td>');
-    modalMoviePoster.css('height', '300px');
-    modalMoviePoster.css('width', '200px');
-    modalMoviePoster.append(modalMovieAnchor);
+    var movieStudio = $('<h6>').html(movie.studio);
+    var movieGenre = $('<h6>').html(movie.genre);
+    var moviePlot = $('<p>').html(movie.plot);
 
-    var moviePlot = $('<p>');
-    moviePlot.html(movie.plot);
-
-    var movieStudio = $('<h6>');
-    movieStudio.html(movie.studio);
-
-    var movieGenre = $('<h6>');
-    movieGenre.html(movie.genre);
-
-    var movieRating = $('<div>');
-    movieRating.raty({
+    var movieRating = $('<span>').raty({
         readOnly: true,
-        start: (movie.rating / 2),
-        number: 5
+        score: (movie.rating / 2),
     });
 
-    var modalMovieInfo = $('<td>');
+    var modalMovieInfo = $('<div>');
+    modalMovieInfo.append(modalMovieAnchor);
     modalMovieInfo.append(moviePlot);
-    modalMovieInfo.append(movieRating);
-    modalMovieInfo.append(movieStudio);
     modalMovieInfo.append(movieGenre);
+    modalMovieInfo.append(movieStudio);
+    modalMovieInfo.append(movieRating);
 
-    var row = $('<tr>');
-    row.append(modalMoviePoster);
-    row.append(modalMovieInfo)
-
-    var table = $('<table>');
-    table.addClass('table table-modal');
-    table.append(row);
-
-
-    showModal(movie.title + ' (' + movie.year + ')',  table, {
+    showModal(movie.title + ' (' + movie.year + ')',  modalMovieInfo, {
         'Play' : function () {
             playItem(movie.file);
             hideModal();
         }
     })
 
-    // Achtergrondje maken
     $('.modal-fanart').css({
-        'background' : '#ffffff url(json/xbmc/?action=thumb&thumb=' + encodeURIComponent(movie.fanart) + '&w=675&h=400&o=15) top center no-repeat',
+        'background' : '#ffffff url(/xbmc/GetThumb?thumb='+encodeURIComponent(movie.fanart)+'&w=675&h=400&o=15) top center no-repeat',
         'background-size' : '100%'
     });
-    table.parent().addClass('trans');
-
 }
 
-// shows inladen
 var showSteps = 99999;
 var lastShowLoaded = 0;
 var allShowsLoaded = false;
@@ -169,15 +140,11 @@ function loadXbmcShows(options) {
     };
     $.extend(sendData, options);
 
-    if (allShowsLoaded) {
-        return true;
-    }
-    if (showsLoading) {
-        return true;
-    }
+    if (allShowsLoaded) return;
+    if (showsLoading) return;
 
     showRequest = $.ajax({
-        url: 'json/xbmc/?action=shows',
+        url: '/xbmc/GetShows',
         type: 'get',
         dataType: 'json',
         data: sendData,
@@ -189,24 +156,22 @@ function loadXbmcShows(options) {
 
             lastShowLoaded += showSteps;
 
-            if (data == null) return false;
+            if (data == null) return;
 
             if (data.limits.end == data.limits.total) {
                 allShowsLoaded = true;
             }
 
-            if (data == null) return false;
+            if (data == null) return;
             $.each(data.tvshows, function (i, show) {
 
                 var showPicture = $('<img>');
-                showPicture.attr('src', 'img/white5x5.png');
-                showPicture.addClass('lazy');
                 if ($('#show-grid').hasClass('banners')) {
-                    showPicture.attr('data-original', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(show.thumbnail) + '&h=80&w=500');
+                    showPicture.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(show.thumbnail) + '&h=80&w=500');
                     showPicture.css('height', '90px');
                     showPicture.css('width', '500px');
                 } else {
-                    showPicture.attr('data-original', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(show.thumbnail) + '&h=150&w=100');
+                    showPicture.attr('srcl', '/xbmc/?GetThumb?thumb=' + encodeURIComponent(show.thumbnail) + '&h=150&w=100');
                     showPicture.css('height', '150px');
                     showPicture.css('width', '100px');
                 }
@@ -246,53 +211,43 @@ function loadXbmcShows(options) {
 }
 
 function xbmcShowEpisode(episode) {
-    // Maak inhoud van modal
     var modalshowPicture = $('<img>');
-    modalshowPicture.css('height', '125px');
-    modalshowPicture.css('width', '200px');
-    modalshowPicture.attr('src', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(episode.thumbnail) + '&w=200&h=125');
+    modalshowPicture.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(episode.thumbnail) + '&w=200&h=125');
 
     var modalshowAnchor = $('<div>');
-    modalshowAnchor.addClass('thumbnail');
+    modalshowAnchor.addClass('thumbnail pull-left');
+    modalshowAnchor.css('margin-right', '20px')
     modalshowAnchor.append(modalshowPicture);
 
-    var modalshowPoster = $('<td>');
-    modalshowPoster.css('height', '125px');
-    modalshowPoster.css('width', '200px');
-    modalshowPoster.append(modalshowAnchor);
+    var modalPlot = $('<p>').html(episode.plot);
 
-    var modalPlot = $('<td>');
-    modalPlot.html(episode.plot);
+    var modalEpisodeInfo = $('<div>');
+    modalEpisodeInfo.append(modalshowAnchor);
+    modalEpisodeInfo.append(modalPlot);
 
-    var row = $('<tr>');
-    row.append(modalshowPoster);
-    row.append(modalPlot)
-
-    var table = $('<table>');
-    table.addClass('table table-modal');
-    table.append(row);
-
-
-    showModal(episode.label,  table, {
+    showModal(episode.label, modalEpisodeInfo, {
         'Play' : function () {
             playItem(episode.file);
             hideModal();
         }
     })
 
-    // Achtergrondje maken
     $('.modal-fanart').css({
-        'background' : '#ffffff url(json/xbmc/?action=thumb&thumb=' + encodeURIComponent(episode.fanart) + '&w=675&h=400&o=15) top center',
+        'background' : '#ffffff url(/xbmc/GetThumb?thumb=' + encodeURIComponent(episode.fanart) + '&w=675&h=400&o=15) top center',
         'background-size' : '100%;'
     });
-    table.parent().addClass('trans');
 }
 
 function loadXBMCShow(show) {
     $.ajax({
-        url: 'json/xbmc/?action=getshow&item=' + show.tvshowid,
+        url: '/xbmc/GetShow?item=' + show.tvshowid,
         type: 'get',
         dataType: 'json',
+        beforeSend: function () {
+            $('#show-seasons').empty();
+            $('#show-grid').hide();
+            $('#show-loader').show();
+        },
         success: function (data) {
             $('#show-title').html(show.title)
             var accordion = $('<div>').addClass('accordion').attr('id', 'show-accordion');
@@ -324,11 +279,9 @@ function loadXBMCShow(show) {
                     var row = $('<tr>');
 
                     var episodeImage = $('<img>');
-                    episodeImage.addClass('lazy');
-                    episodeImage.attr('src', 'img/white5x5.png');
                     episodeImage.css('height', '50px');
                     episodeImage.css('width', '100px');
-                    episodeImage.attr('data-original', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(episode.thumbnail) + '&w=100&h=50');
+                    episodeImage.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(episode.thumbnail) + '&w=100&h=50');
 
                     var episodeThumb = $('<a>').addClass('thumbnail');
                     episodeThumb.append(episodeImage);
@@ -364,22 +317,9 @@ function loadXBMCShow(show) {
                 accordionGroup.append(accordionBody);
                 accordion.append(accordionGroup);
             });
-
-            $('#show-seasons').html('').append(accordion);
-
-            $('#show-grid').fadeOut();
+            $('#show-loader').hide();
             $('#show-details').show();
-        }
-    });
-}
-
-function playItem(item) {
-    $.ajax({
-        url: 'json/xbmc/?action=play&item=' + item,
-        type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            // nothing
+            $('#show-seasons').append(accordion);
         }
     });
 }
@@ -387,7 +327,7 @@ function playItem(item) {
 var nowPlayingThumb = '';
 function loadNowPlaying() {
     $.ajax({
-        url: 'json/xbmc/?action=nowplaying',
+        url: '/xbmc/NowPlaying',
         type: 'get',
         dataType: 'json',
         complete: function() {
@@ -398,14 +338,13 @@ function loadNowPlaying() {
         success: function(data) {
             if (data == null) {
                 $('#nowplaying').hide();
-                return false;
+                return;
             }
 
             if (!$('#nowplaying').is(':visible')) {
                 $('#nowplaying').fadeIn();
             }
 
-            // Onderstaande alleen als we wat anders spelen
             if (nowPlayingThumb != data.itemInfo.item.thumbnail) {
                 var thumbnail = $('<img>');
                 thumbnail.attr('alt', data.itemInfo.item.label);
@@ -413,14 +352,14 @@ function loadNowPlaying() {
                 var thumbContainer = $('#nowplaying .thumbnail');
 
                 if (data.itemInfo.item.type == 'episode') {
-                    thumbnail.attr('src', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(data.itemInfo.item.thumbnail) + '&w=150&h=75');
+                    thumbnail.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(data.itemInfo.item.thumbnail) + '&w=150&h=75');
                     thumbnail.css('height', '75px');
                     thumbnail.css('width', '150px');
                     thumbContainer.css('height', '75px');
                     thumbContainer.css('width', '150px');
                 }
                 if (data.itemInfo.item.type == 'movie') {
-                    thumbnail.attr('src', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(data.itemInfo.item.thumbnail) + '&w=100&h=150');
+                    thumbnail.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(data.itemInfo.item.thumbnail) + '&w=100&h=150');
                     thumbnail.css('height', '150px');
                     thumbnail.css('width', '100px');
                     thumbContainer.css('height', '150px');
@@ -431,20 +370,17 @@ function loadNowPlaying() {
 
                 nowPlayingThumb = data.itemInfo.item.thumbnail;
 
-                // Achtergrondje maken
                 $('#nowplaying').css({
-                    'background' : 'url(json/xbmc/?action=thumb&thumb=' + encodeURIComponent(data.itemInfo.item.fanart) + '&w=1150&h=640&o=10) top center',
+                    'background' : 'url(/xbmc/GetThumb?thumb=' + encodeURIComponent(data.itemInfo.item.fanart) + '&w=1150&h=640&o=10) top center',
                     'background-size' : '100%;',
                     'background-position' : '50% 20%',
                     'margin-bottom' : '10px'
                 });
                 $('#nowplaying-fanart').addClass('trans');
 
-                // Line
                 $('<hr />').insertAfter('#nowplaying');
             }
 
-            // Play button
             var playPauseButton = $('[data-player-control=PlayPause]');
             var playPauseIcon = playPauseButton.find('i');
             playPauseIcon.removeClass();
@@ -454,7 +390,6 @@ function loadNowPlaying() {
                 playPauseIcon.addClass('icon-play');
             }
 
-            // Mute button
             var setMuteButton = $('[data-player-control=SetMute]')
             var setMuteIcon = setMuteButton.find('i');
             setMuteIcon.removeClass();
@@ -487,72 +422,42 @@ function loadNowPlaying() {
     });
 }
 
-function sendNotification(text) {
-    $.ajax({
-        url: 'json/xbmc/?action=notify&text=' + text,
-        type: 'get',
-        dataType: 'html',
-        success: function(data) {
-            notifyInfo('XBMC', 'Notification \'' + text + '\' sent successfully');
-        }
+function playItem(item) {
+    $.get('/xbmc/PlayItem?item='+item);
+}
+
+function sendNotification(string) {
+    $.post('/xbmc/Notify',{'text': string}, function(data) {
+        notify('XBMC', 'Notification sent successfully', 'info');
     });
 }
 
 function xbmcClean() {
-    $.ajax({
-        url: 'json/xbmc/?action=clean',
-        type: 'get',
-        dataType: 'json',
-        success: function(data) {
-            notifyInfo('XBMC', 'Library clean sent successfully');
-        }
+    $.get('/xbmc/Clean', function(data) {
+        notify('XBMC', 'Library clean sent successfully', 'info');
     });
 }
 
 function xbmcScan() {
-    $.ajax({
-        url: 'json/xbmc/?action=scan',
-        type: 'get',
-        dataType: 'json',
-        success: function(data) {
-            notifyInfo('XBMC', 'Library update sent successfully');
-        }
+    $.get('/xbmc/Scan', function(data) {
+        notify('XBMC', 'Library update sent successfully', 'info');
     });
 }
 
 function filterShows(key) {
-    $('.show-title').parent().show();
-    $('.show-title').each(function (i, item) {
-        if (!findInString(key, $(item).html())) {
-            $(item).parent().hide();
-        }
-    });
+    $('#show-grid').children().show();
+    $('#show-grid').find('li:not(:contains('+key+'))').hide();
 }
 
 function filterMovies(key) {
-    $('.movie-title').parent().show();
-    $('.movie-title').each(function (i, item) {
-        if (!findInString(key, $(item).html())) {
-            $(item).parent().hide();
-        }
-    });
+    $('#movie-grid').children().show();
+    $('#movie-grid').find('li:not(:contains('+key+'))').hide();
 }
 
 function enablePlayerControls() {
     $('[data-player-control]').click(function () {
-        var clickItem = $(this);
-        var playerDo = clickItem.attr('data-player-control');
-
-        // Laadscherm
-        clickItem.attr('disabled', true);
-
-        $.ajax({
-            url: 'json/xbmc/?action=controlplayer&do=' + playerDo,
-            type: 'get',
-            dataType: 'json',
-            success: function(data) {
-                if (data == null) return;
-            }
-        });
+        var action = $(this).attr('data-player-control');
+        $(this).attr('disabled', true);
+        $.get('/xbmc/ControlPlayer?do='+action)
     });
 }

@@ -1,6 +1,6 @@
 function loadShows() {
     $.ajax({
-        url: '/json/sickbeard/?action=showlist',
+        url: '/sickbeard/GetShowList',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -32,7 +32,7 @@ function loadShows() {
 
 function loadShow(tvdbid) {
     $.ajax({
-        url: '/json/sickbeard/?action=getshow&tvdbid=' + tvdbid,
+        url: '/sickbeard/GetShow?tvdbid=' + tvdbid,
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -74,11 +74,10 @@ function loadNextAired(options) {
     var defaults = {
        limit : 0
     };
-
     $.extend(defaults, options);
 
     $.ajax({
-        url: '/json/sickbeard/?action=nextaired',
+        url: '/sickbeard/GetNextAired',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -97,23 +96,17 @@ function loadNextAired(options) {
             var nextaired = todayaired.concat(soonaired);
 
             $.each(nextaired, function (i, tvshow) {
-
                 if (defaults.limit != 0 && i == defaults.limit) {
                     return false;
                 }
-
-                var label = tvshow.season + 'x' + tvshow.episode + ' - ' + tvshow.ep_name;
-                var episode = $('<a>').attr('href','#').html(label).click(function(e){
-                    loadShow(tvshow.tvdbid);
-                });
-
                 var row = $('<tr>');
+                episode = shortenText(tvshow.ep_name, 15);
+                episodeLong = tvshow.season+'x'+tvshow.episode+' - '+tvshow.ep_name
                 row.append($('<td>').html(tvshow.show_name));
-                row.append($('<td>').append(episode));
+                row.append($('<td>').html(episode).attr('title',episodeLong));
                 row.append($('<td>').html(tvshow.airdate));
 
                 $('#nextaired_table_body').append(row);
-
             });
 
             $('#nextaired_table_body').parent().trigger('update');
@@ -123,11 +116,10 @@ function loadNextAired(options) {
 
 function loadSickbeardHistory(limit) {
     $.ajax({
-        url: '/json/sickbeard/?action=history&limit=' + limit,
+        url: '/sickbeard/GetHistory?limit=' + limit,
         type: 'get',
         dataType: 'json',
         success: function (result) {
-
             if (result.data.legth == 0) {
                 var row = $('<tr>')
                 row.append($('<td>').html('History is empty'));
@@ -151,7 +143,7 @@ function loadSickbeardHistory(limit) {
 
 function loadLogs() {
     $.ajax({
-        url: '/json/sickbeard/?action=logs',
+        url: '/sickbeard/GetLogs',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -171,7 +163,7 @@ function loadLogs() {
 
 function searchTvDb(query) {
     $.ajax({
-        url: '/json/sickbeard/?action=searchtvdb&query=' + query,
+        url: '/sickbeard/SearchShow?query=' + query,
         type: 'get',
         dataType: 'xml',
         success: function (result) {
@@ -204,7 +196,7 @@ function searchTvDb(query) {
 
 function addShow(tvdbid) {
     $.ajax({
-        url: '/json/sickbeard/?action=addshow&tvdbid=' + tvdbid,
+        url: '/sickbeard/AddShow?tvdbid=' + tvdbid,
         type: 'get',
         dataType: 'json',
         success: function (data) {

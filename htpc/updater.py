@@ -50,7 +50,6 @@ def update():
         return True
     elif tarUpdate():
         return True
-
     return False
 
 def runGit(args):
@@ -111,7 +110,6 @@ def tarUpdate():
         tar.extractall(update_folder)
         tar.close()
     except:
-        print('Failed to extract update file', 'WARNING')
         RemoveUpdateFiles()
         return False
 

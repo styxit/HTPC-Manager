@@ -1,34 +1,25 @@
 #include $webdir + "/header.tpl"#
 
 <div class="container">
-
     <div class="content maincontent">
-
-        <div class="page-header page-title">
-            <h1>Settings</h1>
-        </div>
-
-        <div id="notification-area"></div>
-
+        <h1 class="page-header page-title">Settings</h1>
         <ul class="nav nav-tabs">
             <li class="active"><a href="#server" data-toggle="tab">General</a></li>
             <li><a href="#dashboard" data-toggle="tab">Dashboard</a></li>
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Services <b class="caret"></b></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules <b class="caret"></b></a>
                 <ul class="dropdown-menu">
-                    <li><a href="#xbmc" data-toggle="tab">XBMC</a></li>
-                    <li><a href="#sabnzbd" data-toggle="tab">SABnzbd</a></li>
-                    <li><a href="#couchpotato" data-toggle="tab">Couchpotato</a></li>
-                    <li><a href="#sickbeard" data-toggle="tab">Sickbeard</a></li>
-                    <li><a href="#squeezebox" data-toggle="tab">Squeezebox</a></li>
+                    <li><a href="#xbmcsettings" data-toggle="tab">XBMC</a></li>
+                    <li><a href="#sabnzbdsettings" data-toggle="tab">SABnzbd</a></li>
+                    <li><a href="#couchpotatosettings" data-toggle="tab">Couchpotato</a></li>
+                    <li><a href="#sickbeardsettings" data-toggle="tab">Sickbeard</a></li>
+                    <li><a href="#squeezeboxsettings" data-toggle="tab">Squeezebox</a></li>
+                    <li><a href="#searchsettings" data-toggle="tab">Search</a></li>
                 </ul>
             </li>
-            <li><a href="#nzbsearch" data-toggle="tab">NZB Search</a></li>
-            <li><a href="#style" data-toggle="tab">Style</a></li>            
+            <li><a href="#theme" data-toggle="tab">Themes</a></li>            
         </ul>
-
         <form action="" id="base-settings-form" name="base-settings-form" method="post" class="form-horizontal">
-
             <div class="tab-content">
                 <fieldset id="server" class="tab-pane active">
                     <legend>HTPC-Manager</legend>
@@ -52,7 +43,7 @@
                         </div>
                     </div>
                 </fieldset>
-                <fieldset id="dashboard" class="tab-pane fade">
+                <fieldset id="dashboard" class="tab-pane">
                     <legend>Dashboard</legend>
                     <div class="control-group">
                         <label class="control-label">Show Recent Movies</label>
@@ -81,7 +72,7 @@
                     <div class="control-group">
                         <label class="control-label">Show Recent Music</label>
                         <div class="controls">
-                            <label class="checkbox">
+                            <label for="use_dash_rec_music"  class="checkbox">
                                 #if $getVar('use_dash_rec_music', 1)
                                 <input type="checkbox" checked="checked" value="1" name="use_dash_rec_music" />
                                 #else
@@ -105,7 +96,7 @@
                     <div class="control-group">
                         <label class="control-label">Show CouchPotato</label>
                         <div class="controls">
-                            <label class="checkbox">
+                            <label for="use_dash_couchpotato" class="checkbox">
                                 #if $getVar('use_dash_couchpotato', 1)
                                 <input type="checkbox" checked="checked" value="1" name="use_dash_couchpotato" />
                                 #else
@@ -117,7 +108,7 @@
                     <div class="control-group">
                         <label class="control-label">Show Sabnzbd</label>
                         <div class="controls">
-                            <label class="checkbox">
+                            <label for="use_dash_sabnzbd" class="checkbox">
                                 #if $getVar('use_dash_sabnzbd', 1)
                                 <input type="checkbox" checked="checked" value="1" name="use_dash_sabnzbd" />
                                 #else
@@ -127,7 +118,7 @@
                         </div>
                     </div>                 
                 </fieldset>
-                <fieldset id="sabnzbd" class="tab-pane fade">
+                <fieldset id="sabnzbdsettings" class="tab-pane">
                     <legend>SABnzbd</legend>
                     <div class="control-group">
                         <label class="control-label">Enable</label>
@@ -143,9 +134,9 @@
                     </div>       
                     <div class="control-group">
                         <label class="control-label" for="sabnzbd_name">Menu Name</label>
-                            <div class="controls">
-                                <input class="span3" id="sabnzbd_name" name="sabnzbd_name" type="text" value="$getVar('sabnzbd_name', 'SABnzbd')" />
-                            </div>
+                        <div class="controls">
+                            <input class="span3" id="sabnzbd_name" name="sabnzbd_name" type="text" value="$getVar('sabnzbd_name', 'SABnzbd')" />
+                        </div>
                     </div>
                     <div class="control-group">
                         <label class="control-label" for="sabnzbd_host">IP / Host : Port</label>
@@ -180,8 +171,7 @@
                         </div>
                     </div>
                 </fieldset>
-                
-                <fieldset id="couchpotato" class="tab-pane fade">
+                <fieldset id="couchpotatosettings" class="tab-pane">
                     <legend>CouchPotato</legend>
                     <div class="control-group">
                         <label class="control-label">Enable</label>
@@ -197,9 +187,9 @@
                     </div>           
                     <div class="control-group">
                         <label class="control-label" for="couchpotato_name">Menu Name</label>
-                            <div class="controls">
-                                <input class="span3" id="couchpotato_name" name="couchpotato_name" type="text" value="$getVar('couchpotato_name', 'CouchPotato')" />
-                            </div>
+                        <div class="controls">
+                            <input class="span3" id="couchpotato_name" name="couchpotato_name" type="text" value="$getVar('couchpotato_name', 'CouchPotato')" />
+                        </div>
                     </div>      
                     <div class="control-group">
                         <label class="control-label" for="couchpotato_host">IP / Host : Port</label>
@@ -215,8 +205,7 @@
                         </div>
                     </div>
                 </fieldset>
-
-                <fieldset id="sickbeard" class="tab-pane fade">
+                <fieldset id="sickbeardsettings" class="tab-pane">
                     <legend>Sickbeard</legend>
                     <div class="control-group">
                         <label class="control-label">Enable</label>
@@ -232,9 +221,9 @@
                     </div>
                     <div class="control-group">
                         <label class="control-label" for="sickbeard_name">Menu Name</label>
-                            <div class="controls">
-                                <input class="span3" id="sickbeard_name" name="sickbeard_name" type="text" value="$getVar('sickbeard_name', 'Sickbeard')" />
-                            </div>
+                        <div class="controls">
+                            <input class="span3" id="sickbeard_name" name="sickbeard_name" type="text" value="$getVar('sickbeard_name', 'Sickbeard')" />
+                        </div>
                     </div>
                     <div class="control-group">
                         <label class="control-label" for="sickbeard_host">IP / Host : Port</label>
@@ -251,7 +240,7 @@
                     </div>
                 </fieldset>
 
-                <fieldset id="squeezebox" class="tab-pane fade">
+                <fieldset id="squeezeboxsettings" class="tab-pane">
                     <legend>Squeezebox</legend>
                     <div class="control-group">
                         <label class="control-label">Enable</label>
@@ -267,9 +256,9 @@
                     </div>                   
                     <div class="control-group">
                         <label class="control-label" for="squeezebox_name">Menu Name</label>
-                            <div class="controls">
-                                <input class="span3" id="squeezebox_name" name="squeezebox_name" type="text" value="$getVar('squeezebox_name', 'Squeezebox')" />
-                            </div>
+                        <div class="controls">
+                            <input class="span3" id="squeezebox_name" name="squeezebox_name" type="text" value="$getVar('squeezebox_name', 'Squeezebox')" />
+                        </div>
                     </div>                
                     <div class="control-group">
                         <label class="control-label" for="squeezebox_host">IP / Host : Port</label>
@@ -292,7 +281,7 @@
                     </div>
                 </fieldset>
 
-                <fieldset id="xbmc" class="tab-pane fade">
+                <fieldset id="xbmcsettings" class="tab-pane">
                     <legend>XBMC</legend>
                     <div class="control-group">
                         <label class="control-label">Enable</label>
@@ -308,9 +297,9 @@
                     </div>                   
                     <div class="control-group">
                         <label class="control-label" for="xbmc_name">Menu Name</label>
-                            <div class="controls">
-                                <input class="span3" id="xbmc_name" name="xbmc_name" type="text" value="$getVar('xbmc_name', 'XBMC')" />
-                            </div>
+                        <div class="controls">
+                            <input class="span3" id="xbmc_name" name="xbmc_name" type="text" value="$getVar('xbmc_name', 'XBMC')" />
+                        </div>
                     </div>                   
                     <div class="control-group">
                         <label class="control-label" for="xbmc_host">IP / Host : Port</label>
@@ -357,7 +346,7 @@
                     </div>
                 </fieldset>
 
-                <fieldset id="nzbsearch" class="tab-pane" >
+                <fieldset id="searchsettings" class="tab-pane" >
                     <legend>NZB Matrix</legend>
                     <div class="control-group">
                         <label class="control-label">Enable</label>
@@ -373,9 +362,9 @@
                     </div>                    
                     <div class="control-group">
                         <label class="control-label" for="nzbsearch_name">Menu Name</label>
-                            <div class="controls">
-                                <input class="span3" id="nzbsearch_name" name="nzbsearch_name" type="text" value="$getVar('nzbsearch_name', 'NZBSearch')" />
-                            </div>
+                        <div class="controls">
+                            <input class="span3" id="nzbsearch_name" name="nzbsearch_name" type="text" value="$getVar('nzbsearch_name', 'NZBSearch')" />
+                        </div>
                     </div>
                     <div class="control-group">
                         <label class="control-label" for="nzbmatrix_apikey">API Key</label>
@@ -384,51 +373,45 @@
                         </div>
                     </div>
                 </fieldset>
-
-                <fieldset id="style" class="tab-pane">
-                            <legend>Styling</legend>
-                            <div class="control-group">
-                                <label class="control-label" for="theme">Select Template *</label>
-                                <div class="controls">
-                                    <select id="template" name="template">
-                                    
-                                        #for $templates in eval($getVar('availabletemplates' ''))
-                                            #if $getVar('template', 'default') == $templates
-                                                <option selected="selected" value="$templates">$templates</option>
-                                            #else
-                                                <option value="$templates">$templates</option>
-                                            #end if
-                                        #end for                                                                   
-                                    </select>
-                                </div>
-                            </div>       
-                            <div class="control-group">
-                                <label class="control-label" for="theme">Select Theme</label>
-                                <div class="controls">
-                                    <select id="theme" name="theme">                                  
-                                        #for $themes in eval($getVar('availablethemes' ''))
-                                            #if $getVar('theme', 'default') == $themes
-                                                <option selected="selected" value="$themes">$theme</option>
-                                            #else
-                                                <option value="$themes">$themes</option>
-                                            #end if
-                                        #end for                                                  
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <p>* Requires restart</p> 
+                <fieldset id="theme" class="tab-pane">
+                    <legend>Themes</legend>
+                    <div class="control-group">
+                        <label class="control-label">Select Template *</label>
+                        <div class="controls">
+                            <select id="template" name="template">
+                                #for $t in $getVar('templates' '')
+                                    #if $getVar('template', 'default') == $t
+                                        <option selected="selected" value="$t">$t</option>
+                                    #else
+                                        <option value="$t">$t</option>
+                                    #end if
+                                #end for                                                                   
+                            </select>
+                        </div>
+                    </div>       
+                    <div class="control-group">
+                        <label class="control-label">Select Theme</label>
+                        <div class="controls">
+                            <select id="theme" name="theme">                                  
+                                #for $t in $getVar('themes' '')
+                                    #if $getVar('theme', 'default') == $t
+                                        <option selected="selected" value="$t">$t</option>
+                                    #else
+                                        <option value="$t">$t</option>
+                                    #end if
+                                #end for                                                  
+                            </select>
+                        </div>
+                    </div>
+                    <p>* Requires restart</p> 
                 </fieldset>
-                
                 <div class="form-actions">
                     <input class="btn btn-primary" type="submit" value="Save changes" />
                     <input class="btn" type="reset" value="Clear" />
                 </div>
-
             </div>
         </form>
     </div>
-
 </div>
 
 

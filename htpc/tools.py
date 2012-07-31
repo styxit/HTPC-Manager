@@ -1,18 +1,15 @@
-import sys, os, shutil
-import ConfigParser, cherrypy
-import htpc.updater as updater
+import os, shutil, ConfigParser
 from urllib2 import urlopen
-from json import dumps
 
 def SafeFetchFromUrl(url):
     try:
-	    return urlopen(url).read()
+        return urlopen(url, timeout=5).read()
     except:
-	    return ''
+        return ''
 
 def readSettings(configfile, section = 'htpc'):
     if not os.path.isfile(configfile):
-	    return {}
+        return {}
 
     config = ConfigParser.ConfigParser()
     config.read(configfile)
@@ -24,102 +21,43 @@ def readSettings(configfile, section = 'htpc'):
             configDict[key] = int(val)
         except ValueError:
             configDict[key] = val
+
+    template = os.path.join('interfaces/', configDict.get('template','default'))
+    templates = os.listdir("interfaces/")
+    themes = os.listdir(os.path.join(template, "css/themes/"))
+    configDict.update({
+        'webdir': template,
+        'templates': templates,
+        'themes': themes
+    })
+
     return configDict
 
 def saveSettings(configfile, data, section = 'htpc'):
+    print data
     # Set unchecked checkboxes to 0
-    if not data.has_key('use_sabnzbd'):
-        data['use_sabnzbd'] = 0
-    if not data.has_key('use_couchpotato'):
-        data['use_couchpotato'] = 0
-    if not data.has_key('use_sickbeard'):
-        data['use_sickbeard'] = 0
-    if not data.has_key('use_squeezebox'):
-        data['use_squeezebox'] = 0
-    if not data.has_key('use_xbmc'):
-        data['use_xbmc'] = 0
-    if not data.has_key('use_nzbsearch'):
-        data['use_nzbsearch'] = 0
-    if not data.has_key('xbmc_show_banners'):
-        data['xbmc_show_banners'] = 0
-    if not data.has_key('xbmc_hide_watched'):
-        data['xbmc_hide_watched'] = 0
-    if not data.has_key('use_dash_rec_movies'):
-        data['use_dash_rec_movies'] = 0
-    if not data.has_key('use_dash_rec_tv'):
-        data['use_dash_rec_tv'] = 0
-    if not data.has_key('use_dash_rec_music'):
-        data['use_dash_rec_music'] = 0
-    if not data.has_key('use_dash_sickbeard'):
-        data['use_dash_sickbeard'] = 0
-    if not data.has_key('use_dash_couchpotato'):
-        data['use_dash_couchpotato'] = 0 
-    if not data.has_key('use_dash_sabnzbd'):
-        data['use_dash_sabnzbd'] = 0
+    checkboxes = ('use_sabnzbd', 'use_couchpotato', 'use_squeezebox', 'use_xbmc', 'use_nzbsearch',
+                  'xbmc_show_banners', 'xbmc_hide_watched', 'use_dash_rec_movies', 'use_dash_rec_tv',
+                  'use_dash_rec_music', 'use_dash_sickbeard', 'use_dash_couchpotato', 'use_dash_sabnzbd')
+    for box in checkboxes:
+        if not data.has_key(box):
+            data[box] = 0
         
-    config = ConfigParser.ConfigParser()
-    config.read(configfile)
-
-    if not config.has_section(section):
-	    config.add_section(section)
-
-    for key, val in data.items():
-	    config.set(section, key, val)
-
-    with open(configfile, 'w') as f:
-	    config.write(f)
-
-    return readSettings(configfile)
-
-def updateAvailableThemes(configfile, template, section = 'htpc'):
     config = ConfigParser.ConfigParser()
     config.read(configfile)
 
     if not config.has_section(section):
         config.add_section(section)
-   
-    #Set the available templates and interfaces
-    templates = os.listdir("interfaces/")
-    config.set(section, 'templates', templates)
-    
-    themes = os.listdir(os.path.join(template, "css/themes"))
-    config.set(section, 'themes', themes)
-    
+
+    for key, val in data.items():
+        config.set(section, key, val)
+
     with open(configfile, 'w') as f:
         config.write(f)
 
+    return readSettings(configfile)
+
 def removeThumbs():
-    xbmc_thumbs = os.path.join('userdata/', '/xbmc_thumbs/')
-    if os.path.isdir(xbmc_thumbs):
-	    shutil.rmtree(xbmc_thumbs)
-        
-def getDiskspace():
-    return dumps({})
-
-def shutdown():
-    cherrypy.engine.exit()
-    sys.exit(0)
-
-def restart():
-    cherrypy.engine.exit()
-    arguments = sys.argv[:]
-    arguments.insert(0, sys.executable)
-    if sys.platform == 'win32':
-	    arguments = ['"%s"' % arg for arg in arguments]
-    os.chdir(os.getcwd())
-    os.execv(sys.executable, arguments)
-
-def checkUpdate():
-    behind, url = updater.checkGithub()
-    if behind == 0:
-        return dumps({'behind':behind})
-    elif behind > 0:
-        return dumps({'behind':behind, 'url':url})
-    
-    return dumps({'behind':behind, 'error':url})
-
-def update():
-    cherrypy.engine.exit()
-    status = updater.update()
-    cherrypy.server.start()
-    return dumps({'update':'success'})
+    thumbs = os.path.join('userdata/', '/xbmc_thumbs/')
+    if os.path.isdir(thumbs):
+        shutil.rmtree(thumbs)

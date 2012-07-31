@@ -1,12 +1,27 @@
-$(document).ready(function () {
+ $(document).ready(function() {
     enablePlayerControls();
     loadMovies();
     loadXbmcShows();
     loadNowPlaying();
 
+    $('#xbmc-shutdown').click(function () {
+        $.get('/xbmc/System?do=Suspend', function(data){
+            notify('Shutdown','Shutting down...','warning');
+        });
+    });
+    $('#xbmc-restart').click(function () {
+        $.get('/xbmc/System?do=Reboot', function(data){
+            notify('Reboot','Rebooting...','warning');
+        });
+    });
+    $('#xbmc-wake').click(function () {
+        $.get('/xbmc/System?do=Wake', function(data){
+            notify('Wake','Sending WakeOnLan packet...','warning');
+        });
+    });
+
     $(window).scroll(function() {
         if($(window).scrollTop() + $(window).height() >= $(document).height() - 10) {
-
             if ($('#movies').is(':visible')) {
                 loadMovies({
                     sortorder: $('.active-sortorder').attr('data-sortorder'),
@@ -28,7 +43,6 @@ $(document).ready(function () {
         }
     });
 
-    // Sorting
     $('[data-sortmethod]').click(function () {
         $('#movie-grid').html('');
         lastMovieLoaded = 0;
@@ -56,23 +70,17 @@ $(document).ready(function () {
         });
     });
 
-    // Button setten
     $('#back-to-shows').click(function () {
-        $('#show-details').fadeOut();
+        $('#show-details').hide();
         $('#show-grid').show();
     });
-
-    // Notificatie versturen
     $('#send_notification_button').click(function () {
         sendNotification($('#send_notification_text').val());
     });
-
     $('#btn-clean-lib').click(function () {
         xbmcClean();
     });
-
     $('#btn-scan-lib').click(function () {
         xbmcScan();
     });
-
 });

@@ -9,11 +9,12 @@ $(document).ready(function () {
         limit: 5
     });
     loadWantedMovies();
+    loadDownloadHistory();
 });
 
 function loadDiskSpace() {
     $.ajax({
-        url: 'json/diskspace',
+        url: '/system/diskspace',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -40,7 +41,7 @@ function loadDiskSpace() {
 
 function loadRecentMovies () {
     $.ajax({
-        url: 'json/xbmc/?action=recentmovies',
+        url: '/xbmc/GetRecentMovies',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -54,9 +55,7 @@ function loadRecentMovies () {
                     itemDiv.addClass('active');
                 }
                 var itemImage = $('<img>');
-                itemImage.addClass('lazy');
-                itemImage.attr('src', 'img/white5x5.png');
-                itemImage.attr('data-original', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(movie.fanart) + '&h=240&w=430');
+                itemImage.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(movie.fanart) + '&h=240&w=430');
                 itemImage.attr('alt', movie.title);
                 itemImage.css({
                     width: '430px',
@@ -94,7 +93,7 @@ function loadRecentMovies () {
 
 function loadRecentTVshows () {
     $.ajax({
-        url: 'json/xbmc/?action=recentshows',
+        url: '/xbmc/GetRecentShows',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -110,9 +109,7 @@ function loadRecentTVshows () {
                     itemDiv.addClass('active');
                 }
                 var itemImage = $('<img>');
-                itemImage.addClass('lazy');
-                itemImage.attr('src', 'img/white5x5.png');
-                itemImage.attr('data-original', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(episode.fanart) + '&h=240&w=430');
+                itemImage.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(episode.fanart) + '&h=240&w=430');
                 itemImage.attr('alt', epTitle);
                 itemImage.css({
                     width: '430px',
@@ -149,7 +146,7 @@ function loadRecentTVshows () {
 
 function loadRecentAlbums () {
     $.ajax({
-        url: 'json/xbmc/?action=recentalbums',
+        url: '/xbmc/GetRecentAlbums',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -167,7 +164,7 @@ function loadRecentAlbums () {
                 if (album.thumbnail == '') {
                     itemImage.attr('src', 'img/white5x5.png');
                 } else {
-                    itemImage.attr('src', 'json/xbmc/?action=thumb&thumb=' + encodeURIComponent(album.thumbnail) + '&h=30&w=30');
+                    itemImage.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(album.thumbnail) + '&h=30&w=30');
                 }
 
                 var row = $('<tr>')
@@ -184,7 +181,7 @@ function loadRecentAlbums () {
 
 function loadWantedMovies() {
     $.ajax({
-        url: '/json/couchpotato/?action=movielist',
+        url: '/couchpotato/GetMovieList',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -200,6 +197,33 @@ function loadWantedMovies() {
                 row.append($('<td>').html(item.library.year));
 
                 $('#wantedmovies_table_body').append(row);
+            });
+        }
+    });
+}
+
+function loadDownloadHistory() {
+    $.ajax({
+        url: '/sabnzbd/GetHistory?limit=5',
+        type: 'get',
+        dataType: 'json',
+        success: function (data) {
+            $('#downloads_table_body').html('');
+            $.each(data.history.slots, function (i, slot) {
+                var failMessage = $('<span>');
+                failMessage.addClass('label label-important');
+                failMessage.html(slot.fail_message);
+
+                var file = shortenText(slot.name, 35);
+
+                if (slot.status == 'Failed') {
+                    file.append('&nbsp;'+failMessage);
+                }
+
+                var row = $('<tr>')
+                row.append($('<td>').html(file).attr('title',slot.name));
+                row.append($('<td>').html(slot.status));
+                $('#downloads_table_body').append(row);
             });
         }
     });

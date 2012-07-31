@@ -4,329 +4,306 @@ var album_id = {}
 
 $(document).ready(function () {
     $('#players').change(function() {
-        togglePlayer($(this).val());
+        currentPlayer = $(this).val();
+        refreshPlayer();
+        setInterval("refreshPlayer()", 1000)
+    });
+    $('[data-player-control=VolUp]').click(function() {
+        sendCommand('mixer volume +2.5')
+    });
+    $('[data-player-control=VolDown]').click(function() {
+        sendCommand('mixer volume -2.5')
+    });
+    $('[data-player-control=Power]').click(function() {
+        sendCommand('power')
+    });
+    $('[data-player-control=PlayPause]').click(function(){
+        sendCommand('pause') 
+    });
+    $('[data-player-control=MoveLeft]').click(function() {
+        sendCommand('playlist jump -1')
+    });
+    $('[data-player-control=MoveRight]').click(function() {
+        sendCommand('playlist jump +1')
+    });
+    $('[data-player-control=Shuffle]').click(function() {
+        sendCommand('playlist shuffle')
+    });
+    $('[data-player-control=Repeat]').click(function() {
+        sendCommand('playlist repeat')
+    });
+    $('[data-player-control=SavePlaylist]').click(function() {
+        name = prompt("Save as:","");
+        sendCommand('playlist save '+name)
+        getPlaylists();
+    });
+    $('[data-player-control=ClearPlaylist]').click(function() {
+        sendCommand('playlist clear')
     });
     getPlayers();
     getArtists();
     getAlbums();
-    // Hide stations since its unfinished
-    //getStationGroups();
-    $('[href=#stations]').remove();
+    getStationGroups();
     getPlaylists();
-    setInterval("refreshPlayer()", 1000)
 });
 
-function sendCommand(player, command) {
-    $.ajax({
-        url: '/json/squeezebox/?action=control',
-        type: 'get',
-        dataType: 'json',
-        data: {
-            'player': player,
-            'command': encodeURIComponent(command)
-        },	
-        complete: function() {
-            refreshPlayer(player);
-        }
+function sendCommand(command) {
+    $.get('/squeezebox/PlayerControl',{
+        'player': currentPlayer,
+        'command': encodeURIComponent(command)
+    }, function() {
+        refreshPlayer();
     });
 }
 
 function getPlayers() {
-    $.ajax({
-        url: '/json/squeezebox/?action=getplayers',
-        type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            if (data == null) return false;
-
-            $('#players').html('');
-            $.each(data.result.players_loop, function (i, item) {
-                var player = $('<option>').text(item.name).val(item.playerid);
-                $('#players').append(player);
-            });
-        },
-        complete: function () {
-            togglePlayer($('#players').val());
-        }
-    });
+    $.get('/squeezebox/GetPlayers', function (data) {
+        if (data == null) return;
+        $('#players').html('');
+        $.each(data.result.players_loop, function (i, item) {
+            var player = $('<option>').text(item.name).val(item.playerid);
+            $('#players').append(player);
+        });
+        $('#players').trigger('change');
+    }, 'json');
 }
 
-function togglePlayer(player) {
-    currentPlayer = player;
-    refreshPlayer(player);
-    if (!$('#nowplaying').is(':visible')) {
-        $('#nowplaying').fadeIn();
-    }
-    $('[data-player-control=VolUp]').unbind("click").click(function() {
-        sendCommand(player, 'mixer volume +2.5')
-    });
-    $('[data-player-control=VolDown]').unbind("click").click(function() {
-        sendCommand(player, 'mixer volume -2.5')
-    });
-    $('[data-player-control=Power]').unbind("click").click(function() {
-        sendCommand(player, 'power')
-    });
-    $('[data-player-control=PlayPause]').unbind("click").click(function(){
-        sendCommand(player, 'pause') 
-    });
-    $('[data-player-control=MoveLeft]').unbind("click").click(function() {
-        sendCommand(player, 'playlist jump -1')
-    });
-    $('[data-player-control=MoveRight]').unbind("click").click(function() {
-        sendCommand(player, 'playlist jump +1')
-    });
-    $('[data-player-control=Shuffle]').unbind("click").click(function() {
-        sendCommand(player, 'playlist shuffle')
-    });
-    $('[data-player-control=Repeat]').unbind("click").click(function() {
-        sendCommand(player, 'playlist repeat')
-    });
-    $('[data-player-control=SavePlaylist]').unbind("click").click(function() {
-        name = prompt("Save as:","");
-        sendCommand(player, 'playlist save '+name)
-    });
-    $('[data-player-control=ClearPlaylist]').unbind("click").click(function() {
-        sendCommand(player, 'playlist clear')
-    });
-}
-
-function refreshPlayer(player) {
-    if (player == undefined) player = currentPlayer;
-    $.ajax({
-        url: '/json/squeezebox/?action=getplayer&player='+player,
-        type: 'get',
-        dataType: 'json',
-        success: function (item) {
-            if (item == null) return false;
-            item = item.result;
-            if(item.playlist_loop==undefined) {
-                nowPlaying = "Playlist empty"
-                item.playlist_loop = []
+function refreshPlayer() {
+    if (currentPlayer == null) return;
+    $('#nowplaying').removeClass('hide');
+    $.get('/squeezebox/GetPlayer?player='+currentPlayer, function (player) {
+        if (player == null) return;
+        player = player.result;
+        if (player.playlist_loop==undefined) {
+            nowPlaying = "Playlist empty"
+            player.playlist_loop = []
+        } else {
+            current = player.playlist_loop[player.playlist_cur_index]
+            if (current.artist) {
+                nowPlaying = current.artist + ': ' + current.title;
             } else {
-                current = item.playlist_loop[item.playlist_cur_index]
-                if (current.artist) {
-                    nowPlaying = current.artist + ': ' + current.title;
-                } else {
-                    nowPlaying = current.title;
-                }
+                nowPlaying = current.title;
             }
-            if (nowPlayingThumb != nowPlaying) {
-                nowPlayingThumb = nowPlaying;
-                var thumbnail = $('<img>');
-                thumbnail.attr('src', '/json/squeezebox/?action=getcover&player='+player);
-                thumbnail.css('height', '140px');
-                thumbnail.css('width', '140px');
-                var thumbContainer = $('#nowplaying .thumbnail');
-                thumbContainer.html(thumbnail);
-            }
-            $('#volume').text(item['mixer volume']);
-            $('#player-item-title').text(nowPlaying);
-            $('#player-item-time').text(parseSec(item.time) + ' / ' + parseSec(item.duration));
-            $('#player-progressbar').children().width((item.time / item.duration * 100) + '%');
-            var playPauseIcon = $('[data-player-control=PlayPause]').find('i');
-            var icon = (item.mode=='play')?'icon-pause':'icon-play';
-            playPauseIcon.removeClass().addClass(icon);
-            var powerIcon = $('[data-player-control=Power]');
-            powerIcon.toggleClass('active',(item.power=='1'));
-            $('#playlist_table').html('');
-            $.each(item.playlist_loop, function (t, track) {
-                if (track.album == undefined) track.album = '';
-                var row = $('<tr>')
-                var remove = $('<a>').attr('href','#').click(function() {
-                    sendCommand(player, 'playlist delete '+t);
-                    return false;
-                }).append($('<i>').addClass('icon-remove'));
-                row.append($('<td>').append(remove));
-                var title = $('<a>').attr('href','#').text(track.title).click(function() {
-                    sendCommand(player, 'playlist jump '+t);
-                    return false;
-                });
-                row.append($('<td>').append(title));
-                var artist = $('<a>').attr('href','#').text(track.artist).click(function() {
-                    getSongs('artist_id:'+artist_id[track.artist]);
-                    return false;
-                });
-                row.append($('<td>').append(artist));
-                var album = $('<a>').attr('href','#').text(track.album).click(function() {
-                    getSongs('album_id:'+album_id[track.album]);
-                    return false;
-                });
-                row.append($('<td>').append(album));
-                row.append($('<td>').append(parseSec(track.duration)).addClass('right'));
-                $('#playlist_table').append(row);
-            });
         }
-    });
+        if (nowPlayingThumb != nowPlaying) {
+            nowPlayingThumb = nowPlaying;
+            var thumbnail = $('<img>');
+            thumbnail.attr('src', '/squeezebox/GetCover?player='+currentPlayer);
+            thumbnail.css('height','140px');
+            thumbnail.css('width','140px');
+            $('#nowplaying .thumbnail').html(thumbnail);
+        }
+        $('#volume').text(player['mixer volume']);
+        $('#player-item-title').text(nowPlaying);
+        $('#player-item-time').text(parseSec(player.time) + ' / ' + parseSec(player.duration));
+        $('#player-progressbar').children().width((player.time / player.duration * 100) + '%');
+        var playPauseIcon = $('[data-player-control=PlayPause]').find('i');
+        var icon = (player.mode=='play')?'icon-pause':'icon-play';
+        playPauseIcon.removeClass().addClass(icon);
+        var powerIcon = $('[data-player-control=Power]');
+        powerIcon.toggleClass('active',(player.power=='1'));
+        $('#playlist_table').html('');
+        $.each(player.playlist_loop, function (t, track) {
+            if (track.album == undefined) track.album = '';
+            var row = $('<tr>')
+            var remove = $('<a>').attr('href','#').click(function(e) {
+                e.preventDefault();
+                sendCommand('playlist delete '+t);
+            }).append($('<i>').addClass('icon-remove'));
+            row.append($('<td>').append(remove));
+            var title = $('<a>').attr('href','#').text(track.title).click(function(e) {
+                e.preventDefault();
+                sendCommand('playlist jump '+t);
+            });
+            row.append($('<td>').append(title));
+            var artist = $('<a>').attr('href','#').text(track.artist).click(function(e) {
+                e.preventDefault();
+                getSongs('artist_id:'+artist_id[track.artist]);
+            });
+            row.append($('<td>').append(artist));
+            var album = $('<a>').attr('href','#').text(track.album).click(function(e) {
+                e.preventDefault();
+                getSongs('album_id:'+album_id[track.album]);
+            });
+            row.append($('<td>').append(album));
+            row.append($('<td>').append(parseSec(track.duration)).addClass('right'));
+            $('#playlist_table').append(row);
+        });
+    }, 'json');
 }
 
 function getArtists() {
-    $.ajax({
-        url: '/json/squeezebox/?action=getartists',
-        type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            if (data == null) return false;
-
-            var list = $('<ul>').addClass('nav nav-list')
-            $.each(data.result.artists_loop, function (i, item) {
-                artist_id[item.artist] = item.id;
-                var link = $('<a>').attr('href','#').append(item.artist).click(function(e) {
-                	e.preventDefault();
-                	var albumlist = $('<div>');
-                	$(this).append(albumlist).unbind().click(function(e) {
-                		e.preventDefault();
-                		albumlist.toggleClass('hide');
-                	})
-                	getAlbums(albumlist, item.id);
-                });
-                list.append($('<li>').append(link));
+    $.get('/squeezebox/GetArtists', function (data) {
+        if (data == null) return false;
+        var list = $('<ul>').addClass('artist-list');
+        $.each(data.result.artists_loop, function (i, item) {
+            listitem = $('<li>');
+            artist_id[item.artist] = item.id;
+            var control = $('<div>').addClass('control');
+            var playIcon = $('<i>').addClass('icon-play');
+            var play = $('<a>').attr('href','#').html(playIcon).click(function(e) {
+                e.preventDefault();
+                sendCommand('playlistcontrol cmd:load artist_id:'+item.id);
             });
-            $('#artists').html(list);
-        }
-    });
+            var addIcon = $('<i>').addClass('icon-plus');
+            var add = $('<a>').attr('href','#').html(addIcon).click(function(e) {
+                e.preventDefault();
+                sendCommand('playlistcontrol cmd:add artist_id:'+item.id);
+            });
+            control.append(play);
+            control.append(add);
+            var artist = $('<a>').attr('href','#').text(item.artist).click(function(e) {
+                e.preventDefault();
+                getAlbums($(this), item.id);
+            });
+            listitem.append(control);
+            listitem.append(artist);
+            list.append(listitem);
+        });
+        $('#artists').html(list);
+    }, 'json');
 }
 
-function getAlbums(e, artist) {
-    if (e==undefined) e = $('#albums');
-    filter = (artist==undefined) ? '' : '&artist='+artist
-    $.ajax({
-        url: '/json/squeezebox/?action=getalbums'+filter,
-        type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            if (data == null) return false;
-
-            var list = $('<ul>')
-            if (artist) {
-            	var link = $('<a>').attr('href','#').text('All albums').click(function() {
-                    getSongs('artist_id:'+artist);
-                });
-                list.append($('<li>').append(link));
-            } else {
-            	list.addClass('nav nav-list')
-            }
-            $.each(data.result.albums_loop, function (i, item) {
-                album_id[item.album] = item.id;
-                var link = $('<a>').attr('href','#').text(item.album).click(function() {
-                    getSongs('album_id:'+item.id);
-                });
-                list.append($('<li>').append(link));
-            });
-            e.html(list);
+function getAlbums(link, artist) {
+    container = (link==undefined) ? $('#albums') : link.parent();
+    filter = (artist==undefined) ? '' : '?artist='+artist
+    $.get('/squeezebox/GetAlbums'+filter, function (data) {
+        if (data == null) return;
+        var list = $('<ul>')
+        if (!artist) {
+            list.addClass('album-list');
         }
-    });
+        $.each(data.result.albums_loop, function (i, item) {
+            listitem = $('<li>');
+            album_id[item.album] = item.id;
+            var control = $('<div>').addClass('control');
+            var playIcon = $('<i>').addClass('icon-play');
+            var play = $('<a>').attr('href','#').html(playIcon).click(function(e) {
+                e.preventDefault();
+                sendCommand('playlistcontrol cmd:load album_id:'+item.id);
+            });
+            var addIcon = $('<i>').addClass('icon-plus');
+            var add = $('<a>').attr('href','#').html(addIcon).click(function(e) {
+                e.preventDefault();
+                sendCommand('playlistcontrol cmd:add album_id:'+item.id);
+            });
+            control.append(play);
+            control.append(add);
+            var album = $('<a>').attr('href','#').text(item.album).click(function(e) {
+                e.preventDefault();
+                getSongs('album_id:'+item.id);
+                if (!album) list.addClass('hide');
+            });
+            listitem.append(control);
+            listitem.append(album);
+            list.append(listitem);
+        });
+        container.append(list);
+        if (artist) {
+            link.unbind('click').click(function(e) {
+                e.preventDefault();
+                list.toggleClass('hide');
+            });
+        }
+    }, 'json');
 }
 
 function getSongs(filter){
-    $.ajax({
-        url: '/json/squeezebox/?action=getsongs',
-        type: 'get',
-        dataType: 'json',
-        data: { 'filter': filter },
-        success: function (data) {
-            if (data == null) return false;
-
-            $('[data-player-control=PlayNow]').unbind("click").click(function(){
-                sendCommand(currentPlayer, 'playlistcontrol cmd:load ' + filter);
+    $.get('/squeezebox/GetSongs?filter='+filter, function (data) {
+        if (data == null) return;
+        $('[data-player-control=PlayNow]').unbind('click').click(function(){
+            sendCommand('playlistcontrol cmd:load ' + filter);
+        });
+        $('[data-player-control=AddPlaylist]').unbind('click').click(function(){
+            sendCommand('playlistcontrol cmd:add ' + filter);
+        });
+        $('#song_table').empty();
+        $.each(data.result.titles_loop, function (i, item) {
+            var row = $('<tr>')
+            var title = $('<a>').attr('href','#').text(item.title).click(function(e) {
+                e.preventDefault();
+                sendCommand('playlistcontrol cmd:add track_id:'+item.id);
             });
-            $('[data-player-control=AddPlaylist]').unbind("click").click(function(){
-                sendCommand(currentPlayer, 'playlistcontrol cmd:add ' + filter);
+            row.append($('<td>').append(title));
+            var artist = $('<a>').attr('href','#').text(item.artist).click(function(e) {
+                e.preventDefault();
+                getSongs('artist_id:'+artist_id[item.artist]);
             });
-            $('#song_table').html('')
-            $.each(data.result.titles_loop, function (i, item) {
-                var row = $('<tr>')
-                var title = $('<a>').attr('href','#').text(item.title).click(function() {
-                    sendCommand(currentPlayer, 'playlistcontrol cmd:add track_id:'+item.id);
-                    return false;
-                });
-                row.append($('<td>').append(title));
-                var artist = $('<a>').attr('href','#').text(item.artist).click(function() {
-                    getSongs('artist_id:'+artist_id[item.artist]);
-                    return false;
-                });
-                row.append($('<td>').append(artist));
-                var album = $('<a>').attr('href','#').text(item.album).click(function() {
-                	getSongs('album_id:'+album_id[item.album]);
-                    return false;
-                });
-                row.append($('<td>').append(album));
-                row.append($('<td>').text(parseSec(item.duration)).addClass('right'));
-                $('#song_table').append(row);
+            row.append($('<td>').append(artist));
+            var album = $('<a>').attr('href','#').text(item.album).click(function(e) {
+                e.preventDefault();
+                getSongs('album_id:'+album_id[item.album]);
             });
-        },
-        complete: function() {
-            $('[href=#songs]').trigger('click');
-        }
-    });
+            row.append($('<td>').append(album));
+            row.append($('<td>').text(parseSec(item.duration)).addClass('right'));
+            $('#song_table').append(row);
+        });
+        $('[href=#songs]').trigger('click');
+    }, 'json');
 }
 
 function getStationGroups() {
-    $.ajax({
-        url: '/json/squeezebox/?action=getstationgroups',
-        type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            if (data == null) return false;
-
-            var list = $('<ul>').addClass('nav nav-list')
-            $.each(data.result.radioss_loop, function (i, item) {
-                var link = $('<a>').attr('href','#').text(item.name).click(function(e) {
-                	e.preventDefault();
-                	var stationlist = $('<div>');
-                	$(this).append(stationlist).unbind().click(function(e) {
-                		e.preventDefault();
-                		stationlist.toggleClass('hide');
-                	})
-                	getStations(stationlist, item.cmd);
-                });
-                list.append($('<li>').append(link));
+    $.get('/squeezebox/GetStationGroups', function (data) {
+        if (data == null) return;
+        var list = $('<ul>').addClass('nav nav-list')
+        $.each(data.result.radioss_loop, function (i, item) {
+            var link = $('<a>').attr('href','#').text(item.name).click(function(e) {
+                e.preventDefault();
+                getStations($(this), item.cmd);
             });
-            $('#stations').html(list);
-        }
-    });
+            list.append($('<li>').append(link));
+        });
+        $('#stations').html(list);
+    }, 'json');
 }
 
-function getStations(e, group) {
+function getStations(link, group) {
     $.ajax({
-        url: '/json/squeezebox/?action=getstations',
+        url: '/squeezebox/GetStations',
         type: 'get',
         dataType: 'json',
         data: {
-        	'group': group,
-        	'player': currentPlayer
+            'group': group,
+            'player': currentPlayer
         },
         success: function (data) {
             if (data == null) return false;
-
             var list = $('<ul>')
             $.each(data.result.loop_loop, function (i, item) {
-                album_id[item.album] = item.id;
-                var link = $('<a>').attr('href','#').text(item.name).click(function() {
-                   sendCommand(currentPlayer, 'playlistcontrol cmd:add track_id:'+item.id);
+                var link = $('<a>').attr('href','#').text(item.name).click(function(e) {
+                    e.preventDefault();
+                    if(item.isaudio == 1) {
+                        sendCommand(group+' playlist add item_id:'+item.id);
+                    } else {
+                        notify('Error','Not implementet','error');
+                    }
                 });
                 list.append($('<li>').append(link));
             });
-            e.html(list);
+            link.parent().append(list);
+            link.unbind().click(function(e) {
+                e.preventDefault();
+                list.toggleClass('hide');
+            });
         }
     });
 }
 
 function getPlaylists() {
-    $.ajax({
-        url: '/json/squeezebox/?action=getplaylists',
-        type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            if (data == null) return false;
-
-            var list = $('<ul>').addClass('nav nav-list')
-            $.each(data.result.playlists_loop, function (i, item) {
-                var link = $('<a>').attr('href','#').text(item.playlist).click(function() {
-                    sendCommand(currentPlayer, 'playlistcontrol cmd:load playlist_id:'+item.id)
-                });
-                list.append($('<li>').append(link));
-            });
-            $('#playlists').html(list);
+    $.get('/squeezebox/GetPlaylists', function (data) {
+        if (data == null) return
+        if (data.result.count == 0) {
+            $('#playlists').html('You have no playlists');
+            return;
         }
-    });
+        var list = $('<ul>').addClass('nav nav-list')
+        $.each(data.result.playlists_loop, function (i, item) {
+            var link = $('<a>').attr('href','#').text(item.playlist).click(function(e) {
+                e.preventDefault();
+                sendCommand('playlistcontrol cmd:load playlist_id:'+item.id)
+            });
+            list.append($('<li>').append(link));
+        });
+        $('#playlists').html(list);
+    }, 'json');
 }

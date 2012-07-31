@@ -18,7 +18,7 @@ APP_PATH=/path/to/htpc-manager
 DAEMON=/usr/bin/python
 
 # startup args
-DAEMON_OPTS=" Htpc.py -d"
+DAEMON_OPTS=" Htpc.py"
 
 # script name
 NAME=htpc
