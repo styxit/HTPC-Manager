@@ -7,6 +7,13 @@ html, body {
     background-color: #eee;
     background: url('/img/rough_diagonal.png');
 }
+#playlist_table td i {
+    float: right;
+    display: none;
+}
+#playlist_table td:hover i {
+    display: block;
+}
 .artist-list, .artist-list ul,
 .album-list, .album-list ul {
     margin: 0;
@@ -115,6 +122,9 @@ legend {
 }
 h3 a {
     color: #000;
+}
+#server-control {
+    margin: 0;
 }
 h6.movie-title, h6.show-title {
     color: #555555;

@@ -19,15 +19,23 @@ $(document).ready(function () {
     path = window.location.pathname.split('/');
     $('#'+path[1]).addClass('active');
 
+    $(".search-query").keyup(function () {
+        var filter = $(this).val()
+        $(".filter:visible:first li").each(function () {
+            var shown = ($(this).text().toUpperCase().indexOf(filter.toUpperCase()) >= 0);
+            $(this).toggle(shown);
+        });
+    });
     $('.carousel').carousel();
     $(".table-sortable").tablesorter();
     $('.tabs').tab();
     $('a[data-toggle="tab"]').on('shown', function(e) {
         var current_tab = $(e.target).attr('href');
         $.cookie('active_tab', current_tab);
+        $(".search-query").val('').trigger('keyup');
     });
-    var last_active_tab = $.cookie('active_tab');
-    $('[href=' + last_active_tab + ']').trigger('click');
+    active_tab = (location.hash) ? location.hash : $.cookie('active_tab');
+    $('[href='+active_tab+']').trigger('click');
 
     $('#xbmc-player').tooltip({trigger : 'manual'});
     $('#xbmc-player').tooltip('show');

@@ -1,17 +1,42 @@
- $(document).ready(function() {
+$(document).ready(function() {
     enablePlayerControls();
     loadMovies();
     loadXbmcShows();
     loadNowPlaying();
 
-    $('#xbmc-shutdown').click(function () {
-        $.get('/xbmc/System?do=Suspend', function(data){
-            notify('Shutdown','Shutting down...','warning');
+    $.get('/xbmc/getservers', function (data) {
+        if (data==null) return;
+        var servers = $('<select>').change(function() {
+             $.get('/xbmc/setserver?server='+$(this).val(), function (data) {
+                notify('XBMC','Server change '+data,'info');
+                $('#movie-grid').empty();
+                allMoviesLoaded = false;
+                loadMovies();
+                $('#show-grid').empty();
+                allShowsLoaded = false;
+                loadXbmcShows();
+             });
         });
+        $.each(data.servers, function (i, item) {
+            var server = $('<option>').text(item).val(item);
+            servers.append(server);
+        });
+        servers.val(data.current);
+        $('#servers').append(servers);
+    }, 'json');
+
+    $('#xbmc-notify').click(function () {
+        msg = prompt("Message");
+        if (msg) sendNotification(msg);
     });
     $('#xbmc-restart').click(function () {
         $.get('/xbmc/System?do=Reboot', function(data){
             notify('Reboot','Rebooting...','warning');
+        });
+    });
+    $('#xbmc-shutdown').click(function () {
+        $.get('/xbmc/System?do=Suspend', function(data){
+            notify('Shutdown','Shutting down...','warning');
         });
     });
     $('#xbmc-wake').click(function () {
@@ -33,16 +58,6 @@
             }
         }
     });
-
-    $('.search-query').keyup(function () {
-        if ($('#shows').is(':visible')) {
-            filterShows($(this).val());
-        }
-        if ($('#movies').is(':visible')) {
-            filterMovies($(this).val());
-        }
-    });
-
     $('[data-sortmethod]').click(function () {
         $('#movie-grid').html('');
         lastMovieLoaded = 0;

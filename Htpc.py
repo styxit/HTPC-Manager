@@ -1,15 +1,14 @@
 #!/usr/bin/python
-import os, sys, shutil, argparse
+import os, sys
 import htpc
-from htpc.tools import readSettings
 
 # Set root and insert bundled libraies into path
 htpc.root = os.getcwd()
 sys.path.insert(0, os.path.join(htpc.root, 'libs'))
 
 def main():
-    # Import the bundled CherryPy and tools
-    import cherrypy
+    import shutil, argparse, cherrypy
+    from htpc.tools import readSettings
 
     # Set default conf file and copy sample if it doesnt exist
     htpc.config = os.path.join(htpc.root, 'userdata/config.cfg')
@@ -38,7 +37,7 @@ def main():
 
     # Set server parameters
     cherrypy.config.update({
-        'server.environment': 'production',
+        #'environment': 'production',
         'server.socket_host': htpc.settings['app_host'],
         'server.socket_port': htpc.settings['app_port'],
         'server.root': htpc.root,

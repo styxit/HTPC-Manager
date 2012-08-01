@@ -7,7 +7,7 @@ def SafeFetchFromUrl(url):
     except:
         return ''
 
-def readSettings(configfile, section = 'htpc'):
+def readSettings(configfile='', section='htpc'):
     if not os.path.isfile(configfile):
         return {}
 
@@ -22,19 +22,19 @@ def readSettings(configfile, section = 'htpc'):
         except ValueError:
             configDict[key] = val
 
-    template = os.path.join('interfaces/', configDict.get('template','default'))
-    templates = os.listdir("interfaces/")
-    themes = os.listdir(os.path.join(template, "css/themes/"))
-    configDict.update({
-        'webdir': template,
-        'templates': templates,
-        'themes': themes
-    })
+    if section == 'htpc':
+        template = os.path.join('interfaces/', configDict.get('template','default'))
+        templates = os.listdir("interfaces/")
+        themes = os.listdir(os.path.join(template, "css/themes/"))
+        configDict.update({
+            'webdir': template,
+            'templates': templates,
+            'themes': themes
+        })
 
     return configDict
 
 def saveSettings(configfile, data, section = 'htpc'):
-    print data
     # Set unchecked checkboxes to 0
     checkboxes = ('use_sabnzbd', 'use_couchpotato', 'use_squeezebox', 'use_xbmc', 'use_nzbsearch',
                   'xbmc_show_banners', 'xbmc_hide_watched', 'use_dash_rec_movies', 'use_dash_rec_tv',

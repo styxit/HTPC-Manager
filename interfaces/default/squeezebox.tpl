@@ -58,11 +58,10 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th style="width:15px">&nbsp;</th>
                             <th>Track</th>
                             <th>Artist</th>
                             <th>Album</th>
-                            <th class="right">Duration</th>
+                            <th>Duration</th>
                         </tr>
                     </thead>
                     <tbody id="playlist_table"></tbody>
@@ -72,10 +71,6 @@
             <div id="albums" class="tab-pane sidebar-nav"></div>
             <div id="stations" class="tab-pane sidebar-nav"></div>
             <div id="songs" class="tab-pane">
-                <div class="btn-group pull-right">
-                    <button class="btn btn-mini" data-player-control="PlayNow" title="Play Now"><i class="icon-play"></i></button>
-                    <button class="btn btn-mini" data-player-control="AddPlaylist" title="Add to Playlist"><i class="icon-plus"></i></button>
-                </div>
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -87,6 +82,10 @@
                     </thead>
                     <tbody id="song_table"></tbody>
                 </table>
+                <div class="btn-group pull-right">
+                    <button class="btn" data-player-control="PlayNow" title="Play All"><i class="icon-play"></i> Play All</button>
+                    <button class="btn" data-player-control="AddPlaylist" title="Add to Playlist"><i class="icon-plus"></i> Add to playlist</button>
+                </div>
             </div>
             <div id="playlists" class="tab-pane sidebar-nav"></div>
         </div>

@@ -4,9 +4,13 @@
     <div class="content">
         <h1 class="page-header page-title">
             <a href="http://$getVar('xbmc_host', ''):$getVar('xbmc_port', '')" target="_blank">$getVar('xbmc_name', 'XBMC')</a>
-            <div class="pull-right">
-                <button id="xbmc-restart" class="btn" title="Restart"><i class="icon-repeat"></i></button>
-                <button id="xbmc-shutdown" class="btn" title="Shutdown"><i class="icon-off"></i></button>
+            <div id="server-control" class="btn-toolbar pull-right">
+                <div class="btn-group" id="servers"></div>
+                <div class="btn-group">
+                    <button id="xbmc-notify" class="btn" title="Send notification"><i class="icon-envelope"></i></button>
+                    <button id="xbmc-restart" class="btn" title="Restart"><i class="icon-repeat"></i></button>
+                    <button id="xbmc-shutdown" class="btn" title="Shutdown"><i class="icon-off"></i></button>
+                </div>
             </div>
         </h1>
         <div class="well hide" id="nowplaying">
@@ -53,15 +57,15 @@
                         </ul>
                     </div>
                 </div>
-                <ul id="movie-grid" class="thumbnails" data-scroll-limit="$getVar('xbmc_scroll_limit', '0')"></ul>
+                <ul id="movie-grid" class="thumbnails filter" data-scroll-limit="$getVar('xbmc_scroll_limit', '0')"></ul>
                 <div class="gif-loader" id="movie-loader"><img src="/img/loader.gif" alt="loader" /></div>
                 <button id="xbmc-wake" class="btn hide" title="Wake on Lan"><i class="icon-off"></i> Send WakeOnLan packet</button>
             </div>
             <div id="shows" class="tab-pane">
                 #if $getVar('xbmc_show_banners', 0)
-                <ul id="show-grid" class="thumbnails banners" data-scroll-limit="$getVar('xbmc_scroll_limit', '0')"></ul>
+                <ul id="show-grid" class="thumbnails filter banners" data-scroll-limit="$getVar('xbmc_scroll_limit', '0')"></ul>
                 #else
-                <ul id="show-grid" class="thumbnails" data-scroll-limit="$getVar('xbmc_scroll_limit', '0')"></ul>
+                <ul id="show-grid" class="thumbnails filter" data-scroll-limit="$getVar('xbmc_scroll_limit', '0')"></ul>
                 #end if
                 <div class="gif-loader" id="show-loader"><img src="/img/loader.gif" alt="loader" /></div>
                 <div id="show-details" style="display:none;">

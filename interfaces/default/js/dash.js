@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    loadDiskSpace();
+    //loadDiskSpace();
     enablePlayerControls();
     loadNowPlaying();
     loadRecentMovies();

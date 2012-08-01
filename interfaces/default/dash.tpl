@@ -27,7 +27,7 @@
         <div class="row-fluid">
             #if $getVar('use_dash_rec_movies', 0)
             <div class="span4">
-                <h3><a href="/xbmc/">Recently added Movies</a></h3>
+                <h3><a href="/xbmc/#movies">Recently added Movies</a></h3>
                 <div id="movie-carousel" class="carousel hide  carousel-fanart" style="height:240px;">
                     <div class="carousel-inner"></div>
                     <a class="carousel-control left" href="#movie-carousel" data-slide="prev">&lsaquo;</a>
@@ -37,7 +37,7 @@
             #end if
             #if $getVar('use_dash_rec_tv', 0)
             <div class="span4">
-                <h3><a href="/xbmc/">Recently added TV Shows</a></h3>
+                <h3><a href="/xbmc/#shows">Recently added TV Shows</a></h3>
                 <div id="tvshow-carousel" class="carousel hide carousel-fanart">
                     <div class="carousel-inner"></div>
                     <a class="carousel-control left" href="#tvshow-carousel" data-slide="prev">&lsaquo;</a>
@@ -47,7 +47,7 @@
             #end if
             #if $getVar('use_dash_rec_music', 0)
             <div class="span4">
-                <h3><a href="/xbmc/">Recently added Music</a></h3>
+                <h3><a href="/xbmc/#music">Recently added Music</a></h3>
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -65,7 +65,7 @@
         <div class="row-fluid">
             #if $getVar('use_dash_sickbeard', 0)
             <div class="span4">
-                <h3><a href="/sickbeard/">Next aired</a></h3>
+                <h3><a href="/sickbeard/#nextaired">Next aired</a></h3>
                 <table class="table table-striped table-main">
                     <thead>
                         <tr>
@@ -80,7 +80,7 @@
             #end if
             #if $getVar('use_dash_couchpotato', 0)
             <div class="span4">
-                <h3><a href="/couchpotato/">Wanted movies</a></h3>
+                <h3><a href="/couchpotato/#wanted">Wanted movies</a></h3>
                 <table class="table table-striped table-main">
                     <thead>
                         <tr>
@@ -94,7 +94,7 @@
             #end if
             #if $getVar('use_dash_sabnzbd', 0)
             <div class="span4">
-                <h3><a href="/sabnzbd/">Latest downloads</a></h3>
+                <h3><a href="/sabnzbd/#history">Latest downloads</a></h3>
                 <table class="table table-striped table-main">
                     <thead>
                         <tr>

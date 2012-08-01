@@ -153,7 +153,6 @@ function loadXbmcShows(options) {
             showsLoading = true;
         },
         success: function (data) {
-
             lastShowLoaded += showSteps;
 
             if (data == null) return;
@@ -164,7 +163,6 @@ function loadXbmcShows(options) {
 
             if (data == null) return;
             $.each(data.tvshows, function (i, show) {
-
                 var showPicture = $('<img>');
                 if ($('#show-grid').hasClass('banners')) {
                     showPicture.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(show.thumbnail) + '&h=80&w=500');
@@ -201,10 +199,8 @@ function loadXbmcShows(options) {
                 }
 
                 $('#show-grid').append(showItem);
-
                 $('#show-loader').hide();
                 showsLoading = false;
-
             });
         }
     });
@@ -442,16 +438,6 @@ function xbmcScan() {
     $.get('/xbmc/Scan', function(data) {
         notify('XBMC', 'Library update sent successfully', 'info');
     });
-}
-
-function filterShows(key) {
-    $('#show-grid').children().show();
-    $('#show-grid').find('li:not(:contains('+key+'))').hide();
-}
-
-function filterMovies(key) {
-    $('#movie-grid').children().show();
-    $('#movie-grid').find('li:not(:contains('+key+'))').hide();
 }
 
 function enablePlayerControls() {

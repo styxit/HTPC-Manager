@@ -60,7 +60,7 @@
                 <div class="pull-right visible-desktop">
                     #if $getVar('use_nzbsearch', 0)
                     <form action="/search/" method="get" class="navbar-search">
-                        <input type="text" name="search" class="search-query" placeholder="Search">
+                        <input type="text" name="search" accesskey="s" class="search-query" placeholder="Search">
                     </form>
                     #end if
                     <div class="dropdown pull-left">
