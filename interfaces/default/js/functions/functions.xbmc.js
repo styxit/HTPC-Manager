@@ -428,14 +428,14 @@ function sendNotification(string) {
     });
 }
 
-function xbmcClean() {
-    $.get('/xbmc/Clean', function(data) {
+function xbmcClean(lib) {
+    $.get('/xbmc/Clean?lib='+lib, function(data) {
         notify('XBMC', 'Library clean sent successfully', 'info');
     });
 }
 
-function xbmcScan() {
-    $.get('/xbmc/Scan', function(data) {
+function xbmcScan(lib) {
+    $.get('/xbmc/Scan?lib='+lib, function(data) {
         notify('XBMC', 'Library update sent successfully', 'info');
     });
 }

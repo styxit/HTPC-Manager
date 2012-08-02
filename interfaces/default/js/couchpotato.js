@@ -21,7 +21,7 @@ function getMovieList() {
     $('.tooltip').remove();
     $('#movies_table_body').children().remove();
     $.ajax({
-        url: '/couchpotato/GetMovieList',
+        url: '/couchpotato/GetMovieList?limit='+limit,
         type: 'get',
         dataType: 'json',
         success: function (result) {

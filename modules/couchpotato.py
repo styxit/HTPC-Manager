@@ -16,8 +16,9 @@ class CouchPotato:
         return template.respond()
 
     @cherrypy.expose()
-    def GetMovieList(self):
-        return SafeFetchFromUrl(self.url + 'movie.list')
+    def GetMovieList(self, **kwargs):
+        limit = kwargs.get('limit','')
+        return SafeFetchFromUrl(self.url + 'movie.list?limit_offset='+limit)
 
     @cherrypy.expose()
     def GetNotificationList(self):

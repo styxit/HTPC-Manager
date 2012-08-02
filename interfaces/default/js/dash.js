@@ -8,7 +8,7 @@ $(document).ready(function () {
     loadNextAired({
         limit: 5
     });
-    loadWantedMovies();
+    loadWantedMovies(5);
     loadDownloadHistory();
 });
 
@@ -179,9 +179,9 @@ function loadRecentAlbums () {
     });
 }
 
-function loadWantedMovies() {
+function loadWantedMovies(limit) {
     $.ajax({
-        url: '/couchpotato/GetMovieList',
+        url: '/couchpotato/GetMovieList?limit='+limit,
         type: 'get',
         dataType: 'json',
         success: function (result) {

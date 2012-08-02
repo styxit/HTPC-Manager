@@ -44,6 +44,16 @@ $(document).ready(function() {
             notify('Wake','Sending WakeOnLan packet...','warning');
         });
     });
+    $('#back-to-shows').click(function () {
+        $('#show-details').hide();
+        $('#show-grid').show();
+    });
+    $('#btn-clean-video-lib').click(function () {
+        xbmcClean('video');
+    });
+    $('#btn-scan-video-lib').click(function () {
+        xbmcScan('video');
+    });
 
     $(window).scroll(function() {
         if($(window).scrollTop() + $(window).height() >= $(document).height() - 10) {
@@ -83,19 +93,5 @@ $(document).ready(function() {
             sortorder: $('.active-sortorder').attr('data-sortorder'),
             sortmethod: $('.active-sortmethod').attr('data-sortmethod')
         });
-    });
-
-    $('#back-to-shows').click(function () {
-        $('#show-details').hide();
-        $('#show-grid').show();
-    });
-    $('#send_notification_button').click(function () {
-        sendNotification($('#send_notification_text').val());
-    });
-    $('#btn-clean-lib').click(function () {
-        xbmcClean();
-    });
-    $('#btn-scan-lib').click(function () {
-        xbmcScan();
     });
 });

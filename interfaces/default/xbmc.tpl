@@ -79,17 +79,10 @@
             <div class="tab-pane" id="misc">
                 <div class="form-horizontal">
                     <fieldset>
-                        <legend>Notification</legend>
-                        <div class="control-group">
-                            <input class="span6" id="send_notification_text" name="send_notification_text" type="text" />
-                            <button class="btn" type="button" id="send_notification_button"><i class="icon-envelope"></i> Send</button>
-                        </div>
-                    </fieldset>
-                    <fieldset>
                         <legend>Actions</legend>
                         <div class="control-group">
-                            <button class="btn" id="btn-scan-lib">Update library</button>
-                            <button class="btn" id="btn-clean-lib">Clean library</button>
+                            <button class="btn" id="btn-scan-video-lib">Update video library</button>
+                            <button class="btn" id="btn-clean-video-lib">Clean video library</button>
                         </div>
                     </fieldset>
                 </div>

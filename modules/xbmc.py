@@ -31,8 +31,7 @@ class Xbmc:
         server = kwargs.get('server')
         if (server):
             htpc.xbmc = kwargs.get('server')
-            return dumps('success')
-        return dumps('An error occurred')
+            return 'success'
 
     @cherrypy.expose()
     def GetThumb(self, **kwargs):
@@ -80,15 +79,12 @@ class Xbmc:
             newimage.putalpha(alpha)
             newimage.save(thumbOnDisk + '_' + thumbWidth + '_' + thumbHeight + '.png')
         
-            # Oude weg gooien
             os.unlink(thumbOnDisk)
         
-        # Plaatje weer uitlezen
         f = open(thumbOnDisk + '_' + thumbWidth + '_' + thumbHeight + '.png', 'rb')
         data = f.read()
         f.close()
         
-        # Header setten en data returnen
         cherrypy.response.headers['Content-Type'] = "image/png"
         return data
 
@@ -112,7 +108,7 @@ class Xbmc:
     def GetShows(self, **kwargs):
         try:
             xbmc = Server(self.url('/jsonrpc', True))
-            shows = xbmc.VideoLibrary.GetTVShows(properties=['title', 'year', 'plot', 'thumbnail','playcount'])
+            shows = xbmc.VideoLibrary.GetTVShows(properties=['title', 'year', 'plot', 'thumbnail', 'playcount'])
             if bool(htpc.settings.get('xbmc_hide_watched', 0)):
                 shows['tvshows'] = filter(lambda i: i['playcount'] == 0, shows['tvshows'])
             return dumps(shows)
@@ -121,10 +117,10 @@ class Xbmc:
 
     @cherrypy.expose()
     def GetShow(self, **kwargs):
-        id = kwargs.get('item')
+        id = int(kwargs.get('item'))
         xbmc = Server(self.url('/jsonrpc', True))
-        showinfo = xbmc.VideoLibrary.GetTVShowDetails(tvshowid=int(id),properties=['title', 'thumbnail'])
-        episodes = xbmc.VideoLibrary.GetEpisodes(tvshowid=int(id),properties=['episode', 'season', 'thumbnail', 'plot', 'file','playcount'])
+        showinfo = xbmc.VideoLibrary.GetTVShowDetails(tvshowid=id,properties=['title', 'thumbnail'])
+        episodes = xbmc.VideoLibrary.GetEpisodes(tvshowid=id,properties=['episode', 'season', 'thumbnail', 'plot', 'file','playcount'])
         episodes = episodes[u'episodes']
         seasons = {}
         if bool(htpc.settings.get('xbmc_hide_watched', 0)):
@@ -244,10 +240,13 @@ class Xbmc:
         return dumps(data)
 
     @cherrypy.expose()
-    def Clean(self):
+    def Clean(self, **kwargs):
+        lib = kwargs.get('lib','video')
         xbmc = Server(self.url('/jsonrpc', True))
-        data = xbmc.VideoLibrary.Clean()
-        return dumps(data)
+        if lib == 'video':
+            return dumps(xbmc.VideoLibrary.Clean())
+        elif lib == 'audio':
+            return dumps(xbmc.AudioLibrary.Clean())
 
     @cherrypy.expose()
     def Scan(self):
@@ -256,6 +255,9 @@ class Xbmc:
         return dumps(data)
 
     @cherrypy.expose()
+    def test(self):
+        return self.url('',True)
+
     def url(self, path='', auth=False):
         try:
             settings = readSettings(htpc.configfile, htpc.xbmc)
@@ -265,7 +267,7 @@ class Xbmc:
         port = str(settings.get('xbmc_port', ''))
         username = settings.get('xbmc_username', '')
         password = settings.get('xbmc_password', '')
-        if (auth):
+        if auth and username:
             return 'http://'+username+':'+password+'@'+host+':'+str(port)+path
         return 'http://'+host+':'+str(port)+path
 
