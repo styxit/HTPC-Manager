@@ -361,13 +361,9 @@
                         </div>
                     </div>                    
                     <div class="control-group">
-                        <label class="control-label" for="nzbsearch_name">Menu Name</label>
-                        <div class="controls">
-                            <input class="span3" id="nzbsearch_name" name="nzbsearch_name" type="text" value="$getVar('nzbsearch_name', 'NZBSearch')" />
-                        </div>
-                    </div>
-                    <div class="control-group">
-                        <label class="control-label" for="nzbmatrix_apikey">API Key</label>
+                        <label class="control-label" for="nzbmatrix_apikey">
+                            <a href="http://nzbmatrix.com/account.php?action=api">NZBMatrix API Key</a>
+                        </label>
                         <div class="controls">
                             <input class="span3" id="nzbmatrix_apikey" name="nzbmatrix_apikey" type="text" value="$getVar('nzbmatrix_apikey', '')" />
                         </div>

@@ -95,7 +95,8 @@ def main():
 
     # Daemonize if wanted
     if args.daemon:
-        cherrypy.process.plugins.Daemonizer(cherrypy.engine).subscribe()
+        print "Daemonizing through commandline deactivated due to bug"
+        #cherrypy.process.plugins.Daemonizer(cherrypy.engine).subscribe()
 
     # Start the CherryPy server
     cherrypy.quickstart(Root(), config=appConfig)
