@@ -169,7 +169,7 @@ function loadXbmcShows(options) {
                     showPicture.css('height', '90px');
                     showPicture.css('width', '500px');
                 } else {
-                    showPicture.attr('src', '/xbmc/?GetThumb?thumb=' + encodeURIComponent(show.thumbnail) + '&h=150&w=100');
+                    showPicture.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(show.thumbnail) + '&h=150&w=100');
                     showPicture.css('height', '150px');
                     showPicture.css('width', '100px');
                 }
