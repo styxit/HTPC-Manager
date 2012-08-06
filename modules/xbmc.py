@@ -50,7 +50,6 @@ class Xbmc:
 
         # If there is no local copy
         if not os.path.isfile(thumbOnDisk):
-            return self.url('/vfs/' + thumb)
             request = urllib2.Request(self.url('/vfs/' + thumb))
             auth = self.auth()
             if (auth):
