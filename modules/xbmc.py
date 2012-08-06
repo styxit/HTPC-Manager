@@ -50,7 +50,10 @@ class Xbmc:
 
         # If there is no local copy
         if not os.path.isfile(thumbOnDisk):
-            request = urllib2.Request(self.url('/vfs/' + thumb))
+            if thumb.startswith('image://'): # Frodo
+                request = urllib2.Request(self.url('/image/' + thumb))
+            else:
+                request = urllib2.Request(self.url('/vfs/' + thumb))
             auth = self.auth()
             if (auth):
                 request.add_header("Authorization", "Basic %s" % auth)
