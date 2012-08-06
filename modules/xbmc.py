@@ -50,15 +50,10 @@ class Xbmc:
 
         # If there is no local copy
         if not os.path.isfile(thumbOnDisk):
-            # Hack when using Frodo
-            if thumb[:5]== "image" :
-                url = urllib2.unquote(thumb[8:])
-                request = urllib2.Request(url)
-            else :
-                request = urllib2.Request(self.url('/vfs/' + thumb))
-                auth = self.auth()
-                if (auth):
-                    request.add_header("Authorization", "Basic %s" % auth)
+            request = urllib2.Request(self.url('/vfs/' + thumb))
+            auth = self.auth()
+            if (auth):
+                request.add_header("Authorization", "Basic %s" % auth)
 
             fileObject = urllib2.urlopen(request)
             fileData = fileObject.read()
