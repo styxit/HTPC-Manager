@@ -77,15 +77,48 @@
                 </div>
             </div>
             <div class="tab-pane" id="misc">
-                <div class="form-horizontal">
-                    <fieldset>
-                        <legend>Actions</legend>
-                        <div class="control-group">
-                            <button class="btn" id="btn-scan-video-lib">Update video library</button>
-                            <button class="btn" id="btn-clean-video-lib">Clean video library</button>
-                        </div>
-                    </fieldset>
-                </div>
+            <div class="row-fluid">
+                <fieldset class="span4 form-horizontal">
+                    <legend>Actions</legend>
+                    <div class="control-group">
+                        <button class="btn" id="btn-scan-video-lib">Update video library</button>
+                        <button class="btn" id="btn-clean-video-lib">Clean video library</button>
+                    </div>
+                    <div class="control-group">
+                        <button class="btn" id="btn-scan-music-lib">Update music library</button>
+                        <button class="btn" id="btn-clean-music-lib">Clean music library</button>
+                    </div>
+                </fieldset>
+            <!--
+                <fieldset class="span4 form-horizontal">
+                    <legend>Control</legend>
+                    <div class="control-group">
+                        <button class="btn span2" id="btn-control-back"><i class="icon-arrow-left"></i></button>
+                        <button class="btn span2" id="btn-control-up"><i class="icon-chevron-up"></i></button>
+                        <button class="btn span2" id="btn-control-menu"><i class="icon-cog"></i></button>
+                    </div>
+                    <div class="control-group">
+                        <button class="btn span2" id="btn-control-back"><i class="icon-chevron-left"></i></button>
+                        <button class="btn span2" id="btn-control-up"><i class="icon-ok"></i></button>
+                        <button class="btn span2" id="btn-control-menu"><i class="icon-chevron-right"></i></button>
+                    </div>
+                    <div class="control-group">
+                        <span class="span2"></span>
+                        <button class="btn span2" id="btn-control-up"><i class="icon-chevron-down"></i></button>
+                    </div>
+                </fieldset>
+            -->
+                <fieldset class="span4">
+                    <legend>Audio and subtitles</legend>
+                    <label class="control-label" for="audio">Audio</label>
+                    <div class="controls">
+                        <select id="xbmc-audio"></select>
+                    </div>
+                    <label class="control-label" for="xbmc-subtitles">Subtitles</label>
+                    <div class="controls">
+                        <select id="xbmc-subtitles"></select>
+                    </div>
+                </fieldset>
             </div>
         </div>
     </div>

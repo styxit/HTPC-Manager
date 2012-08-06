@@ -19,12 +19,14 @@ $(document).ready(function () {
     path = window.location.pathname.split('/');
     $('#'+path[1]).addClass('active');
 
-    $(".search-query").keyup(function () {
+    $(".search-query").keyup(function (e) {
         var filter = $(this).val()
         $(".filter:visible:first li").each(function () {
             var shown = ($(this).text().toUpperCase().indexOf(filter.toUpperCase()) >= 0);
             $(this).toggle(shown);
         });
+    }).keydown(function (e) {
+        e.stopPropagation();
     });
     $('.carousel').carousel();
     $(".table-sortable").tablesorter();

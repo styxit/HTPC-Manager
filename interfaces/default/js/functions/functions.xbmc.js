@@ -236,7 +236,7 @@ function xbmcShowEpisode(episode) {
 
 function loadXBMCShow(show) {
     $.ajax({
-        url: '/xbmc/GetShow?item=' + show.tvshowid,
+        url: '/xbmc/GetShow?tvshowid=' + show.tvshowid,
         type: 'get',
         dataType: 'json',
         beforeSend: function () {
@@ -422,6 +422,18 @@ function playItem(item) {
     $.get('/xbmc/PlayItem?item='+item);
 }
 
+function xbmcControl(action) {
+    $.get('/xbmc/ControlPlayer?action='+action, function(data){
+    });
+}
+function enablePlayerControls() {
+    $('[data-player-control]').click(function () {
+        var action = $(this).attr('data-player-control');
+        $(this).attr('disabled', true);
+        xbmcControl(action);
+    });
+}
+
 function sendNotification(string) {
     $.post('/xbmc/Notify',{'text': string}, function(data) {
         notify('XBMC', 'Notification sent successfully', 'info');
@@ -437,13 +449,5 @@ function xbmcClean(lib) {
 function xbmcScan(lib) {
     $.get('/xbmc/Scan?lib='+lib, function(data) {
         notify('XBMC', 'Library update sent successfully', 'info');
-    });
-}
-
-function enablePlayerControls() {
-    $('[data-player-control]').click(function () {
-        var action = $(this).attr('data-player-control');
-        $(this).attr('disabled', true);
-        $.get('/xbmc/ControlPlayer?do='+action)
     });
 }

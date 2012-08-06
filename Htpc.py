@@ -3,7 +3,7 @@ import os, sys
 import htpc
 
 # Set root and insert bundled libraies into path
-htpc.root = os.getcwd()
+htpc.root = os.path.dirname(os.path.abspath(sys.argv[0]))
 sys.path.insert(0, os.path.join(htpc.root, 'libs'))
 
 def main():
@@ -33,7 +33,7 @@ def main():
     # If running on windows ignore daemon
     if args.daemon and sys.platform == 'win32':
         print "Daemon mode not possible on Windows. Starting normally"
-        args.daemon = 0
+        #args.daemon = 0
 
     # Set server parameters
     cherrypy.config.update({

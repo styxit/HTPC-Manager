@@ -1,4 +1,5 @@
-import os, cherrypy, htpc
+import os, sys, platform, subprocess
+import cherrypy, htpc
 from Cheetah.Template import Template
 import urllib, urllib2, base64
 from PIL import Image, ImageEnhance
@@ -16,22 +17,19 @@ class Xbmc:
         return template.respond()
 
     @cherrypy.expose()
-    def getservers(self):
+    def Servers(self, server=None):
+        if (server):
+            htpc.xbmc = server
+            return "success"
+
         servers = htpc.settings.get('xbmc_labels')
         if servers:
-            servers = loads(htpc.settings.get('xbmc_labels'))
+            servers = loads(servers)
             try:
                 current = htpc.xbmc
             except:
                 current = servers[0]
             return dumps({'servers':servers, 'current':current})
-
-    @cherrypy.expose()
-    def setserver(self, **kwargs):
-        server = kwargs.get('server')
-        if (server):
-            htpc.xbmc = kwargs.get('server')
-            return 'success'
 
     @cherrypy.expose()
     def GetThumb(self, **kwargs):
@@ -41,74 +39,107 @@ class Xbmc:
         thumbOpacity = kwargs.get('o', 100)
         thumbParts = thumb.split('/')
         thumbFile = thumbParts.pop()
-        
-        thumbs = os.path.join(htpc.root, 'userdata/', 'xbmc_thumbs/')
-        if not os.path.isdir(thumbs):
-            os.makedirs(thumbs)
+        thumbType = thumbParts.pop()
 
-        thumbOnDisk = os.path.join(thumbs, thumbFile)
-        if not os.path.isfile(thumbOnDisk + '_' + thumbWidth + '_' + thumbHeight + '.png'):
-            # Hack when using nightly
+        xbmc_thumbs = os.path.join(htpc.root, 'userdata/', 'xbmc_thumbs/')
+        if not os.path.exists(xbmc_thumbs):
+            os.makedirs(xbmc_thumbs)
+
+        thumbOnDisk = os.path.join(xbmc_thumbs, thumbType + '_' + thumbFile)
+        fileOut = os.path.join(xbmc_thumbs, thumbOnDisk + '_' + thumbWidth + '_' + thumbHeight + '.png')
+
+        # If there is no local copy
+        if not os.path.isfile(thumbOnDisk):
+            # Hack when using Frodo
             if thumb[:5]== "image" :
                 url = urllib2.unquote(thumb[8:])
                 request = urllib2.Request(url)
             else :
-                request = urllib2.Request(self.url('/vfs/'+thumb))
+                request = urllib2.Request(self.url('/vfs/' + thumb))
                 auth = self.auth()
                 if (auth):
                     request.add_header("Authorization", "Basic %s" % auth)
-        
+
             fileObject = urllib2.urlopen(request)
             fileData = fileObject.read()
-        
-            # Find thumbmail
             f = open(thumbOnDisk, 'wb')
             f.write(fileData)
             f.close()
-        
-            # Resize thumbnail
-            thumbOpacity = float(thumbOpacity)
-            enhanceOpacity = (thumbOpacity / 100)
-        
-            width = int(thumbWidth)
-            height = int(thumbHeight)
-            image = Image.open(thumbOnDisk)
-            newimage = image.resize((width, height), Image.ANTIALIAS).convert('RGBA')
-            alpha = newimage.split()[3]
-            alpha = ImageEnhance.Brightness(alpha).enhance(enhanceOpacity)
-            newimage.putalpha(alpha)
-            newimage.save(thumbOnDisk + '_' + thumbWidth + '_' + thumbHeight + '.png')
-        
-            os.unlink(thumbOnDisk)
-        
-        f = open(thumbOnDisk + '_' + thumbWidth + '_' + thumbHeight + '.png', 'rb')
+
+        # if there is no resized version
+        if not os.path.isfile(fileOut):
+            widthInt = int(thumbWidth)
+            heightInt = int(thumbHeight)
+            imageResized = False
+
+            # Resize with sips on OSX
+            if platform.system() == 'Darwin' and not imageResized:
+                try:
+                    subprocess.call(['sips', '-z', thumbHeight, thumbWidth, thumbOnDisk, '--out', fileOut])
+                    imageResized = True
+                    print 'Used sips'
+                except OSError:
+                    pass
+
+            # Resize with ImageMagick on Linux
+            if platform.system() == 'Linux' and not imageResized:
+                try:
+                    subprocess.call(['convert', thumbOnDisk, '-resize', thumbWidth + 'x' + thumbHeight, fileOut])
+                    imageResized = True
+                    print 'Used ImageMagick'
+                except:
+                    pass
+
+            # resize PIL (for like openelec etc.)
+            if not imageResized:
+                try:
+                    image = Image.open(thumbOnDisk)
+                    newimage = image.resize((widthInt, heightInt), Image.ANTIALIAS).convert('RGBA')
+                    newimage.save(fileOut)
+                    print 'Used PIL'
+                except:
+                    pass
+
+        # If the image got resized fetch the resized one otherwise use the copy
+        # This is just a fallback (it makes the browser slow)
+        noresizeridentifier = os.path.join(htpc.root, 'userdata/', 'no_resizer_found');
+        if os.path.isfile(fileOut):
+            f = open(fileOut, 'rb')
+            try:
+                os.unlink(noresizeridentifier)
+            except:
+                pass
+        else:
+            f = open(thumbOnDisk, 'rb')
+            nf = open(noresizeridentifier, 'w')
+            nf.write('1')
+            nf.close()
         data = f.read()
         f.close()
-        
+        # Header setten en data returnen
         cherrypy.response.headers['Content-Type'] = "image/png"
         return data
 
     @cherrypy.expose()
-    def GetMovies(self, **kwargs):
-        limitstart = kwargs.get('start', 0)
-        limitend = kwargs.get('end', 0)
-        sortmethod = kwargs.get('sortmethod','videotitle')
-        sortorder = kwargs.get('sortorder','ascending')
+    def GetMovies(self, start=0, end=0, sortmethod='videotitle', sortorder='ascending', **kwargs):
         try:
-            xbmc = Server(self.url('/jsonrpc', True))
             ignorearticle = bool(htpc.settings.get('xbmc_ignorearticle',1))
+            xbmc = Server(self.url('/jsonrpc', True))
             data = xbmc.VideoLibrary.GetMovies(sort={'order': sortorder, 'method': sortmethod, 'ignorearticle': ignorearticle}, 
                                                properties=['title', 'year', 'plot', 'thumbnail', 'file', 'fanart', 'studio', 'trailer', 'genre', 'rating'], 
-                                               limits={'start': int(limitstart), 'end': int(limitend)})
+                                               limits={'start': int(start), 'end': int(end)})
             return dumps(data)
         except:
             return 
 
     @cherrypy.expose()
-    def GetShows(self, **kwargs):
+    def GetShows(self, start=0, end=0, sortmethod='videotitle', sortorder='ascending', **kwargs):
         try:
+            ignorearticle = bool(htpc.settings.get('xbmc_ignorearticle',1))
             xbmc = Server(self.url('/jsonrpc', True))
-            shows = xbmc.VideoLibrary.GetTVShows(properties=['title', 'year', 'plot', 'thumbnail', 'playcount'])
+            shows = xbmc.VideoLibrary.GetTVShows(sort={'order': sortorder, 'method': sortmethod, 'ignorearticle': ignorearticle},
+                                                 properties=['title', 'year', 'plot', 'thumbnail', 'playcount'],
+                                                 limits={'start': int(start), 'end': int(end)})
             if bool(htpc.settings.get('xbmc_hide_watched', 0)):
                 shows['tvshows'] = filter(lambda i: i['playcount'] == 0, shows['tvshows'])
             return dumps(shows)
@@ -116,11 +147,10 @@ class Xbmc:
             return
 
     @cherrypy.expose()
-    def GetShow(self, **kwargs):
-        id = int(kwargs.get('item'))
+    def GetShow(self, tvshowid=None, **kwargs):
         xbmc = Server(self.url('/jsonrpc', True))
-        showinfo = xbmc.VideoLibrary.GetTVShowDetails(tvshowid=id,properties=['title', 'thumbnail'])
-        episodes = xbmc.VideoLibrary.GetEpisodes(tvshowid=id,properties=['episode', 'season', 'thumbnail', 'plot', 'file','playcount'])
+        showinfo = xbmc.VideoLibrary.GetTVShowDetails(tvshowid=int(tvshowid),properties=['title', 'thumbnail'])
+        episodes = xbmc.VideoLibrary.GetEpisodes(tvshowid=int(tvshowid),properties=['episode', 'season', 'thumbnail', 'plot', 'file','playcount'])
         episodes = episodes[u'episodes']
         seasons = {}
         if bool(htpc.settings.get('xbmc_hide_watched', 0)):
@@ -132,8 +162,7 @@ class Xbmc:
         return dumps({'show' : showinfo, 'seasons' : seasons})
 
     @cherrypy.expose()
-    def PlayItem(self, **kwargs):
-        item = kwargs.get('item')
+    def PlayItem(self, item=None, **kwargs):
         xbmc = Server(self.url('/jsonrpc', True))
         data = xbmc.Player.Open(item={'file' : item})
         return dumps(data)
@@ -161,11 +190,24 @@ class Xbmc:
                         return
 
     @cherrypy.expose()
-    def ControlPlayer(self, **kwargs):
-        action = kwargs.get('do')
+    def ControlPlayer(self, action="", **kwargs):
         xbmc = Server(self.url('/jsonrpc', True))
         if action == 'SetMute':
             data = xbmc.Application.SetMute(mute='toggle')
+        elif action == 'Back':
+            data = xbmc.Input.Back()
+        elif action == 'Down':
+            data = xbmc.Input.Down()
+        elif action == 'Home':
+            data = xbmc.Input.Home()
+        elif action == 'Left':
+            data = xbmc.Input.Left()
+        elif action == 'Right':
+            data = xbmc.Input.Right()
+        elif action == 'Select':
+            data = xbmc.Input.Select()
+        elif action == 'Up':
+            data = xbmc.Input.Up()
         elif action == 'MoveLeft':
             data = xbmc.Input.Left()
         elif action == 'MoveRight':
@@ -176,8 +218,36 @@ class Xbmc:
         return dumps(data)
 
     @cherrypy.expose()
-    def System(self, **kwargs):
-        action = kwargs.get('do')
+    def Subtitles(self, subtitle='', **kwargs):
+        xbmc = Server(self.url('/jsonrpc', True))
+        player = xbmc.Player.GetActivePlayers()
+        if not player:
+            return 
+        try:
+            subtitle = int(subtitle)
+            xbmc.Player.SetSubtitle(playerid=player[0][u'playerid'], subtitle=subtitle)
+            xbmc.Player.SetSubtitle(playerid=player[0][u'playerid'], subtitle='on')
+        except ValueError:
+            xbmc.Player.SetSubtitle(playerid=player[0][u'playerid'], subtitle='off')
+        data = xbmc.Player.GetProperties(playerid=player[0][u'playerid'], properties=['subtitleenabled', 'currentsubtitle', 'subtitles'])
+        return dumps(data)
+
+    @cherrypy.expose()
+    def Audio(self, audio='', **kwargs):
+        xbmc = Server(self.url('/jsonrpc', True))
+        player = xbmc.Player.GetActivePlayers()
+        if not player:
+            return 
+        try:
+            audio = int(audio)
+            xbmc.Player.SetAudioStream(playerid=player[0][u'playerid'], stream=audio)
+        except ValueError:
+            pass
+        data = xbmc.Player.GetProperties(playerid=player[0][u'playerid'], properties=['currentaudiostream', 'audiostreams'])
+        return dumps(data)
+
+    @cherrypy.expose()
+    def System(self, action='', **kwargs):
         xbmc = Server(self.url('/jsonrpc', True))
         if action == 'Shutdown':
             return dumps(xbmc.System.Shutdown())
@@ -190,29 +260,31 @@ class Xbmc:
                 return dumps(xbmc.JSONRPC.Ping())
             except:
                 return
-        elif action == 'Wake':
-            macaddress = '00:01:2e:47:49:76'
-            try:
-                addr_byte = macaddress.split(':')
-                hw_addr = struct.pack('BBBBBB',
-                int(addr_byte[0], 16),
-                int(addr_byte[1], 16),
-                int(addr_byte[2], 16),
-                int(addr_byte[3], 16),
-                int(addr_byte[4], 16),
-                int(addr_byte[5], 16))
-
-                msg = '\xff' * 6 + hw_addr * 16
-                s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-                s.sendto(msg, ("255.255.255.255", 9))
-                return 'Success'
-            except:
-                return 'Failed to send WOL packet'
 
     @cherrypy.expose()
-    def Notify(self, **kwargs):
-        text = urllib2.unquote(kwargs.get('text')).encode('utf-8')
+    def Wake(self, **kwargs):
+        mac = '00:01:2e:47:49:76'
+        try:
+            addr_byte = mac.split(':')
+            hw_addr = struct.pack('BBBBBB',
+            int(addr_byte[0], 16),
+            int(addr_byte[1], 16),
+            int(addr_byte[2], 16),
+            int(addr_byte[3], 16),
+            int(addr_byte[4], 16),
+            int(addr_byte[5], 16))
+
+            msg = '\xff' * 6 + hw_addr * 16
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            s.sendto(msg, ("255.255.255.255", 9))
+            return 'Packet send to '+mac
+        except:
+            return 'Failed to send WOL packet'
+
+    @cherrypy.expose()
+    def Notify(self, text, **kwargs):
+        text = urllib2.unquote(text).encode('utf-8')
         command = {'command': 'ExecBuiltIn', 'parameter': 'Notification(\'HTPC Manager\', \'' + text + '\')' }
         request = urllib2.Request(self.url('/xbmcCmds/xbmcHttp/?' + urllib.urlencode(command)))
         auth = self.auth()
@@ -240,8 +312,7 @@ class Xbmc:
         return dumps(data)
 
     @cherrypy.expose()
-    def Clean(self, **kwargs):
-        lib = kwargs.get('lib','video')
+    def Clean(self, lib='video', **kwargs):
         xbmc = Server(self.url('/jsonrpc', True))
         if lib == 'video':
             return dumps(xbmc.VideoLibrary.Clean())
@@ -253,10 +324,6 @@ class Xbmc:
         xbmc = Server(self.url('/jsonrpc', True))
         data = xbmc.VideoLibrary.Scan()
         return dumps(data)
-
-    @cherrypy.expose()
-    def test(self):
-        return self.url('',True)
 
     def url(self, path='', auth=False):
         try:

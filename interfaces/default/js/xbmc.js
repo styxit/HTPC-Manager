@@ -4,10 +4,10 @@ $(document).ready(function() {
     loadXbmcShows();
     loadNowPlaying();
 
-    $.get('/xbmc/getservers', function (data) {
+    $.get('/xbmc/Servers', function (data) {
         if (data==null) return;
         var servers = $('<select>').change(function() {
-             $.get('/xbmc/setserver?server='+$(this).val(), function (data) {
+             $.get('/xbmc/Servers?server='+$(this).val(), function (data) {
                 notify('XBMC','Server change '+data,'info');
                 $('#movie-grid').empty();
                 allMoviesLoaded = false;
@@ -25,34 +25,64 @@ $(document).ready(function() {
         $('#servers').append(servers);
     }, 'json');
 
+    $(document).keydown(function (e) {
+        arrow = {8: 'Back', 13: 'Select', 37: 'Left', 38: 'Up', 39: 'Right', 40: 'Down'};
+        command = arrow[e.which];
+        if (command) {
+            xbmcControl(command);
+            e.preventDefault();
+        }
+    });
     $('#xbmc-notify').click(function () {
         msg = prompt("Message");
         if (msg) sendNotification(msg);
     });
     $('#xbmc-restart').click(function () {
-        $.get('/xbmc/System?do=Reboot', function(data){
+        $.get('/xbmc/System?action=Reboot', function(data){
             notify('Reboot','Rebooting...','warning');
         });
     });
     $('#xbmc-shutdown').click(function () {
-        $.get('/xbmc/System?do=Suspend', function(data){
+        $.get('/xbmc/System?action=Suspend', function(data){
             notify('Shutdown','Shutting down...','warning');
         });
     });
     $('#xbmc-wake').click(function () {
-        $.get('/xbmc/System?do=Wake', function(data){
+        $.get('/xbmc/Wake', function(data){
             notify('Wake','Sending WakeOnLan packet...','warning');
         });
     });
+
     $('#back-to-shows').click(function () {
         $('#show-details').hide();
         $('#show-grid').show();
     });
+    $.get('/xbmc/Subtitles', function (data) {
+        if (data==null) return;
+        var subtitles = $('#xbmc-subtitles').change(function() {
+             $.get('/xbmc/Subtitles?set='+$(this).val(), function (data) {
+             });
+        });
+        $.each(data.subtitles, function (i, item) {
+            var subtitle = $('<option>').text(item.name).val(item.index);
+            subtitles.append(subtitle);
+        });
+        subtitles.prepend($('<option>').text('Off').val('off'));
+        current = data.currentsubtitle.index;
+        if (data.subtitleenabled=='false') current = 'off';
+        $('#subtitles').append(subtitles).val(current);
+    }, 'json');
     $('#btn-clean-video-lib').click(function () {
         xbmcClean('video');
     });
     $('#btn-scan-video-lib').click(function () {
         xbmcScan('video');
+    });
+    $('#btn-clean-audio-lib').click(function () {
+        xbmcClean('audio');
+    });
+    $('#btn-scan-audio-lib').click(function () {
+        xbmcScan('audio');
     });
 
     $(window).scroll(function() {
