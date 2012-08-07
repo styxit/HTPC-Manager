@@ -111,9 +111,8 @@ function xbmcShowMovie(movie) {
             hideModal();
         }
     })
-
     $('.modal-fanart').css({
-        'background' : '#ffffff url(/xbmc/GetThumb?thumb='+encodeURIComponent(movie.fanart)+'&w=675&h=400&o=15) top center no-repeat',
+        'background' : '#ffffff url(/xbmc/GetThumb?thumb='+encodeURIComponent(movie.fanart)+'&w=675&h=400&o=10) top center no-repeat',
         'background-size' : '100%'
     });
 }
@@ -229,7 +228,7 @@ function xbmcShowEpisode(episode) {
     })
 
     $('.modal-fanart').css({
-        'background' : '#ffffff url(/xbmc/GetThumb?thumb=' + encodeURIComponent(episode.fanart) + '&w=675&h=400&o=15) top center',
+        'background' : '#ffffff url(/xbmc/GetThumb?thumb=' + encodeURIComponent(episode.fanart) + '&w=675&h=400&o=10) top center',
         'background-size' : '100%;'
     });
 }
@@ -373,8 +372,6 @@ function loadNowPlaying() {
                     'margin-bottom' : '10px'
                 });
                 $('#nowplaying-fanart').addClass('trans');
-
-                $('<hr />').insertAfter('#nowplaying');
             }
 
             var playPauseButton = $('[data-player-control=PlayPause]');

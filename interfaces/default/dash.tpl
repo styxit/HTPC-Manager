@@ -3,27 +3,6 @@
 <div class="container">
     <div class="content maincontent">
         <h1 class="page-header page-title">Dashboard</h1>
-        <div class="well hide" id="nowplaying">
-            <div class="row">
-                <div class="span2">
-                    <div class="thumbnail"></div>
-                </div>
-                <div class="span9">
-                    <h2 id="player-item-title"></h2>
-                    <h2><small id="player-item-time"></small></h2>
-                    <div class="progress" id="player-progressbar">
-                        <div class="bar active"></div>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn" data-player-control="MoveLeft"><i class="icon-backward"></i></button>
-                        <button class="btn" data-player-control="Stop"><i class="icon-stop"></i></button>
-                        <button class="btn" data-player-control="PlayPause"><i class="icon-pause"></i></button>
-                        <button class="btn" data-player-control="MoveRight"><i class="icon-forward"></i></button>
-                        <button class="btn" data-player-control="SetMute"><i class="icon-volume-off"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="row-fluid">
             #if $getVar('use_dash_rec_movies', 0)
             <div class="span4">

@@ -7,6 +7,9 @@ html, body {
     background-color: #eee;
     background: url('/img/rough_diagonal.png');
 }
+#subtitles, #audio {
+    text-align: left;
+}
 #playlist_table td i {
     float: right;
     display: none;

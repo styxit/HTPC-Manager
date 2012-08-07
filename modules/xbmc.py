@@ -69,10 +69,12 @@ class Xbmc:
         if not os.path.isfile(fileOut):
             widthInt = int(thumbWidth)
             heightInt = int(thumbHeight)
+            opacityFloat = float(thumbOpacity)
+            enhance = opacityFloat/100
             imageResized = False
 
             # Resize with sips on OSX
-            if platform.system() == 'Darwin' and not imageResized:
+            if False and platform.system() == 'Darwin' and not imageResized:
                 try:
                     subprocess.call(['sips', '-z', thumbHeight, thumbWidth, thumbOnDisk, '--out', fileOut])
                     imageResized = True
@@ -81,12 +83,12 @@ class Xbmc:
                     pass
 
             # Resize with ImageMagick on Linux
-            if platform.system() == 'Linux' and not imageResized:
+            if False and platform.system() == 'Linux' and not imageResized:
                 try:
                     subprocess.call(['convert', thumbOnDisk, '-resize', thumbWidth + 'x' + thumbHeight, fileOut])
                     imageResized = True
                     print 'Used ImageMagick'
-                except:
+                except OSError:
                     pass
 
             # resize PIL (for like openelec etc.)
@@ -94,6 +96,9 @@ class Xbmc:
                 try:
                     image = Image.open(thumbOnDisk)
                     newimage = image.resize((widthInt, heightInt), Image.ANTIALIAS).convert('RGBA')
+                    alpha = newimage.split()[3]
+                    alpha = ImageEnhance.Brightness(alpha).enhance(enhance)
+                    newimage.putalpha(alpha)
                     newimage.save(fileOut)
                     print 'Used PIL'
                 except:
@@ -115,7 +120,6 @@ class Xbmc:
             nf.close()
         data = f.read()
         f.close()
-        # Header setten en data returnen
         cherrypy.response.headers['Content-Type'] = "image/png"
         return data
 
@@ -223,12 +227,14 @@ class Xbmc:
         if not player:
             return 
         try:
-            subtitle = int(subtitle)
-            xbmc.Player.SetSubtitle(playerid=player[0][u'playerid'], subtitle=subtitle)
-            xbmc.Player.SetSubtitle(playerid=player[0][u'playerid'], subtitle='on')
+            if subtitle:
+                subtitle = int(subtitle)
+                xbmc.Player.SetSubtitle(playerid=player[0][u'playerid'], subtitle=subtitle)
+                xbmc.Player.SetSubtitle(playerid=player[0][u'playerid'], subtitle='on')
         except ValueError:
             xbmc.Player.SetSubtitle(playerid=player[0][u'playerid'], subtitle='off')
         data = xbmc.Player.GetProperties(playerid=player[0][u'playerid'], properties=['subtitleenabled', 'currentsubtitle', 'subtitles'])
+        data['subtitles'].insert(0, {'index':'off', 'name':'Off'})
         return dumps(data)
 
     @cherrypy.expose()
@@ -319,10 +325,12 @@ class Xbmc:
             return dumps(xbmc.AudioLibrary.Clean())
 
     @cherrypy.expose()
-    def Scan(self):
+    def Scan(self, lib='video'):
         xbmc = Server(self.url('/jsonrpc', True))
-        data = xbmc.VideoLibrary.Scan()
-        return dumps(data)
+        if lib == 'video':
+            return dumps(xbmc.VideoLibrary.Scan())
+        elif lib == 'audio':
+            return dumps(xbmc.AudioLibrary.Scan())
 
     def url(self, path='', auth=False):
         try:

@@ -21,7 +21,7 @@ function getMovieList() {
     $('.tooltip').remove();
     $('#movies_table_body').children().remove();
     $.ajax({
-        url: '/couchpotato/GetMovieList?limit='+limit,
+        url: '/couchpotato/GetMovieList',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -54,14 +54,13 @@ function getMovieList() {
                 var info = $('<td>');
                 row.append(info.html(movieHtml));
 
-                /*
-                 * List accepted profiles. Removed for now.
+                /* Ignore profiles for now
                 $.each(item.profile.types, function(i, item) {
                     var profile = $('<span>');
                     profile.addClass('label');
                     profile.html(item.id);
                     info.append(profile);
-                    info.append('&nbsp;');
+                    info.append(' ');
                 });
                 */
 

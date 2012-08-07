@@ -29,8 +29,8 @@ $(document).ready(function() {
         arrow = {8: 'Back', 13: 'Select', 37: 'Left', 38: 'Up', 39: 'Right', 40: 'Down'};
         command = arrow[e.which];
         if (command) {
-            xbmcControl(command);
             e.preventDefault();
+            xbmcControl(command);
         }
     });
     $('#xbmc-notify').click(function () {
@@ -52,25 +52,40 @@ $(document).ready(function() {
             notify('Wake','Sending WakeOnLan packet...','warning');
         });
     });
-
     $('#back-to-shows').click(function () {
         $('#show-details').hide();
         $('#show-grid').show();
     });
     $.get('/xbmc/Subtitles', function (data) {
         if (data==null) return;
-        var subtitles = $('#xbmc-subtitles').change(function() {
-             $.get('/xbmc/Subtitles?set='+$(this).val(), function (data) {
-             });
-        });
-        $.each(data.subtitles, function (i, item) {
-            var subtitle = $('<option>').text(item.name).val(item.index);
-            subtitles.append(subtitle);
-        });
-        subtitles.prepend($('<option>').text('Off').val('off'));
         current = data.currentsubtitle.index;
-        if (data.subtitleenabled=='false') current = 'off';
-        $('#subtitles').append(subtitles).val(current);
+        if (data.subtitleenabled==false) current = 'off';
+        var subtitles = $('#subtitles').empty();
+        $.each(data.subtitles, function (i, item) {
+            var link = $('<a>').attr('href','#').text(item.name).click(function(e) {
+                e.preventDefault();
+                $.get('/xbmc/Subtitles?subtitle='+item.index, function (data) {
+                    notify('Subtitles','Change successful','info');
+                });
+            });
+            if (item.index==current) link.prepend($('<i>').addClass('icon-ok'));
+            subtitles.append($('<li>').append(link));
+        });
+    }, 'json');
+    $.get('/xbmc/Audio', function (data) {
+        if (data==null) return;
+        current = data.currentaudiostream.index;
+        var audio = $('#audio').empty();
+        $.each(data.audiostreams, function (i, item) {
+            var link = $('<a>').attr('href','#').text(item.name).click(function(e) {
+                e.preventDefault();
+                $.get('/xbmc/Audio?audio='+item.index, function (data) {
+                    notify('Audio','Change successful','info');
+                });
+            });
+            if (item.index==current) link.prepend($('<i>').addClass('icon-ok'));
+            audio.append($('<li>').append(link));
+        });
     }, 'json');
     $('#btn-clean-video-lib').click(function () {
         xbmcClean('video');

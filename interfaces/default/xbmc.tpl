@@ -22,14 +22,26 @@
                     <h2 id="player-item-title"></h2>
                     <h2><small id="player-item-time"></small></h2>
                     <div class="progress" id="player-progressbar">
-                        <div class="bar active" style="width: 0%"></div>
+                        <div class="bar active"></div>
                     </div>
-                    <div class="btn-group">
-                        <button class="btn" data-player-control="MoveLeft"><i class="icon-backward"></i></button>
-                        <button class="btn" data-player-control="Stop"><i class="icon-stop"></i></button>
-                        <button class="btn" data-player-control="PlayPause"><i class="icon-pause"></i></button>
-                        <button class="btn" data-player-control="MoveRight"><i class="icon-forward"></i></button>
-                        <button class="btn" data-player-control="SetMute"><i class="icon-volume-off"></i></button>
+                    <div class="btn-toolbar">
+                        <div class="btn-group">
+                            <button class="btn" data-player-control="MoveLeft"><i class="icon-backward"></i></button>
+                            <button class="btn" data-player-control="Stop"><i class="icon-stop"></i></button>
+                            <button class="btn" data-player-control="PlayPause"><i class="icon-pause"></i></button>
+                            <button class="btn" data-player-control="MoveRight"><i class="icon-forward"></i></button>
+                            <button class="btn" data-player-control="SetMute"><i class="icon-volume-off"></i></button>
+                        </div>
+                        <div class="btn-group">
+                            <span class="btn dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown"><i class="icon-text-width"></i></a>
+                                <ul class="dropdown-menu" id="subtitles"></ul>
+                            </span>
+                            <span class="btn dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown"><i class="icon-headphones"></i></a>
+                                <ul class="dropdown-menu" id="audio"></ul>
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -79,14 +91,15 @@
             <div class="tab-pane" id="misc">
             <div class="row-fluid">
                 <fieldset class="span4 form-horizontal">
-                    <legend>Actions</legend>
+                    <legend>Video library</legend>
                     <div class="control-group">
-                        <button class="btn" id="btn-scan-video-lib">Update video library</button>
-                        <button class="btn" id="btn-clean-video-lib">Clean video library</button>
+                        <button class="btn" id="btn-scan-video-lib">Update</button>
+                        <button class="btn" id="btn-clean-video-lib">Clean</button>
                     </div>
+                    <legend>Music library</legend>
                     <div class="control-group">
-                        <button class="btn" id="btn-scan-music-lib">Update music library</button>
-                        <button class="btn" id="btn-clean-music-lib">Clean music library</button>
+                        <button class="btn" id="btn-scan-music-lib">Update</button>
+                        <button class="btn" id="btn-clean-music-lib">Clean</button>
                     </div>
                 </fieldset>
             <!--
@@ -108,17 +121,6 @@
                     </div>
                 </fieldset>
             -->
-                <fieldset class="span4">
-                    <legend>Audio and subtitles</legend>
-                    <label class="control-label" for="audio">Audio</label>
-                    <div class="controls">
-                        <select id="xbmc-audio"></select>
-                    </div>
-                    <label class="control-label" for="xbmc-subtitles">Subtitles</label>
-                    <div class="controls">
-                        <select id="xbmc-subtitles"></select>
-                    </div>
-                </fieldset>
             </div>
         </div>
     </div>

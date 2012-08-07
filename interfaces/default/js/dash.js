@@ -1,43 +1,11 @@
 $(document).ready(function () {
-    //loadDiskSpace();
-    enablePlayerControls();
-    loadNowPlaying();
     loadRecentMovies();
     loadRecentTVshows();
     loadRecentAlbums();
-    loadNextAired({
-        limit: 5
-    });
+    loadNextAired({limit: 5});
     loadWantedMovies(5);
     loadDownloadHistory();
 });
-
-function loadDiskSpace() {
-    $.ajax({
-        url: '/system/diskspace',
-        type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            $.each(data, function (disk, info) {
-                var bytesUsed = (info.TOTAL_DISK_SPACE - info.TOTAL_FREE);
-                var percentageUsed = (bytesUsed / ((info.TOTAL_DISK_SPACE) / 100));
-                if (isNaN(percentageUsed)) {
-                    return true;
-                }
-                var title = $('<h5>').html(disk);
-                $('#hdd-info').append(title);
-                var subTitle = $('<h6>').html(Math.round(percentageUsed) + '%, ' + bytesToSize(bytesUsed, 2) + '  / ' + bytesToSize(info.TOTAL_DISK_SPACE, 2));
-                $('#hdd-info').append(subTitle);
-
-                var progress = $('<div>').addClass('progress');
-                var progressBar = $('<div>').addClass('bar').width(Math.round(percentageUsed) + '%');
-                progress.append(progressBar);
-
-                $('#hdd-info').append(progress);
-            });
-        }
-    });
-}
 
 function loadRecentMovies () {
     $.ajax({
