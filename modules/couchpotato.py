@@ -11,7 +11,7 @@ class CouchPotato:
 
     @cherrypy.expose()
     def index(self):
-        template = Template(file=os.path.join(htpc.template, 'couchpotato.tpl'), searchList=[htpc.settings])
+        template = Template(file=os.path.join(htpc.webdir, 'couchpotato.tpl'), searchList=[htpc.settings])
         template.jsfile = 'couchpotato.js'
         return template.respond()
 

@@ -12,7 +12,7 @@ class Sickbeard:
 
     @cherrypy.expose()
     def index(self):
-        template = Template(file=os.path.join(htpc.template, 'sickbeard.tpl'), searchList=[htpc.settings])
+        template = Template(file=os.path.join(htpc.webdir, 'sickbeard.tpl'), searchList=[htpc.settings])
         template.jsfile = 'sickbeard.js'
         return template.respond()
 

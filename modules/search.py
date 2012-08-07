@@ -28,7 +28,7 @@ class Search:
 
         searchString = kwargs.get('search','')
         htpc.settings.update({'search':searchString})
-        template = Template(file=os.path.join(htpc.template, 'search.tpl'), searchList=[htpc.settings])
+        template = Template(file=os.path.join(htpc.webdir, 'search.tpl'), searchList=[htpc.settings])
         template.jsfile = 'search.js'
         return template.respond()
 

@@ -12,7 +12,7 @@ from htpc.tools import readSettings
 class Xbmc:
     @cherrypy.expose()
     def index(self):
-        template = Template(file=os.path.join(htpc.template, 'xbmc.tpl'), searchList=[htpc.settings])
+        template = Template(file=os.path.join(htpc.webdir, 'xbmc.tpl'), searchList=[htpc.settings])
         template.jsfile = 'xbmc.js'
         return template.respond()
 
@@ -41,7 +41,7 @@ class Xbmc:
         thumbFile = thumbParts.pop()
         thumbType = thumbParts.pop()
 
-        xbmc_thumbs = os.path.join(htpc.root, 'userdata/', 'xbmc_thumbs/')
+        xbmc_thumbs = os.path.join(htpc.datadir, 'xbmc_thumbs/')
         if not os.path.exists(xbmc_thumbs):
             os.makedirs(xbmc_thumbs)
 
@@ -106,7 +106,7 @@ class Xbmc:
 
         # If the image got resized fetch the resized one otherwise use the copy
         # This is just a fallback (it makes the browser slow)
-        noresizeridentifier = os.path.join(htpc.root, 'userdata/', 'no_resizer_found');
+        noresizeridentifier = os.path.join(htpc.datadir, 'no_resizer_found');
         if os.path.isfile(fileOut):
             f = open(fileOut, 'rb')
             try:

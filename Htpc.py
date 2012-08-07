@@ -10,40 +10,56 @@ def main():
     import shutil, argparse, cherrypy
     from htpc.tools import readSettings
 
-    # Set default conf file and copy sample if it doesnt exist
-    htpc.config = os.path.join(htpc.root, 'userdata/config.cfg')
-    if not os.path.isfile(htpc.config):
-        sample = os.path.join(htpc.root, 'userdata/sample-config.cfg')
-        shutil.copy(sample, htpc.config)
-
     # Get variables from commandline
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', default=htpc.config)
-    parser.add_argument('-p', '--port', type=int)
-    parser.add_argument('-d', '--daemon', action='store_true', default=0)
+    parser.add_argument('--config')
+    parser.add_argument('--datadir')
+    parser.add_argument('--port', type=int)
+    parser.add_argument('--daemon', action='store_true', default=0)
+    parser.add_argument('--debug', action='store_true', default=0)
+    parser.add_argument('--pid', default=0)
     args = parser.parse_args()
 
-    # Confirm configuration file exists
-    if not os.path.isfile(args.config):
-        sys.exit("Configuration file: "+args.config+" doesn't exist.")
+    # Set default conf file and copy sample if it doesnt exist
+    htpc.datadir = os.path.join(htpc.root, 'userdata/')
+    if args.datadir:
+        if os.path.isdir(args.datadir):
+            if os.access(args.datadir, os.W_OK):
+                htpc.datadir = args.datadir
+            else:
+                print "No write access to datadir"
+                sys.exit()
+        else:
+            print "Datadir does not exist"
+            sys.exit()
 
-    htpc.configfile = args.config
-    htpc.settings = readSettings(args.config)
+    htpc.configfile = os.path.join(htpc.datadir, 'config.cfg')
+    if args.config:
+        htpc.configfile = args.config
+
+    htpc.settings = readSettings(htpc.configfile)
+
+    htpc.template = htpc.settings.get('template')
+    htpc.webdir = htpc.settings.get('webdir')
+
     if args.port:
         htpc.settings['app_port'] = args.port
-    htpc.template = htpc.settings.get('webdir','default')
+
+    if not args.debug:
+        cherrypy.config.update({
+            'environment': 'production'
+        })
 
     # If running on windows ignore daemon
     if args.daemon and sys.platform == 'win32':
         print "Daemon mode not possible on Windows. Starting normally"
-        #args.daemon = 0
+        args.daemon = 0
 
-    # Set server parameters
+    # Set server ip, port and root
     cherrypy.config.update({
-        #'environment': 'production',
-        'server.socket_host': htpc.settings['app_host'],
-        'server.socket_port': htpc.settings['app_port'],
-        'server.root': htpc.root,
+        'server.socket_host': htpc.settings.get('app_host', '0.0.0.0'),
+        'server.socket_port': htpc.settings.get('app_port', 8085),
+        'server.root': htpc.root
     })
 
     # Genereate a root configuration
@@ -63,7 +79,7 @@ def main():
         get_ha1 = cherrypy.lib.auth_digest.get_ha1_dict_plain(userpassdict)
         rootConfig.update({
             'tools.auth_digest.on': True,
-            'tools.auth_digest.realm': htpc.settings.get('app_name'),
+            'tools.auth_digest.realm': htpc.settings.get('app_name', 'HTPC Manager'),
             'tools.auth_digest.get_ha1': get_ha1,
             'tools.auth_digest.key': 'a565c27146791cfb'
         })
@@ -96,10 +112,13 @@ def main():
     from htpc.index import Root
     from htpc.system import System
 
+    # Generate PID
+    if args.pid:
+        cherrypy.process.plugins.PIDFile(cherrypy.engine, args.pid).subscribe()
+
     # Daemonize if wanted
     if args.daemon:
-        print "Daemonizing through commandline deactivated due to bug"
-        #cherrypy.process.plugins.Daemonizer(cherrypy.engine).subscribe()
+        cherrypy.process.plugins.Daemonizer(cherrypy.engine).subscribe()
 
     # Start the CherryPy server
     cherrypy.quickstart(Root(), config=appConfig)

@@ -6,7 +6,7 @@ from json import dumps
 class Squeezebox:
     @cherrypy.expose()
     def index(self):
-        template = Template(file=os.path.join(htpc.template, 'squeezebox.tpl'), searchList=[htpc.settings])
+        template = Template(file=os.path.join(htpc.webdir, 'squeezebox.tpl'), searchList=[htpc.settings])
         template.jsfile = 'squeezebox.js'
         return template.respond()
 

@@ -16,7 +16,7 @@ class Sabnzbd:
 
     @cherrypy.expose()
     def index(self):
-        template = Template(file=os.path.join(htpc.template, 'sabnzbd.tpl'), searchList=[htpc.settings])
+        template = Template(file=os.path.join(htpc.webdir, 'sabnzbd.tpl'), searchList=[htpc.settings])
         template.jsfile = 'sabnzbd.js'
         return template.respond()
 

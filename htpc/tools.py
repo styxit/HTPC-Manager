@@ -1,4 +1,5 @@
 import os, shutil, ConfigParser
+import htpc
 from urllib2 import urlopen
 
 def SafeFetchFromUrl(url):
@@ -8,26 +9,27 @@ def SafeFetchFromUrl(url):
         return ''
 
 def readSettings(configfile='', section='htpc'):
-    if not os.path.isfile(configfile):
-        return {}
-
-    config = ConfigParser.ConfigParser()
-    config.read(configfile)
-    items = config.items(section)
-
     configDict = {}
-    for key, val in items:
-        try:
-            configDict[key] = int(val)
-        except ValueError:
-            configDict[key] = val
+
+    if os.path.isfile(configfile):
+        config = ConfigParser.ConfigParser()
+        config.read(configfile)
+        items = config.items(section)
+
+        for key, val in items:
+            try:
+                configDict[key] = int(val)
+            except ValueError:
+                configDict[key] = val
 
     if section == 'htpc':
         template = os.path.join('interfaces/', configDict.get('template','default'))
+        webdir = os.path.join(htpc.root, template)
         templates = os.listdir("interfaces/")
         themes = os.listdir(os.path.join(template, "css/themes/"))
         configDict.update({
-            'webdir': template,
+            'template': template,
+            'webdir': webdir,
             'templates': templates,
             'themes': themes
         })
@@ -56,8 +58,3 @@ def saveSettings(configfile, data, section = 'htpc'):
         config.write(f)
 
     return readSettings(configfile)
-
-def removeThumbs():
-    thumbs = os.path.join('userdata/', '/xbmc_thumbs/')
-    if os.path.isdir(thumbs):
-        shutil.rmtree(thumbs)
