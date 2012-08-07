@@ -19,6 +19,7 @@ def main():
     # Get variables from commandline
     parser = argparse.ArgumentParser()
     parser.add_argument('-c', '--config', default=htpc.config)
+    parser.add_argument('-p', '--port', type=int)
     parser.add_argument('-d', '--daemon', action='store_true', default=0)
     args = parser.parse_args()
 
@@ -28,6 +29,8 @@ def main():
 
     htpc.configfile = args.config
     htpc.settings = readSettings(args.config)
+    if args.port:
+        htpc.settings['app_port'] = args.port
     htpc.template = htpc.settings.get('webdir','default')
 
     # If running on windows ignore daemon
