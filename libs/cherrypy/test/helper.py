@@ -29,7 +29,7 @@ def get_tst_config(overconf = {}):
         conf = {
             'scheme': 'http',
             'protocol': "HTTP/1.1",
-            'port': 8080,
+            'port': 54583,
             'host': '127.0.0.1',
             'validate': False,
             'conquer': False,
@@ -300,6 +300,9 @@ class CPWebCase(webtest.WebCase):
         if self.do_gc_test:
             self.getPage("/gc/stats")
             self.assertBody("Statistics:")
+    # Tell nose to run this last in each class.
+    # Prefer sys.maxint for Python 2.3, which didn't have float('inf')
+    test_gc.compat_co_firstlineno = getattr(sys, 'maxint', None) or float('inf')
     
     def prefix(self):
         return self.script_name.rstrip("/")
