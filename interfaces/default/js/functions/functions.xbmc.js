@@ -400,7 +400,7 @@ function loadNowPlaying() {
             var itemTitel = $('#player-item-title')
             var playingTitle = '';
             if (data.itemInfo.item.type == 'episode') {
-                playingTitle = data.itemInfo.item.showtitle + ' - ' + data.itemInfo.item.season + 'x' + data.itemInfo.item.episode + ' ' + data.itemInfo.item.label
+                playingTitle = data.itemInfo.item.showtitle + ' ' + data.itemInfo.item.label
             }
             if (data.itemInfo.item.type == 'movie') {
                 playingTitle = data.itemInfo.item.label + ' (' + data.itemInfo.item.year + ')';
