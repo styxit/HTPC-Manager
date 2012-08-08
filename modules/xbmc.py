@@ -334,7 +334,7 @@ class Xbmc:
 
     def url(self, path='', auth=False):
         try:
-            settings = readSettings(htpc.configfile, htpc.xbmc)
+            settings = readSettings(htpc.xbmc)
         except:
             settings = htpc.settings
         host = settings.get('xbmc_host', '')
@@ -351,4 +351,4 @@ class Xbmc:
         if username and password:
             return base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
 
-cherrypy.tree.mount(Xbmc(), "/xbmc/")
+htpc.root.xbmc = Xbmc()

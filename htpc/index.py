@@ -16,7 +16,7 @@ class Root:
     @cherrypy.expose()
     def settings(self, **kwargs):
         if kwargs:
-            htpc.settings = saveSettings(htpc.configfile,kwargs)
+            htpc.settings = saveSettings(kwargs)
 
         template = Template(file=os.path.join(htpc.webdir, 'settings.tpl'), searchList=[htpc.settings])
         template.jsfile = 'settings.js'

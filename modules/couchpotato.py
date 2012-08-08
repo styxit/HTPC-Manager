@@ -40,4 +40,4 @@ class CouchPotato:
     def AddMovie(self, **kwargs):
         return SafeFetchFromUrl(self.url + 'movie.add/?profile_id='+kwargs.get('profile_id')+'&identifier='+kwargs.get('identifier')+'&title='+kwargs.get('title'))
 
-cherrypy.tree.mount(CouchPotato(), "/couchpotato")
+htpc.root.couchpotato = CouchPotato()

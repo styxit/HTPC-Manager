@@ -42,18 +42,17 @@
             #end if
         </div>
         <div class="row-fluid">
-            #if $getVar('use_dash_sickbeard', 0)
+            #if $getVar('use_dash_sabnzbd', 0)
             <div class="span4">
-                <h3><a href="/sickbeard/#nextaired">Next aired</a></h3>
+                <h3><a href="/sabnzbd/#history">Latest downloads</a></h3>
                 <table class="table table-striped table-main">
                     <thead>
                         <tr>
-                            <th>Showname</th>
-                            <th>Episode</th>
-                            <th>Airdate</th>
+                            <th>File</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="nextaired_table_body"></tbody>
+                    <tbody id="downloads_table_body"></tbody>
                 </table>
             </div>
             #end if
@@ -71,17 +70,18 @@
                 </table>
             </div>
             #end if
-            #if $getVar('use_dash_sabnzbd', 0)
+            #if $getVar('use_dash_sickbeard', 0)
             <div class="span4">
-                <h3><a href="/sabnzbd/#history">Latest downloads</a></h3>
+                <h3><a href="/sickbeard/#nextaired">Next aired</a></h3>
                 <table class="table table-striped table-main">
                     <thead>
                         <tr>
-                            <th>File</th>
-                            <th>Status</th>
+                            <th>Showname</th>
+                            <th>Episode</th>
+                            <th>Airdate</th>
                         </tr>
                     </thead>
-                    <tbody id="downloads_table_body"></tbody>
+                    <tbody id="nextaired_table_body"></tbody>
                 </table>
             </div>
             #end if

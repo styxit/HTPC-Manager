@@ -69,4 +69,4 @@ class Sabnzbd:
     def SetSpeed(self, **kwargs):
         return SafeFetchFromUrl(self.url + '&mode=config&name=speedlimit&value=' + str(kwargs.get('speed')))
 
-cherrypy.tree.mount(Sabnzbd(), "/sabnzbd/")
+htpc.root.sabnzbd = Sabnzbd()

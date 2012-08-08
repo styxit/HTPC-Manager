@@ -94,7 +94,6 @@ class Squeezebox:
             return base64.encodestring('%s:%s' % (username, password)).strip()
 
     def jsonRequest(self, player, params):
-        print self.webhost('/jsonrpc.js')
         data = dumps({"id":1,"method":"slim.request","params":[player,params]})
         request = urllib2.Request(self.webhost('jsonrpc.js'), data)
         auth = self.auth()
@@ -103,4 +102,4 @@ class Squeezebox:
         result = urllib2.urlopen(request, timeout=5).read()
         return result.decode('utf-8')
 
-cherrypy.tree.mount(Squeezebox(), "/squeezebox/")
+htpc.root.squeezebox = Squeezebox()

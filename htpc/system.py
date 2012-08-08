@@ -1,5 +1,5 @@
-import os, sys, shutil
-import cherrypy
+import os, sys, shutil, cherrypy
+import htpc
 import htpc.updater as updater
 from json import dumps
 
@@ -36,4 +36,4 @@ class System:
         cherrypy.server.start()
         return dumps({'update':'success'})
 
-cherrypy.tree.mount(System(), "/system/")
+htpc.root.system = System()

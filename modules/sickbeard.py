@@ -49,4 +49,4 @@ class Sickbeard:
         seriesname = quote(kwargs.get('query'))
         return SafeFetchFromUrl('http://www.thetvdb.com/api/GetSeries.php?seriesname='+seriesname)
 
-cherrypy.tree.mount(Sickbeard(), "/sickbeard/")
+htpc.root.sickbeard = Sickbeard()

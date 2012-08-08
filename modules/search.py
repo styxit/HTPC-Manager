@@ -120,4 +120,4 @@ class Search:
             ]}
         ])
 
-cherrypy.tree.mount(Search(), "/search/")
+htpc.root.search = Search()
