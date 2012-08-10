@@ -1,7 +1,6 @@
 import os, cherrypy, htpc
-from Cheetah.Template import Template
 from urllib import quote
-from htpc.tools import SafeFetchFromUrl
+from htpc.tools import template, SafeFetchFromUrl
 
 class Sickbeard:
     def __init__(self):
@@ -12,9 +11,7 @@ class Sickbeard:
 
     @cherrypy.expose()
     def index(self):
-        template = Template(file=os.path.join(htpc.webdir, 'sickbeard.tpl'), searchList=[htpc.settings])
-        template.jsfile = 'sickbeard.js'
-        return template.respond()
+        return template('sickbeard.html')
 
     @cherrypy.expose()
     def GetShowList(self):

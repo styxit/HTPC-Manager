@@ -1,13 +1,10 @@
 import os, cherrypy, htpc
-from Cheetah.Template import Template
-from htpc.tools import saveSettings
+from htpc.tools import template, saveSettings
 
 class Root:
     @cherrypy.expose()
     def index(self):
-        template = Template(file=os.path.join(htpc.webdir, 'dash.tpl'), searchList=[htpc.settings]);
-        template.jsfile = 'dash.js'
-        return template.respond()
+        return template('dash.html')
 
     @cherrypy.expose()
     def default(self, *args, **kwargs):
@@ -17,7 +14,4 @@ class Root:
     def settings(self, **kwargs):
         if kwargs:
             htpc.settings = saveSettings(kwargs)
-
-        template = Template(file=os.path.join(htpc.webdir, 'settings.tpl'), searchList=[htpc.settings])
-        template.jsfile = 'settings.js'
-        return template.respond()
+        return template('settings.html')

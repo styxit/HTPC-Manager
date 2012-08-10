@@ -12,8 +12,8 @@ $(document).ready(function() {
     $('#search_movie_name').popover({
         placement: 'bottom',
         title: 'Search result',
-        trigger: 'manual',
-        content: '<div class="gif-loader" id="movie-loader"><img src="img/loader.gif" alt="loader" /></div><table class="table"><tbody id="search-movie-list"></tbody></table>'
+        trigger: 'focus',
+        content: '<div class="gif-loader" id="movie-loader"><img src="/img/loader.gif" alt="loader" /></div><table class="table"><tbody id="search-movie-list"></tbody></table>'
     });
 });
 
@@ -153,8 +153,6 @@ function searchMovie(q) {
                 });
                 row.append($('<td>').append(addIcon));
                 $('#search-movie-list').append(row);
-
-                var close = $('<span>&times;test</span>');
             });
         }
     });

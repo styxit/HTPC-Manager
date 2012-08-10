@@ -1,7 +1,6 @@
 import os, cherrypy, htpc
-from Cheetah.Template import Template
 from urllib import quote
-from htpc.tools import SafeFetchFromUrl
+from htpc.tools import template, SafeFetchFromUrl
 
 class Sabnzbd:
     def __init__(self):
@@ -16,9 +15,7 @@ class Sabnzbd:
 
     @cherrypy.expose()
     def index(self):
-        template = Template(file=os.path.join(htpc.webdir, 'sabnzbd.tpl'), searchList=[htpc.settings])
-        template.jsfile = 'sabnzbd.js'
-        return template.respond()
+        return template('sabnzbd.html')
 
     @cherrypy.expose()
     def GetHistory(self, **kwargs):

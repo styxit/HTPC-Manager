@@ -1,5 +1,4 @@
-import os, sys, shutil, cherrypy
-import htpc
+import os, sys, shutil, cherrypy, htpc
 import htpc.updater as updater
 from json import dumps
 

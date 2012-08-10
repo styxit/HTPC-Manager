@@ -1,9 +1,8 @@
 import os, cherrypy, htpc
-from Cheetah.Template import Template
 from urllib import urlencode
 from re import findall
 from json import dumps
-from htpc.tools import SafeFetchFromUrl
+from htpc.tools import template, SafeFetchFromUrl
 
 class Search:
     def __init__(self):
@@ -28,9 +27,7 @@ class Search:
 
         searchString = kwargs.get('search','')
         htpc.settings.update({'search':searchString})
-        template = Template(file=os.path.join(htpc.webdir, 'search.tpl'), searchList=[htpc.settings])
-        template.jsfile = 'search.js'
-        return template.respond()
+        return template('search.html')
 
     def nzbMatrixSearch(self, options, page):
         url = self.url + page + '?apikey='+self.apikey+'&'

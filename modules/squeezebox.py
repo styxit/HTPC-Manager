@@ -1,14 +1,12 @@
 import os, cherrypy, htpc
-from Cheetah.Template import Template
 import urllib2, base64, cherrypy
+from htpc.tools import template
 from json import dumps
 
 class Squeezebox:
     @cherrypy.expose()
     def index(self):
-        template = Template(file=os.path.join(htpc.webdir, 'squeezebox.tpl'), searchList=[htpc.settings])
-        template.jsfile = 'squeezebox.js'
-        return template.respond()
+        return template('squeezebox.html')
 
     @cherrypy.expose()
     def PlayerControl(self, **kwargs):

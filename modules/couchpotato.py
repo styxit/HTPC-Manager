@@ -1,6 +1,5 @@
 import os, cherrypy, htpc
-from Cheetah.Template import Template
-from htpc.tools import SafeFetchFromUrl
+from htpc.tools import template, SafeFetchFromUrl
 
 class CouchPotato:
     def __init__(self):
@@ -11,9 +10,7 @@ class CouchPotato:
 
     @cherrypy.expose()
     def index(self):
-        template = Template(file=os.path.join(htpc.webdir, 'couchpotato.tpl'), searchList=[htpc.settings])
-        template.jsfile = 'couchpotato.js'
-        return template.respond()
+        return template('couchpotato.html')
 
     @cherrypy.expose()
     def GetMovieList(self, **kwargs):

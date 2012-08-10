@@ -1,6 +1,10 @@
-import os, shutil, ConfigParser
-import htpc
+import os, shutil, ConfigParser, htpc
 from urllib2 import urlopen
+from mako.lookup import TemplateLookup
+
+def template(template):
+    lookup = TemplateLookup(directories=[htpc.template])
+    return lookup.get_template(template).render()
 
 def SafeFetchFromUrl(url):
     try:
@@ -21,18 +25,6 @@ def readSettings(section='htpc'):
                 configDict[key] = int(val)
             except ValueError:
                 configDict[key] = val
-
-    if section == 'htpc':
-        htpc.template = os.path.join('interfaces/', configDict.get('template','default'))
-        htpc.webdir = os.path.join(htpc.rundir, htpc.template)
-        templates = os.listdir("interfaces/")
-        themes = os.listdir(os.path.join(htpc.template, "css/themes/"))
-        configDict.update({
-            'template': htpc.template,
-            'webdir': htpc.webdir,
-            'templates': templates,
-            'themes': themes
-        })
 
     return configDict
 

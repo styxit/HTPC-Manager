@@ -139,6 +139,10 @@ table th.tablesorter-header {
     cursor: pointer;
 }
 
+.popover-inner {
+    width: 575px;
+}
+
 [class^="icon-"], [class*=" icon-"] {
     background-image: url("/img/glyphicons-halflings.png") !important;
 }

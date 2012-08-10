@@ -1,20 +1,16 @@
 import os, sys, platform, subprocess
 import cherrypy, htpc
-from Cheetah.Template import Template
 import urllib, urllib2, base64
 from PIL import Image, ImageEnhance
 from jsonrpclib import Server
 from json import loads, dumps
 import socket, struct
-
-from htpc.tools import readSettings
+from htpc.tools import template, readSettings
 
 class Xbmc:
     @cherrypy.expose()
     def index(self):
-        template = Template(file=os.path.join(htpc.webdir, 'xbmc.tpl'), searchList=[htpc.settings])
-        template.jsfile = 'xbmc.js'
-        return template.respond()
+        return template('xbmc.html')
 
     @cherrypy.expose()
     def Servers(self, server=None):

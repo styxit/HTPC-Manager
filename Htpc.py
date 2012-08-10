@@ -28,17 +28,13 @@ def main():
 
     # Set default datadir
     htpc.datadir = os.path.join(htpc.rundir, 'userdata/')
-    # If datadir is set through commandline check if it exists and is writeable
     if args.datadir:
-        if os.path.isdir(args.datadir):
-            if os.access(args.datadir, os.W_OK):
-                htpc.datadir = args.datadir
-            else:
-                print "No write access to datadir"
-                sys.exit()
-        else:
-            print "Datadir does not exist"
-            sys.exit()
+        htpc.datadir = args.datadir
+    if not os.path.isdir(htpc.datadir):
+        os.makedirs(htpc.datadir)
+    if not os.access(htpc.datadir, os.W_OK):
+        print "No write access to datadir"
+        sys.exit()
 
     # Set default conf-file and overwrite if supplied through commandline
     htpc.config = os.path.join(htpc.datadir, 'config.cfg')
@@ -47,6 +43,7 @@ def main():
 
     # Read settings info variable
     htpc.settings = readSettings()
+    htpc.template = os.path.join('interfaces/', htpc.settings.get('template','default'))
 
     # Overwrite port setting if supplied through commandline
     if args.port:
@@ -76,10 +73,11 @@ def main():
     })
 
     # Set static directories
+    webdir = os.path.join(htpc.rundir, htpc.template)
     appConfig = {
         '/': {
             'tools.staticdir.on': True,
-            'tools.staticdir.root': htpc.webdir,
+            'tools.staticdir.root': webdir,
             'tools.staticdir.dir': '',
             'tools.encode.on': True,
             'tools.encode.encoding': 'utf-8',
