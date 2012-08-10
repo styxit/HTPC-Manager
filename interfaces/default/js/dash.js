@@ -118,7 +118,7 @@ function loadRecentAlbums () {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            if (data == null) return false;
+            if (data == null) return;
 
             $.each(data.albums, function (i, album) {
                 if (i > 3) return;
@@ -134,13 +134,13 @@ function loadRecentAlbums () {
                 } else {
                     itemImage.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(album.thumbnail) + '&h=30&w=30');
                 }
-
+                // Frodo fix artist is now a list. Use the first.
+                if($.isArray(album.artist)) album.artist = album.artist[0]
                 var row = $('<tr>')
                 row.append($('<td>').html(itemImage));
                 row.append($('<td>').html(album.artist));
                 row.append($('<td>').html(album.label));
                 row.append($('<td>').html(album.year));
-
                 $('#album-table-body').append(row);
             });
         }
