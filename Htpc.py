@@ -50,7 +50,7 @@ def main():
     htpc.root = Root()
     from htpc.settings import Settings
     from htpc.updater import Updater
-    from modules import *
+    import modules
 
     settings = htpc.settings.Settings()
 

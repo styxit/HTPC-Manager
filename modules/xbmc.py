@@ -1,7 +1,8 @@
 import os, sys, platform, subprocess
 import cherrypy, htpc
+from htpc.proxy import getImage
 import urllib, urllib2, base64
-from PIL import Image, ImageEnhance
+import Image, ImageEnhance
 from jsonrpclib import Server
 from json import loads
 import socket, struct
@@ -123,82 +124,17 @@ class Xbmc:
         return {'current':self.current, 'servers':servers}
 
     @cherrypy.expose()
-    def GetThumb(self, **kwargs):
-        cherrypy.response.headers['Content-Type'] = "image/png"
-        thumb = kwargs.get('thumb')
-        thumbHeight = kwargs.get('h')
-        thumbWidth = kwargs.get('w')
-        thumbOpacity = kwargs.get('o', 100)
-        try:
-            thumbParts = thumb.split('/')
-            thumbFile = thumbParts.pop()
-            thumbType = thumbParts.pop()
-        except IndexError:
-            thumbFile = 'invalid.png'
-            thumbType = ''
+    def GetThumb(self, thumb=None, h=None, w=None, o=100, **kwargs):
+        url = thumb
+        if not url:
+            url = self.url('/images/DefaultVideo.png')
+        if url.startswith('special://'): #eden
+            url = self.url('/vfs/' + url)
+        elif url.startswith('image://'): # Frodo
+            url = urllib2.quote(url[len('image://'):], '')
+            url = self.url('/image/image://' + url)
 
-        xbmc_thumbs = os.path.join(htpc.datadir, 'xbmc_thumbs/')
-        if not os.path.exists(xbmc_thumbs):
-            os.makedirs(xbmc_thumbs)
-
-        thumbOnDisk = os.path.join(xbmc_thumbs, thumbType + '_' + thumbFile)
-        fileOut = os.path.join(xbmc_thumbs, thumbOnDisk + '_' + thumbWidth + '_' + thumbHeight + '.png')
-
-        # If there is no local copy
-        if not os.path.isfile(thumbOnDisk):
-            if thumb.startswith('image://'): # Frodo
-                url = self.url('/image/' + urllib.quote(thumb))
-            else:
-                url = self.url('/vfs/' + thumb)
-            request = urllib2.Request(url)
-            auth = self.auth()
-            if (auth):
-                request.add_header("Authorization", "Basic %s" % auth)
-            try:
-                fileObject = urllib2.urlopen(request)
-            except:
-                request =urllib2.Request(self.url('/images/DefaultVideo.png'))
-                if (auth):
-                    request.add_header("Authorization", "Basic %s" % auth)
-                fileObject = urllib2.urlopen(request)
-            fileData = fileObject.read()
-            f = open(thumbOnDisk, 'wb')
-            f.write(fileData)
-            f.close()
-
-        # if there is no resized version
-        if not os.path.isfile(fileOut):
-            widthInt = int(thumbWidth)
-            heightInt = int(thumbHeight)
-            opacityFloat = float(thumbOpacity)
-            enhance = opacityFloat/100
-            try:
-                image = Image.open(thumbOnDisk)
-                newimage = image.resize((widthInt, heightInt), Image.ANTIALIAS).convert('RGBA')
-                alpha = newimage.split()[3]
-                alpha = ImageEnhance.Brightness(alpha).enhance(enhance)
-                newimage.putalpha(alpha)
-                newimage.save(fileOut)
-            except:
-                pass
-
-        # If the image got resized fetch the resized one otherwise use the copy
-        # This is just a fallback (it makes the browser slow)
-        noresizeridentifier = os.path.join(htpc.datadir, 'no_resizer_found');
-        if os.path.isfile(fileOut):
-            f = open(fileOut, 'rb')
-            try:
-                os.unlink(noresizeridentifier)
-            except:
-                pass
-        else:
-            f = open(thumbOnDisk, 'rb')
-            nf = open(noresizeridentifier, 'w')
-            nf.write('1')
-            nf.close()
-        data = f.read()
-        f.close()
-        return data
+        return getImage(url, h, w, o, self.auth())
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()

@@ -46,7 +46,7 @@ function getMovieList() {
 
                 var movieAnchor = $('<a>').attr('href', '#');
                 movieAnchor.addClass('thumbnail');
-                movieAnchor.append($('<img>').attr('src', movie.library.info.images.poster[0]));
+                movieAnchor.append($('<img>').attr('src', '/couchpotato/GetImage?url='+movie.library.info.images.poster[0]));
                 movieAnchor.click(function(e) {
                     e.preventDefault();
                     showMovie(movie);

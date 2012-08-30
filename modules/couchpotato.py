@@ -1,4 +1,5 @@
 import os, cherrypy, htpc
+from htpc.proxy import getImage
 from json import loads
 from urllib2 import urlopen
 
@@ -28,6 +29,10 @@ class CouchPotato:
             return loads(urlopen(url+'/app.available', timeout=10).read())
         except:
             return
+
+    @cherrypy.expose()
+    def GetImage(self, url, h=None, w=None, o=None):
+        return getImage(url, h, w, o)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
