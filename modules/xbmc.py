@@ -3,39 +3,139 @@ import cherrypy, htpc
 import urllib, urllib2, base64
 from PIL import Image, ImageEnhance
 from jsonrpclib import Server
-from json import loads, dumps
+from json import loads
 import socket, struct
-from htpc.tools import template, readSettings
+
+from sqlobject import *
+
+class XbmcServers(SQLObject):
+    name = StringCol()
+    host = StringCol()
+    port = IntCol()
+    username = StringCol(default=None)
+    password = StringCol(default=None)
+    mac = StringCol(default=None)
 
 class Xbmc:
+    def __init__(self):
+        # xbmc.XBMC.GetInfoLabels(labels=["Network.MacAddress"])
+        XbmcServers.createTable(ifNotExists=True)
+        htpc.modules.append({
+            'name': 'XBMC',
+            'id': 'xbmc',
+            'fields': [
+                {'type':'bool', 'label':'Enable', 'name':'xbmc_enable'},
+                {'type':'text', 'label':'Menu name', 'name':'xbmc_name'},
+                {'type':'bool', 'label':'Use banners', 'name':'xbmc_show_banners'},
+                {'type':'bool', 'label':'Hide watched', 'name':'xbmc_hide_watched'}
+        ]})
+        htpc.modules.append({
+            'name': 'XBMC Servers',
+            'id': 'xbmc_update_server',
+            'action': '/xbmc/server',
+            'test': '/xbmc/ping',
+            'fields': [
+                {'type':'select', 'label':'Server', 'name':'xbmc_server_id', 'options':[
+                    {'name':'New', 'value':0}
+                ]},
+                {'type':'text', 'label':'Name', 'name':'xbmc_server_name'},
+                {'type':'text', 'label':'IP / Host', 'name':'xbmc_server_host'},
+                {'type':'text', 'label':'Port', 'name':'xbmc_server_port'},
+                {'type':'text', 'label':'Username', 'name':'xbmc_server_username'},
+                {'type':'password', 'label':'Password', 'name':'xbmc_server_password'}
+        ]})
+        try:
+            self.current = XbmcServers.select(limit=1).getOne().name
+        except SQLObjectNotFound, e:
+            self.current = None
+
     @cherrypy.expose()
     def index(self):
-        return template('xbmc.html')
+        return htpc.lookup.get_template('xbmc.html').render()
 
     @cherrypy.expose()
-    def Servers(self, server=None):
-        if (server):
-            htpc.xbmc = server
-            return "success"
+    @cherrypy.tools.json_out()
+    def ping(self, xbmc_server_host, xbmc_server_port, xbmc_server_username, xbmc_server_password, **kwargs):
+        try:
+            url = xbmc_server_host+':'+xbmc_server_port
+            if xbmc_server_username and xbmc_server_password:
+                url = xbmc_server_username+':'+xbmc_server_password+'@'+url
+            xbmc = Server('http://'+url+'/jsonrpc')
+            return xbmc.JSONRPC.Ping()
+        except:
+            return
 
-        servers = htpc.settings.get('xbmc_labels')
-        if servers:
-            servers = loads(servers)
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def getserver(self, id):
+        try:
+            server = XbmcServers.selectBy(id=id).getOne()
+            return {
+                'name':server.name,
+                'host':server.host,
+                'port':server.port,
+                'username':server.username,
+                'password':server.password
+            }
+        except SQLObjectNotFound, e:
+            return None
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def server(self, xbmc_server_id, xbmc_server_name, xbmc_server_host, xbmc_server_port,
+               xbmc_server_username=None, xbmc_server_password=None):
+        if xbmc_server_id == "0":
             try:
-                current = htpc.xbmc
+                XbmcServers(name=xbmc_server_name, host=xbmc_server_host, port=int(xbmc_server_port),
+                            username=xbmc_server_username, password=xbmc_server_password)
+                return True
             except:
-                current = servers[0]
-            return dumps({'servers':servers, 'current':current})
+                return False
+        else:
+            try:
+                server = XbmcServers.selectBy(id=xbmc_server_id).getOne()
+                server.name = xbmc_server_name
+                server.host = xbmc_server_host
+                server.port = int(xbmc_server_port)
+                server.username = xbmc_server_username
+                server.password = xbmc_server_password
+                return True
+            except SQLObjectNotFound, e:
+                return False
+
+    @cherrypy.expose()
+    def delserver(self, id):
+        XbmcServers.delete(id)
+        return self.index()
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def Servers(self, server=None):
+        if server:
+            self.current = server
+            return "successful"
+
+        servers = []
+        for x in XbmcServers.select():
+            servers.append({'name':x.name, 'id':x.id})
+        if len(servers) < 1:
+            return
+        return {'current':self.current, 'servers':servers}
 
     @cherrypy.expose()
     def GetThumb(self, **kwargs):
+        cherrypy.response.headers['Content-Type'] = "image/png"
         thumb = kwargs.get('thumb')
         thumbHeight = kwargs.get('h')
         thumbWidth = kwargs.get('w')
         thumbOpacity = kwargs.get('o', 100)
-        thumbParts = thumb.split('/')
-        thumbFile = thumbParts.pop()
-        thumbType = thumbParts.pop()
+        try:
+            thumbParts = thumb.split('/')
+            thumbFile = thumbParts.pop()
+            thumbType = thumbParts.pop()
+        except IndexError:
+            thumbFile = 'invalid.png'
+            thumbType = ''
 
         xbmc_thumbs = os.path.join(htpc.datadir, 'xbmc_thumbs/')
         if not os.path.exists(xbmc_thumbs):
@@ -54,8 +154,13 @@ class Xbmc:
             auth = self.auth()
             if (auth):
                 request.add_header("Authorization", "Basic %s" % auth)
-
-            fileObject = urllib2.urlopen(request)
+            try:
+                fileObject = urllib2.urlopen(request)
+            except:
+                request =urllib2.Request(self.url('/images/DefaultVideo.png'))
+                if (auth):
+                    request.add_header("Authorization", "Basic %s" % auth)
+                fileObject = urllib2.urlopen(request)
             fileData = fileObject.read()
             f = open(thumbOnDisk, 'wb')
             f.write(fileData)
@@ -67,38 +172,15 @@ class Xbmc:
             heightInt = int(thumbHeight)
             opacityFloat = float(thumbOpacity)
             enhance = opacityFloat/100
-            imageResized = False
-
-            # Resize with sips on OSX
-            if False and platform.system() == 'Darwin' and not imageResized:
-                try:
-                    subprocess.call(['sips', '-z', thumbHeight, thumbWidth, thumbOnDisk, '--out', fileOut])
-                    imageResized = True
-                    print 'Used sips'
-                except OSError:
-                    pass
-
-            # Resize with ImageMagick on Linux
-            if False and platform.system() == 'Linux' and not imageResized:
-                try:
-                    subprocess.call(['convert', thumbOnDisk, '-resize', thumbWidth + 'x' + thumbHeight, fileOut])
-                    imageResized = True
-                    print 'Used ImageMagick'
-                except OSError:
-                    pass
-
-            # resize PIL (for like openelec etc.)
-            if not imageResized:
-                try:
-                    image = Image.open(thumbOnDisk)
-                    newimage = image.resize((widthInt, heightInt), Image.ANTIALIAS).convert('RGBA')
-                    alpha = newimage.split()[3]
-                    alpha = ImageEnhance.Brightness(alpha).enhance(enhance)
-                    newimage.putalpha(alpha)
-                    newimage.save(fileOut)
-                    print 'Used PIL'
-                except:
-                    pass
+            try:
+                image = Image.open(thumbOnDisk)
+                newimage = image.resize((widthInt, heightInt), Image.ANTIALIAS).convert('RGBA')
+                alpha = newimage.split()[3]
+                alpha = ImageEnhance.Brightness(alpha).enhance(enhance)
+                newimage.putalpha(alpha)
+                newimage.save(fileOut)
+            except:
+                pass
 
         # If the image got resized fetch the resized one otherwise use the copy
         # This is just a fallback (it makes the browser slow)
@@ -116,154 +198,159 @@ class Xbmc:
             nf.close()
         data = f.read()
         f.close()
-        cherrypy.response.headers['Content-Type'] = "image/png"
         return data
 
     @cherrypy.expose()
-    def GetMovies(self, start=0, end=0, sortmethod='videotitle', sortorder='ascending', **kwargs):
+    @cherrypy.tools.json_out()
+    def GetMovies(self, start=0, end=0, sortmethod='videotitle', sortorder='ascending'):
         try:
-            ignorearticle = bool(htpc.settings.get('xbmc_ignorearticle',1))
             xbmc = Server(self.url('/jsonrpc', True))
-            data = xbmc.VideoLibrary.GetMovies(sort={'order': sortorder, 'method': sortmethod, 'ignorearticle': ignorearticle}, 
-                                               properties=['title', 'year', 'plot', 'thumbnail', 'file', 'fanart', 'studio', 'trailer', 'genre', 'rating'], 
-                                               limits={'start': int(start), 'end': int(end)})
-            return dumps(data)
-        except:
-            return 
-
-    @cherrypy.expose()
-    def GetShows(self, start=0, end=0, sortmethod='videotitle', sortorder='ascending', **kwargs):
-        try:
-            ignorearticle = bool(htpc.settings.get('xbmc_ignorearticle',1))
-            xbmc = Server(self.url('/jsonrpc', True))
-            shows = xbmc.VideoLibrary.GetTVShows(sort={'order': sortorder, 'method': sortmethod, 'ignorearticle': ignorearticle},
-                                                 properties=['title', 'year', 'plot', 'thumbnail', 'playcount'],
-                                                 limits={'start': int(start), 'end': int(end)})
-            if bool(htpc.settings.get('xbmc_hide_watched', 0)):
-                shows['tvshows'] = filter(lambda i: i['playcount'] == 0, shows['tvshows'])
-            return dumps(shows)
+            sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
+            properties = ['title', 'year', 'plot', 'thumbnail', 'file', 'fanart', 'studio', 'trailer', 'imdbnumber', 'genre', 'rating', 'streamdetails']
+            limits = {'start': int(start), 'end': int(end)}
+            return xbmc.VideoLibrary.GetMovies(sort=sort, properties=properties, limits=limits)
         except:
             return
 
     @cherrypy.expose()
-    def GetShow(self, tvshowid=None, **kwargs):
+    @cherrypy.tools.json_out()
+    def GetShows(self, start=0, end=0, sortmethod='videotitle', sortorder='ascending', hidewatched=False):
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
+            properties = ['title', 'year', 'plot', 'thumbnail', 'playcount']
+            limits = {'start': int(start), 'end': int(end)}
+            shows = xbmc.VideoLibrary.GetTVShows(sort=sort, properties=properties, limits=limits)
+            if hidewatched == "1":
+                shows['tvshows'] = filter(lambda i: i['playcount']==0, shows['tvshows'])
+            return shows
+        except:
+            return
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetShow(self, tvshowid=None, hidewatched=False):
         xbmc = Server(self.url('/jsonrpc', True))
         showinfo = xbmc.VideoLibrary.GetTVShowDetails(tvshowid=int(tvshowid),properties=['title', 'thumbnail'])
         episodes = xbmc.VideoLibrary.GetEpisodes(tvshowid=int(tvshowid),properties=['episode', 'season', 'thumbnail', 'plot', 'file','playcount'])
         episodes = episodes[u'episodes']
         seasons = {}
-        if bool(htpc.settings.get('xbmc_hide_watched', 0)):
-            episodes = filter(lambda i : i['playcount'] == 0,episodes)
+        if hidewatched == "1":
+            episodes = filter(lambda i : i['playcount'] == 0, episodes)
         for episode in episodes:
             if not seasons.has_key(episode[u'season']):
                 seasons[episode[u'season']] = {}
             seasons[episode[u'season']][episode[u'episode']] = episode
-        return dumps({'show' : showinfo, 'seasons' : seasons})
+        return {'show':showinfo, 'seasons':seasons}
 
     @cherrypy.expose()
-    def PlayItem(self, item=None, **kwargs):
+    @cherrypy.tools.json_out()
+    def PlayItem(self, item=None):
         xbmc = Server(self.url('/jsonrpc', True))
-        data = xbmc.Player.Open(item={'file' : item})
-        return dumps(data)
+        return xbmc.Player.Open(item={'file' : item})
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def NowPlaying(self):
         try:
             xbmc = Server(self.url('/jsonrpc', True))
             player = xbmc.Player.GetActivePlayers()
             application = xbmc.Application.GetProperties(properties=['muted', 'volume', 'version'])
+            if player[0][u'type'] == 'video':
+                properties = ['speed', 'position', 'totaltime', 'time', 'percentage', 'subtitleenabled', 'currentsubtitle', 'subtitles',
+                              'currentaudiostream', 'audiostreams']
+                playerInfo = xbmc.Player.GetProperties(playerid=player[0][u'playerid'], properties=properties)
+                itemInfo = xbmc.Player.GetItem(playerid=player[0][u'playerid'], properties=['thumbnail', 'showtitle', 'year', 'episode', 'season', 'fanart'])
+                return {'playerInfo':playerInfo, 'itemInfo':itemInfo, 'app':application}
         except:
-            return ''
-        if player:
-            player = player[0]
-            if player[u'type'] == 'video':
-                try:
-                    playerInfo = xbmc.Player.GetProperties(playerid=player[u'playerid'], properties=['speed', 'position', 'totaltime', 'time', 'percentage'])
-                except:
-                    return
-                if playerInfo:
-                    try:
-                        itemInfo = xbmc.Player.GetItem(playerid=player[u'playerid'], properties=['thumbnail', 'showtitle', 'year', 'episode', 'season', 'fanart'])
-                        return dumps({'playerInfo' : playerInfo, 'itemInfo' : itemInfo, 'app' : application})
-                    except:
-                        return
+            return
 
     @cherrypy.expose()
-    def ControlPlayer(self, action="", **kwargs):
+    @cherrypy.tools.json_out()
+    def ControlPlayer(self, action='', percent=''):
         xbmc = Server(self.url('/jsonrpc', True))
+        player = xbmc.Player.GetActivePlayers()
         if action == 'SetMute':
-            data = xbmc.Application.SetMute(mute='toggle')
+            return xbmc.Application.SetMute(mute='toggle')
         elif action == 'Back':
-            data = xbmc.Input.Back()
+            return xbmc.Input.Back()
         elif action == 'Down':
-            data = xbmc.Input.Down()
+            return xbmc.Input.Down()
         elif action == 'Home':
-            data = xbmc.Input.Home()
+            return xbmc.Input.Home()
         elif action == 'Left':
-            data = xbmc.Input.Left()
+            return xbmc.Input.Left()
         elif action == 'Right':
-            data = xbmc.Input.Right()
+            return xbmc.Input.Right()
         elif action == 'Select':
-            data = xbmc.Input.Select()
+            return xbmc.Input.Select()
         elif action == 'Up':
-            data = xbmc.Input.Up()
+            return xbmc.Input.Up()
         elif action == 'MoveLeft':
-            data = xbmc.Input.Left()
+            return xbmc.Input.Left()
         elif action == 'MoveRight':
-            data = xbmc.Input.Right()
-        else:
-            method = 'Player.' + action
-            data = xbmc._request(methodname=method, params={'playerid' : 1})
-        return dumps(data)
-
-    @cherrypy.expose()
-    def Subtitles(self, subtitle='', **kwargs):
-        xbmc = Server(self.url('/jsonrpc', True))
-        player = xbmc.Player.GetActivePlayers()
-        if not player:
-            return 
-        try:
-            if subtitle:
-                subtitle = int(subtitle)
-                xbmc.Player.SetSubtitle(playerid=player[0][u'playerid'], subtitle=subtitle)
-                xbmc.Player.SetSubtitle(playerid=player[0][u'playerid'], subtitle='on')
-        except ValueError:
-            xbmc.Player.SetSubtitle(playerid=player[0][u'playerid'], subtitle='off')
-        data = xbmc.Player.GetProperties(playerid=player[0][u'playerid'], properties=['subtitleenabled', 'currentsubtitle', 'subtitles'])
-        data['subtitles'].insert(0, {'index':'off', 'name':'Off'})
-        return dumps(data)
-
-    @cherrypy.expose()
-    def Audio(self, audio='', **kwargs):
-        xbmc = Server(self.url('/jsonrpc', True))
-        player = xbmc.Player.GetActivePlayers()
-        if not player:
-            return 
-        try:
-            audio = int(audio)
-            xbmc.Player.SetAudioStream(playerid=player[0][u'playerid'], stream=audio)
-        except ValueError:
-            pass
-        data = xbmc.Player.GetProperties(playerid=player[0][u'playerid'], properties=['currentaudiostream', 'audiostreams'])
-        return dumps(data)
-
-    @cherrypy.expose()
-    def System(self, action='', **kwargs):
-        xbmc = Server(self.url('/jsonrpc', True))
-        if action == 'Shutdown':
-            return dumps(xbmc.System.Shutdown())
-        elif action == 'Suspend':
-            return dumps(xbmc.System.Suspend())
-        elif action == 'Reboot':
-            return dumps(xbmc.System.Reboot())
-        elif action == 'Ping':
+            return xbmc.Input.Right()
+        elif action == 'Seek':
             try:
-                return dumps(xbmc.JSONRPC.Ping())
+                percent = float(percent)
+                return xbmc.Player.Seek(playerid=player[0][u'playerid'], value=percent)
+            except:
+                return
+        elif action:
+            try:
+                method = 'Player.'+action
+                return xbmc._request(methodname=method, params={'playerid' : player[0][u'playerid']})
             except:
                 return
 
     @cherrypy.expose()
-    def Wake(self, **kwargs):
+    @cherrypy.tools.json_out()
+    def Subtitles(self, subtitle='off'):
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            player = xbmc.Player.GetActivePlayers()
+            playerid = player[0][u'playerid']
+            try:
+                subtitle = int(subtitle)
+                xbmc.Player.SetSubtitle(playerid=playerid, subtitle=subtitle)
+                xbmc.Player.SetSubtitle(playerid=playerid, subtitle='on')
+            except ValueError:
+                xbmc.Player.SetSubtitle(playerid=playerid, subtitle='off')
+            return
+        except:
+            return
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def Audio(self, audio=None):
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            player = xbmc.Player.GetActivePlayers()
+            playerid = player[0][u'playerid']
+            if audio:
+                try:
+                    audio = int(audio)
+                    xbmc.Player.SetAudioStream(playerid=playerid, stream=audio)
+                except ValueError:
+                    pass
+            return
+        except:
+            return
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def System(self, action=''):
+        xbmc = Server(self.url('/jsonrpc', True))
+        if action == 'Shutdown':
+            return xbmc.System.Shutdown()
+        elif action == 'Suspend':
+            return xbmc.System.Suspend()
+        elif action == 'Reboot':
+            return xbmc.System.Reboot()
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def Wake(self):
         mac = '00:01:2e:47:49:76'
         try:
             addr_byte = mac.split(':')
@@ -274,7 +361,6 @@ class Xbmc:
             int(addr_byte[3], 16),
             int(addr_byte[4], 16),
             int(addr_byte[5], 16))
-
             msg = '\xff' * 6 + hw_addr * 16
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -284,67 +370,81 @@ class Xbmc:
             return 'Failed to send WOL packet'
 
     @cherrypy.expose()
-    def Notify(self, text, **kwargs):
-        text = urllib2.unquote(text).encode('utf-8')
-        command = {'command': 'ExecBuiltIn', 'parameter': 'Notification(\'HTPC Manager\', \'' + text + '\')' }
-        request = urllib2.Request(self.url('/xbmcCmds/xbmcHttp/?' + urllib.urlencode(command)))
-        auth = self.auth()
-        if (auth):
-            request.add_header("Authorization", "Basic %s" % auth)
-        result = urllib2.urlopen(request)
-        return result.read()
-
-    @cherrypy.expose()
-    def GetRecentMovies(self):
+    @cherrypy.tools.json_out()
+    def Notify(self, text):
         xbmc = Server(self.url('/jsonrpc', True))
-        data = xbmc.VideoLibrary.GetRecentlyAddedMovies(properties=['title', 'year', 'plot', 'thumbnail', 'file', 'fanart', 'studio', 'trailer', 'genre', 'rating'])
-        return dumps(data)
+        return xbmc.GUI.ShowNotification(title='HTPC manager', message=text, image='info')
 
     @cherrypy.expose()
-    def GetRecentShows(self):
-        xbmc = Server(self.url('/jsonrpc', True))
-        data = xbmc.VideoLibrary.GetRecentlyAddedEpisodes(properties=['episode', 'season', 'thumbnail', 'plot', 'fanart', 'title', 'file'])
-        return dumps(data)
+    @cherrypy.tools.json_out()
+    def GetRecentMovies(self, limit=5):
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            properties = ['title', 'year', 'plot', 'thumbnail', 'file', 'fanart', 'trailer', 'imdbnumber', 'studio', 'genre', 'rating']
+            limits = {'start': 0, 'end': int(limit)}
+            return xbmc.VideoLibrary.GetRecentlyAddedMovies(properties=properties, limits=limits)
+        except:
+            return
 
     @cherrypy.expose()
-    def GetRecentAlbums(self):
-        xbmc = Server(self.url('/jsonrpc', True))
-        data = xbmc.AudioLibrary.GetRecentlyAddedAlbums(properties=['artist', 'albumlabel', 'year', 'description', 'thumbnail'])
-        return dumps(data)
+    @cherrypy.tools.json_out()
+    def GetRecentShows(self, limit=5):
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            properties = ['episode', 'season', 'thumbnail', 'plot', 'fanart', 'title', 'file']
+            limits = {'start': 0, 'end': int(limit)}
+            return xbmc.VideoLibrary.GetRecentlyAddedEpisodes(properties=properties, limits=limits)
+        except:
+            return
 
     @cherrypy.expose()
-    def Clean(self, lib='video', **kwargs):
+    @cherrypy.tools.json_out()
+    def GetRecentAlbums(self, limit=5):
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            limits = {'start': 0, 'end': int(limit)}
+            return xbmc.AudioLibrary.GetRecentlyAddedAlbums(properties=['artist', 'albumlabel', 'year', 'description', 'thumbnail'], limits=limits)
+        except:
+            return
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def Clean(self, lib='video'):
         xbmc = Server(self.url('/jsonrpc', True))
         if lib == 'video':
-            return dumps(xbmc.VideoLibrary.Clean())
+            return xbmc.VideoLibrary.Clean()
         elif lib == 'audio':
-            return dumps(xbmc.AudioLibrary.Clean())
+            return xbmc.AudioLibrary.Clean()
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def Scan(self, lib='video'):
         xbmc = Server(self.url('/jsonrpc', True))
         if lib == 'video':
-            return dumps(xbmc.VideoLibrary.Scan())
+            return xbmc.VideoLibrary.Scan()
         elif lib == 'audio':
-            return dumps(xbmc.AudioLibrary.Scan())
+            return xbmc.AudioLibrary.Scan()
 
     def url(self, path='', auth=False):
         try:
-            settings = readSettings(htpc.xbmc)
-        except:
-            settings = htpc.settings
-        host = settings.get('xbmc_host', '')
-        port = str(settings.get('xbmc_port', ''))
-        username = settings.get('xbmc_username', '')
-        password = settings.get('xbmc_password', '')
-        if auth and username:
-            return 'http://'+username+':'+password+'@'+host+':'+str(port)+path
-        return 'http://'+host+':'+str(port)+path
+            server = XbmcServers.selectBy(id=self.current).getOne()
+        except SQLObjectNotFound, e:
+            server = XbmcServers.select(limit=1).getOne()
+        except SQLObjectNotFound, e:
+            return
+        url = server.host+':'+str(server.port)+path
+        if auth and server.username and server.password:
+            url = server.username+':'+server.password+'@'+url
+        return 'http://'+url
 
     def auth(self):
-        username = htpc.settings.get('xbmc_username', '')
-        password = htpc.settings.get('xbmc_password', '')
-        if username and password:
-            return base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+        try:
+            server = XbmcServers.selectBy(id=self.current).getOne()
+        except SQLObjectNotFound, e:
+            server = XbmcServers.select(limit=1).getOne()
+        except SQLObjectNotFound, e:
+            return
+        if server.username and server.password:
+            return base64.encodestring('%s:%s' % (server.username, server.password)).replace('\n', '')
 
 htpc.root.xbmc = Xbmc()

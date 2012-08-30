@@ -1,10 +1,13 @@
 <%inherit file="base.html"/>
 <%block name="header"><script src="/js/sabnzbd.js"></script></%block>
-<%import htpc%>
+<%
+import htpc
+settings = htpc.settings.Settings()
+%>
 <div class="container">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="http://${htpc.settings.get('sabnzbd_host', '')}:${htpc.settings.get('sabnzbd_port', '')}" target="_blank">${htpc.settings.get('sabnzbd_name', 'SABnzbd')}</a>
+            <a href="http://${settings.get('sabnzbd_host')}:${settings.get('sabnzbd_port')}" target="_blank">${settings.get('sabnzbd_name', 'SABnzbd')}</a>
             <small>
                 <strong>Speed:</strong> <span id="queue_speed"></span>
                 <strong>Status:</strong> <span id="queue_state"></span>

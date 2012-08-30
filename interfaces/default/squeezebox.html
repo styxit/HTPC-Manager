@@ -1,10 +1,13 @@
 <%inherit file="base.html"/>
 <%block name="header"><script src="/js/squeezebox.js"></script></%block>
-<%import htpc%>
+<%
+import htpc
+settings = htpc.settings.Settings()
+%>
 <div class="container">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="http://${htpc.settings.get('squeezebox_host', '')}:${htpc.settings.get('squeezebox_port', '')}" target="_blank">${htpc.settings.get('squeezebox_name', 'Squeezebox')}</a>
+            <a href="http://${settings.get('squeezebox_host', '')}:${settings.get('squeezebox_port', '')}" target="_blank">${settings.get('squeezebox_name', 'Squeezebox')}</a>
             <select id="players" class="pull-right"></select>
         </h1>
         <div class="well hide" id="nowplaying">

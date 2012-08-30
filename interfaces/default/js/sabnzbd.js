@@ -26,7 +26,7 @@ $(document).ready(function () {
         }
     });
 
-    setCategories('#nzb_category', '*');
+    setCategories('#nzb_category', 'Default');
 
     $('#nzb_set_speed').click(function() {
         var speed = ($('#nzb_get_speed').val());

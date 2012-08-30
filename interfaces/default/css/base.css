@@ -1,11 +1,134 @@
-@media (min-width: 1200px) {
-    body {
-        padding-top: 45px;
+html, body {
+    background: #eee url('/img/rough_diagonal.png');
+}
+.content {
+    background: #fff;
+    margin: -20px;
+    padding: 20px;
+    -webkit-border-radius: 0 0 6px 6px;
+    -moz-border-radius: 0 0 6px 6px;
+    border-radius: 0 0 6px 6px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    box-shadow: 0 1px 2px rgba(0,0,0,.15);
+}
+@media (min-width: 980px) {
+    .content {
+        margin: 0;
+        padding-top: 60px;
     }
 }
-html, body {
-    background-color: #eee;
-    background: url('/img/rough_diagonal.png');
+.span4 thead {
+    display: none;
+}
+#tvshow-carousel, #tvshow-carousel img,
+#movie-carousel, #movie-carousel img {
+    height: 240px;
+    width: 365px;
+}
+.carousel-caption {
+    cursor: pointer;
+}
+h1 {
+    font-size: 2em;
+}
+h1 .pull-right {
+    margin: 0;
+}
+h1 .pull-right select {
+    margin-top: 8px;
+}
+h2{
+    margin: 0;
+    padding: 0;
+    font-size: 1.5em;
+}
+.page-header.page-title {
+    background-color: #f5f5f5;
+    padding: 15px 15px 15px;
+    margin: -20px -20px 20px;
+}
+.page-header.page-title a {
+    color: #000;
+    text-decoration: none;
+}
+#search-movie-list {
+    margin: 0;
+    padding: 0;
+    max-height: 600px;
+    overflow-y: auto;
+}
+#search-movie-list li {
+    margin: 15px 0;
+    padding: 0;
+    list-style: none;
+    cursor: pointer;
+    clear: both;
+    overflow: auto;
+}
+#search-movie-list li:hover {
+    background: #eee;
+}
+#search-movie-list img {
+    height: 100px;
+    width: 75px;
+}
+#search-movie-list h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 1.5em;
+}
+#search-movie-list .movie-info {
+    margin: 0 0 0 95px;
+}
+#movie-grid img,
+#movie-grid .thumbnail,
+#wanted-grid img,
+#wanted-grid .thumbnail {
+    height: 150px;
+    width: 100px;
+}
+#search-movie-list .thumbnail {
+    margin: 10px;
+    float: left;
+    height: 100px;
+    width: 75px;
+}
+h6.movie-title, h6.show-title {
+    color: #555555;
+    text-align: center;
+    margin: 0;
+    padding-top: 4px;
+}
+#show-grid img {
+    height: 150px;
+    width: 100px;
+}
+#show-grid.banners img {
+    height: 90px;
+    width: 500px;
+}
+#show-seasons {
+    margin: 0;
+    padding: 0;
+}
+#show-seasons .season-header {
+    font-weight: bold;
+    font-size: 1.5em;
+    display: block;
+}
+#show-seasons .thumbnail,
+#show-season .thumbnail img {
+    height: 85px;
+    width: 150px;
+}
+.modal-movieinfo {
+    margin-left: 230px;
+}
+.modal-youtube {
+    border: 0;
+    height: 375px;
+    width: 670px;
 }
 #subtitles, #audio {
     text-align: left;
@@ -52,37 +175,16 @@ html, body {
 .album-list li:hover .control {
     display: block;
 }
-.content {
-    background: #fff;
-    padding: 20px;
-    margin: 0;
-    -webkit-border-radius: 0 0 6px 6px;
-    -moz-border-radius: 0 0 6px 6px;
-    border-radius: 0 0 6px 6px;
-    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
-    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
-    box-shadow: 0 1px 2px rgba(0,0,0,.15);
+#nowplaying .thumbnail,
+#nowplaying .thumbnail img {
+    height: 140px;
+    width: 140px;
 }
-.brand {
-    margin-top: 4px;
-}
-#menu {
-    margin-top: 5px;
-}
-#settings {
-    display: block;
-}
-.page-header.page-title {
-    background-color: #f5f5f5;
-    padding: 20px 20px 10px;
-    margin: -20px -20px 20px;
-}
-.page-header.page-title a {
-    color: #000;
-    text-decoration: none;
+#nowplaying #player-progressbar {
+    cursor: pointer;
 }
 legend {
-    margin-bottom: 0;
+    margin: 0;
 }
 #notify-user {
     position: fixed;
@@ -105,16 +207,14 @@ legend {
     border-left: 0;
     border-right: 0;
 }
-.trans {
-    background: transparent;
-    background-color : rgba(255,255,255,0.8);
-    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#CCFFFFFF,endColorstr=#CCFFFFFF)";
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr=#CCFFFFFF,endColorstr=#CCFFFFFF);
-    zoom: 1;
-}
-.gif-loader {
-    text-align: center;
+.spinner {
     display: none;
+    background: url('/img/loader.gif') 50% 50% no-repeat;
+    height: 40px;
+}
+.spinner-inline {
+    display: inline-block;
+    width: 40px;
 }
 #modal_dialog.modal {
     width: 700px;
@@ -126,27 +226,15 @@ legend {
 h3 a {
     color: #000;
 }
-#server-control {
-    margin: 0;
-}
-h6.movie-title, h6.show-title {
-    color: #555555;
-    text-align: center;
-    padding-top: 4px;
-}
-
 table th.tablesorter-header {
     cursor: pointer;
 }
-
-.popover-inner {
+.popover {
     width: 575px;
 }
-
 [class^="icon-"], [class*=" icon-"] {
     background-image: url("/img/glyphicons-halflings.png") !important;
 }
-
 .icon-white {
     background-image: url("/img/glyphicons-halflings-white.png") !important;
 }

@@ -2,9 +2,9 @@ $(document).ready(function () {
     loadRecentMovies();
     loadRecentTVshows();
     loadRecentAlbums();
-    loadNextAired({limit: 5});
-    loadWantedMovies(5);
     loadDownloadHistory();
+    loadWantedMovies(5);
+    loadNextAired({limit: 5});
 });
 
 function loadRecentMovies () {
@@ -13,47 +13,22 @@ function loadRecentMovies () {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            if (data == null) {
-                return false;
-            }
+            if (data == null) return;
+            $('#movie-carousel').show();
             $.each(data.movies, function (i, movie) {
-                var itemDiv = $('<div>');
-                itemDiv.addClass('item');
-                if (i == 0) {
-                    itemDiv.addClass('active');
-                }
+                var itemDiv = $('<div>').addClass('item');
+                if (i == 0) itemDiv.addClass('active');
                 var itemImage = $('<img>');
-                itemImage.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(movie.fanart) + '&h=240&w=430');
+                itemImage.attr('src', '/xbmc/GetThumb?h=240&w=430&thumb='+encodeURIComponent(movie.fanart));
                 itemImage.attr('alt', movie.title);
-                itemImage.css({
-                    width: '430px',
-                    height: '240px'
-                });
-
-                var itemTitle = $('<h4>');
-                itemTitle.html(movie.title);
-
-                var itemPlot = $('<p>');
-                itemPlot.html(shortenText(movie.plot, 100));
-                var itemCaption = $('<div>');
-                itemCaption.addClass('carousel-caption');
-
-                itemCaption.append(itemTitle);
-                itemCaption.append(itemPlot);
-                itemCaption.css('cursor', 'pointer');
-                itemCaption.click(function () {
-                    xbmcShowMovie(movie)
-                });
-
                 itemDiv.append(itemImage);
-                itemDiv.append(itemCaption);
-
-                $('#movie-carousel').css({
-                    height: '240px'
+                var itemCaption = $('<div>').addClass('carousel-caption').click(function() {
+                    xbmcShowMovie(movie);
                 });
-                $('#movie-carousel').show();
+                itemCaption.append($('<h4>').html(movie.title));
+                itemCaption.append($('<p>').html(shortenText(movie.plot, 90)));
+                itemDiv.append(itemCaption);
                 $('#movie-carousel .carousel-inner').append(itemDiv);
-
             });
         }
     });
@@ -65,48 +40,23 @@ function loadRecentTVshows () {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            if (data == null) return false;
-
+            if (data == null) return;
+            $('#tvshow-carousel').show();
             $.each(data.episodes, function (i, episode) {
-
                 var epTitle = episode.label;
-
-                var itemDiv = $('<div>');
-                itemDiv.addClass('item');
-                if (i == 0) {
-                    itemDiv.addClass('active');
-                }
+                var itemDiv = $('<div>').addClass('item');
+                if (i == 0) itemDiv.addClass('active');
                 var itemImage = $('<img>');
-                itemImage.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(episode.fanart) + '&h=240&w=430');
+                itemImage.attr('src', '/xbmc/GetThumb?h=240&w=430&thumb='+encodeURIComponent(episode.fanart));
                 itemImage.attr('alt', epTitle);
-                itemImage.css({
-                    width: '430px',
-                    height: '240px'
-                });
-
-                var itemTitle = $('<h4>');
-                itemTitle.html(epTitle);
-                var itemPlot = $('<p>');
-                itemPlot.html(shortenText(episode.plot, 100));
-                var itemCaption = $('<div>');
-                itemCaption.addClass('carousel-caption');
-
-                itemCaption.append(itemTitle);
-                itemCaption.append(itemPlot);
-                itemCaption.css('cursor', 'pointer');
-                itemCaption.click(function () {
+                itemDiv.append(itemImage);
+                var itemCaption = $('<div>').addClass('carousel-caption').click(function() {
                     xbmcShowEpisode(episode)
                 });
-
-                itemDiv.append(itemImage);
+                itemCaption.append($('<h4>').html(epTitle));
+                itemCaption.append($('<p>').html(shortenText(episode.plot, 90)));
                 itemDiv.append(itemCaption);
-
-                $('#tvshow-carousel').css({
-                    height: '240px'
-                });
-                $('#tvshow-carousel').show();
                 $('#tvshow-carousel .carousel-inner').append(itemDiv);
-
             });
         }
     });
@@ -119,21 +69,10 @@ function loadRecentAlbums () {
         dataType: 'json',
         success: function (data) {
             if (data == null) return;
-
+            $('#album-table-body').parent().show();
             $.each(data.albums, function (i, album) {
-                if (i > 3) return;
-
                 var itemImage = $('<img>');
-                itemImage.css({
-                    width: '30px',
-                    height: '30px'
-                });
-
-                if (album.thumbnail == '') {
-                    itemImage.attr('src', 'img/white5x5.png');
-                } else {
-                    itemImage.attr('src', '/xbmc/GetThumb?thumb=' + encodeURIComponent(album.thumbnail) + '&h=30&w=30');
-                }
+                itemImage.attr('src', '/xbmc/GetThumb?h=30&w=30&thumb='+encodeURIComponent(album.thumbnail));
                 // Frodo fix artist is now a list. Use the first.
                 if($.isArray(album.artist)) album.artist = album.artist[0]
                 var row = $('<tr>')
@@ -178,19 +117,15 @@ function loadDownloadHistory() {
         success: function (data) {
             $('#downloads_table_body').html('');
             $.each(data.history.slots, function (i, slot) {
-                var failMessage = $('<span>');
-                failMessage.addClass('label label-important');
-                failMessage.html(slot.fail_message);
-
-                var file = shortenText(slot.name, 35);
-
                 if (slot.status == 'Failed') {
-                    file.append('&nbsp;'+failMessage);
+                    var status = $('<i>').addClass('icon-remove');
+                    status.attr('title', slot.fail_message);
+                } else {
+                    var status = $('<i>').addClass('icon-ok');
                 }
-
                 var row = $('<tr>')
-                row.append($('<td>').html(file).attr('title',slot.name));
-                row.append($('<td>').html(slot.status));
+                row.append($('<td>').html(slot.name).attr('title', slot.name));
+                row.append($('<td>').html(status));
                 $('#downloads_table_body').append(row);
             });
         }

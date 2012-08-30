@@ -1,40 +1,63 @@
 import os, cherrypy, htpc
 from urllib import urlencode
+from urllib2 import urlopen
 from re import findall
 from json import dumps
-from htpc.tools import template, SafeFetchFromUrl
 
 class Search:
     def __init__(self):
-        self.url = 'http://api.nzbmatrix.com/v1.1/'
-        self.apikey = htpc.settings.get('nzbmatrix_apikey', '')
+        htpc.modules.append({
+            'name': 'NZBSearch',
+            'id': 'nzbsearch',
+            'test': '/search/ping',
+            'fields': [
+                {'type':'bool', 'label':'Enable', 'name':'nzbsearch_enable'},
+                {'type':'text', 'label':'Username', 'name':'nzbmatrix_username'},
+                {'type':'text', 'label':'Apikey', 'name':'nzbmatrix_apikey'}
+        ]})
 
     @cherrypy.expose()
-    def index(self, *args, **kwargs):
-        if kwargs.has_key('query'):
+    def index(self, query='', catid='', nzbid='', search=''):
+        if query:
             return self.nzbMatrixSearch({
-                'search': kwargs.get('query',''),
-                'catid' : kwargs.get('catid','')
-            }, 
+                'search': query,
+                'catid' : catid
+            },
                 'search.php'
             )
-        elif kwargs.has_key('nzbid'):
+        if nzbid:
             return self.nzbMatrixSearch({
-                'id': kwargs.get('nzbid','')
+                'id': nzbid
             },
                 'details.php'
             )
+        return htpc.lookup.get_template('search.html').render()
 
-        searchString = kwargs.get('search','')
-        htpc.settings.update({'search':searchString})
-        return template('search.html')
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def ping(self, nzbmatrix_username, nzbmatrix_apikey, **kwargs):
+        try:
+            url = 'http://api.nzbmatrix.com/v1.1/account.php?'
+            url = url + 'username='+nzbmatrix_username+'&'
+            url = url + 'apikey='+nzbmatrix_apikey
+            result = urlopen(url, timeout=10).read()
+            if not result.startswith('error'):
+                return result
+        except:
+            return
 
-    def nzbMatrixSearch(self, options, page):
-        url = self.url + page + '?apikey='+self.apikey+'&'
-        source = SafeFetchFromUrl(url+urlencode(options)).decode("cp1252").encode('utf-8')
+    def nzbMatrixSearch(self, options, path):
+        settings = htpc.settings.Settings()
+        apikey = settings.get('nzbmatrix_apikey', '')
+        url = 'http://api.nzbmatrix.com/v1.1/'+path+'?apikey='+apikey+'&'
+        try:
+            source = urlopen(url+urlencode(options), timeout=10).read()
+        except:
+            source = ''
 
-        if source.startswith('error'):
-            return source
+        source = source.decode("cp1252").encode('utf-8')
+
+        if source.startswith('error'): return source
 
         data = {}
         for index, text in enumerate(source[:-2].split('\n|\n')):

@@ -1,91 +1,144 @@
+var profiles;
+
 $(document).ready(function() {
-    getMovieList();
     getNotificationList();
-    $('#search_movie_name').keydown(function(e){
-        if(e.which == 13){
-            searchMovie($('#search_movie_name').val());
-        }
-    }).focus();
-    $('#search_movie_button').click(function() {
-        searchMovie($('#search_movie_name').val());
+    getMovieList();
+    getHistory();
+    $('#searchform').submit(function(e) {
+        e.preventDefault();
+        var search = $('#search_movie_name').val();
+        if (search) searchMovie(search);
+    });
+    $('#searchform button').click(function(e) {
+        e.stopPropagation();
     });
     $('#search_movie_name').popover({
         placement: 'bottom',
-        title: 'Search result',
-        trigger: 'focus',
-        content: '<div class="gif-loader" id="movie-loader"><img src="/img/loader.gif" alt="loader" /></div><table class="table"><tbody id="search-movie-list"></tbody></table>'
+        trigger: 'manual',
+        content: '<div class="spinner" id="searchspinner"></div><ul id="search-movie-list"></ul>'
+    });
+    $('html').click(function(){
+        $('#search_movie_name').popover('hide');
+    });
+    $.get('/couchpotato/GetProfiles', function(data) {
+        profiles = data;
     });
 });
 
 function getMovieList() {
-    $('.tooltip').remove();
-    $('#movies_table_body').children().remove();
+    $('#wanted-grid').children().remove();
+    $('.spinner').show();
     $.ajax({
         url: '/couchpotato/GetMovieList',
         type: 'get',
         dataType: 'json',
         success: function (result) {
-            if (result == null) {
-                var row = $('<tr>')
-                row.append($('<td>').html('No wanted movies found').attr('colspan', '5'));
-                $('#movies_table_body').append(row);
+            $('.spinner').hide();
+            if (result == null) result.total = 0;
+            if (result.total == 0) {
+                var row = $('<li>').html('No wanted movies found');
+                $('#wanted-grid').append(row);
                 return false;
             }
 
-            $.each(result.movies, function(i, item) {
-                var movieImage = $('<img>');
-                movieImage.css('height', '150px');
-                movieImage.css('width', '100px');
-                movieImage.attr('src', item.library.info.images.poster[0]);
+            $.each(result.movies, function(i, movie) {
+                movieItem = $('<li>').attr('id', movie.id);
 
-                var movieThumb = $('<a>').addClass('thumbnail');
-                movieThumb.append(movieImage);
-                movieThumb.css('height', '150px');
-                movieThumb.css('width', '100px');
-
-                var movieTitle = item.library.info.original_title;
-
-                var row = $('<tr>');
-                row.attr('id', item.id);
-                row.append($('<td>').append(movieThumb));
-                var movieHtml = '<h3>' + movieTitle + ' (' + item.library.year + ')</h3>';
-                movieHtml += item.library.plot + '<br />';
-
-                var info = $('<td>');
-                row.append(info.html(movieHtml));
-
-                /* Ignore profiles for now
-                $.each(item.profile.types, function(i, item) {
-                    var profile = $('<span>');
-                    profile.addClass('label');
-                    profile.html(item.id);
-                    info.append(profile);
-                    info.append(' ');
+                var movieAnchor = $('<a>').attr('href', '#');
+                movieAnchor.addClass('thumbnail');
+                movieAnchor.append($('<img>').attr('src', movie.library.info.images.poster[0]));
+                movieAnchor.click(function(e) {
+                    e.preventDefault();
+                    showMovie(movie);
                 });
-                */
+                movieItem.append(movieAnchor);
 
-                var editIcon = makeIcon('icon-pencil', 'Edit');
-                var refreshIcon = makeIcon('icon-refresh', 'Refresh');
-                refreshIcon.click(function() {
-                   refreshMovie(item.id, movieTitle);
-                });
-                var removeIcon = makeIcon('icon-remove', 'Remove');
-                removeIcon.click(function() {
-                    deleteMovie(item.id, movieTitle);
-                });
+                var movieTitle = shortenText(movie.library.info.original_title, 12);
+                movieItem.append($('<h6>').addClass('movie-title').html(movieTitle));
 
-                //row.append($('<td>').append(editIcon));
-                row.append($('<td>').append(refreshIcon));
-                row.append($('<td>').append(removeIcon));
-
-                $('#movies_table_body').append(row);
+                $('#wanted-grid').append(movieItem);
             });
+        }
+    });
+}
+function showMovie(movie) {
+    var movieTitle = movie.library.info.original_title
+    var modalMovieAnchor = $('<div>').addClass('thumbnail pull-left');
+    modalMovieAnchor.append($('<img>').attr('src', movie.library.info.images.poster[0]));
+
+    var modalMovieInfo = $('<div>').addClass('modal-movieinfo');
+    if (movie.library.info.runtime) {
+        modalMovieInfo.append($('<p>').html('<b>Runtime:</b> ' + parseSec(movie.library.info.runtime)));
+    }
+    modalMovieInfo.append($('<p>').html('<b>Plot:</b> ' + movie.library.plot));
+    if (movie.library.info.directors) {
+        modalMovieInfo.append($('<p>').html('<b>Director:</b> ' + movie.library.info.directors));
+    }
+    if (movie.library.info.genres) {
+        modalMovieInfo.append($('<p>').html('<b>Genre:</b> ' + movie.library.info.genres));
+    }
+    if (movie.library.info.rating.imdb) {
+        var rating = $('<div>').raty({
+            readOnly: true,
+            score: (movie.library.info.rating.imdb[0] / 2),
+        })
+        modalMovieInfo.append(rating);
+    }
+
+    var modalProfile = $('<p>').html('');
+    var profileSelect = $('<select>').change(function() {
+        editMovie(movie.id, $(this).val());
+    });
+    $.each(profiles.list, function(i, item) {
+        if (!item.hide) {
+            var option = $('<option>').val(item.id).text(item.label);
+            if (item.label == movie.profile.label) option.attr('selected','selected');
+            profileSelect.append(option);
+        }
+    });
+    modalProfile.append(profileSelect);
+    modalMovieInfo.append(modalProfile);
+
+    modalBody = $('<div>');
+    modalBody.append(modalMovieAnchor);
+    modalBody.append(modalMovieInfo);
+
+    var modalButtons = {
+        'Delete' : function() {
+            deleteMovie(movie.id, movieTitle);
+            hideModal();
+        },
+        'Refresh' : function() {
+            refreshMovie(movie.id, movieTitle);
+            hideModal();
+        }
+    }
+    if (movie.library.info.imdb) {
+        $.extend(modalButtons,{
+            'IMDb' : function() {
+                window.open('http://www.imdb.com/title/'+movie.library.info.imdb,'IMDb')
+            }
+        });
+    }
+
+    showModal(movieTitle + ' ('+movie.library.year+')',  modalBody, modalButtons);
+}
+
+function editMovie(id, profile) {
+    $.ajax({
+        url: '/couchpotato/EditMovie',
+        data: {id: id, profile: profile},
+        type: 'get',
+        dataType: 'json',
+        success: function (result) {
+            if (result.success) {
+                notify('CouchPotato', 'Profile changed', 'info');
+            }
         }
     });
 }
 
 function deleteMovie(id, name) {
-    $('.tooltip').remove();
     $.ajax({
         url: '/couchpotato/DeleteMovie',
         data: {id: id},
@@ -115,55 +168,65 @@ function refreshMovie(id, name) {
 }
 
 function searchMovie(q) {
-    $('.tooltip').remove();
+    $('#search_movie_name').popover('show')
+    $('#search-movie-list').click(function(e) {
+        e.stopPropagation();
+    });
+    $('#searchspinner').show();
     $.ajax({
         url: '/couchpotato/SearchMovie',
         data: {q: encodeURIComponent(q)},
         type: 'get',
         dataType: 'json',
-        beforeSend: function () {
-            $('#search_movie_name').popover('show');
-            $('#movie-loader').show();
-        },
         success: function (result) {
+            $('.spinner').hide();
             $.each(result.movies, function(i, item) {
-                $('#movie-loader').hide();
-
-                var movieImage = $('<img>');
-                movieImage.css('height', '100px');
-                movieImage.css('width', '75px');
-                movieImage.attr('src', item.images.poster[0]);
-
-                var movieThumb = $('<a>').addClass('thumbnail');
-                movieThumb.append(movieImage);
-                movieThumb.css('height', '100px');
-                movieThumb.css('width', '75px');
-
-                var row = $('<tr>');
-                row.attr('data-imdb', item.imdb);
-                row.append($('<td>').append(movieThumb));
-
-                var movieHtml = '<h3>' + item.original_title + ' <small>' + item.year + '</small></h3>';
-                movieHtml += shortenText(item.plot, 200);
-                row.append($('<td>').append(movieHtml));
-
-                var addIcon = makeIcon('icon-plus', 'Add');
-                addIcon.click(function() {
-                    addMovie(12, item.imdb, item.original_title);
+                var row = $('<li>').click(function(e) {
+                    e.stopPropagation();
+                    selectProfile(item)
                 });
-                row.append($('<td>').append(addIcon));
+
+                var movieThumb = $('<div>').addClass('thumbnail');
+                movieThumb.append($('<img>').attr('src', item.images.poster[0]));
+                row.append(movieThumb);
+
+                var movieInfo = $('<div>').addClass('movie-info');
+                movieInfo.append($('<h3>').text(item.original_title + ' ('+item.year+')'));
+                movieInfo.append($('<p>').html(shortenText(item.plot, 200)));
+                row.append(movieInfo);
+
                 $('#search-movie-list').append(row);
             });
         }
     });
 }
 
+function selectProfile(movie) {
+    var form = $('<form>').addClass('form-inline').submit(function(e) {
+        e.preventDefault();
+        var profile = $('#profile').val();
+        var title = $('#title').val();
+        addMovie(profile, movie.imdb, title);
+    });
+    var titleSelect = $('<select>').attr('id','title');
+    $.each(movie.titles, function(i, item) {
+        titleSelect.append($('<option>').text(item));
+    });
+    form.append(titleSelect);
+    var profileSelect = $('<select>').attr('id','profile');
+    $.each(profiles.list, function(i, item) {
+        if (!item.hide) {
+            var option = $('<option>').val(item.id).text(item.label);
+            profileSelect.append(option);
+        }
+    });
+    form.append(profileSelect);
+    form.append($('<button>').attr('type','submit').addClass('btn btn-success').text('Add'));
+    $('#search-movie-list').html(form);
+}
+
 function addMovie(profile, id, title) {
-    $('.tooltip').remove();
-    var loader = $('#movie-loader').show();
-    $('[data-imdb=' + id + ']').children().remove();
-    var row = $('<td>').attr('colspan', 3).append(loader);
-    $('[data-imdb=' + id + ']').append(row);
+    $('#search_movie_name').popover('hide');
     $.ajax({
         url: '/couchpotato/AddMovie',
         data: {
@@ -175,7 +238,6 @@ function addMovie(profile, id, title) {
         dataType: 'json',
         success: function (result) {
             notify('CouchPotato', title + ' successfully added!', 'info');
-            $('#search_movie_name').popover('hide');
             setTimeout(getMovieList, 1000);
         },
     });
@@ -187,7 +249,30 @@ function getNotificationList() {
         type: 'get',
         dataType: 'json',
         success: function (result) {
-            console.log(result);
+            if (result == null) return;
+            $.each(result.notifications, function(i, item) {
+                if (!item.read) {
+                    notify('Notifications', item.message, 'info');
+                }
+            });
+        }
+    });
+}
+
+function getHistory() {
+    $.ajax({
+        url: '/couchpotato/GetNotificationList',
+        type: 'get',
+        dataType: 'json',
+        success: function (result) {
+            if (result == null) return;
+            $.each(result.notifications, function(i, item) {
+                date = parseDate(item.added);
+                var row = $('<tr>');
+                row.append($('<td>').text(date));
+                row.append($('<td>').text(item.message));
+                $('#history-grid').prepend(row);
+            });
         }
     });
 }

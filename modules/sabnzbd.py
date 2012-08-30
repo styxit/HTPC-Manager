@@ -1,69 +1,104 @@
 import os, cherrypy, htpc
 from urllib import quote
-from htpc.tools import template, SafeFetchFromUrl
+from urllib2 import urlopen
+from json import loads
 
 class Sabnzbd:
     def __init__(self):
-        host = htpc.settings.get('sabnzbd_host', '')
-        port = str(htpc.settings.get('sabnzbd_port', ''))
-        apikey = htpc.settings.get('sabnzbd_apikey', '')
-        ssl = htpc.settings.get('sabnzbd_ssl', 0)
-        useSSL = ''
-        if int(ssl):
-            useSSL = 's'
-        self.url = 'http'+useSSL+'://'+host+':'+port+'/sabnzbd/api?output=json&apikey='+apikey
+        htpc.modules.append({
+            'name': 'SABnzbd',
+            'id': 'sabnzbd',
+            'test': '/sabnzbd/version',
+            'fields': [
+                {'type':'bool', 'label':'Enable', 'name':'sabnzbd_enable'},
+                {'type':'text', 'label':'Menu name', 'name':'sabnzbd_name'},
+                {'type':'text', 'label':'IP / Host *', 'name':'sabnzbd_host'},
+                {'type':'text', 'label':'Port *', 'name':'sabnzbd_port'},
+                {'type':'text', 'label':'API key', 'name':'sabnzbd_apikey'},
+                {'type':'bool', 'label':'Use SSL', 'name':'sabnzbd_ssl'}
+        ]})
 
     @cherrypy.expose()
     def index(self):
-        return template('sabnzbd.html')
+        return htpc.lookup.get_template('sabnzbd.html').render()
 
     @cherrypy.expose()
-    def GetHistory(self, **kwargs):
-        return SafeFetchFromUrl(self.url + '&mode=history&limit=' + str(kwargs.get('limit')))
+    @cherrypy.tools.json_out()
+    def version(self, sabnzbd_host, sabnzbd_port, sabnzbd_apikey, sabnzbd_ssl=False, **kwargs):
+        ssl = 's' if sabnzbd_ssl else ''
+        url = 'http'+ssl+'://'+sabnzbd_host+':'+sabnzbd_port+'/sabnzbd/api?output=json&apikey='+sabnzbd_apikey
+        try:
+            return loads(urlopen(url+'&mode=version', timeout=10).read())
+        except:
+            return
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetHistory(self, limit=''):
+        return self.fetch('&mode=history&limit='+limit)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def GetStatus(self):
-        return SafeFetchFromUrl(self.url + '&mode=queue')
+        return self.fetch('&mode=queue')
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def GetWarnings(self):
-        return SafeFetchFromUrl(self.url + '&mode=warnings')
+        return self.fetch('&mode=warnings')
 
     @cherrypy.expose()
-    def TogglePause(self, **kwargs):
-        return SafeFetchFromUrl(self.url + '&mode=' + kwargs.get('mode'))
+    @cherrypy.tools.json_out()
+    def TogglePause(self, mode=''):
+        return self.fetch('&mode='+mode)
 
     @cherrypy.expose()
-    def AddNzbFromUrl(self, **kwargs):
-        url = kwargs.get('nzb_url')
-        cat = kwargs.get('nzb_category')
-        category = ''
-        if cat:
-            category = '&cat=' + str(cat)
-        return SafeFetchFromUrl(self.url + '&mode=addurl&name=' + quote(url) + category)
+    @cherrypy.tools.json_out()
+    def AddNzbFromUrl(self, nzb_url, nzb_category=''):
+        if nzb_category:
+            nzb_category = '&cat='+nzb_category
+        return self.fetch('&mode=addurl&name='+quote(nzb_url)+nzb_category)
 
     @cherrypy.expose()
-    def DeleteNzb(self, **kwargs):
-        return SafeFetchFromUrl(self.url + '&mode=queue&name=delete&value=' + kwargs.get('id'))
+    @cherrypy.tools.json_out()
+    def DeleteNzb(self, id):
+        return self.fetch('&mode=queue&name=delete&value='+id)
 
     @cherrypy.expose()
-    def DeleteHistory(self, **kwargs):
-        return SafeFetchFromUrl(self.url + '&mode=history&name=delete&value=' + kwargs.get('id'))
+    @cherrypy.tools.json_out()
+    def DeleteHistory(self, id):
+        return self.fetch('&mode=history&name=delete&value='+id)
 
     @cherrypy.expose()
-    def Retry(self, **kwargs):
-        return SafeFetchFromUrl(self.url + '&mode=retry&value=' + kwargs.get('id'))
+    @cherrypy.tools.json_out()
+    def Retry(self, id):
+        return self.fetch('&mode=retry&value='+id)
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def GetCategories(self):
-        return SafeFetchFromUrl(self.url + '&mode=get_cats')
+        return self.fetch('&mode=get_cats')
 
     @cherrypy.expose()
-    def ChangeCategory(self, **kwargs):
-        return SafeFetchFromUrl(self.url + '&mode=change_cat&value=' + kwargs.get('id') + '&value2=' + kwargs.get('cat'))
+    @cherrypy.tools.json_out()
+    def ChangeCategory(self, id, cat):
+        return self.fetch('&mode=change_cat&value='+id+'&value2='+cat)
 
     @cherrypy.expose()
-    def SetSpeed(self, **kwargs):
-        return SafeFetchFromUrl(self.url + '&mode=config&name=speedlimit&value=' + str(kwargs.get('speed')))
+    @cherrypy.tools.json_out()
+    def SetSpeed(self, speed):
+        return self.fetch('&mode=config&name=speedlimit&value='+speed)
+
+    def fetch(self, path):
+        try:
+            settings = htpc.settings.Settings()
+            host = settings.get('sabnzbd_host', '')
+            port = str(settings.get('sabnzbd_port', ''))
+            apikey = settings.get('sabnzbd_apikey', '')
+            ssl = 's' if settings.get('sabnzbd_ssl', 0) else ''
+            url = 'http'+ssl+'://'+host+':'+port+'/sabnzbd/api?output=json&apikey='+apikey+path
+            return loads(urlopen(url, timeout=10).read())
+        except:
+            return
 
 htpc.root.sabnzbd = Sabnzbd()

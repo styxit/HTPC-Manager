@@ -1,40 +1,85 @@
 import os, cherrypy, htpc
-from htpc.tools import template, SafeFetchFromUrl
+from json import loads
+from urllib2 import urlopen
 
 class CouchPotato:
     def __init__(self):
-        host = htpc.settings.get('couchpotato_host', '')
-        port = str(htpc.settings.get('couchpotato_port', ''))
-        apikey = htpc.settings.get('couchpotato_apikey', '')
-        self.url = 'http://'+host+':'+port+'/api/'+apikey+'/';
+        htpc.modules.append({
+            'name': 'CouchPotato',
+            'id': 'couchpotato',
+            'test': '/couchpotato/ping',
+            'fields': [
+                {'type':'bool', 'label':'Enable', 'name':'couchpotato_enable'},
+                {'type':'text', 'label':'Menu name', 'name':'couchpotato_name'},
+                {'type':'text', 'label':'IP / Host *', 'name':'couchpotato_host'},
+                {'type':'text', 'label':'Port *', 'name':'couchpotato_port'},
+                {'type':'text', 'label':'API key', 'name':'couchpotato_apikey'},
+        ]})
 
     @cherrypy.expose()
     def index(self):
-        return template('couchpotato.html')
+        return htpc.lookup.get_template('couchpotato.html').render()
 
     @cherrypy.expose()
-    def GetMovieList(self, **kwargs):
-        limit = kwargs.get('limit','')
-        return SafeFetchFromUrl(self.url + 'movie.list?limit_offset='+limit)
+    @cherrypy.tools.json_out()
+    def ping(self, couchpotato_host, couchpotato_port, couchpotato_apikey, **kwargs):
+        try:
+            url = 'http://'+couchpotato_host+':'+couchpotato_port+'/api/'+couchpotato_apikey
+            return loads(urlopen(url+'/app.available', timeout=10).read())
+        except:
+            return
 
     @cherrypy.expose()
-    def GetNotificationList(self):
-        return SafeFetchFromUrl(self.url + 'notification.list')
-    
+    @cherrypy.tools.json_out()
+    def GetMovieList(self, limit=''):
+        return self.fetch('movie.list?limit_offset='+limit)
+
     @cherrypy.expose()
-    def DeleteMovie(self, **kwargs):
-        return SafeFetchFromUrl(self.url + 'movie.delete/?id=' + kwargs.get('id'))
-    
+    @cherrypy.tools.json_out()
+    def GetNotificationList(self, limit='20'):
+        data = self.fetch('notification.list?limit_offset='+limit)
+        self.fetch('notification.markread')
+        return data
+
     @cherrypy.expose()
-    def RefreshMovie(self, **kwargs):
-        return SafeFetchFromUrl(self.url + 'movie.refresh/?id=' +  kwargs.get('id'))
-    
+    @cherrypy.tools.json_out()
+    def DeleteMovie(self, id=''):
+        return self.fetch('movie.delete/?id='+id)
+
     @cherrypy.expose()
-    def SearchMovie(self, **kwargs):
-        return SafeFetchFromUrl(self.url + 'movie.search/?q=' +  kwargs.get('q'))
-    
+    @cherrypy.tools.json_out()
+    def RefreshMovie(self, id):
+        return self.fetch('movie.refresh/?id='+id)
+
     @cherrypy.expose()
-    def AddMovie(self, **kwargs):
-        return SafeFetchFromUrl(self.url + 'movie.add/?profile_id='+kwargs.get('profile_id')+'&identifier='+kwargs.get('identifier')+'&title='+kwargs.get('title'))
+    @cherrypy.tools.json_out()
+    def EditMovie(self, id, profile):
+        return self.fetch('movie.edit/?id='+id+'&profile_id='+profile)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def SearchMovie(self, q=''):
+        return self.fetch('movie.search/?q='+q)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetProfiles(self):
+        return self.fetch('profile.list')
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def AddMovie(self, profile_id='', identifier='', title=''):
+        return self.fetch('movie.add/?profile_id='+profile_id+'&identifier='+identifier+'&title='+title)
+
+    def fetch(self, path):
+        try:
+            settings = htpc.settings.Settings()
+            host = settings.get('couchpotato_host', '')
+            port = str(settings.get('couchpotato_port', ''))
+            apikey = settings.get('couchpotato_apikey', '')
+            url = 'http://'+host+':'+port+'/api/'+apikey+'/'+path
+            return loads(urlopen(url, timeout=10).read())
+        except:
+            return
 
 htpc.root.couchpotato = CouchPotato()

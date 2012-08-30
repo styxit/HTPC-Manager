@@ -110,7 +110,7 @@ function searchNzbs(query, catid) {
         dataType: 'json',
         beforeSend: function () {
             $('#results_table_body').empty();
-            $('#show-loader').show();
+            $('.spinner').show();
         },
         success: function (data) {
             if (data === null) return
@@ -140,7 +140,7 @@ function searchNzbs(query, catid) {
 
                 row.append($('<td>').append(toSabIcon));
 
-                 $('#show-loader').hide();
+                 $('.spinner').hide();
                 $('#results_table_body').append(row);
             });
         }
@@ -159,6 +159,6 @@ $(document).ready(function () {
     $('#search_nzb_button').click(function () {
         searchNzbs($('#search_query').val(), $('#catid').val());
     });
-    
+
     getCategories();
 });

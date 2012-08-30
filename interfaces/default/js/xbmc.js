@@ -4,99 +4,71 @@ $(document).ready(function() {
     loadXbmcShows();
     loadNowPlaying();
 
-    $.get('/xbmc/Servers', function (data) {
+    $.get('/xbmc/Servers', function(data) {
         if (data==null) return;
         var servers = $('<select>').change(function() {
-             $.get('/xbmc/Servers?server='+$(this).val(), function (data) {
+             $.get('/xbmc/Servers?server='+$(this).val(), function(data) {
                 notify('XBMC','Server change '+data,'info');
-                $('#movie-grid').empty();
-                allMoviesLoaded = false;
-                loadMovies();
-                $('#show-grid').empty();
-                allShowsLoaded = false;
-                loadXbmcShows();
              });
         });
-        $.each(data.servers, function (i, item) {
-            var server = $('<option>').text(item).val(item);
+        $.each(data.servers, function(i, item) {
+            var server = $('<option>').text(item.name).val(item.id);
             servers.append(server);
         });
         servers.val(data.current);
         $('#servers').append(servers);
     }, 'json');
 
-    $(document).keydown(function (e) {
-        arrow = {8: 'Back', 13: 'Select', 37: 'Left', 38: 'Up', 39: 'Right', 40: 'Down'};
+    $(document).keydown(function(e) {
+        arrow = {8: 'Back', 27: 'Back', 13: 'Select', 37: 'Left', 38: 'Up', 39: 'Right', 40: 'Down',
+                 88: 'Stop', 32: 'PlayPause'};
         command = arrow[e.which];
         if (command) {
             e.preventDefault();
             xbmcControl(command);
         }
     });
-    $('#xbmc-notify').click(function () {
+    $('#hidewatched').click(function() {
+        $(this).toggleClass('hidewatched');
+        $('#show-seasons').hide();
+        $('#show-grid').empty();
+        allShowsLoaded = false;
+        loadXbmcShows();
+        $('#show-grid').show();
+    });
+    $('#xbmc-notify').click(function() {
         msg = prompt("Message");
         if (msg) sendNotification(msg);
     });
-    $('#xbmc-restart').click(function () {
+    $('#xbmc-restart').click(function() {
         $.get('/xbmc/System?action=Reboot', function(data){
             notify('Reboot','Rebooting...','warning');
         });
     });
-    $('#xbmc-shutdown').click(function () {
+    $('#xbmc-shutdown').click(function() {
         $.get('/xbmc/System?action=Suspend', function(data){
             notify('Shutdown','Shutting down...','warning');
         });
     });
-    $('#xbmc-wake').click(function () {
+    $('#xbmc-wake').click(function() {
         $.get('/xbmc/Wake', function(data){
             notify('Wake','Sending WakeOnLan packet...','warning');
         });
     });
-    $('#back-to-shows').click(function () {
-        $('#show-details').hide();
-        $('#show-grid').show();
-    });
-    $.get('/xbmc/Subtitles', function (data) {
-        if (data==null) return;
-        current = data.currentsubtitle.index;
-        if (data.subtitleenabled==false) current = 'off';
-        var subtitles = $('#subtitles').empty();
-        $.each(data.subtitles, function (i, item) {
-            var link = $('<a>').attr('href','#').text(item.name).click(function(e) {
-                e.preventDefault();
-                $.get('/xbmc/Subtitles?subtitle='+item.index, function (data) {
-                    notify('Subtitles','Change successful','info');
-                });
-            });
-            if (item.index==current) link.prepend($('<i>').addClass('icon-ok'));
-            subtitles.append($('<li>').append(link));
-        });
-    }, 'json');
-    $.get('/xbmc/Audio', function (data) {
-        if (data==null) return;
-        current = data.currentaudiostream.index;
-        var audio = $('#audio').empty();
-        $.each(data.audiostreams, function (i, item) {
-            var link = $('<a>').attr('href','#').text(item.name).click(function(e) {
-                e.preventDefault();
-                $.get('/xbmc/Audio?audio='+item.index, function (data) {
-                    notify('Audio','Change successful','info');
-                });
-            });
-            if (item.index==current) link.prepend($('<i>').addClass('icon-ok'));
-            audio.append($('<li>').append(link));
-        });
-    }, 'json');
-    $('#btn-clean-video-lib').click(function () {
+    $('.clean-video-lib').click(function(e) {
+        e.preventDefault();
         xbmcClean('video');
     });
-    $('#btn-scan-video-lib').click(function () {
+    $('.scan-video-lib').click(function(e) {
+        e.preventDefault();
         xbmcScan('video');
     });
-    $('#btn-clean-audio-lib').click(function () {
+    $('.clean-audio-lib').click(function(e) {
+        e.preventDefault();
         xbmcClean('audio');
     });
-    $('#btn-scan-audio-lib').click(function () {
+    $('.scan-audio-lib').click(function(e) {
+        e.preventDefault();
         xbmcScan('audio');
     });
 
@@ -113,7 +85,7 @@ $(document).ready(function() {
             }
         }
     });
-    $('[data-sortmethod]').click(function () {
+    $('[data-sortmethod]').click(function() {
         $('#movie-grid').html('');
         lastMovieLoaded = 0;
         allMoviesLoaded = false;
@@ -126,7 +98,7 @@ $(document).ready(function() {
             sortmethod: $('.active-sortmethod').attr('data-sortmethod')
         });
     });
-    $('[data-sortorder]').click(function () {
+    $('[data-sortorder]').click(function() {
         $('#movie-grid').html('');
         lastMovieLoaded = 0;
         allMoviesLoaded = false;

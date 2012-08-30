@@ -4,7 +4,7 @@ function loadShows() {
         type: 'get',
         dataType: 'json',
         success: function (result) {
-            if (result.data.legth == 0) {
+            if (result.data.length == 0) {
                 var row = $('<tr>')
                 row.append($('<td>').html('No shows found'));
                 $('#tvshows_table_body').append(row);
@@ -13,17 +13,16 @@ function loadShows() {
                 var name = $('<a>').attr('href','#').html(showname).click(function(e){
                     loadShow(tvshow.tvdbid);
                 });
-
                 var row = $('<tr>')
                 row.append($('<td>').html(name));
                 row.append($('<td>').html(tvshow.status));
                 row.append($('<td>').html(tvshow.next_ep_airdate));
                 row.append($('<td>').html(tvshow.network));
-                row.append($('<td>').html(tvshow.quality));
-
+                var quality = $('<span>').text(tvshow.quality).addClass('label');
+                if (tvshow.quality == "HD") quality.addClass('label-success');
+                row.append($('<td>').html(quality));
                 $('#tvshows_table_body').append(row);
             });
-
             $('#tvshows_table_body').parent().trigger('update');
         }
     });
@@ -100,10 +99,8 @@ function loadNextAired(options) {
                     return false;
                 }
                 var row = $('<tr>');
-                episode = shortenText(tvshow.ep_name, 15);
-                episodeLong = tvshow.season+'x'+tvshow.episode+' - '+tvshow.ep_name
                 row.append($('<td>').html(tvshow.show_name));
-                row.append($('<td>').html(episode).attr('title',episodeLong));
+                row.append($('<td>').html(tvshow.ep_name));
                 row.append($('<td>').html(tvshow.airdate));
 
                 $('#nextaired_table_body').append(row);
@@ -168,13 +165,10 @@ function searchTvDb(query) {
         dataType: 'xml',
         success: function (result) {
             series = $(result).find('Series');
-
             if (series.length == 0) {
-                $('#add_show_button').attr('disabled', false)
-                // TODO nog een error message tonen
+                $('#add_show_button').attr('disabled', false);
                 return;
             }
-
             $('#add_show_select').html('');
             series.each(function() {
                 var tvdbid = $(this).find('seriesid').text();
@@ -200,7 +194,7 @@ function addShow(tvdbid) {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            alert(data.message);
+            notify('Add TV show',data.message,'success');
             cancelAddShow();
         }
     });

@@ -19,7 +19,7 @@ $(document).ready(function () {
         sendCommand('power')
     });
     $('[data-player-control=PlayPause]').click(function(){
-        sendCommand('pause') 
+        sendCommand('pause')
     });
     $('[data-player-control=MoveLeft]').click(function() {
         sendCommand('playlist jump -1')
@@ -90,52 +90,51 @@ function refreshPlayer() {
             nowPlayingThumb = nowPlaying;
             var thumbnail = $('<img>');
             thumbnail.attr('src', '/squeezebox/GetCover?player='+currentPlayer);
-            thumbnail.css('height','140px');
-            thumbnail.css('width','140px');
             $('#nowplaying .thumbnail').html(thumbnail);
         }
-            $('#volume').text(player['mixer volume']);
-            $('#player-item-title').text(nowPlaying);
-            $('#player-item-time').text(parseSec(player.time) + ' / ' + parseSec(player.duration));
-            $('#player-progressbar').children().width((player.time / player.duration * 100) + '%');
-            var playPauseIcon = $('[data-player-control=PlayPause]').find('i');
-            var icon = (player.mode=='play')?'icon-pause':'icon-play';
-            playPauseIcon.removeClass().addClass(icon);
-            var powerIcon = $('[data-player-control=Power]');
-            powerIcon.toggleClass('active',(player.power=='1'));
-            $('#playlist_table').html('');
-            $.each(player.playlist_loop, function (t, track) {
-                if (track.album == undefined) track.album = '';
-                var row = $('<tr>')
-                var play = $('<a>').attr('href','#').click(function(e) {
-                    e.preventDefault();
-                    sendCommand('playlist jump '+t);
-                }).append($('<i>').addClass('icon-play'));
-                var remove = $('<a>').attr('href','#').click(function(e) {
-                    e.preventDefault();
-                    sendCommand('playlist delete '+t);
-                }).append($('<i>').addClass('icon-remove'));
-                var title = $('<a>').attr('href','#').text(track.title).click(function(e) {
-                    e.preventDefault();
-                    sendCommand('playlist jump '+t);
-                });
-                var current = $('<td>').append(title);
-                current.append(remove);
-                current.append(play);
-                row.append(current);
-                var artist = $('<a>').attr('href','#').text(track.artist).click(function(e) {
-                    e.preventDefault();
-                    getSongs('artist_id:'+artist_id[track.artist]);
-                });
-                row.append($('<td>').append(artist));
-                var album = $('<a>').attr('href','#').text(track.album).click(function(e) {
-                    e.preventDefault();
-                    getSongs('album_id:'+album_id[track.album]);
-                });
-                row.append($('<td>').append(album));
-                row.append($('<td>').append(parseSec(track.duration)).addClass('right'));
-                $('#playlist_table').append(row);
+        $('#volume').text(player['mixer volume']);
+        $('#player-item-title').text(nowPlaying);
+        $('#player-item-time').text(parseSec(player.time) + ' / ' + parseSec(player.duration));
+        $('#player-progressbar').children().width((player.time / player.duration * 100) + '%');
+        var playPauseIcon = $('[data-player-control=PlayPause]').find('i');
+        var icon = (player.mode=='play')?'icon-pause':'icon-play';
+        playPauseIcon.removeClass().addClass(icon);
+        var powerIcon = $('[data-player-control=Power]');
+        powerIcon.toggleClass('active',(player.power=='1'));
+        $('#playlist_table').html('');
+        $.each(player.playlist_loop, function (t, track) {
+            if (track.album == undefined) track.album = '';
+            var row = $('<tr>')
+            var current = $('<td>').append(title);
+            var play = $('<a>').attr('href','#').click(function(e) {
+                e.preventDefault();
+                sendCommand('playlist jump '+t);
+            }).append($('<i>').addClass('icon-play'));
+            current.append(play);
+            var remove = $('<a>').attr('href','#').click(function(e) {
+                e.preventDefault();
+                sendCommand('playlist delete '+t);
+            }).append($('<i>').addClass('icon-remove'));
+            current.append(remove);
+            var title = $('<a>').attr('href','#').text(track.title).click(function(e) {
+                e.preventDefault();
+                sendCommand('playlist jump '+t);
             });
+            current.append(title);
+            row.append(current);
+            var artist = $('<a>').attr('href','#').text(track.artist).click(function(e) {
+                e.preventDefault();
+                getSongs('artist_id:'+artist_id[track.artist]);
+            });
+            row.append($('<td>').append(artist));
+            var album = $('<a>').attr('href','#').text(track.album).click(function(e) {
+                e.preventDefault();
+                getSongs('album_id:'+album_id[track.album]);
+            });
+            row.append($('<td>').append(album));
+            row.append($('<td>').append(parseSec(track.duration)).addClass('right'));
+            $('#playlist_table').append(row);
+        });
     }, 'json');
 }
 

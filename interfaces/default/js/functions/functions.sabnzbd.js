@@ -28,7 +28,7 @@ function retryHistoryItem(id) {
 
 function loadHistory() {
     $.ajax({
-        url: '/sabnzbd/GetHistory?limit=25',
+        url: '/sabnzbd/GetHistory?limit=10',
         type: 'get',
         dataType: 'json',
         success: function (data) {

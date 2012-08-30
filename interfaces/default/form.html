@@ -1,0 +1,44 @@
+<%def name="buildForm(action='', method='POST', id='', classes='form-horizontal', legend='', fields=[], buttons=[
+    {'name':'Save changes', 'type':'submit', 'classes':'btn-primary'},
+    {'name':'Clear', 'type':'reset'}
+])"><%
+import htpc
+settings = htpc.settings.Settings()
+%><form${' action="'+action+'"' if action else ''} method="${method}" id="${id}"${' class="'+classes+'"' if classes else ''}>
+    <fieldset>
+        <legend>${legend}</legend>
+        % for field in fields:
+        <div class="control-group">
+            <label for="${field.get('name')}" class="control-label">${field.get('label')}</label>
+            <div class="controls">
+                % if field.get('type') in ['text', 'password']:
+                <% value = field.get('value') if field.get('value') else settings.get(field.get('name')) %>
+                <input type="${field.get('type')}" name="${field.get('name')}" id="${field.get('name')}" class="span3" value="${value}"/>
+                % elif field.get('type') == 'bool':
+                <% checked = field.get('checked') if field.get('checked') else settings.get(field.get('name')) %>
+                <input type="checkbox" name="${field.get('name')}" id="${field.get('name')}"${
+                ' checked="checked"' if checked else ''}${
+                ' class="enable-module"' if field.get('name').endswith('enable') else ''}/>
+                % elif field.get('type') == 'select':
+                <select name="${field.get('name')}" id="${field.get('name')}">
+                    % for option in field.get('options'):
+                    <option value="${option.get('value')}"${
+                    ' selected="selected"' if option.get('selected', 0) else ''}>${option.get('name')}</option>
+                    % endfor
+                </select>
+                % endif
+            </div>
+        </div>
+        % endfor
+        <div class="form-actions">
+        % for btn in buttons:
+            % if btn.get('test'):
+            <button type="${btn.get('type')}" class="btn ${btn.get('classes', '')}" data-target="${btn.get('test')}" data-loading-text="Testing...">${btn.get('name')}</button>
+            % else:
+            <button type="${btn.get('type')}" class="btn ${btn.get('classes', '')}">${btn.get('name')}</button>
+            % endif
+        % endfor
+        </div>
+    </fieldset>
+</form>
+</%def>

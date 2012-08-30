@@ -1,49 +1,89 @@
 import os, cherrypy, htpc
 from urllib import quote
-from htpc.tools import template, SafeFetchFromUrl
+from urllib2 import urlopen
+from json import loads
 
 class Sickbeard:
     def __init__(self):
-        host = htpc.settings.get('sickbeard_host', '')
-        port = str(htpc.settings.get('sickbeard_port', ''))
-        apikey = htpc.settings.get('sickbeard_apikey', '')
-        self.url = 'http://' + host + ':' + str(port) + '/api/' + apikey + '/?cmd=';
+        htpc.modules.append({
+            'name': 'Sickbeard',
+            'id': 'sickbeard',
+            'test': '/sickbeard/ping',
+            'fields': [
+                {'type':'bool', 'label':'Enable', 'name':'sickbeard_enable'},
+                {'type':'text', 'label':'Menu name', 'name':'sickbeard_name'},
+                {'type':'text', 'label':'IP / Host *', 'name':'sickbeard_host'},
+                {'type':'text', 'label':'Port *', 'name':'sickbeard_port'},
+                {'type':'text', 'label':'API key', 'name':'sickbeard_apikey'}
+        ]})
 
     @cherrypy.expose()
     def index(self):
-        return template('sickbeard.html')
+        return htpc.lookup.get_template('sickbeard.html').render()
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def ping(self, sickbeard_host, sickbeard_port, sickbeard_apikey, **kwargs):
+        try:
+            url = 'http://'+sickbeard_host+':'+sickbeard_port+'/api/'+sickbeard_apikey+'/?cmd=';
+            response = loads(urlopen(url+'sb.ping', timeout=10).read())
+            if response.get('result') == "success":
+                return response
+        except:
+            return
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def GetShowList(self):
-        return SafeFetchFromUrl(self.url + 'shows&sort=name')
+        return self.fetch('shows&sort=name')
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def GetNextAired(self):
-        return SafeFetchFromUrl(self.url + 'future')
+        return self.fetch('future')
 
     @cherrypy.expose()
-    def GetPoster(self, **kwargs):
-        return SafeFetchFromUrl(self.url + 'show.getposter&tvdbid=' + kwargs.get('tvdbid'))
+    @cherrypy.tools.json_out()
+    def GetPoster(self, tvdbid):
+        return self.fetch('show.getposter&tvdbid='+tvdbid)
 
     @cherrypy.expose()
-    def GetHistory(self, **kwargs):
-        return SafeFetchFromUrl(self.url + 'history&limit=' + kwargs.get('limit'))
+    @cherrypy.tools.json_out()
+    def GetHistory(self, limit=''):
+        return self.fetch('history&limit='+limit)
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def GetLogs(self):
-        return SafeFetchFromUrl(self.url + 'logs&min_level=info')
+        return self.fetch('logs&min_level=info')
 
     @cherrypy.expose()
-    def AddShow(self, **kwargs):
-        return SafeFetchFromUrl(self.url + 'show.addnew&tvdbid=' + kwargs.get('tvdbid'))
+    @cherrypy.tools.json_out()
+    def AddShow(self, tvdbid):
+        return self.fetch('show.addnew&tvdbid='+tvdbid)
 
     @cherrypy.expose()
-    def GetShow(self, **kwargs):
-        return SafeFetchFromUrl(self.url + 'show&tvdbid=' + kwargs.get('tvdbid'))
+    @cherrypy.tools.json_out()
+    def GetShow(self, tvdbid):
+        return self.fetch('show&tvdbid='+tvdbid)
 
     @cherrypy.expose()
-    def SearchShow(self, **kwargs):
-        seriesname = quote(kwargs.get('query'))
-        return SafeFetchFromUrl('http://www.thetvdb.com/api/GetSeries.php?seriesname='+seriesname)
+    def SearchShow(self, query):
+        try:
+            url = 'http://www.thetvdb.com/api/GetSeries.php?seriesname='+quote(query)
+            return loads(urlopen(url, timeout=10).read())
+        except:
+            return
+
+    def fetch(self, cmd):
+        try:
+            settings = htpc.settings.Settings()
+            host = settings.get('sickbeard_host', '')
+            port = str(settings.get('sickbeard_port', ''))
+            apikey = settings.get('sickbeard_apikey', '')
+            url = 'http://' + host + ':' + str(port) + '/api/' + apikey + '/?cmd='+cmd;
+            return loads(urlopen(url, timeout=10).read())
+        except:
+            return
 
 htpc.root.sickbeard = Sickbeard()

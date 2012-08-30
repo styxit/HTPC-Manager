@@ -1,6 +1,1 @@
-import xbmc
-import sabnzbd
-import sickbeard
-import couchpotato
-import squeezebox
-import search
+__all__ = ["xbmc", "sabnzbd", "couchpotato", "sickbeard", "squeezebox", "search"]
