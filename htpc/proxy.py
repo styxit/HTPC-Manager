@@ -1,6 +1,9 @@
 import os, cherrypy, htpc
 from cherrypy.lib.static import serve_file
-import Image, ImageEnhance
+try:
+    import Image, ImageEnhance
+except:
+    from PIL import Image, ImageEnhance
 from urllib2 import quote, unquote, Request, urlopen
 
 def getImage(url, h=None, w=None, o=100, auth=None, **kwargs):
