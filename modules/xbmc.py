@@ -1,12 +1,8 @@
-import os, sys, platform, subprocess
-import cherrypy, htpc
-from htpc.proxy import getImage
-import urllib, urllib2, base64
-import Image, ImageEnhance
-from jsonrpclib import Server
-from json import loads
+import os, sys, cherrypy, htpc
+import urllib2, base64
 import socket, struct
-
+from htpc.proxy import getImage
+from jsonrpclib import Server
 from sqlobject import *
 
 class XbmcServers(SQLObject):
