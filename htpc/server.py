@@ -21,7 +21,7 @@ def start():
 
     # Create PID if specified
     if htpc.pid:
-        PIDFile(cherrypy.engine, args.pid).subscribe()
+        PIDFile(cherrypy.engine, htpc.pid).subscribe()
 
     # Set static directories
     webdir = os.path.join(htpc.rundir, htpc.template)
