@@ -24,13 +24,8 @@ def start():
         Daemonizer(cherrypy.engine).subscribe()
 
     # Create PID if specified
-<<<<<<< HEAD
-    if htpc.PID:
-        PIDFile(cherrypy.engine, htpc.PID).subscribe()
-=======
     if htpc.pid:
         PIDFile(cherrypy.engine, htpc.pid).subscribe()
->>>>>>> 31eef0c42da6432e03977db77f25c302c08130f5
 
     # Set static directories
     webdir = os.path.join(htpc.RUNDIR, htpc.TEMPLATE)
