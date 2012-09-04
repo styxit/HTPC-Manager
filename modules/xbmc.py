@@ -1,15 +1,15 @@
 """ Module for connecting to XBMC """
 import cherrypy
 import htpc
-import urllib2
 import base64
 import socket
 import struct
-from htpc.proxy import get_image
+from urllib2 import quote, unquote
 from jsonrpclib import Server
 from xmlrpclib import ProtocolError
 from sqlobject import SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol, IntCol
+from htpc.proxy import get_image
 
 
 class XbmcServers(SQLObject):
@@ -167,16 +167,14 @@ class Xbmc:
     @cherrypy.expose()
     def GetThumb(self, thumb=None, h=None, w=None, o=100):
         """ Parse thumb to get the url and send to htpc.proxy.get_image """
-        url = urllib2.unquote(thumb)
+        url = unquote(thumb)
         if not url:
             url = self.url('/images/DefaultVideo.png')
         if url.startswith('special://'):  # Eden
-            url = urllib2.quote(url, '')
-            url = self.url('/vfs/' + url)
+            url = self.url('/vfs/' + quote(url))
         elif url.startswith('image://'):  # Frodo
             url = url[len('image://'):].encode('utf-8')
-            url = urllib2.quote(urllib2.quote(url, '()'), '()')
-            url = self.url('/image/image://' + url)
+            url = self.url('/image/' + quote(url))
 
         return get_image(url, h, w, o, self.auth())
 
