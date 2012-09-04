@@ -1,10 +1,13 @@
-import os, cherrypy, htpc
-import urllib2, base64, cherrypy
+import cherrypy
+import urllib2
+import base64
+import htpc
 from json import dumps, loads
+
 
 class Squeezebox:
     def __init__(self):
-        htpc.modules.append({
+        htpc.MODULES.append({
             'name': 'Squeezebox',
             'id': 'squeezebox',
             'fields': [
@@ -18,7 +21,7 @@ class Squeezebox:
 
     @cherrypy.expose()
     def index(self):
-        return htpc.lookup.get_template('squeezebox.html').render()
+        return htpc.LOOKUP.get_template('squeezebox.html').render()
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -34,11 +37,11 @@ class Squeezebox:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetPlayer(self, player):
-        return self.jsonRequest(player, ["status","0"])
+        return self.jsonRequest(player, ["status", "0"])
 
     @cherrypy.expose()
     def GetCover(self, player):
-        url = self.webhost('music/current/cover.jpg?player='+player)
+        url = self.webhost('music/current/cover.jpg?player=' + player)
         request = urllib2.Request(url)
         auth = self.auth()
         if auth:
@@ -49,20 +52,20 @@ class Squeezebox:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetGenres(self):
-        return self.jsonRequest("", ["genres","0"])
+        return self.jsonRequest("", ["genres", "0"])
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetArtists(self):
-        return self.jsonRequest("", ["artists","0"])
+        return self.jsonRequest("", ["artists", "0"])
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetAlbums(self, artist=None, start=0, end=999):
         if artist:
-            return self.jsonRequest("", ["albums", start, end, "artist_id:%s"%artist])
+            return self.jsonRequest("", ["albums", start, end, "artist_id:%s" % artist])
         else:
-            return self.jsonRequest("", ["albums","0"])
+            return self.jsonRequest("", ["albums", "0"])
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -82,13 +85,13 @@ class Squeezebox:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetPlaylists(self):
-        return self.jsonRequest("", ["playlists","0"])
+        return self.jsonRequest("", ["playlists", "0"])
 
     def webhost(self, path=''):
         settings = htpc.settings.Settings()
         host = settings.get('squeezebox_host', '')
         port = str(settings.get('squeezebox_port', ''))
-        return 'http://'+host+':'+str(port)+'/'+path
+        return 'http://' + host + ':' + str(port) + '/' + path
 
     def auth(self):
         settings = htpc.settings.Settings()
@@ -98,12 +101,10 @@ class Squeezebox:
             return base64.encodestring('%s:%s' % (username, password)).strip()
 
     def jsonRequest(self, player, params):
-        data = dumps({"id":1,"method":"slim.request","params":[player,params]})
+        data = dumps({"id": 1, "method": "slim.request", "params": [player, params]})
         request = urllib2.Request(self.webhost('jsonrpc.js'), data)
         auth = self.auth()
         if (auth):
             request.add_header("Authorization", "Basic %s" % auth)
         result = urllib2.urlopen(request, timeout=5).read()
         return loads(result.decode('utf-8'))
-
-htpc.root.squeezebox = Squeezebox()

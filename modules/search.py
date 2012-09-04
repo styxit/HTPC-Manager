@@ -1,12 +1,14 @@
-import os, cherrypy, htpc
+import cherrypy
+import htpc
 from urllib import urlencode
 from urllib2 import urlopen
 from re import findall
 from json import dumps
 
+
 class Search:
     def __init__(self):
-        htpc.modules.append({
+        htpc.MODULES.append({
             'name': 'NZBSearch',
             'id': 'nzbsearch',
             'test': '/search/ping',
@@ -21,7 +23,7 @@ class Search:
         if query:
             return self.nzbMatrixSearch({
                 'search': query,
-                'catid' : catid
+                'catid': catid
             },
                 'search.php'
             )
@@ -31,15 +33,15 @@ class Search:
             },
                 'details.php'
             )
-        return htpc.lookup.get_template('search.html').render()
+        return htpc.LOOKUP.get_template('search.html').render()
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def ping(self, nzbmatrix_username, nzbmatrix_apikey, **kwargs):
         try:
             url = 'http://api.nzbmatrix.com/v1.1/account.php?'
-            url = url + 'username='+nzbmatrix_username+'&'
-            url = url + 'apikey='+nzbmatrix_apikey
+            url = url + 'username=' + nzbmatrix_username + '&'
+            url = url + 'apikey=' + nzbmatrix_apikey
             result = urlopen(url, timeout=10).read()
             if not result.startswith('error'):
                 return result
@@ -49,15 +51,16 @@ class Search:
     def nzbMatrixSearch(self, options, path):
         settings = htpc.settings.Settings()
         apikey = settings.get('nzbmatrix_apikey', '')
-        url = 'http://api.nzbmatrix.com/v1.1/'+path+'?apikey='+apikey+'&'
+        url = 'http://api.nzbmatrix.com/v1.1/' + path + '?apikey=' + apikey + '&'
         try:
-            source = urlopen(url+urlencode(options), timeout=10).read()
+            source = urlopen(url + urlencode(options), timeout=10).read()
         except:
             source = ''
 
         source = source.decode("cp1252").encode('utf-8')
 
-        if source.startswith('error'): return source
+        if source.startswith('error'):
+            return source
 
         data = {}
         for index, text in enumerate(source[:-2].split('\n|\n')):
@@ -139,5 +142,3 @@ class Search:
                 {'id': 40, 'name': 'Other: Other'},
             ]}
         ])
-
-htpc.root.search = Search()

@@ -1,20 +1,20 @@
 #!/usr/bin/env python
-def main():
-    import os, sys, shutil, argparse, htpc
+# -*- coding: utf-8 -*-A
+"""
+This is the main executable of HTPC Manager. It parses the
+command line arguments, sets globals variables and calls the
+start function to start the server.
+"""
+import os
+import sys
+import htpc
 
-    # Set root and insert bundled libraies into path
-    htpc.rundir = os.path.dirname(os.path.abspath(sys.argv[0]))
-    sys.path.insert(0, os.path.join(htpc.rundir, 'libs'))
 
-    from sqlobject import connectionForURI, sqlhub
-    from mako.lookup import TemplateLookup
-
-    # Set default datadir
-    datadir = os.path.join(htpc.rundir, 'userdata/')
-
-    # Get variables from commandline
+def parse_arguments():
+    """ Get variables from commandline """
+    import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--datadir', default=datadir,
+    parser.add_argument('--datadir', default=None,
                         help='Set the datadirectory')
     parser.add_argument('--db', default=None,
                         help='Use a custom database')
@@ -28,59 +28,96 @@ def main():
                         help='Generate PID file at location')
     parser.add_argument('--debug', action='store_true', default=False,
                         help='Print debug text')
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def load_modules():
+    """ Import the system modules """
+    from htpc.root import Root
+    htpc.ROOT = Root()
+    from htpc.settings import Settings
+    htpc.ROOT.settings = Settings()
+    from htpc.updater import Updater
+    htpc.ROOT.update = Updater()
+    from modules.xbmc import Xbmc
+    htpc.ROOT.xbmc = Xbmc()
+    from modules.sabnzbd import Sabnzbd
+    htpc.ROOT.sabnzbd = Sabnzbd()
+    from modules.couchpotato import Couchpotato
+    htpc.ROOT.couchpotato = Couchpotato()
+    from modules.sickbeard import Sickbeard
+    htpc.ROOT.sickbeard = Sickbeard()
+    from modules.squeezebox import Squeezebox
+    htpc.ROOT.squeezebox = Squeezebox()
+    from modules.search import Search
+    htpc.ROOT.search = Search()
+
+
+def main():
+    """
+    Main function is called at startup.
+    """
+
+    # Set root and insert bundled libraies into path
+    htpc.RUNDIR = os.path.dirname(os.path.abspath(sys.argv[0]))
+    sys.path.insert(0, os.path.join(htpc.RUNDIR, 'libs'))
+
+    from sqlobject import connectionForURI, sqlhub
+    from mako.lookup import TemplateLookup
+
+    args = parse_arguments()
 
     # Set datadir, create if it doesn't exist and exit if it isn't writable.
-    htpc.datadir = args.datadir
-    if not os.path.isdir(htpc.datadir):
-        os.makedirs(htpc.datadir)
-    if not os.access(htpc.datadir, os.W_OK):
+    htpc.DATADIR = os.path.join(htpc.RUNDIR, 'userdata/')
+    if args.datadir:
+        htpc.DATADIR = args.datadir
+    if not os.path.isdir(htpc.DATADIR):
+        os.makedirs(htpc.DATADIR)
+    if not os.access(htpc.DATADIR, os.W_OK):
         sys.exit("No write access to datadir")
 
     # Set default database and overwrite if supplied through commandline
-    htpc.db = os.path.join(htpc.datadir, 'database.db')
+    htpc.DB = os.path.join(htpc.DATADIR, 'database.db')
     if args.db:
-        htpc.db = args.db
+        htpc.DB = args.db
     # Initiate database connection
-    sqlhub.processConnection = connectionForURI('sqlite:' + htpc.db)
+    sqlhub.processConnection = connectionForURI('sqlite:' + htpc.DB)
 
     # Inititialize root and settings page
-    htpc.modules = []
-    from htpc.root import Root
-    htpc.root = Root()
+    load_modules()
+
+    # Load settings from database
     from htpc.settings import Settings
-    from htpc.updater import Updater
-    import modules
+    settings = Settings()
 
-    settings = htpc.settings.Settings()
-
-    htpc.template = os.path.join('interfaces/', settings.get('app_template','default'))
-    htpc.lookup = TemplateLookup(directories=[htpc.template])
+    htpc.TEMPLATE = os.path.join('interfaces/',
+                                 settings.get('app_template', 'default'))
+    htpc.LOOKUP = TemplateLookup(directories=[htpc.TEMPLATE])
 
     # Overwrite host setting if supplied through commandline
-    htpc.host = settings.get('app_host', '0.0.0.0')
+    htpc.HOST = settings.get('app_host', '0.0.0.0')
     if args.host:
-        htpc.host = args.host
+        htpc.HOST = args.host
 
     # Overwrite port setting if supplied through commandline
-    htpc.port = int(settings.get('app_port', 8085))
+    htpc.PORT = int(settings.get('app_port', 8085))
     if args.port:
-        htpc.port = args.port
+        htpc.PORT = args.port
 
-    htpc.username = settings.get('app_username')
-    htpc.password = settings.get('app_password')
+    htpc.USERNAME = settings.get('app_username')
+    htpc.PASSWORD = settings.get('app_password')
 
-    htpc.daemon = False
+    htpc.DAEMON = False
     if args.daemon and sys.platform != 'win32':
-        htpc.daemon = True
+        htpc.DAEMON = True
 
-    htpc.pid = False
+    htpc.PID = False
     if args.pid:
-        htpc.pid = args.pid
+        htpc.PID = args.pid
 
-    htpc.debug = False
+    htpc.DEBUG = False
     if args.debug:
-        htpc.debug = True
+        htpc.DEBUG = True
 
     from htpc.server import start
     start()

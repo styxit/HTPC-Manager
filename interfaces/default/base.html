@@ -29,7 +29,7 @@ settings = htpc.settings.Settings()
             <a href="/" class="brand">HTPC Manager</a>
             <div class="nav-collapse">
                 <ul class="nav">
-                    % for m in htpc.modules:
+                    % for m in htpc.MODULES:
                     % if settings.get(m.get('id')+'_enable') and m.get('id') != 'nzbsearch':
                     <li id="nav-${m.get('id')}"><a href="/${m.get('id')}/">${settings.get(m.get('id')+'_name')}</a></li>
                     %endif

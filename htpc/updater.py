@@ -1,11 +1,23 @@
-# Original code by Mikie (https://github.com/Mikie-Ghost/)
-import os, urllib2, tarfile, shutil
-import platform, subprocess, re
+"""
+Update HTPC-Manager from Github. Either through git command or tarball.
+Original code by Mikie (https://github.com/Mikie-Ghost/)
+"""
+import os
+import urllib2
+import tarfile
+import shutil
+import platform
+import subprocess
+import re
 from json import loads
-import cherrypy, htpc
+import cherrypy
+import htpc
+
 
 class Updater:
+    """ Main class """
     def __init__(self):
+        """ Set GitHub constants on load """
         self.user = 'mbw2001'
         self.repo = 'htpc-manager'
         self.branch = 'master'
@@ -13,62 +25,72 @@ class Updater:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def index(self):
+        """ Handle server requests. Update on POST. Get status on GET. """
         method = cherrypy.request.method.upper()
         if method == 'POST':
             cherrypy.engine.exit()
-            if self.gitUpdate():
+            if self.git_update():
                 status = True
-            elif self.tarUpdate():
+            elif self.tar_update():
                 status = True
             else:
                 status = False
             cherrypy.server.start()
-            return {'completed':status}
+            return {'completed': status}
         else:
-            behind, url = self.checkGithub()
+            behind, url = self.check_github()
             if behind == 0:
-                return {'behind':behind}
+                return {'behind': behind}
             elif behind > 0:
-                return {'behind':behind, 'url':url}
-            return {'behind':behind, 'error':url}
+                return {'behind': behind, 'url': url}
+            return {'behind': behind, 'error': url}
 
-    def currentCommit(self):
-        output, err = self.runGit('rev-parse HEAD')
+    def current_commit(self):
+        """ Get hash of current Git commit """
+        output, err = self.run_git('rev-parse HEAD')
         output = output.strip()
         if not re.match('^[a-z0-9]+$', output):
+            print err
             return None
         return output
 
-    def latestCommit(self):
+    def latest_commit(self):
+        """ Get hash of latest git commit """
         try:
-            url = 'https://api.github.com/repos/%s/%s/commits/%s' % (self.user, self.repo, self.branch)
+            url = 'https://api.github.com/repos/%s/%s/commits/%s' % (
+                    self.user, self.repo, self.branch)
             result = urllib2.urlopen(url).read()
             git = loads(result)
             return git['sha'].strip()
         except:
             return None
 
-    def commitsBehind(self, current, latest):
+    def commits_behind(self, current, latest):
+        """ Check how many commits between current and latest """
         try:
-            url = 'https://api.github.com/repos/%s/%s/compare/%s...%s' % (self.user, self.repo, current, latest)
+            url = 'https://api.github.com/repos/%s/%s/compare/%s...%s' % (
+                    self.user, self.repo, current, latest)
             result = urllib2.urlopen(url).read()
             git = loads(result)
             return int(git['total_commits'])
         except:
             return -1
 
-    def checkGithub(self):
-        current = self.currentCommit()
-        latest = self.latestCommit()
+    def check_github(self):
+        """ Check for updates """
+        current = self.current_commit()
+        latest = self.latest_commit()
         if current == latest:
             return (0, '')
         else:
-            behind = self.commitsBehind(current, latest)
-            htpc.update = (behind, 'https://github.com/%s/%s/compare/%s...%s' % (self.user, self.repo, current, latest))
-            return htpc.update
+            behind = self.commits_behind(current, latest)
+            htpc.UPDATE = (behind, 'https://github.com/%s/%s/compare/%s...%s'
+                    % (self.user, self.repo, current, latest))
+            return htpc.UPDATE
 
-    def gitUpdate(self):
-        output, err = self.runGit('pull origin %s' % branch)
+    def git_update(self):
+        """ Do update through git """
+        output, err = self.run_git('pull origin %s' % self.branch)
 
         if not output:
             return err
@@ -81,17 +103,19 @@ class Updater:
 
         return True
 
-    def tarUpdate(self):
-        tar_file = os.path.join(htpc.rundir, '%s.tar.gz' % self.repo)
-        update_folder = os.path.join(htpc.rundir, 'update')
+    def tar_update(self):
+        """ Do update from tar file """
+        tar_file = os.path.join(htpc.RUNDIR, '%s.tar.gz' % self.repo)
+        update_folder = os.path.join(htpc.RUNDIR, 'update')
 
         try:
-            url = urllib2.urlopen('https://github.com/%s/%s/tarball/%s' % (self.user, self.repo, self.branch))
-            f = open(tar_file,'wb')
-            f.write(url.read())
-            f.close()
+            url = urllib2.urlopen('https://github.com/%s/%s/tarball/%s'
+                    % (self.user, self.repo, self.branch))
+            file_obj = open(tar_file, 'wb')
+            file_obj.write(url.read())
+            file_obj.close()
         except:
-            self.removeUpdateFiles()
+            self.remove_update_files()
             return False
 
         try:
@@ -99,15 +123,16 @@ class Updater:
             tar.extractall(update_folder)
             tar.close()
         except:
-            self.removeUpdateFiles()
+            self.remove_update_files()
             return False
 
-        latest = self.latestCommit()
-        root_src_dir = os.path.join(update_folder, '%s-%s-%s' % (self.user, self.repo, latest[:7]))
+        latest = self.latest_commit()
+        root_src_dir = os.path.join(update_folder, '%s-%s-%s'
+                % (self.user, self.repo, latest[:7]))
 
         try:
             for src_dir, dirs, files in os.walk(root_src_dir):
-                dst_dir = src_dir.replace(root_src_dir, htpc.rundir)
+                dst_dir = src_dir.replace(root_src_dir, htpc.RUNDIR)
                 if not os.path.exists(dst_dir):
                     os.mkdir(dst_dir)
                 for file_ in files:
@@ -117,13 +142,14 @@ class Updater:
                         os.remove(dst_file)
                     shutil.move(src_file, dst_dir)
         except:
-            self.removeUpdateFiles()
+            self.remove_update_files()
             return False
 
-        self.removeUpdateFiles()
+        self.remove_update_files()
         return True
 
-    def runGit(self, args):
+    def run_git(self, args):
+        """ Tool for running git program on system """
         git_locations = ['git']
 
         if platform.system().lower() == 'darwin':
@@ -135,12 +161,14 @@ class Updater:
             cmd = cur_git + ' ' + args
 
             try:
-                p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True, cwd=htpc.rundir)
-                output, err = p.communicate()
+                proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT, shell=True, cwd=htpc.RUNDIR)
+                output, err = proc.communicate()
             except OSError:
                 continue
 
-            if 'not found' in output or "not recognized as an internal or external command" in output:
+            # not recognized as an internal or external command
+            if 'not found' in output or "not recognized" in output:
                 return ('', output)
             elif 'fatal:' in output or err:
                 return ('', output)
@@ -149,14 +177,13 @@ class Updater:
 
         return (output, err)
 
-    def removeUpdateFiles(self):
-        tar_file = os.path.join(htpc.rundir, '%s.tar.gz' % self.repo)
-        update_folder = os.path.join(htpc.rundir, 'update')
+    def remove_update_files(self):
+        """ Remove leftover update files """
+        tar_file = os.path.join(htpc.RUNDIR, '%s.tar.gz' % self.repo)
+        update_folder = os.path.join(htpc.RUNDIR, 'update')
 
         if os.path.exists(tar_file):
             os.remove(tar_file)
 
         if os.path.exists(update_folder):
             shutil.rmtree(update_folder)
-
-htpc.root.update = Updater()

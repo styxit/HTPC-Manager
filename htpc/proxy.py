@@ -1,67 +1,68 @@
-import os, cherrypy, htpc
+""" Tool for proxying images and resizing if needed """
+import os
+import htpc
 from cherrypy.lib.static import serve_file
 try:
-    import Image, ImageEnhance
-except:
+    import Image
+    import ImageEnhance
+except ImportError:
     from PIL import Image, ImageEnhance
-from urllib2 import quote, unquote, Request, urlopen
+from urllib2 import unquote, Request, urlopen
 
-def getImage(url, h=None, w=None, o=100, auth=None, **kwargs):
+
+def get_image(url, height=None, width=None, opacity=100, auth=None):
+    """ Load image form cache if possible, else download. Resize if needed """
     # Create image directory if it doesnt exist
-    imgdir = os.path.join(htpc.datadir, 'images/')
+    imgdir = os.path.join(htpc.DATADIR, 'images/')
     if not os.path.exists(imgdir):
         os.makedirs(imgdir)
 
-    fileName = unquote(unquote(url)).rsplit('/', 1).pop()
-    imgName, imgType = fileName.rsplit('.', 1)
+    filename = unquote(unquote(url)).rsplit('/', 1).pop()
+    imgname, imgtype = filename.rsplit('.', 1)
 
-    original = resized = os.path.join(imgdir, imgType+'_'+imgName+'.png')
-    if h and w:
-        resized = os.path.join(imgdir, original+'_'+w+'_'+h+'.png')
+    original = resized = os.path.join(imgdir, imgtype + '_' + imgname + '.png')
+    if height and width:
+        resized = os.path.join(imgdir,
+                original + '_' + width + '_' + height + '.png')
 
     # If there is no local copy of the original
     if not os.path.isfile(original):
-        original = downloadImage(url, original, auth)
-
-    if not original:
-        print "Error downloading image"
-        raise cherrypy.NotFound(fileName)
+        original = download_image(url, original, auth)
 
     # If there is no local resized copy
     if not os.path.isfile(resized):
-        resized = resizeImage(original, h, w, o, resized)
-
-    if not resized:
-        resized = original
+        resized = resize_image(original, height, width, opacity, resized)
 
     # Load file from disk
     return serve_file(path=resized, content_type='image/png')
 
-def downloadImage(url, dest, auth=None):
-    try:
-        request = Request(url)
-        if (auth):
-            request.add_header("Authorization", "Basic %s" % auth)
-        data = urlopen(request).read()
-        f = open(dest, 'wb')
-        f.write(data)
-        f.close()
-        return dest
-    except:
-        return False
 
-def resizeImage(img, height, width, opacity, dest):
+def download_image(url, dest, auth=None):
+    """ Download image and save to disk """
+    request = Request(url)
+    if (auth):
+        request.add_header("Authorization", "Basic %s" % auth)
+    data = urlopen(request).read()
+    file_obj = open(dest, 'wb')
+    file_obj.write(data)
+    file_obj.close()
+    return dest
+
+
+def resize_image(img, height, width, opacity, dest):
+    """ Resize image, set opacity and save to disk """
     height = int(height)
     width = int(width)
     opacity = float(opacity)
-    enhance = opacity/100
+    enhance = opacity / 100
     try:
         image = Image.open(img)
-        resized = image.resize((width, height), Image.ANTIALIAS).convert('RGBA')
+        resized = image.resize((width, height),
+                               Image.ANTIALIAS).convert('RGBA')
         alpha = resized.split()[3]
         alpha = ImageEnhance.Brightness(alpha).enhance(enhance)
         resized.putalpha(alpha)
         resized.save(dest)
         return dest
-    except:
-        return False
+    except ValueError:
+        return img
