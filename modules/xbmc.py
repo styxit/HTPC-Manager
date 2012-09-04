@@ -86,11 +86,11 @@ class Xbmc:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def ping(self, xbmc_server_host='', xbmc_server_port='',
-            xbmc_server_username='', xbmc_server_password=''):
+            xbmc_server_username='', xbmc_server_password='', **kwargs):
         """ Tests settings, returns "pong" on success and null on fail """
+        if not xbmc_server_host or not xbmc_server_port:
+            return
         try:
-            if not xbmc_server_host:
-                raise ProtocolError(None, None, None, None)
             url = xbmc_server_host + ':' + xbmc_server_port
             auth = ''
             if xbmc_server_username and xbmc_server_password:
