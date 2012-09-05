@@ -1,5 +1,6 @@
 """ Tool for proxying images and resizing if needed """
 import os
+import hashlib
 import htpc
 from cherrypy.lib.static import serve_file
 try:
@@ -17,9 +18,11 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
     if not os.path.exists(imgdir):
         os.makedirs(imgdir)
 
-    filename = unquote(unquote(url)).replace(' ', '_').replace('\\', '/')
-    filename = filename.rsplit('/', 1).pop()
+    filepath = unquote(unquote(url)).replace(' ', '_').replace('\\', '/')
+    filename = filepath.rsplit('/', 1).pop()
     imgname, imgtype = filename.rsplit('.', 1)
+    if imgname in ['folder', 'fanart', 'banner', 'poster']:
+        imgname = hashlib.md5(filepath).hexdigest()
 
     original = resized = os.path.join(imgdir, imgtype + '_' + imgname + '.png')
     if height and width:
