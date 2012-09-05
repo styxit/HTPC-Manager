@@ -17,7 +17,8 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
     if not os.path.exists(imgdir):
         os.makedirs(imgdir)
 
-    filename = unquote(unquote(url)).rsplit('/', 1).pop()
+    filename = unquote(unquote(url)).replace(' ', '_').replace('\\', '/')
+    filename = filename.rsplit('/', 1).pop()
     imgname, imgtype = filename.rsplit('.', 1)
 
     original = resized = os.path.join(imgdir, imgtype + '_' + imgname + '.png')
