@@ -29,6 +29,10 @@ class Search:
 
     @cherrypy.expose()
     def thumb(self, url, h=None, w=None, o=100):
+        if url.startswith('rageid'):
+            settings = htpc.settings.Settings()
+            host = settings.get('newznab_host', '')
+            url = 'http://' + host + '/covers/tv/' + url[6:] + '.jpg'
         return get_image(url, h, w, o)
 
     @cherrypy.expose()

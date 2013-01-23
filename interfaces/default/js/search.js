@@ -81,35 +81,46 @@ function search(query, catid) {
 }
 
 function showDetails(data) {
-    var modalTitle = "";
-    if (data.attr['imdbtitle'])  modalTitle += data.attr['imdbtitle'];
-    if (data.attr['imdbyear'])  modalTitle += ' (' + data.attr['imdbyear'] + ')';
-    if (data.attr['artist'])  modalTitle += data.attr['artist'];
-    if (data.attr['album'])  modalTitle += ' - ' + data.attr['album'];
-    if (data.attr['season'])  modalTitle += data.attr['season'];
-    if (data.attr['episode'])  modalTitle += data.attr['episode'];
-    if (data.attr['tvtitle'])  modalTitle += ' ' + data.attr['tvtitle'];
+    var modalTitle = data.description;
+    if (data.attr['imdbtitle']) {
+        modalTitle = data.attr['imdbtitle'];
+        if (data.attr['imdbyear'])  modalTitle += ' (' + data.attr['imdbyear'] + ')';
+    } else if (data.attr['artist'] && data.attr['album']) {
+        modalTitle = data.attr['artist'] + ' - ' + data.attr['album'];
+    }
 
     var modalImage = '';
     if (data.attr["coverurl"]) {
         var url = '/search/thumb?url='+data.attr['coverurl']+'&w=200&h=300';
         var modalImage = $('<div>').addClass('thumbnail pull-left');
         modalImage.append($('<img>').attr('src', url));
+    } else if (data.attr["rageid"]) {
+        var url = '/search/thumb?url=rageid'+data.attr['rageid']+'&w=200&h=300';
+        var modalImage = $('<div>').addClass('thumbnail pull-left');
+        modalImage.append($('<img>').attr('src', url));
     }
 
     var modalInfo = $('<div>').addClass('modal-movieinfo');
     if(data.attr['imdbtagline']) {
-        modalInfo.append($('<p>').html('<b>Tagline:</b> ' + data.attr['imdbtagline']));
+        modalInfo.append($('<p>').html(data.attr['imdbtagline']));
     }
     if(data.attr['genre']) {
         modalInfo.append($('<p>').html('<b>Genre:</b> ' + data.attr['genre']));
     }
+    /*
     if(data.attr['imdbdirector']) {
         modalInfo.append($('<p>').html('<b>Director:</b> ' + data.attr['imdbdirector']));
     }
     if(data.attr['imdbactors']) {
         modalInfo.append($('<p>').html('<b>Actors:</b> ' + data.attr['imdbactors']));
     }
+    */
+    modalInfo.append($('<p>').html('<b>Size:</b> ' + bytesToSize(data.attr['size'])));
+    modalInfo.append($('<p>').html('<b>Grabs:</b> ' + data.attr['grabs']));
+    modalInfo.append($('<p>').html('<b>Files:</b> ' + data.attr['files']));
+    var password = data.attr['password'];
+    if (password == 0) password = 'None';
+    modalInfo.append($('<p>').html('<b>Password:</b> ' + password));
     if(data.attr['imdbscore']) {
         var rating = $('<span>').raty({
             readOnly: true,
@@ -135,10 +146,18 @@ function showDetails(data) {
         }
     }
     if (data.attr['imdb']) {
-        var imdbLink = 'http://www.imdb.com/title/tt' + data.attr['imdb'] + '/';
+        var link = 'http://www.imdb.com/title/tt' + data.attr['imdb'] + '/';
         $.extend(modalButtons,{
             'IMDb' : function() {
-                window.open(imdbLink,'IMDb')
+                window.open(link,'IMDb')
+            }
+        });
+    }
+    if (data.attr['rageid']) {
+        var link = 'http://www.tvrage.com/shows/id-' + data.attr['rageid'];
+        $.extend(modalButtons,{
+            'TVRage' : function() {
+                window.open(link,'TVRage')
             }
         });
     }
