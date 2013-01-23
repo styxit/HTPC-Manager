@@ -8,7 +8,7 @@ try:
     import ImageEnhance
 except ImportError:
     from PIL import Image, ImageEnhance
-from urllib2 import unquote, Request, urlopen
+from urllib2 import Request, urlopen
 
 
 def get_image(url, height=None, width=None, opacity=100, auth=None):
@@ -18,13 +18,10 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
     if not os.path.exists(imgdir):
         os.makedirs(imgdir)
 
-    filepath = unquote(unquote(url)).replace(' ', '_').replace('\\', '/')
-    filename = filepath.rsplit('/', 1).pop()
-    imgname, imgtype = filename.rsplit('.', 1)
-    if imgname in ['folder', 'fanart', 'banner', 'poster']:
-        imgname = hashlib.md5(filepath).hexdigest()
+    # Create a hash of the path to use as filename
+    imgname = hashlib.md5(url).hexdigest()
 
-    original = resized = os.path.join(imgdir, imgtype + '_' + imgname + '.png')
+    original = resized = os.path.join(imgdir, imgname + '.png')
     if height and width:
         resized = os.path.join(imgdir,
                 original + '_' + width + '_' + height + '.png')

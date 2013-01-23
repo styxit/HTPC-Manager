@@ -11,12 +11,12 @@ class Squeezebox:
             'name': 'Squeezebox',
             'id': 'squeezebox',
             'fields': [
-                {'type':'bool', 'label':'Enable', 'name':'squeezebox_enable'},
-                {'type':'text', 'label':'Menu name', 'name':'squeezebox_name'},
-                {'type':'text', 'label':'IP / Host *', 'name':'squeezebox_host'},
-                {'type':'text', 'label':'Port *', 'name':'squeezebox_port'},
-                {'type':'text', 'label':'Username', 'name':'squeezebox_username'},
-                {'type':'password', 'label':'Password', 'name':'squeezebox_password'}
+                {'type': 'bool', 'label': 'Enable', 'name': 'squeezebox_enable'},
+                {'type': 'text', 'label': 'Menu name', 'name': 'squeezebox_name'},
+                {'type': 'text', 'label': 'IP / Host *', 'name': 'squeezebox_host'},
+                {'type': 'text', 'label': 'Port *', 'name': 'squeezebox_port'},
+                {'type': 'text', 'label': 'Username', 'name': 'squeezebox_username'},
+                {'type': 'password', 'label': 'Password', 'name': 'squeezebox_password'}
         ]})
 
     @cherrypy.expose()

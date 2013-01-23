@@ -11,7 +11,7 @@ settings = htpc.settings.Settings()
     <link href="/css/bootstrap-responsive.min.css" rel="stylesheet">
     <link href="/css/jquery.pnotify.default.css" rel="stylesheet">
     <link href="/css/base.css" rel="stylesheet">
-    <link href="/css/themes/${settings.get('theme','default.css')}" rel="stylesheet">
+    <link href="/css/themes/${settings.get('app_theme','default.css')}" rel="stylesheet">
     <script src="/js/libs/jquery-1.7.2.min.js"></script>
     <script src="/js/libs/jquery-ui-1.8.18.custom.min.js"></script>
     <script src="/js/default.js"></script>
@@ -41,7 +41,7 @@ settings = htpc.settings.Settings()
                     %else:
                     <form class="navbar-form pull-right">
                     %endif
-                    <input type="text" name="search" id="search" class="span3" accesskey="s" placeholder="Search">
+                    <input type="text" name="query" id="search" class="span3" accesskey="s" placeholder="Search">
                         <span class="dropdown">
                             <button type="button" class="btn" data-toggle="dropdown"><i class="icon-cog"></i></button>
                             <ul class="dropdown-menu pull-right">

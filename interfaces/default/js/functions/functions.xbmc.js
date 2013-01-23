@@ -1,3 +1,10 @@
+function errorHandler() {
+    $('.spinner').hide();
+    $('#xbmc-wake').show();
+    notify('Error','Error connecting to XBMC','error');
+    moviesLoading = false;
+}
+
 var lastMovieLoaded = 0;
 var allMoviesLoaded = false;
 var moviesLoading = false;
@@ -15,7 +22,7 @@ function loadMovies(options) {
         start: lastMovieLoaded,
         end: (lastMovieLoaded + movieLimit),
         sortorder: 'ascending',
-        sortmethod: 'videotitle'
+        sortmethod: 'title'
     };
     $.extend(sendData, options);
     if (allMoviesLoaded) return;
@@ -65,13 +72,6 @@ function loadMovies(options) {
             errorHandler();
         }
     });
-}
-
-function errorHandler() {
-    $('.spinner').hide();
-    $('#xbmc-wake').show();
-    notify('Error','Error connecting to XBMC','error');
-    moviesLoading = false;
 }
 
 function xbmcShowMovie(movie) {

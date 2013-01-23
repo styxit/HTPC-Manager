@@ -173,14 +173,12 @@ class Xbmc:
         if url.startswith('special://'):  # Eden
             url = self.url('/vfs/' + quote(url))
         elif url.startswith('image://'):  # Frodo
-            url = url[len('image://'):].encode('utf-8')
-            url = self.url('/image/' + quote(url))
-
+            url = self.url('/image/' + quote(thumb))
         return get_image(url, h, w, o, self.auth())
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetMovies(self, start=0, end=0, sortmethod='videotitle',
+    def GetMovies(self, start=0, end=0, sortmethod='title',
             sortorder='ascending'):
         """ Get a list of all movies """
         try:
@@ -190,12 +188,12 @@ class Xbmc:
                     'imdbnumber', 'genre', 'rating', 'streamdetails']
             limits = {'start': int(start), 'end': int(end)}
             return xbmc.VideoLibrary.GetMovies(sort=sort, properties=properties, limits=limits)
-        except:
+        except ValueError:
             return
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetShows(self, start=0, end=0, sortmethod='videotitle', sortorder='ascending', hidewatched=False):
+    def GetShows(self, start=0, end=0, sortmethod='title', sortorder='ascending', hidewatched=False):
         """ Get a list of all the TV Shows """
         try:
             xbmc = Server(self.url('/jsonrpc', True))

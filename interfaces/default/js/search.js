@@ -1,111 +1,33 @@
 function getCategories() {
     $.ajax({
-        url: '/search/getNzbMatrixCategories',
+        url: '/search/getcategories',
         type: 'get',
         dataType: 'json',
         success: function (data) {
             if (data == null) return false;
 
-            $('#catid').html('');
-            $.each(data, function (i, item) {
-                if (item.id != undefined) {
-                    var option = $('<option>').html(item.name);
-                    option.attr("value",item.id)
-                    $('#catid').append(option)
-                } else {
-                    var optgroup = $('<optgroup>');
-                    optgroup.attr('label', item.label);
-                    $.each(item.value, function (i, item) {
-                        var option = $('<option>').html(item.name);
-                        option.attr("value",item.id)
-                        optgroup.append(option)
-                    });
-                    $('#catid').append(optgroup)
-                }
+            var select = $('#catid').html('');
+            select.append($('<option>').html('Everything').attr('value','-1'));
+            $.each(data.category, function (c, cat) {
+                var option = $('<option>').html(cat["@attributes"]["name"]);
+                option.attr('value',cat["@attributes"]["id"])
+                select.append(option)
+                $.each(cat.subcat, function (s, sub) {
+                    if (sub["@attributes"] == undefined) sub = cat.subcat;
+                    var name = cat["@attributes"]["name"]+'-'+sub["@attributes"]["name"]
+                    var option = $('<option>').html('&nbsp;&nbsp;'+name);
+                    option.attr('value',sub["@attributes"]["id"])
+                    select.append(option)
+                });
             });
         }
     });
 }
 
-function sendToSab(nzbid) {
-    return $.ajax({
-        url: '/sabnzbd/AddNzbFromUrl',
-        type: 'post',
-        dataType: 'json',
-        data: {
-            nzb_url: 'http://nzbmatrix.com/nzb-download.php?id=' + nzbid
-        },
-        success: function (result) {
-            return true;
-        }
-    });
-}
-
-function getDetails(nzbid) {
+function search(query, catid) {
+    if (query==undefined) return;
     $.ajax({
-        url: '/search/?nzbid='+nzbid,
-        type: 'get',
-        dataType: 'json',
-        success: function (data) {
-            if (data === null) return
-
-            var modalTitle = data[0].NZBNAME
-
-            var modalPoster = $('<img>');
-            modalPoster.css('height', '150px');
-            modalPoster.css('width', '100px');
-            modalPoster.attr('src', data[0].IMAGE);
-
-            var modalLeft = $('<td>');
-            modalLeft.append(modalPoster);
-            modalLeft.css('width', '100px');
-
-            var modalMiddle = $('<td>');
-            modalMiddle.append($('<h6>').text('Category'));
-            modalMiddle.append($('<p>').text(data[0].CATEGORY));
-            modalMiddle.append($('<h6>').text('Language'));
-            modalMiddle.append($('<p>').text(data[0].LANGUAGE));
-            modalMiddle.append($('<h6>').text('Size'));
-            modalMiddle.append($('<p>').text(bytesToSize(data[0].SIZE)));
-            modalMiddle.append($('<h6>').text('Hits'));
-            modalMiddle.append($('<p>').text(data[0].HITS));
-            modalMiddle.append($('<h6>').text('Comments'));
-            modalMiddle.append($('<p>').text(data[0].COMMENTS));
-            var modalRight = $('<td>');
-            modalRight.append($('<h6>').text('Added to Usenet'));
-            modalRight.append($('<p>').text(data[0].USENET_DATE));
-            modalRight.append($('<h6>').text('Added to Index'));
-            modalRight.append($('<p>').text(data[0].INDEX_DATE));
-            modalRight.append($('<h6>').text('Parts'));
-            modalRight.append($('<p>').text(data[0].PARTS));
-            modalRight.append($('<h6>').text('Group'));
-            modalRight.append($('<p>').text(data[0].GROUP));
-
-            var row = $('<tr>');
-            row.append(modalLeft);
-            row.append(modalMiddle);
-            row.append(modalRight);
-
-            var modalTable = $('<table>');
-            modalTable.addClass('table table-bordered');
-            modalTable.append(row);
-
-            showModal(modalTitle, modalTable, {
-                'IMDb' : function () {
-                    window.open(data[0].LINK,'IMDb')
-                },
-                'Download' : function () {
-                    sendToSab(nzbid)
-                    hideModal();
-                }
-            })
-        }
-    });
-}
-
-function searchNzbs(query, catid) {
-    $.ajax({
-        url: '/search/?query='+query+'&catid='+catid,
+        url: '/search/search?q='+query+'&cat='+catid,
         type: 'get',
         dataType: 'json',
         beforeSend: function () {
@@ -113,52 +35,135 @@ function searchNzbs(query, catid) {
             $('.spinner').show();
         },
         success: function (data) {
+            $('.spinner').hide();
             if (data === null) return
             $.each(data, function (i, item) {
-                if (item.NZBNAME == undefined) return
+                var attributes = []
+                $.each(item.attr, function(a, attr) {
+                    var name = attr['@attributes']['name'];
+                    var value = attr['@attributes']['value'];
+                    attributes[name] = value.replace(/\|/g,', ');
+                });
+                item.attr = attributes;
 
                 var row = $('<tr>');
-                var itemlink = $('<a>').attr('href','#').text(item.NZBNAME).click(function(){
-                    getDetails(item.NZBID);
+                var itemlink = $('<a>').attr('href','#').text(item.description).click(function(){
+                    showDetails(item);
+                    return false;
                 });
                 row.append($('<td>').append(itemlink));
-                var cat = item.CATEGORY.replace(' >',':')
-                var catlink = $('<a>').attr('href','#').text(cat).click(function(){
-                    $('#catid option:contains("'+cat+'")').attr('selected', 'selected');
-                    searchNzbs($('#search_query').val(), $('#catid').val());
+                var cat = $('<a>').attr('href','#').text(item.category).click(function(){
+                    $('#catid option:contains("'+item.category+'")').attr('selected', 'selected');
+                    $('#searchform').submit();
                 });
-                row.append($('<td>').append(catlink));
-                row.append($('<td>').addClass('right').html(item.HITS));
-                row.append($('<td>').addClass('right').html(bytesToSize(item.SIZE, 2)));
+                row.append($('<td>').append(cat));
+                row.append($('<td>').addClass('right').html(bytesToSize(item.attr['size'], 2)));
 
                 var toSabIcon = $('<i>');
                 toSabIcon.addClass('icon-download-alt');
                 toSabIcon.css('cursor', 'pointer');
                 toSabIcon.click(function() {
-                    sendToSab(item.NZBID)
+                    sendToSab(item.link)
                 });
-
                 row.append($('<td>').append(toSabIcon));
 
-                 $('.spinner').hide();
                 $('#results_table_body').append(row);
             });
         }
     });
 }
 
-$(document).ready(function () {
-    if ($('#search_query').val()) {
-        searchNzbs($('#search_query').val(), $('#catid').val());
+function showDetails(data) {
+    var modalTitle = "";
+    if (data.attr['imdbtitle'])  modalTitle += data.attr['imdbtitle'];
+    if (data.attr['imdbyear'])  modalTitle += ' (' + data.attr['imdbyear'] + ')';
+    if (data.attr['artist'])  modalTitle += data.attr['artist'];
+    if (data.attr['album'])  modalTitle += ' - ' + data.attr['album'];
+    if (data.attr['season'])  modalTitle += data.attr['season'];
+    if (data.attr['episode'])  modalTitle += data.attr['episode'];
+    if (data.attr['tvtitle'])  modalTitle += ' ' + data.attr['tvtitle'];
+
+    var modalImage = '';
+    if (data.attr["coverurl"]) {
+        modalImage = $('<div>').addClass('thumbnail pull-left');
+        modalImage.append($('<img>').attr('src', data.attr["coverurl"]));
     }
-    $('#search_query').keydown(function(e){
-        if(e.which == 13){
-            searchNzbs($('#search_query').val(), $('#catid').val());
+
+    var modalInfo = $('<div>').addClass('modal-movieinfo');
+    if(data.attr['imdbtagline']) {
+        modalInfo.append($('<p>').html('<b>Tagline:</b> ' + data.attr['imdbtagline']));
+    }
+    if(data.attr['genre']) {
+        modalInfo.append($('<p>').html('<b>Genre:</b> ' + data.attr['genre']));
+    }
+    if(data.attr['imdbdirector']) {
+        modalInfo.append($('<p>').html('<b>Director:</b> ' + data.attr['imdbdirector']));
+    }
+    if(data.attr['imdbactors']) {
+        modalInfo.append($('<p>').html('<b>Actors:</b> ' + data.attr['imdbactors']));
+    }
+    if(data.attr['imdbscore']) {
+        var rating = $('<span>').raty({
+            readOnly: true,
+            score: (data.attr['imdbscore'] / 2),
+        })
+        modalInfo.append(rating);
+    }
+    if(data.attr['label']) {
+        modalInfo.append($('<p>').html('<b>Label:</b> ' + data.attr['label']));
+    }
+    if(data.attr['tracks']) {
+        modalInfo.append($('<p>').html('<b>Tracks:</b> ' + data.attr['tracks']));
+    }
+
+    var modalBody = $('<div>');
+    modalBody.append(modalImage);
+    modalBody.append(modalInfo);
+
+    var modalButtons = {
+        'Download' : function () {
+            sendToSab(data.link)
+            hideModal();
         }
-    })
-    $('#search_nzb_button').click(function () {
-        searchNzbs($('#search_query').val(), $('#catid').val());
+    }
+    if (data.attr['imdb']) {
+        var imdbLink = 'http://www.imdb.com/title/tt' + data.attr['imdb'] + '/';
+        $.extend(modalButtons,{
+            'IMDb' : function() {
+                window.open(imdbLink,'IMDb')
+            }
+        });
+    }
+
+    /*
+    if (data.attr['backdropurl']) {
+        $('.modal-fanart').css({
+            'background' : '#ffffff url('+data.attr['backdropurl']+') top center no-repeat',
+            'background-size' : '100%'
+        });
+    }
+    */
+    showModal(modalTitle, modalBody, modalButtons);
+}
+
+function sendToSab(url) {
+    return $.ajax({
+        url: '/sabnzbd/AddNzbFromUrl',
+        type: 'post',
+        dataType: 'json',
+        data: {nzb_url: url},
+        success: function (result) {
+            notify('', 'Sent to SabNZBd', 'info');
+        }
     });
+}
+
+$(document).ready(function () {
+    $('#searchform').submit(function() {
+        search($('#query').val(), $('#catid').val());
+        return false;
+    });
+    if ($('#query').val()) $('#searchform').submit();
 
     getCategories();
 });

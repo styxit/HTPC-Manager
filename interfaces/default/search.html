@@ -1,27 +1,26 @@
 <%inherit file="base.html"/>
 <%block name="header"><script src="/js/search.js"></script></%block>
 <%
-import cherrypy, htpc
+import htpc
 settings = htpc.settings.Settings()
 %>
 <div class="container">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="http://nzbmatrix.com" target="_blank">${settings.get('nzbsearch_name', 'Search')}</a>
+            <a href="http://${settings.get('newznab_host')}" target="_blank">${settings.get('nzbsearch_name', 'Search')}</a>
         </h1>
-        <div class="well form-inline">
-            <input class="span6" id="search_query" name="search_query" type="text" value="${cherrypy.request.params.get('search')}" placeholder="Search term" />
+        <form action="" id="searchform" class="well form-inline">
+            <input class="span6" id="query" name="query" type="text" value="${query}" placeholder="Search term" />
             <select class="span2" name="catid" id="catid">
-                <option value="">All</option>
+                <option value="">Everything</option>
             </select>
-            <button class="btn btn-success" type="submit" id="search_nzb_button"><i class="icon-search icon-white"></i> Search</button>
-        </div>
+            <button type="submit" id="search_nzb_button" class="btn btn-success"><i class="icon-search icon-white"></i> Search</button>
+        </form>
         <table class="table table-striped">
             <thead>
                 <tr>
                     <th>NZB</th>
                     <th>Category</th>
-                    <th class="right">Hits</th>
                     <th class="right">Size</th>
                     <th>&nbsp;</th>
                 </tr>
