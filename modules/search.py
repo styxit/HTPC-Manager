@@ -1,5 +1,6 @@
 import cherrypy
 import htpc
+from htpc.proxy import get_image
 from urllib import urlencode
 from urllib2 import urlopen, quote
 from re import findall
@@ -25,6 +26,10 @@ class Search:
     @cherrypy.tools.json_out()
     def ping(self, newznab_host, newznab_apikey, **kwargs):
         return 1
+
+    @cherrypy.expose()
+    def thumb(self, url, h=None, w=None, o=100):
+        return get_image(url, h, w, o)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()

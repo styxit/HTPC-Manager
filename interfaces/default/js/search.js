@@ -35,9 +35,14 @@ function search(query, catid) {
             $('.spinner').show();
         },
         success: function (data) {
+            var stop = 0;
             $('.spinner').hide();
-            if (data === null) return
+            if (data === null) return;
             $.each(data, function (i, item) {
+                if (item.description == undefined) {
+                    item = data;
+                    stop = 1;
+                }
                 var attributes = []
                 $.each(item.attr, function(a, attr) {
                     var name = attr['@attributes']['name'];
@@ -55,6 +60,7 @@ function search(query, catid) {
                 var cat = $('<a>').attr('href','#').text(item.category).click(function(){
                     $('#catid option:contains("'+item.category+'")').attr('selected', 'selected');
                     $('#searchform').submit();
+                    return false;
                 });
                 row.append($('<td>').append(cat));
                 row.append($('<td>').addClass('right').html(bytesToSize(item.attr['size'], 2)));
@@ -68,6 +74,7 @@ function search(query, catid) {
                 row.append($('<td>').append(toSabIcon));
 
                 $('#results_table_body').append(row);
+                if (stop) return false;
             });
         }
     });
@@ -85,8 +92,9 @@ function showDetails(data) {
 
     var modalImage = '';
     if (data.attr["coverurl"]) {
-        modalImage = $('<div>').addClass('thumbnail pull-left');
-        modalImage.append($('<img>').attr('src', data.attr["coverurl"]));
+        var url = '/search/thumb?url='+data.attr['coverurl']+'&w=200&h=300';
+        var modalImage = $('<div>').addClass('thumbnail pull-left');
+        modalImage.append($('<img>').attr('src', url));
     }
 
     var modalInfo = $('<div>').addClass('modal-movieinfo');
@@ -135,14 +143,13 @@ function showDetails(data) {
         });
     }
 
-    /*
     if (data.attr['backdropurl']) {
+        var url = '/search/thumb?url='+data.attr['backdropurl']+'&w=675&h=400&o=20';
         $('.modal-fanart').css({
-            'background' : '#ffffff url('+data.attr['backdropurl']+') top center no-repeat',
+            'background' : '#ffffff url('+url+') top center no-repeat',
             'background-size' : '100%'
         });
     }
-    */
     showModal(modalTitle, modalBody, modalButtons);
 }
 
