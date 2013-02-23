@@ -1,0 +1,62 @@
+.sickbeard_show .banner{
+  position: relative;
+  border-radius: 6px 0px 0px 6px; 
+  background:  center left no-repeat ;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.sickbeard_show .banner .show_details {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+    color: White;
+    overflow:hidden;
+}
+.sickbeard_show .banner .show_details #show_details_top{
+  background: Red;
+  display: block;
+  height: 15px;
+  min-height: 10px;
+  position: absolute;
+  top: -15px;
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5); 
+  border-radius: 6px 6px 0px 0px; 
+}
+
+.sickbeard_show .banner .show_details #show_details_bottom{
+  display: block;
+  height: 15px;
+  min-height: 10px;
+  position: absolute;
+  margin-left: 0px;
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5); 
+  border-radius: 0px 0px 6px 6px; 
+}
+
+.sickbeard_show .banner .show_details td{
+  padding: 2px 5px;
+}
+
+.sickbeard_show .banner .show_details table,
+.sickbeard_show .banner .show_details strong {
+  margin:10px;
+}
+
+
+@media all and  (max-width: 767px) {
+  /*
+   * On small screens, remove top and bottom round bars on show-detail block
+   */
+  .sickbeard_show .banner .show_details #show_details_bottom,
+  .sickbeard_show .banner .show_details #show_details_top{
+    display: none;
+  }
+  /*
+   * On small screens, Add rounded corners on all sides on banner and detail-box
+   */  
+  .sickbeard_show .banner .show_details,
+  .sickbeard_show .banner{
+    border-radius: 6px; 
+  }
+}

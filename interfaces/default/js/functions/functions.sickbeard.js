@@ -10,9 +10,7 @@ function loadShows() {
                 $('#tvshows_table_body').append(row);
             }
             $.each(result.data, function (showname, tvshow) {
-                var name = $('<a>').attr('href','#').html(showname).click(function(e){
-                    loadShow(tvshow.tvdbid);
-                });
+                var name = $('<a>').attr('href','/sickbeard/view/' + tvshow.tvdbid).text(showname);
                 var row = $('<tr>')
                 row.append($('<td>').html(name));
                 row.append($('<td>').html(tvshow.status));
@@ -99,7 +97,11 @@ function loadNextAired(options) {
                     return false;
                 }
                 var row = $('<tr>');
-                row.append($('<td>').html(tvshow.show_name));
+                var name = $('<a>').attr('href','#').html(tvshow.show_name).click(function(e){
+                    loadShow(tvshow.tvdbid);
+                });
+                
+                row.append($('<td>').append(name));
                 row.append($('<td>').html(tvshow.ep_name));
                 row.append($('<td>').html(tvshow.airdate));
 
@@ -207,4 +209,60 @@ function cancelAddShow() {
     $('#add_show_name').fadeIn();
     $('#add_tvdbid_button').hide();
     $('#add_show_button').show();
+}
+
+function sickbeardStatusLabel(text){
+  var statusOK = ['Continuing', 'Downloaded'];
+  var statusInfo = ['Snatched', 'Unaired'];  
+  var statusError = ['Ended'];
+  var statusWarning = ['Skipped'];
+  
+  var label = $('<span>').addClass('label').text(text);
+  
+  if (statusOK.indexOf(text) != -1) {
+    label.addClass('label-success');
+  }
+  else if (statusInfo.indexOf(text) != -1) {
+    label.addClass('label-info');
+  }
+  else if (statusError.indexOf(text) != -1) {
+    label.addClass('label-important');
+  }
+  else if (statusWarning.indexOf(text) != -1) {
+    label.addClass('label-warning');
+  }
+  
+  var icon = sickbeardStatusIcon(text, true);
+  if (icon != '') {
+    label.prepend(' ').prepend(icon);
+  }
+  return label;
+}
+
+function sickbeardStatusIcon(iconText, white){
+  var text =[
+    'Downloaded',
+    'Continuing',
+    'Snatched',
+    'Unaired',
+    'Archived',
+    'Skipped'
+  ];
+  var icons = [
+    'icon-download-alt',
+    'icon-refresh',
+    'icon-share-alt',
+    'icon-time',
+    'icon-lock',
+    'icon-fast-forward'
+  ];
+  
+  if (text.indexOf(iconText) != -1) {
+    var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
+    if (white == true) {
+      icon.addClass('icon-white');
+    }
+    return icon;
+  }
+  return '';
 }

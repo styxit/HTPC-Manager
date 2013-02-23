@@ -21,7 +21,15 @@ class Sickbeard:
 
     @cherrypy.expose()
     def index(self):
-        return htpc.LOOKUP.get_template('sickbeard.html').render()
+        return htpc.LOOKUP.get_template('sickbeard/index.html').render()
+
+    @cherrypy.expose()    
+    def view(self, tvdbid):
+        if not (tvdbid.isdigit()):
+          raise cherrypy.HTTPError("500 Error", "Invalid show ID.")
+          return False
+          
+        return htpc.LOOKUP.get_template('sickbeard/view.html').render(tvdbid=tvdbid)    
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -73,6 +81,11 @@ class Sickbeard:
     @cherrypy.tools.json_out()
     def GetShow(self, tvdbid):
         return self.fetch('show&tvdbid=' + tvdbid)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetSeason(self, tvdbid, season):
+        return self.fetch('show.seasons&tvdbid=' + tvdbid + '&season=' + season)
 
     @cherrypy.expose()
     def SearchShow(self, query):
