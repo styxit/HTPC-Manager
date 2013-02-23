@@ -45,9 +45,14 @@ class Sickbeard:
         return self.fetch('future')
 
     @cherrypy.expose()
-    @cherrypy.tools.json_out()
+    def GetBanner(self, tvdbid):
+        cherrypy.response.headers['Content-Type'] = 'image/jpeg'
+        return self.fetch('show.getbanner&tvdbid=' + tvdbid, True)
+
+    @cherrypy.expose()
     def GetPoster(self, tvdbid):
-        return self.fetch('show.getposter&tvdbid=' + tvdbid)
+        cherrypy.response.headers['Content-Type'] = 'image/jpeg'
+        return self.fetch('show.getposter&tvdbid=' + tvdbid, True)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -77,13 +82,17 @@ class Sickbeard:
         except:
             return
 
-    def fetch(self, cmd):
+    def fetch(self, cmd, img=False):
         try:
             settings = htpc.settings.Settings()
             host = settings.get('sickbeard_host', '')
             port = str(settings.get('sickbeard_port', ''))
             apikey = settings.get('sickbeard_apikey', '')
             url = 'http://' + host + ':' + str(port) + '/api/' + apikey + '/?cmd=' + cmd
+
+            if (img == True):
+              return urlopen(url, timeout=10).read()
+              
             return loads(urlopen(url, timeout=10).read())
         except:
             return
