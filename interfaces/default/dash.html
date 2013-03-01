@@ -30,17 +30,7 @@ settings = htpc.settings.Settings()
             %if settings.get('dash_rec_music', 0):
             <div class="span4">
                 <h3><a href="/xbmc/#music">Recently added Music</a></h3>
-                <table class="table table-striped hide">
-                    <thead>
-                        <tr>
-                            <th>&nbsp;</th>
-                            <th>Artist</th>
-                            <th>Album</th>
-                            <th>Year</th>
-                        </tr>
-                    </thead>
-                    <tbody id="album-table-body"></tbody>
-                </table>
+                <div id="albums-content"></div>
             </div>
             %endif
         </div>

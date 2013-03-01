@@ -64,24 +64,37 @@ function loadRecentTVshows () {
 
 function loadRecentAlbums () {
     $.ajax({
-        url: '/xbmc/GetRecentAlbums',
+        url: '/xbmc/GetRecentAlbums/4',
         type: 'get',
         dataType: 'json',
         success: function (data) {
             if (data == null) return;
-            $('#album-table-body').parent().show();
+            $('#albums-content').parent().show();
             $.each(data.albums, function (i, album) {
-                var itemImage = $('<img>');
-                itemImage.attr('src', '/xbmc/GetThumb?h=30&w=30&thumb='+encodeURIComponent(album.thumbnail));
+                if (album.thumbnail != '') {
+                  imageSrc = '/xbmc/GetThumb?h=45&w=45&thumb='+encodeURIComponent(album.thumbnail);
+                } else {
+                  imageSrc = '/js/libs/holder.js/45x45/text:No cover';
+                }
+                
                 // Frodo fix artist is now a list. Use the first.
                 if($.isArray(album.artist)) album.artist = album.artist[0]
-                var row = $('<tr>')
-                row.append($('<td>').html(itemImage));
-                row.append($('<td>').html(album.artist));
-                row.append($('<td>').html(album.label));
-                row.append($('<td>').html(album.year));
-                $('#album-table-body').append(row);
+                
+                var row = $('<div>').addClass('media');
+                row.append(
+                  $('<a>').addClass('pull-left').attr('href', '#').append(
+                    $('<img>').addClass('media-object').attr('src', imageSrc)
+                  ),
+                  $('<div>').addClass('media-body').append(
+                    $('<h5>').addClass('media-heading').html(album.label),
+                    album.artist + ' - ' + album.label + ' ',
+                    $('<b>').text(album.year)
+                  )
+                ); 
+                $('#albums-content').append(row);       
             });
+            
+            Holder.run();
         }
     });
 }

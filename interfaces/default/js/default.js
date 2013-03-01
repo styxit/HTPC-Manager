@@ -6,6 +6,7 @@ var scriptArray = [
     '/js/libs/jquery.tablesorter.min.js',
     '/js/libs/jquery.raty.min.js',
     '/js/libs/jquery.pnotify.min.js',
+    '/js/libs/holder.js',
     '/js/functions/functions.xbmc.js',
     '/js/functions/functions.sickbeard.js',
     '/js/functions/functions.sabnzbd.js'

@@ -54,7 +54,11 @@ function loadMovies(options) {
 
                 var movieAnchor = $('<a>').attr('href', '#');
                 movieAnchor.addClass('thumbnail');
-                var src = '/xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(movie.thumbnail)
+                if (movie.thumbnail != '') {
+                  var src = '/xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(movie.thumbnail);
+                } else {
+                  var src = '/js/libs/holder.js/100x150/text:No artwork';
+                }
                 movieAnchor.append($('<img>').attr('src', src));
                 movieAnchor.click(function(e) {
                     e.preventDefault();
@@ -67,6 +71,7 @@ function loadMovies(options) {
 
             });
             moviesLoading = false;
+            Holder.run();
         },
         error: function() {
             errorHandler();
