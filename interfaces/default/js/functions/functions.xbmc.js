@@ -116,7 +116,7 @@ function xbmcShowMovie(movie) {
 
     var modalButtons = {
         'Play' : function() {
-            playItem(movie.file);
+            playItem(movie.movieid, 'movie');
             hideModal();
         }
     }
@@ -410,8 +410,9 @@ function loadNowPlaying() {
     });
 }
 
-function playItem(item) {
-    $.get('/xbmc/PlayItem?item='+item);
+function playItem(item, type) {
+    type = typeof type !== 'undefined' ? '&type='+type : '';
+    $.get('/xbmc/PlayItem?item='+item+type);
 }
 
 function xbmcControl(action) {

@@ -226,9 +226,13 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def PlayItem(self, item=None):
+    def PlayItem(self, item=None, type=None):
         """ Play a file in XBMC """
         xbmc = Server(self.url('/jsonrpc', True))
+        
+        if type == 'movie':
+            return xbmc.Player.Open(item={'movieid': int(item)})
+        
         return xbmc.Player.Open(item={'file': item})
 
     @cherrypy.expose()
