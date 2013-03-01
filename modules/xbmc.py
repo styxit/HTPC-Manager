@@ -185,7 +185,7 @@ class Xbmc:
             xbmc = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
             properties = ['title', 'year', 'plot', 'thumbnail', 'file', 'fanart', 'studio', 'trailer',
-                    'imdbnumber', 'genre', 'rating', 'streamdetails']
+                    'imdbnumber', 'genre', 'rating', 'streamdetails', 'playcount']
             limits = {'start': int(start), 'end': int(end)}
             return xbmc.VideoLibrary.GetMovies(sort=sort, properties=properties, limits=limits)
         except ValueError:

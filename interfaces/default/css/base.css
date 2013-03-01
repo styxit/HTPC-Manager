@@ -89,6 +89,7 @@ h2{
 #movie-grid .thumbnail,
 #wanted-grid img,
 #wanted-grid .thumbnail {
+    position: relative;
     height: 150px;
     width: 100px;
 }
@@ -97,6 +98,13 @@ h2{
     float: left;
     height: 100px;
     width: 75px;
+}
+#movie-grid i{
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 16px; 
+    height: 16px;
 }
 h6.movie-title, h6.show-title {
     color: #555555;

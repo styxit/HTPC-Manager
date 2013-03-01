@@ -60,6 +60,11 @@ function loadMovies(options) {
                   var src = '/js/libs/holder.js/100x150/text:No artwork';
                 }
                 movieAnchor.append($('<img>').attr('src', src));
+                
+                if (movie.playcount >= 1) {
+                  movieAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok'));
+                }
+                
                 movieAnchor.click(function(e) {
                     e.preventDefault();
                     xbmcShowMovie(movie);
