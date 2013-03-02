@@ -456,7 +456,6 @@ function loadPlaylist(type){
           
           var modalContent = $('<ol>');
           $.each(data.items, function(i, item){
-            console.log(item);
             var playItemText;
             if (item.type == 'song') {
                 playItemText = item.title + ' <small class="muted">' + item.artist[0] + '</small>';
