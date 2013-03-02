@@ -187,11 +187,6 @@ h6.movie-title, h6.show-title {
 .album-list li:hover .control {
     display: block;
 }
-#nowplaying .thumbnail,
-#nowplaying .thumbnail img {
-    height: 140px;
-    width: 140px;
-}
 #nowplaying #player-progressbar {
     cursor: pointer;
 }

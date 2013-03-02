@@ -315,19 +315,14 @@ function loadNowPlaying() {
             if (nowPlayingThumb != data.itemInfo.item.thumbnail) {
                 nowPlayingThumb = data.itemInfo.item.thumbnail;
 
-                var thumbnail = $('<img>');
+                var thumbnail = $('#nowplaying .thumb img');
                 thumbnail.attr('alt', data.itemInfo.item.label);
                 if (data.itemInfo.item.type == 'episode') {
                     thumbnail.attr('src', '/xbmc/GetThumb?w=150&h=75&thumb='+encodeURIComponent(nowPlayingThumb));
-                    thumbnail.css('height', '75px');
-                    thumbnail.css('width', '150px');
                 }
                 if (data.itemInfo.item.type == 'movie') {
                     thumbnail.attr('src', '/xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(nowPlayingThumb));
-                    thumbnail.css('height', '150px');
-                    thumbnail.css('width', '100px');
                 }
-                $('#nowplaying .thumbnail').html(thumbnail);
 
                 $('#nowplaying').css({
                     'background' : 'url(/xbmc/GetThumb?w=1150&h=640&o=10&thumb='+encodeURIComponent(data.itemInfo.item.fanart)+') top center',
