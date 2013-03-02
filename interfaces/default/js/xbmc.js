@@ -71,6 +71,11 @@ $(document).ready(function() {
         e.preventDefault();
         xbmcScan('audio');
     });
+    
+    $('#nowplaying button#playlistLoader').on('click', function(e) {
+        e.preventDefault();
+        loadPlaylist('audio');
+    });    
 
     $(window).scroll(function() {
         if($(window).scrollTop() + $(window).height() >= $(document).height() - 10) {

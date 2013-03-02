@@ -239,17 +239,43 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    def Playlist(self, type='audio'):
+        """ Get a playlist from XBMC """
+        xbmc = Server(self.url('/jsonrpc', True))
+        playlists = xbmc.Playlist.GetPlaylists()
+        playlistId = -1
+        for playlist in playlists:
+            if playlist['type'] == type:
+                playlistId = playlist['playlistid']
+                print playlistId
+        
+        if playlistId is not -1:
+            return xbmc.Playlist.GetItems(playlistid=playlistId, properties=['artist', 'title', 'album'])
+        
+        return
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def NowPlaying(self):
         """ Get information about current playing item """
         try:
             xbmc = Server(self.url('/jsonrpc', True))
             player = xbmc.Player.GetActivePlayers()
             application = xbmc.Application.GetProperties(properties=['muted', 'volume', 'version'])
+            
             if player[0][u'type'] == 'video':
                 properties = ['speed', 'position', 'totaltime', 'time', 'percentage', 'subtitleenabled', 'currentsubtitle', 'subtitles',
                               'currentaudiostream', 'audiostreams']
                 playerInfo = xbmc.Player.GetProperties(playerid=player[0][u'playerid'], properties=properties)
                 itemInfo = xbmc.Player.GetItem(playerid=player[0][u'playerid'], properties=['thumbnail', 'showtitle', 'year', 'episode', 'season', 'fanart'])
+                return {'playerInfo': playerInfo, 'itemInfo': itemInfo, 'app': application}
+                
+            elif player[0][u'type'] == 'audio':
+                properties = ['speed', 'position', 'totaltime', 'time', 'percentage',
+                              'currentaudiostream', 'audiostreams']
+                playerInfo = xbmc.Player.GetProperties(playerid=player[0][u'playerid'], properties=properties)
+                itemInfo = xbmc.Player.GetItem(playerid=player[0][u'playerid'], properties=['title', 'artist', 'album', 'thumbnail', 'showtitle', 'year', 'episode', 'season', 'fanart'])
+
                 return {'playerInfo': playerInfo, 'itemInfo': itemInfo, 'app': application}
         except:
             return

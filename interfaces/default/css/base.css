@@ -205,10 +205,6 @@ legend {
     display: inline-block;
     width: 40px;
 }
-#modal_dialog.modal {
-    width: 700px;
-    margin-left: -350px;
-}
 .popover {
     width: 575px;
 }
