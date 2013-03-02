@@ -281,7 +281,7 @@ function loadXBMCShow(show) {
                     episodeAnchor.append($('<img>').attr('src', src));
                     episodeAnchor.click(function(e) {
                         e.preventDefault();
-                        playItem(episode.file);
+                        playItem(episode.episodeid, 'episode');
                     });
                     episodeItem.append(episodeAnchor);
                     episodeItem.append($('<h6>').addClass('show-title').html(shortenText(episode.label, 20)));
@@ -361,14 +361,19 @@ function loadNowPlaying() {
             itemTime.html(playingTime + ' / ' + totalTime);
 
             var itemTitel = $('#player-item-title')
+            var itemSubtitel = $('#player-item-subtitle')
             var playingTitle = '';
+            var playingSubtitle = '';
             if (data.itemInfo.item.type == 'episode') {
-                playingTitle = data.itemInfo.item.showtitle + ' ' + data.itemInfo.item.label
+                playingTitle = data.itemInfo.item.label;
+                playingSubtitle = data.itemInfo.item.showtitle + ' ' + data.itemInfo.item.season + 'x' + data.itemInfo.item.episode;
             }
             if (data.itemInfo.item.type == 'movie') {
-                playingTitle = data.itemInfo.item.label + ' (' + data.itemInfo.item.year + ')';
+                playingTitle = data.itemInfo.item.label;
+                playingSubtitle  = data.itemInfo.item.year;
             }
             itemTitel.html(playingTitle);
+            itemSubtitel.html(playingSubtitle);
 
             $('#player-progressbar').click(function(e) {
                 pos = ((e.pageX-this.offsetLeft)/$(this).width()*100).toFixed(2);

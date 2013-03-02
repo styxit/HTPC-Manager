@@ -232,6 +232,8 @@ class Xbmc:
         
         if type == 'movie':
             return xbmc.Player.Open(item={'movieid': int(item)})
+        if type == 'episode':
+            return xbmc.Player.Open(item={'episodeid': int(item)})
         
         return xbmc.Player.Open(item={'file': item})
 
