@@ -26,14 +26,17 @@ html, body {
         margin: 0 0 20px 0;
         padding-top: 60px;
     }
-    #tvshow-carousel, #tvshow-carousel img,
-    #movie-carousel, #movie-carousel img {
-        height: 240px;
-        width: 365px;
-    }
 }
 .carousel-caption {
     cursor: pointer;
+}
+
+#tvshow-carousel .item,
+#movie-carousel .item {
+  height: 200px;
+  background-position: center 20%;
+  background-size: cover;
+  background-repeat: no-repeat; 
 }
 h1.page-header.page-title {
     background-color: #f5f5f5;
