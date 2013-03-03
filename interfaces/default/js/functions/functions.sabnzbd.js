@@ -58,12 +58,17 @@ function loadHistory() {
                 failMessage.html(slot.fail_message);
 
                 var row = $('<tr>')
-                if (slot.status == 'Failed') {
-                    row.append($('<td>').html(slot.name).append('&nbsp;').append(failMessage));
-                } else {
-                    row.append($('<td>').html(slot.name));
+                
+                var name = $('<td>').html(slot.name);
+                if (slot.category != '*') {
+                    name.append('&nbsp;').append(sabnzbdStatusLabel(slot.category));
                 }
-                row.append($('<td>').html(slot.status));
+                if (slot.status == 'Failed') {
+                    $(name).append('&nbsp;').append(failMessage);
+                }
+
+                row.append(name);
+                row.append($('<td>').append(sabnzbdStatusLabel(slot.status)));
                 row.append($('<td>').html(slot.size));
                 row.append($('<td>').append(deleteImage));
                 row.append($('<td>').append(retryImage));
@@ -218,4 +223,51 @@ function setCategories(selector, select) {
             });
         }
     });
+}
+
+
+function sabnzbdStatusLabel(text){
+  var statusOK = ['Completed'];
+  var statusInfo = [];  
+  var statusError = ['Failed'];
+  var statusWarning = [];
+  
+  var label = $('<span>').addClass('label').text(text);
+  
+  if (statusOK.indexOf(text) != -1) {
+    label.addClass('label-success');
+  }
+  else if (statusInfo.indexOf(text) != -1) {
+    label.addClass('label-info');
+  }
+  else if (statusError.indexOf(text) != -1) {
+    label.addClass('label-important');
+  }
+  else if (statusWarning.indexOf(text) != -1) {
+    label.addClass('label-warning');
+  }
+  
+  var icon = sabnzbdStatusIcon(text, true);
+  if (icon != '') {
+    label.prepend(' ').prepend(icon);
+  }
+  return label;
+}
+
+function sabnzbdStatusIcon(iconText, white){
+  var text =[
+    'Completed'
+  ];
+  var icons = [
+    'icon-ok'
+  ];
+  
+  if (text.indexOf(iconText) != -1) {
+    var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
+    if (white == true) {
+      icon.addClass('icon-white');
+    }
+    return icon;
+  }
+  return '';
 }
