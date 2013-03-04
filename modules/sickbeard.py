@@ -91,7 +91,7 @@ class Sickbeard:
     def SearchShow(self, query):
         try:
             url = 'http://www.thetvdb.com/api/GetSeries.php?seriesname=' + quote(query)
-            return loads(urlopen(url, timeout=10).read())
+            return urlopen(url, timeout=10).read()
         except:
             return
 
