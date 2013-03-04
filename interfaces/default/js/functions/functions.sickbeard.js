@@ -298,7 +298,7 @@ function sickbeardStatusIcon(iconText, white){
   ];
   var icons = [
     'icon-download-alt',
-    'icon-refresh',
+    'icon-repeat',
     'icon-share-alt',
     'icon-time',
     'icon-lock',
