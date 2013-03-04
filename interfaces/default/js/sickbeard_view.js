@@ -71,19 +71,25 @@ function renderSeason(){
       
       // If result is not 'succes' it must be a failure
       if (data.result != 'success') {
-        notifyError('Error', 'This is not a vaid season for this show');
+        notifyError('Error', 'This is not a valid season for this show');
         return;
       }
       
       // Loop through data
       $.each(data.data, function(index, value){
         var row = $('<tr>');
+		
+        var search_link = $('<a>').addClass('btn btn-mini').attr('title', 'Search new download').append($('<i>').addClass('icon-search')).on('click', function(){
+          searchEpisode(showid, season, index, value.name);
+        });
+		
         row.append(
           $('<td>').text(index),
           $('<td>').text(value.name),
           $('<td>').text(value.airdate),
           $('<td>').append(sickbeardStatusLabel(value.status)),
-          $('<td>').text(value.quality)
+          $('<td>').text(value.quality),
+          $('<td>').append(search_link)
         );
         seasonContent.append(row);
       }); // end loop

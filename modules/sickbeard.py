@@ -86,6 +86,11 @@ class Sickbeard:
     @cherrypy.tools.json_out()
     def GetSeason(self, tvdbid, season):
         return self.fetch('show.seasons&tvdbid=' + tvdbid + '&season=' + season)
+        
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def SearchEpisodeDownload(self, tvdbid, season, episode):
+        return self.fetch('episode.search&tvdbid=' + tvdbid + '&season=' + season + '&episode=' + episode, False, 45)
 
     @cherrypy.expose()
     def SearchShow(self, query):
@@ -95,7 +100,7 @@ class Sickbeard:
         except:
             return
 
-    def fetch(self, cmd, img=False):
+    def fetch(self, cmd, img=False, timeout = 10):
         try:
             settings = htpc.settings.Settings()
             host = settings.get('sickbeard_host', '')
@@ -104,8 +109,8 @@ class Sickbeard:
             url = 'http://' + host + ':' + str(port) + '/api/' + apikey + '/?cmd=' + cmd
 
             if (img == True):
-              return urlopen(url, timeout=10).read()
+              return urlopen(url, timeout=timeout).read()
               
-            return loads(urlopen(url, timeout=10).read())
+            return loads(urlopen(url, timeout=timeout).read())
         except:
             return

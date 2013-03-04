@@ -37,7 +37,7 @@ function loadShow(tvdbid) {
             data = data.data;
 
             var table = $('<table>');
-            table.addClass('table table-bordered table-striped');
+            table.addClass('table table-bordered table-striped table-condensed');
 
             row = $('<tr>');
             row.append('<th>Status</th><td>' + data.status + '</td>');
@@ -62,8 +62,21 @@ function loadShow(tvdbid) {
             row = $('<tr>');
             row.append('<th>Network</th><td>' + data.network + '</td>');
             table.append(row);
+            
+            modalContent = $('<div>');
+            modalContent.append(
+              $('<img>').attr('src', '/sickbeard/GetBanner/'+tvdbid).addClass('img-rounded'),
+              $('<hr>'),
+              table
+             );
+            
+            var modalButtons = {
+              'Show' : function() {
+                window.location = '/sickbeard/view/' + tvdbid;
+              }
+            }
 
-            showModal(data.show_name, table, {});
+            showModal(data.show_name, modalContent, modalButtons);
         }
     });
 }
@@ -205,6 +218,36 @@ function addShow(tvdbid) {
             cancelAddShow();
         }
     });
+}
+
+function searchEpisode(tvdbid, season, episode, name) {
+  var modalcontent = $('<div>');
+  modalcontent.append($('<p>').html('Looking for episode &quot;'+ name +'&quot;.'));
+  modalcontent.append($('<div>').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'));
+  showModal('Searching episode '+season + 'x'+episode, modalcontent, {});
+  
+  $.ajax({
+    url: '/sickbeard/SearchEpisodeDownload?tvdbid=' + tvdbid +'&season=' + season +'&episode='+episode,
+    type: 'get',
+    dataType: 'json',
+    timeout: 40000,
+    success: function (data) {
+      // If result is not 'succes' it must be a failure
+      if (data.result != 'success') {
+        notify('Error', data.message, 'error');
+        return;
+      } else {
+        notify('OK', name+ ' ' + season + 'x'+episode+' found. ' + data.message, 'success');
+        return;
+      }
+    },
+    error: function (data) {
+      notify('Error', 'Episode not found.', 'error', 1);
+    },
+    complete: function (data) {
+      hideModal();
+    }
+  });
 }
 
 function cancelAddShow() {
