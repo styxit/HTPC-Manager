@@ -246,6 +246,8 @@ function searchEpisode(tvdbid, season, episode, name) {
     },
     complete: function (data) {
       hideModal();
+      // Trigger latest season
+      $('#season-list li.active a').trigger('click');
     }
   });
 }
