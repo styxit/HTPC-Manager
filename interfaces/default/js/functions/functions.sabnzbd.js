@@ -228,7 +228,7 @@ function setCategories(selector, select) {
 
 function sabnzbdStatusLabel(text){
   var statusOK = ['Completed'];
-  var statusInfo = [];  
+  var statusInfo = ['Extracting', 'Running'];
   var statusError = ['Failed'];
   var statusWarning = [];
   
@@ -256,10 +256,14 @@ function sabnzbdStatusLabel(text){
 
 function sabnzbdStatusIcon(iconText, white){
   var text =[
-    'Completed'
+    'Completed',
+    'Extracting',
+    'Running'
   ];
   var icons = [
-    'icon-ok'
+    'icon-ok',
+    'icon-share',
+    'icon-play-circle'
   ];
   
   if (text.indexOf(iconText) != -1) {
