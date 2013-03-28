@@ -226,6 +226,42 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    def GetArtists(self, start=0, end=0, sortmethod='artist', sortorder='ascending'):
+        """ Get a list of all artists """
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
+            properties = ['thumbnail', 'fanart']
+            limits = {'start': int(start), 'end': int(end)}
+            return xbmc.AudioLibrary.GetArtists(properties=properties, limits=limits, sort=sort)
+        except ValueError:
+            return
+            
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetArtistDetails(self, artistid):
+        """ Get artist details from xbmc """
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            properties = ['thumbnail', 'fanart', 'description']
+            return xbmc.AudioLibrary.GetArtistDetails(artistid=int(artistid), properties=properties)
+        except ValueError:
+            return
+    
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetAlbums(self, artistid):
+        """ Get a list of all albums for artist """
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            properties=['artist', 'albumlabel', 'year', 'description', 'thumbnail']
+            filter = {'artistid': int(artistid)}
+            return xbmc.AudioLibrary.GetAlbums(filter=filter, properties=properties)
+        except ValueError:
+            return
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def PlayItem(self, item=None, type=None):
         """ Play a file in XBMC """
         xbmc = Server(self.url('/jsonrpc', True))
@@ -234,6 +270,8 @@ class Xbmc:
             return xbmc.Player.Open(item={'movieid': int(item)})
         if type == 'episode':
             return xbmc.Player.Open(item={'episodeid': int(item)})
+        if type == 'artist':
+            return xbmc.Player.Open(item={'artistid': int(item)})
         
         return xbmc.Player.Open(item={'file': item})
 

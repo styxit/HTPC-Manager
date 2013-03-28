@@ -299,6 +299,135 @@ function loadXBMCShow(show) {
     });
 }
 
+function xbmcLoadAlbums(artistid){
+  // Check if current artist-albums are already showing
+  var isLoaded = $('#artist-'+artistid).hasClass('artist-albums-loaded');
+  
+  // Hide all albums
+  var openArtists = $('#artist-grid .artist-albums');
+  openArtists.slideUp(300, function() {
+      $(this).remove();
+  });
+  $('#artist-grid .artist-albums-loaded').removeClass('artist-albums-loaded');
+  
+  // If currently clicked artist had albums showing; do nothing (hide albums only)
+  if (isLoaded == true) {
+    return;
+  }
+  
+  $.ajax({
+    url: '/xbmc/GetAlbums/'+artistid,
+    type: 'get',
+    dataType: 'json',
+    success: function(albums){
+      // container, holding albums
+      var albumContainer = $('<ul>').addClass('artist-albums').addClass('thumbnails').css('display', 'none');
+      
+      // Loop albums
+      $.each(albums.albums, function (i, album) {
+        var li = $('<li>');
+        if (album.thumbnail == '') {
+         li.append($('<img>').attr('src', '?holder.js/150x150/text:'+album.label).attr('title', album.label).addClass('img-rounded img-polaroid'));
+        } else {
+          li.append($('<img>').attr('src', '/xbmc/GetThumb?w=150&h=150&thumb='+encodeURIComponent(album.thumbnail)).attr('title', album.label).addClass('img-rounded img-polaroid'));
+        }
+        li.append($('<h6>').addClass('album-title').html(shortenText(album.label, 21)));
+        albumContainer.append(li);
+      });
+      $('#artist-'+artistid).addClass('artist-albums-loaded').after(albumContainer);
+      $('#artist-'+artistid).parent().find('.artist-albums').show(300);
+      Holder.run();
+    }  
+  });
+}
+
+function xbmcPlayArtist(artistid){
+  $.ajax({
+    url: '/xbmc/GetArtistDetails/'+artistid,
+    type: 'get',
+    dataType: 'json',
+    success: function(artist){
+      artist = artist.artistdetails;      
+      var modalButtons = {
+        'Play now' : function() {
+          playItem(artist.artistid, 'artist');
+          hideModal();
+          notify('Ok', artist.label + ' playing now.', 'success');
+        },
+        'Add to queue' : function() {
+          hideModal();
+          notify('Oops', 'Queue not yet implemented.', 'error');
+        }
+      }
+      showModal(artist.label, $('<p>').text('All songs.'), modalButtons);
+    }
+  });
+}
+
+
+function loadArtists(options) {
+
+    var sendData = {
+        start: 0,
+        end: 25,
+        sortorder: 'ascending',
+        sortmethod: 'artist'
+    };
+    $.extend(sendData, options);
+
+    $('.spinner').show();
+    artistRequest = $.ajax({
+        url: '/xbmc/GetArtists',
+        type: 'get',
+        data: sendData,
+        dataType: 'json',
+        success: function (data) {
+          $('.spinner').hide();
+
+          if (data == null) {
+              errorHandler();
+              return;
+          }
+
+          if (data.artists != undefined) {
+            $('#artist-grid').html('');
+            $.each(data.artists, function (i, artist) {
+              var artistRow = $('<tr>');
+              var playArtist = $('<td>').addClass('span1');
+              playArtist.append($('<a>').attr('href', 'javascript:void(0)').addClass('play-artist').attr('data-artistid', artist.artistid).attr('title', 'Play all songs for artist '+artist.label).html('<i class="icon-play-circle">'));
+              
+              var artistItem = $('<td>');
+              artistItem.attr('title', artist.label);
+
+              artistItem.html($('<a>').attr('href', 'javascript:void(0)').addClass('load-albums').attr('id', 'artist-'+artist.artistid).attr('data-artistid', artist.artistid).html(artist.label));
+              
+              artistRow.append(
+                playArtist,
+                artistItem
+              );
+              $('#artist-grid').append(artistRow);
+            });
+          }
+          paginateArtists(data.limits)
+        },
+        error: function() {
+            errorHandler();
+        }
+    });
+}
+function paginateArtists(limit){
+  current = limit.start/25
+  $('#artistPager').pagination(limit.total,{
+    current_page: current,
+    num_edge_entries:1,
+    items_per_page:25,
+    num_display_entries:4,
+    ellipse_text:'<a href="#">...</a>',
+    callback:function(page,component){
+      loadArtists({start: (page*25), end: (page*25+25)});
+    }
+  });
+}
 var nowPlayingThumb = 'empty-image';
 function loadNowPlaying() {
     $.ajax({

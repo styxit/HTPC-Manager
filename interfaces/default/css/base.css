@@ -109,7 +109,7 @@ h2{
     width: 16px; 
     height: 16px;
 }
-h6.movie-title, h6.show-title {
+h6.movie-title, h6.show-title, h6.album-title {
     color: #555555;
     text-align: center;
     margin: 0;

@@ -1,6 +1,7 @@
 $(document).ready(function() {
     enablePlayerControls();
     loadMovies();
+    loadArtists();
     loadXbmcShows();
     loadNowPlaying();
 
@@ -28,6 +29,15 @@ $(document).ready(function() {
             xbmcControl(command);
         }
     });
+    
+    $(document).on("click", "#artist-grid a.load-albums", function(event){
+      xbmcLoadAlbums($(this).attr('data-artistid'));
+    });
+    
+    $(document).on("click", "#artist-grid a.play-artist", function(event){
+      xbmcPlayArtist($(this).attr('data-artistid'));
+    });
+    
     $('#hidewatched').click(function() {
         $(this).toggleClass('hidewatched');
         $('#show-seasons').hide();

@@ -1,5 +1,5 @@
 <%inherit file="base.html"/>
-<%block name="header"><script src="/js/xbmc.js"></script></%block>
+<%block name="header"><script src="/js/xbmc.js"></script><script src="/js/libs/jquery.pager.js"></script></%block>
 <%
 import htpc
 settings = htpc.settings.Settings()
@@ -58,6 +58,7 @@ settings = htpc.settings.Settings()
         <ul class="nav nav-tabs">
             <li class="active"><a href="#movies" data-toggle="tab">Movies</a></li>
             <li><a href="#shows" data-toggle="tab">TV Shows</a></li>
+            <li><a href="#music" data-toggle="tab">Music</a></li>
         </ul>
         <div class="tab-content">
             <div id="movies" class="active tab-pane">
@@ -111,6 +112,10 @@ settings = htpc.settings.Settings()
                 <ul id="show-grid" class="thumbnails filter" data-scroll-limit="${settings.get('xbmc_scroll_limit', '0')}"></ul>
                 %endif
                 <ul id="show-seasons" class="filter hide" data-scroll-limit="${settings.get('xbmc_scroll_limit', '0')}"></ul>
+            </div>
+            <div id="music" class="tab-pane">
+              <div id="artistPager" class="pagination"></div>
+              <table id="artist-grid" class="filter table table-condensed table-striped table-bordered" data-scroll-limit="${settings.get('xbmc_scroll_limit', '0')}"></table>
             </div>
         </div>
         <div class="spinner"></div>
