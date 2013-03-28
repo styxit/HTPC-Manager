@@ -17,7 +17,7 @@ function loadShowData(showid){
       if (data.next_ep_airdate != '') {
         $('.sickbeard_next_air').text(data.next_ep_airdate);
       }
-      
+
       renderSeasonTabs(showid, data.season_list);
     },
     error: function(){
@@ -29,10 +29,10 @@ function loadShowData(showid){
 function renderSeasonTabs(showid, seasons){
   list = $('#season-list');
   list.html('');
-  
+
   $.each(seasons, function(index, seasonNr){
     var label = seasonNr;
-    
+
     // Specials are marked as season 0
     if (label == 0) {
       label = 'Specials';
@@ -48,7 +48,7 @@ function renderSeasonTabs(showid, seasons){
     list.append(pill);
   });
   list.find('a').on('click', renderSeason);
-  
+
   // Trigger latest season
  list.find('li:first-child a').trigger('click');
 }
@@ -57,10 +57,10 @@ function renderSeasonTabs(showid, seasons){
 function renderSeason(){
   $('#season-list li').removeClass('active');
   $(this).parent().addClass("active");
-  
+
   showid = $(this).attr('data-showid');
-  season = $(this).attr('data-season');  
-  
+  season = $(this).attr('data-season');
+
   $.ajax({
     url: '/sickbeard/GetSeason?tvdbid=' + showid + '&season=' + season,
     type: 'get',
@@ -68,21 +68,21 @@ function renderSeason(){
     success: function(data){
       var seasonContent = $('#season-content');
       seasonContent.html(''); // Clear table contents before inserting new rows
-      
+
       // If result is not 'succes' it must be a failure
       if (data.result != 'success') {
         notifyError('Error', 'This is not a valid season for this show');
         return;
       }
-      
+
       // Loop through data
       $.each(data.data, function(index, value){
         var row = $('<tr>');
-		
+
         var search_link = $('<a>').addClass('btn btn-mini').attr('title', 'Search new download').append($('<i>').addClass('icon-search')).on('click', function(){
           searchEpisode(showid, season, index, value.name);
         });
-		
+
         row.append(
           $('<td>').text(index),
           $('<td>').text(value.name),
@@ -93,10 +93,10 @@ function renderSeason(){
         );
         seasonContent.append(row);
       }); // end loop
-      
+
       // Trigger tableSort update
-      seasonContent.parent().trigger("update"); 
-      seasonContent.parent().trigger("sorton",[[[0,1]]]); 
+      seasonContent.parent().trigger("update");
+      seasonContent.parent().trigger("sorton",[[[0,1]]]);
     },
     error: function(){
         notify('Error', 'Error while loading season.', 'error');

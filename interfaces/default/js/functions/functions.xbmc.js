@@ -46,13 +46,13 @@ function loadMovies(options) {
             if (data.limits.end == data.limits.total) {
                 allMoviesLoaded = true;
             }
-            
+
             if (data.movies != undefined) {
                 $.each(data.movies, function (i, movie) {
                     var movieItem = $('<li>')
                     movieItem.attr('title', movie.title);
                     movieItem.attr('id', movie.title);
-    
+
                     var movieAnchor = $('<a>').attr('href', '#');
                     movieAnchor.addClass('thumbnail');
                     if (movie.thumbnail != '') {
@@ -61,20 +61,20 @@ function loadMovies(options) {
                       var src = '/js/libs/holder.js/100x150/text:No artwork';
                     }
                     movieAnchor.append($('<img>').attr('src', src));
-                    
+
                     if (movie.playcount >= 1) {
                       movieAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok'));
                     }
-                    
+
                     movieAnchor.click(function(e) {
                         e.preventDefault();
                         xbmcShowMovie(movie);
                     });
                     movieItem.append(movieAnchor);
                     movieItem.append($('<h6>').addClass('movie-title').html(shortenText(movie.title, 12)));
-    
+
                     $('#movie-grid').append(movieItem);
-    
+
                 });
             }
             moviesLoading = false;
@@ -194,13 +194,13 @@ function loadXbmcShows(options) {
             if (data.tvshows != undefined) {
                 $.each(data.tvshows, function (i, show) {
                     var showItem = $('<li>').addClass('show-item');
-    
+
                     var showAnchor = $('<a>').attr('href', '#').click(function(e) {
                         e.preventDefault();
                         loadXBMCShow(show);
                     });
                     showAnchor.addClass('thumbnail');
-    
+
                     var showPicture = $('<img>');
                     if ($('#show-grid').hasClass('banners')) {
                         showPicture.attr('src', '/xbmc/GetThumb?h=80&w=500&thumb='+encodeURIComponent(show.thumbnail));
@@ -214,7 +214,7 @@ function loadXbmcShows(options) {
                     } else {
                         showItem.append($('<h6>').addClass('show-title').html(shortenText(show.title, 12)));
                     }
-    
+
                     $('#show-grid').append(showItem);
                 });
             }
@@ -302,19 +302,19 @@ function loadXBMCShow(show) {
 function xbmcLoadAlbums(artistid){
   // Check if current artist-albums are already showing
   var isLoaded = $('#artist-'+artistid).hasClass('artist-albums-loaded');
-  
+
   // Hide all albums
   var openArtists = $('#artist-grid .artist-albums');
   openArtists.slideUp(300, function() {
       $(this).remove();
   });
   $('#artist-grid .artist-albums-loaded').removeClass('artist-albums-loaded');
-  
+
   // If currently clicked artist had albums showing; do nothing (hide albums only)
   if (isLoaded == true) {
     return;
   }
-  
+
   $.ajax({
     url: '/xbmc/GetAlbums/'+artistid,
     type: 'get',
@@ -322,7 +322,7 @@ function xbmcLoadAlbums(artistid){
     success: function(albums){
       // container, holding albums
       var albumContainer = $('<ul>').addClass('artist-albums').addClass('thumbnails').css('display', 'none');
-      
+
       // Loop albums
       $.each(albums.albums, function (i, album) {
         var li = $('<li>');
@@ -337,7 +337,7 @@ function xbmcLoadAlbums(artistid){
       $('#artist-'+artistid).addClass('artist-albums-loaded').after(albumContainer);
       $('#artist-'+artistid).parent().find('.artist-albums').show(300);
       Holder.run();
-    }  
+    }
   });
 }
 
@@ -347,7 +347,7 @@ function xbmcPlayArtist(artistid){
     type: 'get',
     dataType: 'json',
     success: function(artist){
-      artist = artist.artistdetails;      
+      artist = artist.artistdetails;
       var modalButtons = {
         'Play now' : function() {
           playItem(artist.artistid, 'artist');
@@ -395,12 +395,12 @@ function loadArtists(options) {
               var artistRow = $('<tr>');
               var playArtist = $('<td>').addClass('span1');
               playArtist.append($('<a>').attr('href', 'javascript:void(0)').addClass('play-artist').attr('data-artistid', artist.artistid).attr('title', 'Play all songs for artist '+artist.label).html('<i class="icon-play-circle">'));
-              
+
               var artistItem = $('<td>');
               artistItem.attr('title', artist.label);
 
               artistItem.html($('<a>').attr('href', 'javascript:void(0)').addClass('load-albums').attr('id', 'artist-'+artist.artistid).attr('data-artistid', artist.artistid).html(artist.label));
-              
+
               artistRow.append(
                 playArtist,
                 artistItem
@@ -501,7 +501,7 @@ function loadNowPlaying() {
 
             // Hide playlist button (only shows at audio)
             $('#nowplaying button#playlistLoader').hide();
-            
+
             var itemTitel = $('#nowplaying #player-item-title')
             var itemSubtitel = $('#nowplaying #player-item-subtitle')
             var playingTitle = '';
@@ -531,7 +531,7 @@ function loadNowPlaying() {
 
             var progressBar = $('#nowplaying #player-progressbar').find('.bar');
             progressBar.css('width', data.playerInfo.percentage + '%');
-            
+
             if (data.playerInfo.subtitles) {
                 var subtitles = $('#subtitles').empty();
                 data.playerInfo.subtitles.push({'index':'off','name':'None'});
@@ -582,7 +582,7 @@ function loadPlaylist(type){
               notify('Oops..', 'Playlist is empty');
               return;
           }
-          
+
           var modalContent = $('<ol>');
           $.each(data.items, function(i, item){
             var playItemText;
@@ -593,7 +593,7 @@ function loadPlaylist(type){
             }
             modalContent.append($('<li>').html(playItemText));
           });
-          
+
           showModal('Playlist', modalContent, {});
         }
     });

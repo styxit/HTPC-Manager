@@ -58,7 +58,7 @@ function loadHistory() {
                 failMessage.html(slot.fail_message);
 
                 var row = $('<tr>')
-                
+
                 var name = $('<td>').html(slot.name);
                 if (slot.category != '*') {
                     name.append('&nbsp;').append(sabnzbdStatusLabel(slot.category));
@@ -231,9 +231,9 @@ function sabnzbdStatusLabel(text){
   var statusInfo = ['Extracting', 'Running'];
   var statusError = ['Failed'];
   var statusWarning = [];
-  
+
   var label = $('<span>').addClass('label').text(text);
-  
+
   if (statusOK.indexOf(text) != -1) {
     label.addClass('label-success');
   }
@@ -246,7 +246,7 @@ function sabnzbdStatusLabel(text){
   else if (statusWarning.indexOf(text) != -1) {
     label.addClass('label-warning');
   }
-  
+
   var icon = sabnzbdStatusIcon(text, true);
   if (icon != '') {
     label.prepend(' ').prepend(icon);
@@ -265,7 +265,7 @@ function sabnzbdStatusIcon(iconText, white){
     'icon-share',
     'icon-play-circle'
   ];
-  
+
   if (text.indexOf(iconText) != -1) {
     var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
     if (white == true) {

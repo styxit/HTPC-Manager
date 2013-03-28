@@ -29,15 +29,15 @@ $(document).ready(function() {
             xbmcControl(command);
         }
     });
-    
+
     $(document).on("click", "#artist-grid a.load-albums", function(event){
       xbmcLoadAlbums($(this).attr('data-artistid'));
     });
-    
+
     $(document).on("click", "#artist-grid a.play-artist", function(event){
       xbmcPlayArtist($(this).attr('data-artistid'));
     });
-    
+
     $('#hidewatched').click(function() {
         $(this).toggleClass('hidewatched');
         $('#show-seasons').hide();
@@ -81,11 +81,11 @@ $(document).ready(function() {
         e.preventDefault();
         xbmcScan('audio');
     });
-    
+
     $('#nowplaying button#playlistLoader').on('click', function(e) {
         e.preventDefault();
         loadPlaylist('audio');
-    });    
+    });
 
     $(window).scroll(function() {
         if($(window).scrollTop() + $(window).height() >= $(document).height() - 10) {

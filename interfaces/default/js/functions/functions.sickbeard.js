@@ -22,7 +22,7 @@ function loadShows() {
                 $('#tvshows_table_body').append(row);
             });
             $('#tvshows_table_body').parent().trigger('update');
-            $('#tvshows_table_body').parent().trigger("sorton",[[[0,0]]]); 
+            $('#tvshows_table_body').parent().trigger("sorton",[[[0,0]]]);
         }
     });
 }
@@ -62,14 +62,14 @@ function loadShow(tvdbid) {
             row = $('<tr>');
             row.append('<th>Network</th><td>' + data.network + '</td>');
             table.append(row);
-            
+
             modalContent = $('<div>');
             modalContent.append(
               $('<img>').attr('src', '/sickbeard/GetBanner/'+tvdbid).addClass('img-rounded'),
               $('<hr>'),
               table
              );
-            
+
             var modalButtons = {
               'Show' : function() {
                 window.location = '/sickbeard/view/' + tvdbid;
@@ -114,7 +114,7 @@ function loadNextAired(options) {
                 var name = $('<a>').attr('href','#').html(tvshow.show_name).click(function(e){
                     loadShow(tvshow.tvdbid);
                 });
-                
+
                 row.append(
                   $('<td>').append(name),
                   $('<td>').html(tvshow.ep_name),
@@ -225,7 +225,7 @@ function searchEpisode(tvdbid, season, episode, name) {
   modalcontent.append($('<p>').html('Looking for episode &quot;'+ name +'&quot;.'));
   modalcontent.append($('<div>').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'));
   showModal('Searching episode '+season + 'x'+episode, modalcontent, {});
-  
+
   $.ajax({
     url: '/sickbeard/SearchEpisodeDownload?tvdbid=' + tvdbid +'&season=' + season +'&episode='+episode,
     type: 'get',
@@ -263,12 +263,12 @@ function cancelAddShow() {
 
 function sickbeardStatusLabel(text){
   var statusOK = ['Continuing', 'Downloaded', 'HD'];
-  var statusInfo = ['Snatched', 'Unaired'];  
+  var statusInfo = ['Snatched', 'Unaired'];
   var statusError = ['Ended'];
   var statusWarning = ['Skipped'];
-  
+
   var label = $('<span>').addClass('label').text(text);
-  
+
   if (statusOK.indexOf(text) != -1) {
     label.addClass('label-success');
   }
@@ -281,7 +281,7 @@ function sickbeardStatusLabel(text){
   else if (statusWarning.indexOf(text) != -1) {
     label.addClass('label-warning');
   }
-  
+
   var icon = sickbeardStatusIcon(text, true);
   if (icon != '') {
     label.prepend(' ').prepend(icon);
@@ -306,7 +306,7 @@ function sickbeardStatusIcon(iconText, white){
     'icon-lock',
     'icon-fast-forward'
   ];
-  
+
   if (text.indexOf(iconText) != -1) {
     var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
     if (white == true) {

@@ -23,7 +23,7 @@ jQuery.fn.pagination = function(maxentries, opts){
         }
 
         /**
-         * Calculate start and end point of pagination links depending on 
+         * Calculate start and end point of pagination links depending on
          * current_page and num_display_entries.
          * @return {Array}
          */
@@ -37,7 +37,7 @@ jQuery.fn.pagination = function(maxentries, opts){
         }
 
         /**
-         * This is the event handling function for the pagination links. 
+         * This is the event handling function for the pagination links.
          * @param {int} page_id The new page number
          */
         function pageSelected(page_id, evt){
@@ -134,9 +134,9 @@ jQuery.fn.pagination = function(maxentries, opts){
         opts.items_per_page = (!opts.items_per_page || opts.items_per_page < 0)?1:opts.items_per_page;
         // Store DOM element for easy access from all inner functions
         var panel = jQuery(this);
-        // Attach control functions to the DOM element 
+        // Attach control functions to the DOM element
         this.selectPage = function(page_id){ pageSelected(page_id);}
-        this.prevPage = function(){ 
+        this.prevPage = function(){
             if (current_page > 0) {
                 pageSelected(current_page - 1);
                 return true;
@@ -145,7 +145,7 @@ jQuery.fn.pagination = function(maxentries, opts){
                 return false;
             }
         }
-        this.nextPage = function(){ 
+        this.nextPage = function(){
             if(current_page < numPages()-1) {
                 pageSelected(current_page+1);
                 return true;
