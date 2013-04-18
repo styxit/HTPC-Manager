@@ -114,6 +114,10 @@ settings = htpc.settings.Settings()
                 <ul id="show-seasons" class="filter hide" data-scroll-limit="${settings.get('xbmc_scroll_limit', '0')}"></ul>
             </div>
             <div id="music" class="tab-pane">
+              <div class="pull-right input-prepend">
+                <span class="add-on"><i class="icon-search"></i></span>
+                <input type="text" class="span2" placeholder="Filter" id="xbmc-filter-artists" name="artist-query"/>
+              </div>
               <div id="artistPager" class="pagination"></div>
               <table id="artist-grid" class="filter table table-condensed table-striped table-bordered" data-scroll-limit="${settings.get('xbmc_scroll_limit', '0')}"></table>
             </div>

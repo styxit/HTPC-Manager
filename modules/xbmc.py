@@ -226,14 +226,15 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetArtists(self, start=0, end=0, sortmethod='artist', sortorder='ascending'):
+    def GetArtists(self, start=0, end=0, sortmethod='artist', sortorder='ascending', filter=''):
         """ Get a list of all artists """
         try:
             xbmc = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
             properties = ['thumbnail', 'fanart']
             limits = {'start': int(start), 'end': int(end)}
-            return xbmc.AudioLibrary.GetArtists(properties=properties, limits=limits, sort=sort)
+            filter = {'field': 'artist', 'operator': 'contains', 'value': filter}
+            return xbmc.AudioLibrary.GetArtists(properties=properties, limits=limits, sort=sort, filter=filter)
         except ValueError:
             return
             

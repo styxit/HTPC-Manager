@@ -21,6 +21,7 @@ $(document).ready(function() {
     }, 'json');
 
     $(document).keydown(function(e) {
+      if (!$('input').is(":focus")) {
         arrow = {8: 'Back', 27: 'Back', 13: 'Select', 37: 'Left', 38: 'Up', 39: 'Right', 40: 'Down',
                  88: 'Stop', 32: 'PlayPause'};
         command = arrow[e.which];
@@ -28,6 +29,7 @@ $(document).ready(function() {
             e.preventDefault();
             xbmcControl(command);
         }
+      }
     });
 
     $(document).on("click", "#artist-grid a.load-albums", function(event){
@@ -85,6 +87,13 @@ $(document).ready(function() {
     $('#nowplaying button#playlistLoader').on('click', function(e) {
         e.preventDefault();
         loadPlaylist('audio');
+    });
+
+    // Audio search artist
+    $('#xbmc-filter-artists').keyup(function(){
+        loadArtists({
+            'filter': $(this).val()
+        });
     });
 
     $(window).scroll(function() {

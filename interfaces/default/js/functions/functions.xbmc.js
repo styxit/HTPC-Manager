@@ -371,7 +371,8 @@ function loadArtists(options) {
         start: 0,
         end: 25,
         sortorder: 'ascending',
-        sortmethod: 'artist'
+        sortmethod: 'artist',
+        filter: ''
     };
     $.extend(sendData, options);
 
@@ -424,7 +425,7 @@ function paginateArtists(limit){
     num_display_entries:4,
     ellipse_text:'<a href="#">...</a>',
     callback:function(page,component){
-      loadArtists({start: (page*25), end: (page*25+25)});
+      loadArtists({start: (page*25), end: (page*25+25), filter: $('#xbmc-filter-artists').val()});
     }
   });
 }
