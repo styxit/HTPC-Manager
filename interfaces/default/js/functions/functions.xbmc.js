@@ -449,18 +449,27 @@ function loadNowPlaying() {
 
                 var thumbnail = $('#nowplaying .thumb img');
                 thumbnail.attr('alt', data.itemInfo.item.label);
+                 thumbnail.removeAttr('style width height');
                 if (nowPlayingThumb == '') {
-                  thumbnail.attr('src', '?holder.js/100x140/text:No+artwork');
+                  thumbnail.attr('src', '?holder.js/140x140/text:No+artwork');
+                  thumbnail.attr('width', '140').attr('height', '140');
                 } else {
                   if (data.itemInfo.item.type == 'episode') {
                       thumbnail.attr('src', '/xbmc/GetThumb?w=150&h=75&thumb='+encodeURIComponent(nowPlayingThumb));
+                      thumbnail.attr('width', '150').attr('height', '75');
                   }
                   else if (data.itemInfo.item.type == 'movie') {
                       thumbnail.attr('src', '/xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(nowPlayingThumb));
+                      thumbnail.attr('width', '100').attr('height', '150');
                   }
                   else if (data.itemInfo.item.type == 'song') {
                       thumbnail.attr('src', '/xbmc/GetThumb?w=180&h=180&thumb='+encodeURIComponent(nowPlayingThumb));
-                  }
+                      thumbnail.attr('width', '180').attr('height', '180');
+                  } 
+                  else  {
+                      thumbnail.attr('src', '/xbmc/GetThumb?w=140&h=140&thumb='+encodeURIComponent(nowPlayingThumb));
+                      thumbnail.attr('width', '140').attr('height', '140');
+                  } 
                 }
                 var nowPlayingBackground = '?holder.js/1150x640/#f5f5f5:#f5f5f5';
                 if (data.itemInfo.item.fanart) {
