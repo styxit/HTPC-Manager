@@ -345,6 +345,16 @@ class Xbmc:
             return xbmc.Input.Left()
         elif action == 'MoveRight':
             return xbmc.Input.Right()
+        elif action == 'PlayNext':
+            try:
+                return xbmc.Player.GoTo(playerid=player[0][u'playerid'], to='next')
+            except:
+                return
+        elif action == 'PlayPrev':
+            try:
+                return xbmc.Player.GoTo(playerid=player[0][u'playerid'], to='previous')
+            except:
+                return
         elif action == 'Seek':
             try:
                 percent = float(percent)
