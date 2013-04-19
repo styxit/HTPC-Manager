@@ -53,14 +53,20 @@ $(document).ready(function() {
         if (msg) sendNotification(msg);
     });
     $('#xbmc-restart').click(function() {
-        $.get('/xbmc/System?action=Reboot', function(data){
+        var answer = confirm("Reboot xbmc system?");
+        if (answer) {
+          $.get('/xbmc/System?action=Reboot', function(data){
             notify('Reboot','Rebooting...','warning');
-        });
+          });
+        }
     });
     $('#xbmc-shutdown').click(function() {
-        $.get('/xbmc/System?action=Suspend', function(data){
+        var answer = confirm("Shutdown xbmc system?");
+        if (answer) {
+          $.get('/xbmc/System?action=Suspend', function(data){
             notify('Shutdown','Shutting down...','warning');
-        });
+          });
+        }
     });
     $('#xbmc-wake').click(function() {
         $.get('/xbmc/Wake', function(data){
