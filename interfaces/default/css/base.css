@@ -217,9 +217,13 @@ h3 a {
 table th.tablesorter-header {
     cursor: pointer;
 }
-[class^="icon-"], [class*=" icon-"] {
-    background-image: url("/img/glyphicons-halflings.png") !important;
+[class^="icon-"], [class*=" icon-"],
+[class^="icon-"]:hover, [class*=" icon-"]:hover{
+    text-decoration: none;
 }
 .icon-white {
-    background-image: url("/img/glyphicons-halflings-white.png") !important;
+    color:white;
+}
+.icon-black {
+    color:black;
 }
