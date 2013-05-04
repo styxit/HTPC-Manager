@@ -145,7 +145,7 @@ function loadSickbeardHistory(limit) {
                 var row = $('<tr>');
                 row.append(
                   $('<td>').html(tvshow.date),
-                  $('<td>').html(tvshow.show_name),
+                  $('<td>').append($('<a>').text(tvshow.show_name).attr('href', '/sickbeard/view/'+tvshow.tvdbid)),
                   $('<td>').html(tvshow.season + 'x' + tvshow.episode),
                   $('<td>').append(sickbeardStatusLabel(tvshow.status)),
                   $('<td>').html(tvshow.quality)
