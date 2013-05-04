@@ -91,7 +91,7 @@ function xbmcShowMovie(movie) {
     modalMovieAnchor.append($('<img>').attr('src', '/xbmc/GetThumb?w=200&h=300&thumb='+encodeURIComponent(movie.thumbnail)));
 
     var modalMovieInfo = $('<div>').addClass('modal-movieinfo');
-    if(movie.streamdetails) {
+    if(movie.streamdetails && movie.streamdetails.video[0]) {
         var runtime = parseSec(movie.streamdetails.video[0].duration);
         modalMovieInfo.append($('<p>').html('<b>Runtime:</b> ' + runtime));
     }
