@@ -27,6 +27,20 @@ html, body {
         padding-top: 60px;
     }
 }
+
+/*
+ * Prevent overflow on dashboard tables
+ */
+.dashboard .span4 td{
+    overflow:hidden;
+}
+.dashboard .span4 table{
+    table-layout: fixed;
+}
+.dashboard .span4 #downloads_table_body td:last-child {
+    width: 14px;
+}
+
 .carousel-caption {
     cursor: pointer;
 }
