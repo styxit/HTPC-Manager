@@ -1,0 +1,15 @@
+.xbmc_playlist ol#playlist li span.playlist-controls{
+  color: #ccc;
+}
+
+.xbmc_playlist ol#playlist li:hover span.playlist-controls{
+  color: #000;
+}
+
+.xbmc_playlist ol#playlist li .label {
+  display: none;
+}
+
+.xbmc_playlist ol#playlist li.active .label {
+  display: inline-block;
+}

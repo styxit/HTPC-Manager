@@ -510,7 +510,7 @@ function loadNowPlaying() {
 
 
             // Hide playlist button (only shows at audio)
-            $('#nowplaying button#playlistLoader').hide();
+            $('#nowplaying #playlistLoader').hide();
 
             var itemTitel = $('#nowplaying #player-item-title')
             var itemSubtitel = $('#nowplaying #player-item-subtitle')
@@ -527,7 +527,7 @@ function loadNowPlaying() {
             else if (data.itemInfo.item.type == 'song') {
                 playingTitle = data.itemInfo.item.title;
                 playingSubtitle  = data.itemInfo.item.artist[0] + ' (' + data.itemInfo.item.album + ')';
-                $('#nowplaying button#playlistLoader').show();
+                $('#nowplaying #playlistLoader').show();
             } else {
                 playingTitle = data.itemInfo.item.label;
             }
@@ -577,6 +577,10 @@ function loadNowPlaying() {
             }
 
             $('[data-player-control]').attr('disabled', false);
+
+            //update playlist
+            $("ol#playlist li").removeClass('active');
+            $("ol#playlist li[data-identifier='"+data.itemInfo.item.type+data.itemInfo.item.id+"']").addClass('active');
         }
     });
 }
@@ -609,9 +613,63 @@ function loadPlaylist(type){
     });
 }
 
+function playlist(type){
+    //Get all Playlists
+    $.ajax({
+        url: '/xbmc/Playlist/audio',
+        type: 'get',
+        dataType: 'json',
+        complete: function() {
+            setTimeout('playlist()', 60000);
+        },
+        success: function(data) {
+          var playlistContent = $('ol#playlist');
+          playlistContent.html('');
+
+          if (data.limits.total == 0 || data.items == undefined) {
+              playlistContent.append($('<li>').html('<small>Playlist is empty</small>'));
+              return;
+          }
+
+          $.each(data.items, function(i, item){
+            var listItem = $('<li>').html('&nbsp;');
+            if (item.type == 'song') {
+                playItemText = '<a href="#" class="playnow">'+item.title + '</a> <small class="muted">' + item.artist[0] + '</small>';
+            } else {
+                playItemText = '<a href="#" class="playnow">'+item.label+'</a>';
+            }
+            listItem.append($('<span>').html(playItemText));
+
+            // Add controls to playitem
+            var controls = $('<span>').addClass('playlist-controls pull-right');
+            controls.append($('<i>').addClass('icon-chevron-up'));
+            controls.append($('<i>').addClass('icon-chevron-down'));
+            controls.append($('<i>').addClass('icon-remove'));
+            listItem.append(controls);
+
+            // Add song identifier to list item
+            listItem.attr('data-identifier', item.type+item.id);
+            listItem.attr('data-item-id', item.id);
+            listItem.attr('data-item-type', item.type);
+
+            // Add speaker to item
+            speaker = $('<span>').addClass('label label-info').append($('<i>').addClass('icon-volume-up'));
+            listItem.prepend(speaker);
+
+            playlistContent.append(listItem);
+          });
+        }
+    });
+}
+
 function playItem(item, type) {
     type = typeof type !== 'undefined' ? '&type='+type : '';
     $.get('/xbmc/PlayItem?item='+item+type);
+}
+
+function playlistJump(position) {
+    $.get('/xbmc/ControlPlayer/JumpItem/'+position, function(data){
+    });
 }
 
 function xbmcControl(action) {

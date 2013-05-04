@@ -81,7 +81,12 @@ class Xbmc:
     @cherrypy.expose()
     def index(self):
         """ Generate page from template """
-        return htpc.LOOKUP.get_template('xbmc.html').render()
+        return htpc.LOOKUP.get_template('xbmc/index.html').render()
+
+    @cherrypy.expose()
+    def playlist(self):
+        """ Generate page from template """
+        return htpc.LOOKUP.get_template('xbmc/playlist.html').render()
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -273,6 +278,8 @@ class Xbmc:
             return xbmc.Player.Open(item={'episodeid': int(item)})
         if type == 'artist':
             return xbmc.Player.Open(item={'artistid': int(item)})
+        if type == 'song':
+            return xbmc.Player.Open(item={'songid': int(item)})
         
         return xbmc.Player.Open(item={'file': item})
 
@@ -353,6 +360,11 @@ class Xbmc:
         elif action == 'PlayPrev':
             try:
                 return xbmc.Player.GoTo(playerid=player[0][u'playerid'], to='previous')
+            except:
+                return
+        elif action == 'JumpItem':
+            try:
+                return xbmc.Player.GoTo(playerid=player[0][u'playerid'], to=int(percent))
             except:
                 return
         elif action == 'Seek':

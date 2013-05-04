@@ -90,11 +90,6 @@ $(document).ready(function() {
         xbmcScan('audio');
     });
 
-    $('#nowplaying button#playlistLoader').on('click', function(e) {
-        e.preventDefault();
-        loadPlaylist('audio');
-    });
-
     // Audio search artist
     $('#xbmc-filter-artists').keyup(function(){
         loadArtists({
