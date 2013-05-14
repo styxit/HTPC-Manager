@@ -1,71 +1,518 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <title>Htpc-manager by styxit</title>
-  </head>
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Htpc Manager</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <body>
-    <div id="container">
-      <div class="inner">
+  <link rel="stylesheet" href="css/animate.css">
 
-        <header>
-          <h1>Htpc-manager</h1>
-          <h2></h2>
-        </header>
+  <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
 
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/styxit/HTPC-Manager/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/styxit/HTPC-Manager/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/styxit/HTPC-Manager" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
+  <link rel="stylesheet" href="css/style.css">
+  <!--[if lt IE 9]>
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome-ie7.min.css" rel="stylesheet">
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+<body id="anchor-home" data-target="#primary-nav">
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </a>
+        <a class="brand" href="index.html">Htpc Manager</a>
+        <div id="primary-nav" class="nav-collapse">
+          <ul class="nav">
+            <li><a class="anchorLink" href="#home">Home</a></li>
+            <li><a class="anchorLink" href="#features">Features</a></li>
+            <li><a class="anchorLink" href="#software">Software</a></li>
+            <li><a class="anchorLink" href="#screenshots">Screenshots</a></li>
+            <li><a class="anchorLink" href="#support">Support</a></li>
+            <li><a class="anchorLink" href="#development">Development</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div><!--/container-->
+    </div><!--/navbar-inner-->
+  </div><!--/navbar-->
 
-        <hr>
+  <div class="teaser">
+    <div class="container">
+      <div class="row">
+        <div class="span12 headline">
+          <h1>Manage your Htpc from everywhere</h1>
+          <i class="description">All with one application. Checkout all the cool features!</i>
+        </div><!--/span12-->
+      </div><!--/row-->
+      <div class="row animated fadeInUp">
+        <div class="span12">
+          <div id="headerCarousel" class="carousel slide" data-interval="false">
+            <div class="carousel-inner">
+              <!--slide-->
+              <div class="active item">
+                <div class="row">
+                  <div class="span6 text-center animated rotateIn">
+                    <img src="img/slider/dashboard.png" alt="">
+                  </div>
+                  <div class="span4 animated rotateInDownRight">
+                    <h2>Easy contol your Htpc</h2>
+                    <p>Using multiple applications to control you htpc? No More! </p>
+                    <p>Htpc Manager combines all your software and provides an easy way to controll them all!</p>
+                    <a class="btn btn-red anchorLink" href="#features">Features <i class="icon-double-angle-right"></i></a>
+                  </div>
+                </div>
+              </div>
 
-        <section id="main_content">
-          <h3>Welcome to GitHub Pages.</h3>
+              <!--slide-->
+              <div class="item">
+                <div class="row">
+                  <div class="span6 text-center animated bounceInDown">
+                    <img src="img/slider/tablet-perspective.png" alt="">
+                  </div>
+                  <div class="span4 animated fadeInDownBig">
+                    <h2>Works on tablets!</h2>
+                    <p>Don't get off the couch to check your downloads or active tv shows.</p>
+                    <p>Play some music with xbmc without touching a keyboard or even turning on your tv screen.</p>
+                  </div>
+                </div>
+              </div>
+              <!--slide-->
+              <div class="item animated fadeInUpBig">
+                <div class="row">
+                  <div class="span12 text-center">
+                    <img alt="" src="img/slider/fullscreens.png">
+                  </div>
+                </div>
+              </div>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+              <div class="item">
+                <div class="row">
+                  <div class="span6 text-center animated fadeInUpBig">
+                    <img src="img/slider/multidevices.png" alt="">
+                  </div>
+                  <div class="span4 animated fadeInDownBig">
+                    <h2>Htpc on the go</h2>
+                    <p>Control your downloads or check the status from your tv shows when you're not at home.</p>
+                    <p>Htpc Manager can be access from anywhere aslong as you have an internet connection. Start a new download so when you get home, it is waiting for you. Ready to watch!</p>
+                    <p>All this by combining the software you are already using.</p>
+                    <a class="btn btn-danger anchorLink" href="#software">Software <i class="icon-double-angle-right"></i></a>
+                  </div>
+                </div>
+              </div>
+              <!--slide-->
+            </div><!--/carousel-inner-->
+            <!-- Carousel nav -->
+            <a class="carousel-control left" href="#headerCarousel" data-slide="prev">‹</a>
+            <a class="carousel-control right" href="#headerCarousel" data-slide="next">›</a>
+          </div><!--/myCarousel-->
+        </div><!--/span12-->
+      </div><!--/row-->
+    </div><!--/container-->
+  </div>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
-
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
-
-<h3>Designer Templates</h3>
-
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-        </section>
-
-        <footer>
-          Htpc-manager is maintained by <a href="https://github.com/styxit">styxit</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
-
-        
+  <div class="container"><!--main content-->
+    <div class="motivater">
+      <div class="row">
+        <div class="span12">
+          <a class="btn btn-success btn-large" href="https://github.com/styxit/HTPC-Manager/archive/master.zip"><i class="icon-cloud-download"></i> Download now</a>
+          <a class="btn btn-primary btn-large" href="https://github.com/styxit/HTPC-Manager"><i class="icon-github"></i> Github project</a>
+          <span class="slogan">Start using Htpc Manager now! It's free and runs on every platform.</span>
+          <p>* Ok, maybe not every platform.</p>
+        </div>
       </div>
     </div>
-  </body>
-</html>
+
+    <section id="anchor-features">
+      <div class="row">
+        <div class="span12">
+          <h2 class="page-header">
+            <em> Features</em>
+            <a class="up anchorLink pull-right" href="#home">
+              <i class="icon-chevron-up"></i>
+             </a>
+          </h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span4">
+          <img class="thumbnail" src="img/features/xbmc.png" alt="">
+          <br>
+        </div>
+        <div class="span5">
+          <h3>Xbmc control</h3>
+          <p>Play/pause your movies and tv shows, control your media library and create music playlist. Almost all functions xbmc provides, you can run from Htpc Manager.</p>
+        </div>
+        <div class="span3">
+          <div class="well">
+            <strong>Xbmc features</strong>
+            <hr />
+            <ul class="icons-ul">
+              <li><i class="icon-li icon-ok"></i> Browse library (movies, tvshow, music)</li>
+              <li><i class="icon-li icon-ok"></i> Play item</li>
+              <li><i class="icon-li icon-ok"></i> Show music playlist</li>
+              <li><i class="icon-li icon-ok"></i> Pause, play, stop, skip item.</li>
+              <li><i class="icon-li icon-ok"></i> Select subtitle and audiostream.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="span4">
+          <img class="thumbnail" src="img/features/sickbeard.png" alt="">
+          <br>
+        </div>
+        <div class="span5">
+          <h3>Tv show management <small>with Sickbeard</small></h3>
+          <p>If you use Sickbeard to auto-download your tv shows, you can now do it all from within Htpc Manager. All features like Add new show, search episode, next up and show overview can be handled throug Htpc Manager.</p>
+        </div>
+        <div class="span3">
+          <div class="well">
+            <strong>Sickbeard features</strong>
+            <hr>
+            <ul class="icons-ul">
+              <li><i class="icon-li icon-ok"></i> Tvshow overview</li>
+              <li><i class="icon-li icon-ok"></i> Show tvshow details</li>
+              <li><i class="icon-li icon-ok"></i> List episodes</li>
+              <li><i class="icon-li icon-ok"></i> Next airing episodes</li>
+              <li><i class="icon-li icon-ok"></i> Search download for episode</li>
+              <li><i class="icon-li icon-ok"></i> Add new show to Sickbeard</li>
+              <li><i class="icon-li icon-ok"></i> Sickbeard history</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <br />
+      <div class="row">
+        <div class="span4">
+          <img class="thumbnail" src="img/features/sabnzbd.png" alt="Sabnzbd screenshot">
+          <br>
+        </div>
+        <div class="span5">
+          <h3>Download <small>using Sabnzbd</small></h3>
+          <p>Sabnzbd might be the most populair multi-platform software for usenet downloads. It is fully automated so you don't have to look at it. And now with Htpc Manager, all it's great features are easily managable and combined with all your other htpc software.</p>
+          <p>Because the interface for Htpc Manager is responsive and works on all devices, you are always in control of your downloads. Everywhere.</p>
+        </div>
+        <div class="span3">
+          <div class="well">
+            <strong>Sabnzbd features</strong>
+            <hr>
+            <ul class="icons-ul">
+              <li><i class="icon-li icon-ok"></i> Add new nzb</li>
+              <li><i class="icon-li icon-ok"></i> View current downloads</li>
+              <li><i class="icon-li icon-ok"></i> Show Sabnzbd history</li>
+              <li><i class="icon-li icon-ok"></i> Restart failed downloads</li>
+              <li><i class="icon-li icon-ok"></i> Assign downloads to category</li>
+              <li><i class="icon-li icon-ok"></i> Limit download speed</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <br />
+      <div class="row">
+        <div class="span4">
+          <img class="thumbnail" src="img/features/responsive.png" alt="">
+          <br>
+        </div>
+        <div class="span5">
+          <h3>Multi-device <small>Responsive interface</small></h3>
+          <p>Htpc Manager is created using <a href="http://twitter.github.io/bootstrap">Twitter Bootstrap</a> and is compatible with all sorts of devices. Wether you use Htpc Manager on your desktop, tablet or phone, it always looks good! The interface adjust according to your screen size.</p>
+          <p>On you desktop, white spacing makes sure the interface looks nice and clean, while on your phone the content adjusts size to fint on the screen without vertical scrolling.</p>
+        </div>
+        <div class="span3">
+          <div class="well">
+            <strong>Twitter Bootstrap?</strong>
+            <hr>
+            <p><i class="icon-tag"></i> Bootstrap was made to not only look and behave great in the latest desktop browsers (as well as IE7!), but in tablet and smartphone browsers via responsive CSS as well.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="anchor-software">
+      <div class="row">
+        <div class="span12">
+          <h2 class="page-header">
+            <em> Compatible software</em>
+            <a class="up anchorLink pull-right" href="#home">
+              <i class="icon-chevron-up"></i>
+             </a>
+           </h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span4">
+          <div class="media">
+            <a class="pull-left" href="http://www.xbmc.org">
+              <img class="media-object" src="img/software/xbmc.png" height="80" width="80" alt="xbmc logo"/>
+            </a>
+            <div class="media-body">
+              <h3 class="media-heading">Xbmc</h3>
+              <p>XBMC is an award-winning free and open source (GPL) software media player and entertainment hub for digital media. XBMC is available for Linux, OSX, and Windows.</p>
+              <p>It has been designed to be the perfect companion for your HTPC. Supporting an almost endless range of remote controls, and combined with its beautiful interface and powerful skinning engine, XBMC feels very natural to use from the couch and is the ideal solution for your home theater.</p>
+              <p>
+                <a href="http://www.xbmc.org"><i class="icon-external-link"></i> Xbmc.org</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="span4">
+          <div class="media">
+            <a class="pull-left" href="http://www.sickbeard.com">
+              <img class="media-object" src="img/software/sickbeard.png" height="80" width="80" alt="sickbeard logo" />
+            </a>
+            <div class="media-body">
+              <h3 class="media-heading">Sickbeard</h3>
+              <p>Sick Beard is a PVR for newsgroup users. It watches for new episodes of your favorite shows and when they are posted it downloads them, sorts and renames them, and optionally generates metadata for them.</p>
+              <p>
+                <a href="http://www.sickbeard.com"><i class="icon-external-link"></i> Sickbeard.com</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="span4">
+          <div class="media">
+            <a class="pull-left" href="http://www.sabnzbd.org">
+              <img class="media-object" src="img/software/sabnzbd.png" height="80" width="80" alt="sabnzbd logo" />
+            </a>
+            <div class="media-body">
+              <h3 class="media-heading">Sabnzbd</h3>
+              <p>SABnzbd is an Open Source Binary Newsreader written in Python.</p>
+              <p>SABnzbd makes Usenet as simple and streamlined as possible by automating everything it can. All you have to do is add an .nzb. SABnzbd takes over from there, where it will be automatically downloaded, verified, repaired, extracted and filed away with zero human interaction.</p>
+
+              <p>
+                <a href="http://www.sabnzbd.org"><i class="icon-external-link"></i> Sabnzbd.org</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div><!--/row-->
+      <div class="row">
+        <div class="span4">
+          <div class="media">
+            <a class="pull-left" href="http://www.couchpota.to">
+              <img class="media-object" src="img/software/couchpotato.png" height="80" width="80" alt="couchpotato logo">
+            </a>
+            <div class="media-body">
+              <h3 class="media-heading">Couchpotato</h3>
+              <p>An automatic NZB and torrent downloader, just fill in what you want to see and CouchPotato will add it to your "want to watch"-list. Every day it will search through multiple NZBs &amp; Torrents sites, looking for the best possible match. Once a correct release is found, it will send it to Sabnzbd.</p>
+              <p>
+                <a href="http://www.couchpota.to"><i class="icon-external-link"></i> Couchpota.to</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="span4">
+          <div class="media">
+            <a class="pull-left" href="http://www.newznab.com/">
+              <img class="media-object" src="img/software/newznab.png"  height="80" width="80" alt="newznab logo"/>
+            </a>
+            <div class="media-body">
+              <h3 class="media-heading">Newznab</h3>
+              <p>Newznab is a usenet indexing application, that makes building a usenet community easy.</p>
+              <p>Use your favorite newznab-based nzb indexer like <a href="http://www.nzbs.org">nzbs.org</a>, <a href="http://nzb-matrix.eu/">nzb matrix</a> or even your own private index, to search for downloads from within Htpc Manager.</p>
+              <p>
+                <a href="http://www.newznab.com/"><i class="icon-external-link"></i> Newznab.com</a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="span4">
+          <div class="media">
+            <a class="pull-left" href="http://www.python.org/">
+              <img class="media-object" src="img/software/python.png"  height="80" width="80" alt="python logo" />
+            </a>
+            <div class="media-body">
+              <h3 class="media-heading">Python</h3>
+              <p>Python is a programming language that lets you work more quickly and integrate your systems more effectively. Python runs on Windows, Linux/Unix, Mac OS X, and has been ported to the Java and .NET virtual machines.</p>
+              <p>At the heart of Htpc Manager lies Python. It is used to serve all the pages to the browser and maintains the Api-connections between all software modules.</p>
+              <p>
+                <a href="http://www.python.org/"><i class="icon-external-link"></i> Python.org</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div><!--/row-->
+    </section>
+    <section class="motivater">
+      <div class="row">
+        <div class="span12">
+          <span class="slogan">Htpc Manager combines all your favorite software into one slick interface</span>
+          <p>Do all your htpc-taskt without using 5 different interfaces!</p>
+        </div>
+      </div>
+    </section>
+    <section id="anchor-screenshots">
+      <div class="row">
+        <div class="span12">
+          <h2 class="page-header">
+            <em> Screenshots</em>
+            <a class="up anchorLink pull-right" href="#home">
+              <i class="icon-chevron-up"></i>
+            </a>
+          </h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span12">
+          <ul class="thumbnails">
+            <li class="span3">
+              <a class="js-fancybox thumbnail" rel="album" href="img/screenshots/dashboard.png" title="Htpc Manager Dashboard"><img src="img/screenshots/dashboard-tbn.png" alt="Screenshot dashboard" /></a>
+            </li>
+            <li class="span3">
+              <a class="js-fancybox thumbnail" rel="album" href="img/screenshots/sickbeard.png" title="Browse music library"><img src="img/screenshots/sickbeard-tbn.png" alt="Screenshot browse music" /></a>
+            </li>
+            <li class="span3">
+              <a class="js-fancybox thumbnail" rel="album" href="img/screenshots/musicbrowser.png" title="Browse music library"><img src="img/screenshots/musicbrowser-tbn.png" alt="Screenshot browse music" /></a>
+            </li>
+            <li class="span3">
+              <a class="js-fancybox thumbnail" rel="album" href="img/screenshots/nowplaying.png" title="Music playlist"><img src="img/screenshots/nowplaying-tbn.png" alt="Screenshot now playing" /></a>
+            </li>
+            <li class="span3">
+              <a class="js-fancybox thumbnail" rel="album" href="img/screenshots/moviedetail.png" title="Movie details popup"><img src="img/screenshots/moviedetail-tbn.png" alt="Screenshot movie details popup" /></a>
+            </li>
+            <li class="span3">
+              <a class="js-fancybox thumbnail" rel="album" href="img/screenshots/tvshow.png" title="Sickbeard tvshow details"><img src="img/screenshots/tvshow-tbn.png" alt="Screenshot tvshow details" /></a>
+            </li>
+            <li class="span3">
+              <a class="js-fancybox thumbnail" rel="album" href="img/screenshots/sabnzbd.png" title="Downloads"><img src="img/screenshots/sabnzbd-tbn.png" alt="Screenshot sabnzbd" /></a>
+            </li>
+            <li class="span3">
+              <a class="js-fancybox thumbnail" rel="album" href="img/screenshots/ipad.png" title="iPad responsive view"><img src="img/screenshots/ipad-tbn.png" alt="Screenshot iPad responsive view" /></a>
+            </li>
+          </ul>
+        </div><!--span12-->
+      </div><!--/row-->
+    </section>
+
+    <section id="anchor-support">
+      <div class="row">
+        <div class="span12">
+          <h2 class="page-header">
+            <em> Support</em>
+            <a class="up anchorLink pull-right" href="#home">
+              <i class="icon-chevron-up"></i>
+            </a>
+          </h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span4">
+          <div class="well">
+            <h3><i class="icon-github"></i> Github support</h3>
+            <hr>
+            <p>Htpc Manager is an open Github project. You can contribute if you want to, or report any bugs or feature-requests in the <a href="https://github.com/styxit/HTPC-Manager/issues">issues</a>.</p>
+            <p>Any udates made to Htpc Manager are available through Github. You can download a new version, do a git-pull, or even update directly from Htpc Manager!</p>
+            <a class="btn btn-primary" href="https://github.com/styxit/HTPC-Manager">Github project <i class="icon-double-angle-right"></i></a>
+          </div>
+        </div>
+        <div class="span4">
+          <div class="well">
+            <h3><i class="icon-group"></i> Xbmc forum</h3>
+            <hr>
+            <p>There is a forum thread on the Xbmc forums, discussing Htpc Manager. Visit the Xbmc forum thread to get more information about the current development, how-to's and keep an eye on the ongoing discussion.</p>
+            <a class="btn btn-danger" href="http://forum.xbmc.org/showthread.php?tid=126297&action=newpost">Xbmc forum <i class="icon-double-angle-right"></i></a>
+          </div>
+        </div>
+        <div class="span4">
+          <div class="well">
+            <h3><i class="icon-rss"></i> Latest updates</h3>
+            <hr>
+            <ul id="github-commit-list" class="icons-ul">
+              <li><i class="icon-spinner icon-spin icon-li"></i> Loading commits</li>
+            </ul>
+            <a class="btn btn-success" href="https://github.com/styxit/HTPC-Manager/commits/master">Github commits <i class="icon-double-angle-right"></i></a>
+          </div>
+        </div>
+      </div><!--/row-->
+    </section>
+
+    <section id="anchor-development">
+      <div class="row">
+        <div class="span12">
+          <h2 class="page-header">
+            <em> Development</em>
+            <a class="up anchorLink pull-right" href="#home">
+              <i class="icon-chevron-up"></i>
+            </a>
+          </h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="span4">
+          <h3>Future development</h3>
+          <hr />
+          <p>Htpc Manager is currently developed by <a href="https://github.com/styxit">Styxit</a>, but the project is supported by developers from all around the world.</p>
+          <p>You can contribute yourself by forking the project and send me pull-requests with your own features and improvements.</p>
+        </div>
+        <div class="span4">
+          <div class="well">
+            <div class="media">
+              <a class="pull-left" href="http://blog.styxit.com">
+                <img class="media-object img-rounded" src="http://www.gravatar.com/avatar/1865f4f4c943819629c67dc60f126e7e" alt="styxit gravatar" />
+              </a>
+              <div class="media-body">
+                <h3 class="media-heading">Styxit</h3>
+                <p>Styxit is an enthousiast developer from the Netherlands. Familiar with langages like php, javascript (jquery) Python, with a passion for open-source projects.</p>
+                <p>
+                  <a href="http://blog.styxit.com"><i class="icon-external-link"></i> Github hosted weblog</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div><!--/span-->
+        <div class="span4">
+          <h3>Used projects</h3>
+          <hr />
+          <p>Htpc Manager strongly relies on other opensource projects.</p>
+          <ul>
+            <li><a href="http://www.makotemplates.org">Mako templates</a></li>
+            <li><a href="http://jquery.com/">Jquery</a></li>
+            <li><a href="http://www.cherrypy.org/">CherryPy</a></li>
+            <li><a href="http://twitter.github.io/bootstrap/">Twitter Bootstrap</a></li>
+          </ul>
+        </div><!--/span-->
+      </div><!--/row-->
+    </section>
+  </div><!--/main content-->
+
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="span2">
+          <h3>Links</h3>
+          <ul>
+            <li><a href="http://blog.styxit.com" title=""><i class="icon-external-link"></i> Styxit weblog</a></li>
+            <li><a href="http://www.exonet.nl" title="Exonet hosting"><i class="icon-external-link"></i> Exonet</a></li>
+          </ul>
+        </div>
+        <div class="span2">
+          <h3>Recources</h3>
+          <ul>
+            <li><a href="http://twitter.github.io/bootstrap" title="Twitter Bootstrap"><i class="icon-twitter"></i> Twitter Bootstrap</a></li>
+          </ul>
+        </div>
+      </div><!--/row-->
+    </div> <!-- /container -->
+  </footer>
+
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+  <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+  <script type="text/javascript" src="js/jquery.anchor.js"></script>
+
+  <link rel="stylesheet" href="fancybox/jquery.fancybox.css?v=2.1.4" type="text/css" media="screen" />
+  <script type="text/javascript" src="fancybox/jquery.fancybox.pack.js?v=2.1.4"></script>
+
+  <script type="text/javascript" src="js/jquery.github.rss.js"></script>
+  <script type="text/javascript" src="js/script.js"></script>
+
+</body></html>
