@@ -1,8 +1,15 @@
 <%inherit file="base.html"/>
-<%block name="header"><script src="/js/search.js"></script></%block>
+<%block name="header">
 <%
 import htpc
 settings = htpc.settings.Settings()
+webdir = htpc.WEBDIR
+%>
+<script src="${webdir}js/search.js"></script></%block>
+<%
+import htpc
+settings = htpc.settings.Settings()
+webdir = htpc.WEBDIR
 %>
 <div class="container">
     <div class="content maincontent">

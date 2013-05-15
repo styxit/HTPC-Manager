@@ -10,7 +10,7 @@ class Couchpotato:
         htpc.MODULES.append({
             'name': 'CouchPotato',
             'id': 'couchpotato',
-            'test': '/couchpotato/ping',
+            'test': htpc.WEBDIR + 'couchpotato/ping',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'couchpotato_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'couchpotato_name'},

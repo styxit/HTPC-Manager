@@ -9,7 +9,7 @@ $(document).ready(function () {
 
 function loadRecentMovies () {
     $.ajax({
-        url: '/xbmc/GetRecentMovies',
+        url: WEBDIR + 'xbmc/GetRecentMovies',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -19,7 +19,7 @@ function loadRecentMovies () {
                 var itemDiv = $('<div>').addClass('item');
                 if (i == 0) itemDiv.addClass('active');
                 
-                itemDiv.attr('style', "background-image: url(/xbmc/GetThumb?h=240&w=430&thumb="+encodeURIComponent(movie.fanart)+ ");");
+                itemDiv.attr('style', "background-image: url(' + WEBDIR + 'xbmc/GetThumb?h=240&w=430&thumb="+encodeURIComponent(movie.fanart)+ ");");
 
                 var itemCaption = $('<div>').addClass('carousel-caption').click(function() {
                     xbmcShowMovie(movie);
@@ -35,7 +35,7 @@ function loadRecentMovies () {
 
 function loadRecentTVshows () {
     $.ajax({
-        url: '/xbmc/GetRecentShows',
+        url: WEBDIR + 'xbmc/GetRecentShows',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -45,7 +45,7 @@ function loadRecentTVshows () {
                 var epTitle = episode.label;
                 var itemDiv = $('<div>').addClass('item');
                 if (i == 0) itemDiv.addClass('active');
-                itemDiv.attr('style', "background-image: url(/xbmc/GetThumb?h=240&w=430&thumb="+encodeURIComponent(episode.fanart)+ ");");
+                itemDiv.attr('style', "background-image: url(' + WEBDIR + 'xbmc/GetThumb?h=240&w=430&thumb="+encodeURIComponent(episode.fanart)+ ");");
                 var itemCaption = $('<div>').addClass('carousel-caption').click(function() {
                     xbmcShowEpisode(episode)
                 });
@@ -60,7 +60,7 @@ function loadRecentTVshows () {
 
 function loadRecentAlbums () {
     $.ajax({
-        url: '/xbmc/GetRecentAlbums/4',
+        url: WEBDIR + 'xbmc/GetRecentAlbums/4',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -68,9 +68,9 @@ function loadRecentAlbums () {
             $('#albums-content').parent().show();
             $.each(data.albums, function (i, album) {
                 if (album.thumbnail != '') {
-                  imageSrc = '/xbmc/GetThumb?h=45&w=45&thumb='+encodeURIComponent(album.thumbnail);
+                  imageSrc = WEBDIR + 'xbmc/GetThumb?h=45&w=45&thumb='+encodeURIComponent(album.thumbnail);
                 } else {
-                  imageSrc = '/js/libs/holder.js/45x45/text:No cover';
+                  imageSrc = WEBDIR + 'js/libs/holder.js/45x45/text:No cover';
                 }
                 
                 // Frodo fix artist is now a list. Use the first.
@@ -97,7 +97,7 @@ function loadRecentAlbums () {
 
 function loadWantedMovies(limit) {
     $.ajax({
-        url: '/couchpotato/GetMovieList?limit='+limit,
+        url: WEBDIR + 'couchpotato/GetMovieList?limit='+limit,
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -120,7 +120,7 @@ function loadWantedMovies(limit) {
 
 function loadDownloadHistory() {
     $.ajax({
-        url: '/sabnzbd/GetHistory?limit=5',
+        url: WEBDIR + 'sabnzbd/GetHistory?limit=5',
         type: 'get',
         dataType: 'json',
         success: function (data) {

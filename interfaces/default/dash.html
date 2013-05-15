@@ -1,5 +1,11 @@
 <%inherit file="base.html"/>
-<%block name="header"><script src="/js/dash.js"></script></%block>
+<%block name="header">
+<%
+import htpc
+settings = htpc.settings.Settings()
+webdir = htpc.WEBDIR
+%>
+<script src="${webdir}js/dash.js"></script></%block>
 <%
 import htpc
 settings = htpc.settings.Settings()

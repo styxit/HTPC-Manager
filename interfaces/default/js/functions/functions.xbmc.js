@@ -30,7 +30,7 @@ function loadMovies(options) {
     $('.spinner').show();
     moviesLoading = true;
     movieRequest = $.ajax({
-        url: '/xbmc/GetMovies',
+        url: WEBDIR + 'xbmc/GetMovies',
         type: 'get',
         data: sendData,
         dataType: 'json',
@@ -56,9 +56,9 @@ function loadMovies(options) {
                     var movieAnchor = $('<a>').attr('href', '#');
                     movieAnchor.addClass('thumbnail');
                     if (movie.thumbnail != '') {
-                      var src = '/xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(movie.thumbnail);
+                      var src = WEBDIR + 'xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(movie.thumbnail);
                     } else {
-                      var src = '/js/libs/holder.js/100x150/text:No artwork';
+                      var src = WEBDIR + 'js/libs/holder.js/100x150/text:No artwork';
                     }
                     movieAnchor.append($('<img>').attr('src', src));
 
@@ -88,7 +88,7 @@ function loadMovies(options) {
 
 function xbmcShowMovie(movie) {
     var modalMovieAnchor = $('<div>').addClass('thumbnail pull-left');
-    modalMovieAnchor.append($('<img>').attr('src', '/xbmc/GetThumb?w=200&h=300&thumb='+encodeURIComponent(movie.thumbnail)));
+    modalMovieAnchor.append($('<img>').attr('src', WEBDIR + 'xbmc/GetThumb?w=200&h=300&thumb='+encodeURIComponent(movie.thumbnail)));
 
     var modalMovieInfo = $('<div>').addClass('modal-movieinfo');
     if(movie.streamdetails && movie.streamdetails.video[0]) {
@@ -142,7 +142,7 @@ function xbmcShowMovie(movie) {
 
     showModal(movie.title + ' ('+movie.year+')',  modalBody, modalButtons);
     $('.modal-fanart').css({
-        'background' : '#ffffff url(/xbmc/GetThumb?w=675&h=400&o=10&thumb='+encodeURIComponent(movie.fanart)+') top center no-repeat',
+        'background' : '#ffffff url(' + WEBDIR + 'xbmc/GetThumb?w=675&h=400&o=10&thumb='+encodeURIComponent(movie.fanart)+') top center no-repeat',
         'background-size' : '100%'
     });
 }
@@ -175,7 +175,7 @@ function loadXbmcShows(options) {
     showsLoading = true;
     $('.spinner').show();
     showRequest = $.ajax({
-        url: '/xbmc/GetShows',
+        url: WEBDIR + 'xbmc/GetShows',
         type: 'get',
         dataType: 'json',
         data: sendData,
@@ -203,9 +203,9 @@ function loadXbmcShows(options) {
 
                     var showPicture = $('<img>');
                     if ($('#show-grid').hasClass('banners')) {
-                        showPicture.attr('src', '/xbmc/GetThumb?h=80&w=500&thumb='+encodeURIComponent(show.thumbnail));
+                        showPicture.attr('src', WEBDIR + 'xbmc/GetThumb?h=80&w=500&thumb='+encodeURIComponent(show.thumbnail));
                     } else {
-                        showPicture.attr('src', '/xbmc/GetThumb?&h=150&w=100&thumb='+encodeURIComponent(show.thumbnail));
+                        showPicture.attr('src', WEBDIR + 'xbmc/GetThumb?&h=150&w=100&thumb='+encodeURIComponent(show.thumbnail));
                     }
                     showAnchor.append(showPicture);
                     showItem.append(showAnchor);
@@ -225,7 +225,7 @@ function loadXbmcShows(options) {
 
 function xbmcShowEpisode(episode) {
     var modalshowPicture = $('<img>');
-    modalshowPicture.attr('src', '/xbmc/GetThumb?w=200&h=125&thumb='+encodeURIComponent(episode.thumbnail));
+    modalshowPicture.attr('src', WEBDIR + 'xbmc/GetThumb?w=200&h=125&thumb='+encodeURIComponent(episode.thumbnail));
 
     var modalshowAnchor = $('<div>');
     modalshowAnchor.addClass('thumbnail pull-left');
@@ -246,7 +246,7 @@ function xbmcShowEpisode(episode) {
     })
 
     $('.modal-fanart').css({
-        'background' : '#ffffff url(/xbmc/GetThumb?w=675&h=400&o=10&thumb='+encodeURIComponent(episode.fanart)+') top center',
+        'background' : '#ffffff url(' + WEBDIR + 'xbmc/GetThumb?w=675&h=400&o=10&thumb='+encodeURIComponent(episode.fanart)+') top center',
         'background-size' : '100%;'
     });
 }
@@ -257,7 +257,7 @@ function loadXBMCShow(show) {
     $('#show-grid').hide();
     $('#show-seasons').empty();
     $.ajax({
-        url: '/xbmc/GetShow?tvshowid='+show.tvshowid+'&hidewatched='+hidewatched,
+        url: WEBDIR + 'xbmc/GetShow?tvshowid='+show.tvshowid+'&hidewatched='+hidewatched,
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -280,7 +280,7 @@ function loadXBMCShow(show) {
                     var episodeItem = $('<li>');
                     var episodeAnchor = $('<a>').attr('href', '#').addClass('thumbnail');
                     episodeAnchor.attr('title', episode.plot);
-                    var src = '/xbmc/GetThumb?w=150&h=85&thumb='+encodeURIComponent(episode.thumbnail)
+                    var src = WEBDIR + 'xbmc/GetThumb?w=150&h=85&thumb='+encodeURIComponent(episode.thumbnail)
                     episodeAnchor.append($('<img>').attr('src', src));
                     episodeAnchor.click(function(e) {
                         e.preventDefault();
@@ -316,7 +316,7 @@ function xbmcLoadAlbums(artistid){
   }
 
   $.ajax({
-    url: '/xbmc/GetAlbums/'+artistid,
+    url: WEBDIR + 'xbmc/GetAlbums/'+artistid,
     type: 'get',
     dataType: 'json',
     success: function(albums){
@@ -329,7 +329,7 @@ function xbmcLoadAlbums(artistid){
         if (album.thumbnail == '') {
          li.append($('<img>').attr('src', '?holder.js/150x150/text:'+album.label).attr('title', album.label).addClass('img-rounded img-polaroid'));
         } else {
-          li.append($('<img>').attr('src', '/xbmc/GetThumb?w=150&h=150&thumb='+encodeURIComponent(album.thumbnail)).attr('title', album.label).addClass('img-rounded img-polaroid'));
+          li.append($('<img>').attr('src', WEBDIR + 'xbmc/GetThumb?w=150&h=150&thumb='+encodeURIComponent(album.thumbnail)).attr('title', album.label).addClass('img-rounded img-polaroid'));
         }
         li.append($('<h6>').addClass('album-title').html(shortenText(album.label, 21)));
         albumContainer.append(li);
@@ -343,7 +343,7 @@ function xbmcLoadAlbums(artistid){
 
 function xbmcPlayArtist(artistid){
   $.ajax({
-    url: '/xbmc/GetArtistDetails/'+artistid,
+    url: WEBDIR + 'xbmc/GetArtistDetails/'+artistid,
     type: 'get',
     dataType: 'json',
     success: function(artist){
@@ -378,7 +378,7 @@ function loadArtists(options) {
 
     $('.spinner').show();
     artistRequest = $.ajax({
-        url: '/xbmc/GetArtists',
+        url: WEBDIR + 'xbmc/GetArtists',
         type: 'get',
         data: sendData,
         dataType: 'json',
@@ -432,7 +432,7 @@ function paginateArtists(limit){
 var nowPlayingThumb = 'empty-image';
 function loadNowPlaying() {
     $.ajax({
-        url: '/xbmc/NowPlaying',
+        url: WEBDIR + 'xbmc/NowPlaying',
         type: 'get',
         dataType: 'json',
         complete: function() {
@@ -455,25 +455,25 @@ function loadNowPlaying() {
                   thumbnail.attr('width', '140').attr('height', '140');
                 } else {
                   if (data.itemInfo.item.type == 'episode') {
-                      thumbnail.attr('src', '/xbmc/GetThumb?w=150&h=75&thumb='+encodeURIComponent(nowPlayingThumb));
+                      thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=150&h=75&thumb='+encodeURIComponent(nowPlayingThumb));
                       thumbnail.attr('width', '150').attr('height', '75');
                   }
                   else if (data.itemInfo.item.type == 'movie') {
-                      thumbnail.attr('src', '/xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(nowPlayingThumb));
+                      thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(nowPlayingThumb));
                       thumbnail.attr('width', '100').attr('height', '150');
                   }
                   else if (data.itemInfo.item.type == 'song') {
-                      thumbnail.attr('src', '/xbmc/GetThumb?w=180&h=180&thumb='+encodeURIComponent(nowPlayingThumb));
+                      thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=180&h=180&thumb='+encodeURIComponent(nowPlayingThumb));
                       thumbnail.attr('width', '180').attr('height', '180');
                   } 
                   else  {
-                      thumbnail.attr('src', '/xbmc/GetThumb?w=140&h=140&thumb='+encodeURIComponent(nowPlayingThumb));
+                      thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=140&h=140&thumb='+encodeURIComponent(nowPlayingThumb));
                       thumbnail.attr('width', '140').attr('height', '140');
                   } 
                 }
                 var nowPlayingBackground = '?holder.js/1150x640/#f5f5f5:#f5f5f5';
                 if (data.itemInfo.item.fanart) {
-                    nowPlayingBackground = '/xbmc/GetThumb?w=1150&h=640&o=10&thumb='+encodeURIComponent(data.itemInfo.item.fanart);
+                    nowPlayingBackground = WEBDIR + 'xbmc/GetThumb?w=1150&h=640&o=10&thumb='+encodeURIComponent(data.itemInfo.item.fanart);
                 }
                 $('#nowplaying').addClass('holderjs');
                 $('#nowplaying').css({
@@ -536,7 +536,7 @@ function loadNowPlaying() {
 
             $('#nowplaying #player-progressbar').click(function(e) {
                 pos = ((e.pageX-this.offsetLeft)/$(this).width()*100).toFixed(2);
-                $.get('/xbmc/ControlPlayer?action=Seek&percent='+pos);
+                $.get(WEBDIR + 'xbmc/ControlPlayer?action=Seek&percent='+pos);
             });
 
             var progressBar = $('#nowplaying #player-progressbar').find('.bar');
@@ -550,7 +550,7 @@ function loadNowPlaying() {
                 $.each(data.playerInfo.subtitles, function (i, item) {
                     var link = $('<a>').attr('href','#').text(item.name).click(function(e) {
                         e.preventDefault();
-                        $.get('/xbmc/Subtitles?subtitle='+item.index, function (data) {
+                        $.get(WEBDIR + 'xbmc/Subtitles?subtitle='+item.index, function (data) {
                             notify('Subtitles','Change successful','info');
                         });
                     });
@@ -563,7 +563,7 @@ function loadNowPlaying() {
                 $.each(data.playerInfo.audiostreams, function (i, item) {
                     var link = $('<a>').attr('href','#').text(item.name).click(function(e) {
                         e.preventDefault();
-                        $.get('/xbmc/Audio?audio='+item.index, function (data) {
+                        $.get(WEBDIR + 'xbmc/Audio?audio='+item.index, function (data) {
                             notify('Audio','Change successful','info');
                         });
                     });
@@ -588,7 +588,7 @@ function loadNowPlaying() {
 function loadPlaylist(type){
     //Get all Playlists
     $.ajax({
-        url: '/xbmc/Playlist/audio',
+        url: WEBDIR + 'xbmc/Playlist/audio',
         type: 'get',
         dataType: 'json',
         success: function(data) {
@@ -616,7 +616,7 @@ function loadPlaylist(type){
 function playlist(type){
     //Get all Playlists
     $.ajax({
-        url: '/xbmc/Playlist/audio',
+        url: WEBDIR + 'xbmc/Playlist/audio',
         type: 'get',
         dataType: 'json',
         complete: function() {
@@ -664,16 +664,16 @@ function playlist(type){
 
 function playItem(item, type) {
     type = typeof type !== 'undefined' ? '&type='+type : '';
-    $.get('/xbmc/PlayItem?item='+item+type);
+    $.get(WEBDIR + 'xbmc/PlayItem?item='+item+type);
 }
 
 function playlistJump(position) {
-    $.get('/xbmc/ControlPlayer/JumpItem/'+position, function(data){
+    $.get(WEBDIR + 'xbmc/ControlPlayer/JumpItem/'+position, function(data){
     });
 }
 
 function xbmcControl(action) {
-    $.get('/xbmc/ControlPlayer?action='+action, function(data){
+    $.get(WEBDIR + 'xbmc/ControlPlayer?action='+action, function(data){
     });
 }
 function enablePlayerControls() {
@@ -685,19 +685,19 @@ function enablePlayerControls() {
 }
 
 function sendNotification(string) {
-    $.post('/xbmc/Notify',{'text': string}, function(data) {
+    $.post(WEBDIR + 'xbmc/Notify',{'text': string}, function(data) {
         notify('XBMC', 'Notification sent successfully', 'info');
     });
 }
 
 function xbmcClean(lib) {
-    $.get('/xbmc/Clean?lib='+lib, function(data) {
+    $.get(WEBDIR + 'xbmc/Clean?lib='+lib, function(data) {
         notify('XBMC', 'Library clean sent successfully', 'info');
     });
 }
 
 function xbmcScan(lib) {
-    $.get('/xbmc/Scan?lib='+lib, function(data) {
+    $.get(WEBDIR + 'xbmc/Scan?lib='+lib, function(data) {
         notify('XBMC', 'Library update sent successfully', 'info');
     });
 }

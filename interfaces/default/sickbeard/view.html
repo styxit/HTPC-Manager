@@ -1,11 +1,17 @@
 <%inherit file="../base.html"/>
 <%block name="header">
-  <script src="/js/sickbeard_view.js"></script>
-  <link rel="stylesheet" type="text/css" href="/css/sickbeard_view.css" />
+<%
+import htpc
+settings = htpc.settings.Settings()
+webdir = htpc.WEBDIR
+%>
+  <script src="${webdir}js/sickbeard_view.js"></script>
+  <link rel="stylesheet" type="text/css" href="${webdir}css/sickbeard_view.css" />
 </%block>
 <%
 import htpc
 settings = htpc.settings.Settings()
+webdir = htpc.WEBDIR
 %>
 <div class="container">
     <div class="content maincontent sickbeard_show">
@@ -14,12 +20,12 @@ settings = htpc.settings.Settings()
         </h1>
         
         <ul class="breadcrumb">
-          <li><a href="/">Home</a> <span class="divider">/</span></li>
-          <li><a href="/sickbeard">${settings.get('sickbeard_name', 'Sickbeard')}</a> <span class="divider">/</span></li>
+          <li><a href="${webdir}">Home</a> <span class="divider">/</span></li>
+          <li><a href="${webdir}sickbeard">${settings.get('sickbeard_name', 'Sickbeard')}</a> <span class="divider">/</span></li>
           <li class="active sickbeard_showname">Show details</li>
         </ul>     
         
-        <div class="row-fluid banner" style="background-image:url(/sickbeard/GetBanner/${tvdbid});">
+        <div class="row-fluid banner" style="background-image:url(${webdir}sickbeard/GetBanner/${tvdbid});">
             <div class="span8" style="min-height: 0px;"></div>
             <div class="show_details span4 pull-right">
                 <div id="show_details_top" class="span4"></div>

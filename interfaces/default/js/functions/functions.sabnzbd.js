@@ -1,7 +1,7 @@
 function removeHistoryItem(id) {
     if (confirm('Are you sure?')) {
         $.ajax({
-            url: '/sabnzbd/DeleteHistory?id=' + id,
+            url: WEBDIR + 'sabnzbd/DeleteHistory?id=' + id,
             type: 'get',
             dataType: 'json',
             success: function (data) {
@@ -15,7 +15,7 @@ function removeHistoryItem(id) {
 function retryHistoryItem(id) {
     if (confirm('Are you sure?')) {
         $.ajax({
-            url: '/sabnzbd/Retry?id=' + id,
+            url: WEBDIR + 'sabnzbd/Retry?id=' + id,
             type: 'get',
             dataType: 'json',
             success: function (data) {
@@ -28,13 +28,13 @@ function retryHistoryItem(id) {
 
 function loadHistory() {
     $.ajax({
-        url: '/sabnzbd/GetHistory?limit=10',
+        url: WEBDIR + 'sabnzbd/GetHistory?limit=10',
         type: 'get',
         dataType: 'json',
         success: function (data) {
             if (data.status == false) {
                 $('#notification_area').addClass('alert alert-error');
-                $('#notification_area').html('<strong>Error</strong> Could not connect to SABnzbd, go to <a href="/settings">settings</a>');
+                $('#notification_area').html('<strong>Error</strong> Could not connect to SABnzbd, go to <a href="' + WEBDIR + 'settings">settings</a>');
                 return false;
             }
             $('#history_table_body').html('');
@@ -82,7 +82,7 @@ function loadHistory() {
 function removeQueueItem(id) {
     if (confirm('Are you sure?')) {
         $.ajax({
-            url: '/sabnzbd/DeleteNzb?id=' + id,
+            url: WEBDIR + 'sabnzbd/DeleteNzb?id=' + id,
             type: 'get',
             dataType: 'json',
             success: function (data) {
@@ -95,7 +95,7 @@ function removeQueueItem(id) {
 
 function changeCategory(id, cat) {
     $.ajax({
-        url: '/sabnzbd/ChangeCategory?id=' + id + '&cat=' + cat,
+        url: WEBDIR + 'sabnzbd/ChangeCategory?id=' + id + '&cat=' + cat,
         type: 'get',
         dataType: 'json'
     });
@@ -105,13 +105,13 @@ var queueToggleStatusAction = '';
 
 function loadQueue(once) {
     $.ajax({
-        url: '/sabnzbd/GetStatus',
+        url: WEBDIR + 'sabnzbd/GetStatus',
         type: 'get',
         dataType: 'json',
         success: function (object) {
             if (object.status == false) {
                 $('#notification_area').addClass('alert alert-error');
-                $('#notification_area').html('<strong>Error</strong> Could not connect to SABnzbd, go to <a href="/settings">settings</a>');
+                $('#notification_area').html('<strong>Error</strong> Could not connect to SABnzbd, go to <a href="' + WEBDIR + 'settings">settings</a>');
                 return false;
             }
             data = object.queue;
@@ -187,7 +187,7 @@ function loadQueue(once) {
 
 function loadWarnings() {
     $.ajax({
-        url: '/sabnzbd/GetWarnings',
+        url: WEBDIR + 'sabnzbd/GetWarnings',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -208,7 +208,7 @@ function loadWarnings() {
 // Haal categorieen op
 function setCategories(selector, select) {
     $.ajax({
-        url: '/sabnzbd/GetCategories',
+        url: WEBDIR + 'sabnzbd/GetCategories',
         type: 'post',
         dataType: 'json',
         success: function (data) {

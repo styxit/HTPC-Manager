@@ -3,7 +3,7 @@ $(document).ready(function () {
         var clickItem = $(this);
         clickItem.button('loading');
         $.ajax({
-            url: '/sabnzbd/TogglePause?mode='+queueToggleStatusAction,
+            url: WEBDIR + 'sabnzbd/TogglePause?mode='+queueToggleStatusAction,
             dataType: 'json',
             type: 'get'
         });
@@ -14,7 +14,7 @@ $(document).ready(function () {
     })
 
     $('#add_nzb_form').ajaxForm({
-        url: '/sabnzbd/AddNzbFromUrl',
+        url: WEBDIR + 'sabnzbd/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
         success: function (result) {
@@ -31,7 +31,7 @@ $(document).ready(function () {
     $('#nzb_set_speed').click(function() {
         var speed = ($('#nzb_get_speed').val());
         $.ajax({
-            url: '/sabnzbd/SetSpeed?speed=' + speed,
+            url: WEBDIR + 'sabnzbd/SetSpeed?speed=' + speed,
             type: 'post',
             dataType: 'json'
         });

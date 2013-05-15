@@ -10,7 +10,7 @@ class Sabnzbd:
         htpc.MODULES.append({
             'name': 'SABnzbd',
             'id': 'sabnzbd',
-            'test': '/sabnzbd/version',
+            'test': htpc.WEBDIR + 'sabnzbd/version',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'sabnzbd_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'sabnzbd_name'},
