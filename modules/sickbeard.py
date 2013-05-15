@@ -10,7 +10,7 @@ class Sickbeard:
         htpc.MODULES.append({
             'name': 'Sickbeard',
             'id': 'sickbeard',
-            'test': '/sickbeard/ping',
+            'test': htpc.WEBDIR + 'sickbeard/ping',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'sickbeard_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'sickbeard_name'},

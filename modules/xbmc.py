@@ -11,7 +11,6 @@ from sqlobject import SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol, IntCol
 from htpc.proxy import get_image
 
-
 class XbmcServers(SQLObject):
     """ SQLObject class for xbmc_servers table """
     name = StringCol()
@@ -47,8 +46,8 @@ class Xbmc:
         htpc.MODULES.append({
             'name': 'XBMC Servers',
             'id': 'xbmc_update_server',
-            'action': '/xbmc/server',
-            'test': '/xbmc/ping',
+            'action': htpc.WEBDIR + 'xbmc/server',
+            'test': htpc.WEBDIR + 'xbmc/ping',
             'fields': [
                 {'type':'select',
                  'label':'Server',

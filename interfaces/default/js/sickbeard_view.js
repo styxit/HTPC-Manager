@@ -1,6 +1,6 @@
 function loadShowData(showid){
   $.ajax({
-    url: '/sickbeard/GetShow?tvdbid=' + showid,
+    url: WEBDIR + 'sickbeard/GetShow?tvdbid=' + showid,
     type: 'get',
     dataType: 'json',
     success: function(data){
@@ -62,7 +62,7 @@ function renderSeason(){
   season = $(this).attr('data-season');
 
   $.ajax({
-    url: '/sickbeard/GetSeason?tvdbid=' + showid + '&season=' + season,
+    url: WEBDIR + 'sickbeard/GetSeason?tvdbid=' + showid + '&season=' + season,
     type: 'get',
     dataType: 'json',
     success: function(data){

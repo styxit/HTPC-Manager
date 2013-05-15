@@ -49,7 +49,7 @@ $(document).ready(function () {
 });
 
 function sendCommand(command) {
-    $.get('/squeezebox/PlayerControl',{
+    $.get(WEBDIR + 'squeezebox/PlayerControl',{
         'player': currentPlayer,
         'command': encodeURIComponent(command)
     }, function() {
@@ -58,7 +58,7 @@ function sendCommand(command) {
 }
 
 function getPlayers() {
-    $.get('/squeezebox/GetPlayers', function (data) {
+    $.get(WEBDIR + 'squeezebox/GetPlayers', function (data) {
         if (data == null) return;
         $('#players').html('');
         $.each(data.result.players_loop, function (i, item) {
@@ -72,7 +72,7 @@ function getPlayers() {
 function refreshPlayer() {
     if (currentPlayer == null) return;
     $('#nowplaying').removeClass('hide');
-    $.get('/squeezebox/GetPlayer?player='+currentPlayer, function (player) {
+    $.get(WEBDIR + 'squeezebox/GetPlayer?player='+currentPlayer, function (player) {
         if (player == null) return;
         player = player.result;
         if (player.playlist_loop==undefined) {
@@ -89,7 +89,7 @@ function refreshPlayer() {
         if (nowPlayingThumb != nowPlaying) {
             nowPlayingThumb = nowPlaying;
             var thumbnail = $('<img>');
-            thumbnail.attr('src', '/squeezebox/GetCover?player='+currentPlayer);
+            thumbnail.attr('src', WEBDIR + 'squeezebox/GetCover?player='+currentPlayer);
             $('#nowplaying .thumbnail').html(thumbnail);
         }
         $('#volume').text(player['mixer volume']);
@@ -139,7 +139,7 @@ function refreshPlayer() {
 }
 
 function getArtists() {
-    $.get('/squeezebox/GetArtists', function (data) {
+    $.get(WEBDIR + 'squeezebox/GetArtists', function (data) {
         if (data == null) return false;
         var list = $('<ul>').addClass('artist-list filter');
         $.each(data.result.artists_loop, function (i, item) {
@@ -173,7 +173,7 @@ function getArtists() {
 function getAlbums(link, artist) {
     container = (link==undefined) ? $('#albums') : link.parent();
     filter = (artist==undefined) ? '' : '?artist='+artist
-    $.get('/squeezebox/GetAlbums'+filter, function (data) {
+    $.get(WEBDIR + 'squeezebox/GetAlbums'+filter, function (data) {
         if (data == null) return;
         var list = $('<ul>')
         if (!artist) {
@@ -215,7 +215,7 @@ function getAlbums(link, artist) {
 }
 
 function getSongs(filter){
-    $.get('/squeezebox/GetSongs?filter='+filter, function (data) {
+    $.get(WEBDIR + 'squeezebox/GetSongs?filter='+filter, function (data) {
         if (data == null) return;
         $('[data-player-control=PlayNow]').unbind('click').click(function(){
             sendCommand('playlistcontrol cmd:load ' + filter);
@@ -249,7 +249,7 @@ function getSongs(filter){
 }
 
 function getStationGroups() {
-    $.get('/squeezebox/GetStationGroups', function (data) {
+    $.get(WEBDIR + 'squeezebox/GetStationGroups', function (data) {
         if (data == null) return;
         var list = $('<ul>').addClass('nav nav-list')
         $.each(data.result.radioss_loop, function (i, item) {
@@ -266,7 +266,7 @@ function getStationGroups() {
 
 function getStationGroup(link, group, filter) {
     $.ajax({
-        url: '/squeezebox/GetStationGroup',
+        url: WEBDIR + 'squeezebox/GetStationGroup',
         type: 'get',
         dataType: 'json',
         data: {
@@ -306,7 +306,7 @@ function getStationGroup(link, group, filter) {
 }
 
 function getPlaylists() {
-    $.get('/squeezebox/GetPlaylists', function (data) {
+    $.get(WEBDIR + 'squeezebox/GetPlaylists', function (data) {
         if (data == null) return
         if (data.result.count == 0) {
             $('#playlists').html('You have no playlists');

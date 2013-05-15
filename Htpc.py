@@ -83,6 +83,8 @@ def main():
     # Initiate database connection
     sqlhub.processConnection = connectionForURI('sqlite:' + htpc.DB)
 
+    htpc.WEBDIR = "/home/"    
+
     # Inititialize root and settings page
     load_modules()
 

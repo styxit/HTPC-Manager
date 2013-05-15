@@ -1,11 +1,17 @@
 <%inherit file="../base.html"/>
 <%block name="header">
-	<script src="/js/xbmc_playlist.js"></script><script src="/js/libs/jquery.pager.js"></script>
-	<link rel="stylesheet" type="text/css" href="/css/xbmc_playlist.css" />
+<%
+import htpc
+settings = htpc.settings.Settings()
+webdir = htpc.WEBDIR
+%>
+	<script src="${webdir}js/xbmc_playlist.js"></script><script src="/js/libs/jquery.pager.js"></script>
+	<link rel="stylesheet" type="text/css" href="${webdir}css/xbmc_playlist.css" />
 </%block>
 <%
 import htpc
 settings = htpc.settings.Settings()
+webdir = htpc.WEBDIR
 %>
 <div class="container xbmc_playlist">
     <div class="content">
@@ -54,8 +60,8 @@ settings = htpc.settings.Settings()
                         </div>
                         
                         <div class="btn-group pull-right" id="playlistLoader">
-	                        <a href="/xbmc" class="btn btn-small"><i class="icon-th"></i> Library</a>
-	                        <a href="/xbmc/playlist" class="btn btn-small active"><i class="icon-list-ol"></i> playlist</a>
+	                        <a href="${webdir}xbmc" class="btn btn-small"><i class="icon-th"></i> Library</a>
+	                        <a href="${webdir}xbmc/playlist" class="btn btn-small active"><i class="icon-list-ol"></i> playlist</a>
                     	</div>
                     </div>
                 </div>
