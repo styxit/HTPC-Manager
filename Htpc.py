@@ -28,6 +28,8 @@ def parse_arguments():
                         help='Generate PID file at location')
     parser.add_argument('--debug', action='store_true', default=False,
                         help='Print debug text')
+    parser.add_argument('--webdir', default="/",
+                        help='Use a custom webdir')
     return parser.parse_args()
 
 
@@ -83,7 +85,9 @@ def main():
     # Initiate database connection
     sqlhub.processConnection = connectionForURI('sqlite:' + htpc.DB)
 
-    htpc.WEBDIR = "/home/"    
+    htpc.WEBDIR = "/"    
+    if args.webdir:
+        htpc.WEBDIR = args.webdir
 
     # Inititialize root and settings page
     load_modules()
