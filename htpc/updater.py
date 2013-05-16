@@ -18,7 +18,7 @@ class Updater:
     """ Main class """
     def __init__(self):
         """ Set GitHub constants on load """
-        self.user = 'mbw2001'
+        self.user = 'styxit'
         self.repo = 'htpc-manager'
         self.branch = 'master'
 
