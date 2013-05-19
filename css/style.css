@@ -29,9 +29,10 @@ h2 {
 /*
 Add label icon on every h2
 */
-.span12 > h2:before {
+.span12 > h2:before,
+body#page h2:before {
   font-family: FontAwesome;;
-  content:"\f02e ";
+  content:"\f02e\00a0";
 }
 
 h2 small {

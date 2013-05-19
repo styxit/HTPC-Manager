@@ -1,3 +1,6 @@
+---
+title: Index
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,28 +28,7 @@
   <meta property="og:description" content="Htpc Manager is an application that combines all your favorite software into one slick interface." />
 </head>
 <body id="anchor-home" data-target="#primary-nav">
-  <div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-      <div class="container">
-        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </a>
-        <a class="brand" href="index.html">Htpc Manager</a>
-        <div id="primary-nav" class="nav-collapse">
-          <ul class="nav">
-            <li><a class="anchorLink" href="#home">Home</a></li>
-            <li><a class="anchorLink" href="#features">Features</a></li>
-            <li><a class="anchorLink" href="#software">Software</a></li>
-            <li><a class="anchorLink" href="#screenshots">Screenshots</a></li>
-            <li><a class="anchorLink" href="#support">Support</a></li>
-            <li><a class="anchorLink" href="#development">Development</a></li>
-          </ul>
-        </div><!--/.nav-collapse -->
-      </div><!--/container-->
-    </div><!--/navbar-inner-->
-  </div><!--/navbar-->
+  {% include menu.html %}
 
   <div class="teaser">
     <div class="container">
@@ -129,7 +111,7 @@
           <a class="btn btn-success btn-large" href="https://github.com/styxit/HTPC-Manager/archive/master.zip"><i class="icon-cloud-download"></i> Download now</a>
           <a class="btn btn-primary btn-large" href="https://github.com/styxit/HTPC-Manager"><i class="icon-github"></i> Github project</a>
           <span class="slogan">Start using Htpc Manager now! It's free and runs on every platform.</span>
-          <p>* Ok, maybe not every platform.</p>
+          <p>* Ok, maybe not every platform. Check the <a href="installation.html">Installation guide</a></p>
         </div>
       </div>
     </div>
@@ -488,25 +470,7 @@
     </section>
   </div><!--/main content-->
 
-  <footer>
-    <div class="container">
-      <div class="row">
-        <div class="span2">
-          <h3>Links</h3>
-          <ul>
-            <li><a href="http://blog.styxit.com" title=""><i class="icon-external-link"></i> Styxit weblog</a></li>
-            <li><a href="http://www.exonet.nl" title="Exonet hosting"><i class="icon-external-link"></i> Exonet</a></li>
-          </ul>
-        </div>
-        <div class="span2">
-          <h3>Recources</h3>
-          <ul>
-            <li><a href="http://twitter.github.io/bootstrap" title="Twitter Bootstrap"><i class="icon-twitter"></i> Twitter Bootstrap</a></li>
-          </ul>
-        </div>
-      </div><!--/row-->
-    </div> <!-- /container -->
-  </footer>
+  {% include footer.html %}
 
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 
@@ -519,17 +483,6 @@
   <script type="text/javascript" src="js/jquery.github.rss.js"></script>
   <script type="text/javascript" src="js/script.js"></script>
 
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-40926459-2']);
-    _gaq.push(['_setDomainName', 'htpc.io']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
+  {% include analytics.html %}
 </body>
 </html>
