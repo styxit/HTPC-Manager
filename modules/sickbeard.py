@@ -4,7 +4,6 @@ from urllib import quote
 from urllib2 import urlopen
 from json import loads
 from urllib2 import Request
-import base64
 
 class Sickbeard:
     def __init__(self):
@@ -18,9 +17,7 @@ class Sickbeard:
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'sickbeard_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'sickbeard_port'},
                 {'type': 'text', 'label': 'API key', 'name': 'sickbeard_apikey'},
-		{'type': 'text', 'label': 'Basepath', 'name': 'sickbeard_basepath'},
-                {'type': 'text', 'label': 'User', 'name': 'sickbeard_user'},
-                {'type': 'password', 'label': 'Password', 'name': 'sickbeard_password'}
+		{'type': 'text', 'label': 'Basepath (with trailing slash)', 'name': 'sickbeard_basepath'}
         ]})
 
     @cherrypy.expose()
@@ -40,17 +37,11 @@ class Sickbeard:
     def ping(self, sickbeard_host, sickbeard_port, sickbeard_apikey, **kwargs):
         try:
             settings = htpc.settings.Settings()
-            user = settings.get('sickbeard_user', '')
-            password = settings.get('sickbeard_password', '')
             sickbeard_basepath = settings.get('sickbeard_basepath', '/')
             if(sickbeard_basepath == ""):
               sickbeard_basepath = "/"
             url = 'http://' + sickbeard_host + ':' + sickbeard_port + sickbeard_basepath + 'api/' + sickbeard_apikey + '/?cmd='
             request = Request(url + 'sb.ping')
-            if user != '' and password != '':
-              base64string = base64.encodestring('%s:%s' % (user, password)).replace('\n', '')
-              request.add_header("Authorization", "Basic %s" % base64string)
-            
             response = loads(urlopen(request, timeout=10).read())
             if response.get('result') == "success":
                 return response
@@ -121,16 +112,13 @@ class Sickbeard:
             host = settings.get('sickbeard_host', '')
             port = str(settings.get('sickbeard_port', ''))
             apikey = settings.get('sickbeard_apikey', '')
-            user = settings.get('sickbeard_user', '')
-            password = settings.get('sickbeard_password', '')
             sickbeard_basepath = settings.get('sickbeard_basepath', '/')
+
             if(sickbeard_basepath == ""):
               sickbeard_basepath = "/"
             url = 'http://' + host + ':' + str(port) + sickbeard_basepath + 'api/' + apikey + '/?cmd=' + cmd
             request = Request(url)
-            if user != '' and password != '':
-              base64string = base64.encodestring('%s:%s' % (user, password)).replace('\n', '')
-              request.add_header("Authorization", "Basic %s" % base64string)
+
             if (img == True):
               return urlopen(request, timeout=timeout).read()
               

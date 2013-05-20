@@ -1,6 +1,5 @@
 import cherrypy
 import htpc
-import base64
 from htpc.proxy import get_image
 from json import loads
 from urllib2 import urlopen
@@ -18,9 +17,7 @@ class Couchpotato:
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'couchpotato_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'couchpotato_port'},
                 {'type': 'text', 'label': 'API key', 'name': 'couchpotato_apikey'},
-		{'type': 'text', 'label': 'Basepath', 'name': 'couchpotato_basepath'},
-		{'type': 'text', 'label': 'User', 'name': 'couchpotato_user'},
-		{'type': 'password', 'label': 'Password', 'name': 'couchpotato_password'}
+		{'type': 'text', 'label': 'Basepath (with trailing slash)', 'name': 'couchpotato_basepath'}
         ]})
 
     @cherrypy.expose()
@@ -31,16 +28,11 @@ class Couchpotato:
     @cherrypy.tools.json_out()
     def ping(self, couchpotato_host, couchpotato_port, couchpotato_apikey, **kwargs):
         settings = htpc.settings.Settings()
-	user = settings.get('couchpotato_user', '')
-        password = settings.get('couchpotato_password', '')
 	couchpotato_basepath = settings.get('couchpotato_basepath', '/')
 	if(couchpotato_basepath == ""):
           couchpotato_basepath = "/"
         url = 'http://' + couchpotato_host + ':' + couchpotato_port + couchpotato_basepath + 'api/' + couchpotato_apikey
         request = Request(url + '/app.available')
-        if user != '' and password != '':
-          base64string = base64.encodestring('%s:%s' % (user, password)).replace('\n', '')
-          request.add_header("Authorization", "Basic %s" % base64string)   
 	try:
             return loads(urlopen(request, timeout=10).read())
         except:
@@ -98,16 +90,11 @@ class Couchpotato:
             host = settings.get('couchpotato_host', '')
             port = str(settings.get('couchpotato_port', ''))
             apikey = settings.get('couchpotato_apikey', '')
-	    user = settings.get('couchpotato_user', '')
-	    password = settings.get('couchpotato_password', '')
             couchpotato_basepath = settings.get('couchpotato_basepath', '/')
             if(couchpotato_basepath == ""):
               couchpotato_basepath = "/"
             url = 'http://' + host + ':' + port + couchpotato_basepath + 'api/' + apikey + '/' + path
 	    request = Request(url)
-            if user != '' and password != '':
-              base64string = base64.encodestring('%s:%s' % (user, password)).replace('\n', '')
-              request.add_header("Authorization", "Basic %s" % base64string)
             return loads(urlopen(request, timeout=10).read())
         except:
             return
