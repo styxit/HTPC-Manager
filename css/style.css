@@ -31,8 +31,13 @@ Add label icon on every h2
 */
 .span12 > h2:before,
 body#page h2:before {
-  font-family: FontAwesome;;
+  font-family: FontAwesome;
   content:"\f02e\00a0";
+}
+
+body#page h2{
+  margin: 20px 0 20px;
+  border-bottom: 1px solid #eeeeee;
 }
 
 h2 small {
