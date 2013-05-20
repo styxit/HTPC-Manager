@@ -46,7 +46,7 @@ python Htpc.py --debug --port 8089
 
 By default, Osx comes with Python 2.7 pre-installed. Great! No need to install Pyton manually! If you want, you can already [start using](#general_usage) Htpc Manager.
 
-### Image library
+### Python Image library
 The Python Image Library needs to be installed on your system to convert images provided by xbmc. To do this, the commandline tools from Xcode are needed to compile PIL.
 
 1. #### Install Xcode from the [AppStore](https://itunes.apple.com/en/app/xcode/id497799835)
@@ -64,7 +64,37 @@ Download and install the [Mac Ports](http://ethan.tira-thompson.com/Mac_OS_X_Por
 You should now be ready to go. Take a look at the [usage](#general_usage) to get you started.
 
 ## Windows
-```Windows install guide comming soon```
+
+Installing Python on windows requires multiple steps, follow them carefully and you should be ok. Depending on your system you can use python 32 or 64 bits.
+
+1. #### Download Python 2.7 from [python.org](http://www.python.org/download/)
+Depending on your version of Windowns you can choose the ```Python 2.7.5 Windows Installer``` or the ```Python 2.7.5 Windows X86-64 Installer```.
+
+2. #### Install Python 2.7
+Run your newly downloaded Python installer. Follow the instructions. Do not change the install directory, but keep it at "C:\Python27\\" as we will be refering to it later on.
+
+2. #### Add python executable to system path
+To run ```python``` from anywhere on the commandline, instead of ```C:\Python27\python.exe```, we add python directory to the system path. Open up the "Environment variables" *[as described here](http://www.howtogeek.com/118594/how-to-edit-your-system-path-for-easy-command-line-access/)*.
+
+    1. Create a new System variable, name it ```PYTHONPATH``` and add the following line:
+    ```C:\Python27;C:\Python27\Lib;C:\Python27\DLLs;C:\Python27\Lib\lib-tk;C:\Python27\Scripts```
+    2. Open the system variable named ```path```
+    3. At the end of the line add a semicolon (;) if it is not already there.
+    4. After the ';' sign, add ```%PYTHONPATH%```
+
+Python is now installed and can be used from the commandline by typing ```python```. Take a look at the [usage](#general_usage) to get you started or continue to install PIL and benefit from all the Htpc Manager features.
+
+
+### Python Image library
+Installing PIL on windows can be diffucult. Most downloads require the installation of visual studio so PIL can be compiled on your system. I used a precompiled version of PIL for windows.
+
+1. #### Download the precompiled PIL installer
+    * [Python 2.7 x64](https://mega.co.nz/#!8sUimBZY!NmMElxyKpCsVW9iN1AXzPhyiAIEQvTxtYHjwsL2JUVE)
+    * Python 2.7 32 bit comming soon!
+2. #### Install PIL
+Execute your downloaded PIL installer and follow the instructions to complete the PIL install.
+
+If everything went well, the Python Image Library is now installed. All images retieved from Xbmc should now show up nicely.
 
 ## Linux
 ```Linux install guide comming soon```
