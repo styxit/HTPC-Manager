@@ -29,11 +29,11 @@ $(document).ready(function () {
             notify('Settings', msg, 'info');
         });
     });
-    $.get('/xbmc/Servers', function(data) {
+    $.get(WEBDIR + 'xbmc/Servers', function(data) {
         if (data==null) return;
         var servers = $('#xbmc_server_id').change(function() {
             var item = $(this);
-            $.get('/xbmc/getserver?id='+item.val(), function(data) {
+            $.get(WEBDIR + 'xbmc/getserver?id='+item.val(), function(data) {
                 if (data==null) return item.parents('form:first').get(0).reset();
                 $('#xbmc_server_name').val(data.name);
                 $('#xbmc_server_host').val(data.host);
@@ -49,7 +49,7 @@ $(document).ready(function () {
         var removeIcon = $('<i>').addClass('icon-remove');
         var removeBtn = $('<button>').addClass('btn').html(removeIcon).click(function(e){
             id = $('#xbmc_server_id').val()
-            $.get('/xbmc/delserver?id='+id, function(data) {
+            $.get(WEBDIR + 'xbmc/delserver?id='+id, function(data) {
                 notify('Settings', 'Server deleted', 'info');
             });
         }).insertAfter(servers);

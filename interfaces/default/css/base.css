@@ -1,8 +1,8 @@
 html, body {
-    background: #eee url('/img/bodybg.jpg');
+    background: #eee url('../img/bodybg.jpg');
 }
 .navbar, .navbar-inner {
-    background: url('/img/headerbg.jpg') !important;
+    background: url('../img/headerbg.jpg') !important;
 }
 .navbar input {
     background: #eee;
@@ -212,7 +212,7 @@ legend {
 }
 .spinner {
     display: none;
-    background: url('/img/loader.gif') 50% 50% no-repeat;
+    background: url('../img/loader.gif') 50% 50% no-repeat;
     height: 40px;
 }
 .spinner-inline {

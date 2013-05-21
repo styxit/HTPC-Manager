@@ -11,7 +11,7 @@ class Search:
         htpc.MODULES.append({
             'name': 'Newznab',
             'id': 'nzbsearch',
-            'test': '/search/ping',
+            'test': htpc.WEBDIR + 'search/ping',
             'fields': [
                 {'type':'bool', 'label':'Enable', 'name':'nzbsearch_enable'},
                 {'type':'text', 'label':'Host', 'name':'newznab_host'},

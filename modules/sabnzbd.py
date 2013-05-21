@@ -10,14 +10,15 @@ class Sabnzbd:
         htpc.MODULES.append({
             'name': 'SABnzbd',
             'id': 'sabnzbd',
-            'test': '/sabnzbd/version',
+            'test': htpc.WEBDIR + 'sabnzbd/version',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'sabnzbd_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'sabnzbd_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'sabnzbd_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'sabnzbd_port'},
                 {'type': 'text', 'label': 'API key', 'name': 'sabnzbd_apikey'},
-                {'type': 'bool', 'label': 'Use SSL', 'name': 'sabnzbd_ssl'}
+                {'type': 'bool', 'label': 'Use SSL', 'name': 'sabnzbd_ssl'},
+		{'type': 'text', 'label': 'Basepath (with trailing slash)', 'name': 'sabnzbd_basepath'}
         ]})
 
     @cherrypy.expose()
@@ -28,7 +29,11 @@ class Sabnzbd:
     @cherrypy.tools.json_out()
     def version(self, sabnzbd_host, sabnzbd_port, sabnzbd_apikey, sabnzbd_ssl=False, **kwargs):
         ssl = 's' if sabnzbd_ssl else ''
-        url = 'http' + ssl + '://' + sabnzbd_host + ':' + sabnzbd_port + '/sabnzbd/api?output=json&apikey=' + sabnzbd_apikey
+	settings = htpc.settings.Settings()
+	sabnzbd_basepath = settings.get('sabnzbd_basepath', '/sabnzbd/')
+        if(sabnzbd_basepath == ""):
+          sabnzbd_basepath = "/sabnzbd/"
+        url = 'http' + ssl + '://' + sabnzbd_host + ':' + sabnzbd_port + sabnzbd_basepath + 'api?output=json&apikey=' + sabnzbd_apikey
         try:
             return loads(urlopen(url + '&mode=version', timeout=10).read())
         except:
@@ -98,7 +103,10 @@ class Sabnzbd:
             port = str(settings.get('sabnzbd_port', ''))
             apikey = settings.get('sabnzbd_apikey', '')
             ssl = 's' if settings.get('sabnzbd_ssl', 0) else ''
-            url = 'http' + ssl + '://' + host + ':' + port + '/sabnzbd/api?output=json&apikey=' + apikey + path
+	    sabnzbd_basepath = settings.get('sabnzbd_basepath', '/sabnzbd/')
+            if(sabnzbd_basepath == ""):
+              sabnzbd_basepath = "/sabnzbd/"
+            url = 'http' + ssl + '://' + host + ':' + port + sabnzbd_basepath + 'api?output=json&apikey=' + apikey + path
             return loads(urlopen(url, timeout=10).read())
         except:
             return

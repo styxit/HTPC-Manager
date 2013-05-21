@@ -1,22 +1,26 @@
 <%
 import htpc
 settings = htpc.settings.Settings()
+webdir = htpc.WEBDIR
 %><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <title>HTPC Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
-    <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/bootstrap-responsive.min.css" rel="stylesheet">
-    <link href="/css/jquery.pnotify.default.css" rel="stylesheet">
-    <link href="/css/base.css" rel="stylesheet">
-    <link href="/css/themes/${settings.get('app_theme','default.css')}" rel="stylesheet">
-    <script src="/js/libs/jquery-1.7.2.min.js"></script>
-    <script src="/js/libs/jquery-ui-1.8.18.custom.min.js"></script>
-    <script src="/js/default.js"></script>
+    <link href="${webdir}css/bootstrap.min.css" rel="stylesheet">
+    <link href="${webdir}css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="${webdir}css/jquery.pnotify.default.css" rel="stylesheet">
+    <link href="${webdir}css/base.css" rel="stylesheet">
+    <link href="${webdir}css/themes/${settings.get('app_theme','default.css')}" rel="stylesheet">
+    <script type="text/javascript">
+      var WEBDIR = "${webdir}";
+    </script>
+    <script src="${webdir}js/libs/jquery-1.7.2.min.js"></script>
+    <script src="${webdir}js/libs/jquery-ui-1.8.18.custom.min.js"></script>
+    <script src="${webdir}js/default.js"></script>
     <%block name="header"/>
-    <link rel="stylesheet" type="text/css" href="/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="${webdir}css/font-awesome.min.css" />
 </head>
 
 <body>
@@ -27,18 +31,18 @@ settings = htpc.settings.Settings()
             <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                 <i class="icon-th icon-white"></i>
             </a>
-            <a href="/" class="brand">HTPC Manager</a>
+            <a href="${webdir}" class="brand">HTPC Manager</a>
             <div class="nav-collapse">
                 <ul class="nav">
                     % for m in htpc.MODULES:
                     % if settings.get(m.get('id')+'_enable') and m.get('id') != 'nzbsearch':
-                    <li id="nav-${m.get('id')}"><a href="/${m.get('id')}/">${settings.get(m.get('id')+'_name')}</a></li>
+                    <li id="nav-${m.get('id')}"><a href="${webdir}${m.get('id')}/">${settings.get(m.get('id')+'_name')}</a></li>
                     %endif
                     % endfor
                 </ul>
                 <div class="pull-right visible-desktop">
                     %if settings.get('nzbsearch_enable'):
-                    <form action="/search/" method="get" class="navbar-form pull-right">
+                    <form action="${webdir}search/" method="get" class="navbar-form pull-right">
                     %else:
                     <form class="navbar-form pull-right">
                     %endif
@@ -48,7 +52,7 @@ settings = htpc.settings.Settings()
                             <ul class="dropdown-menu pull-right">
                                 <li><a href="http://github.com/styxit/HTPC-Manager"><i class="icon-github"></i> Github project</a></li>
                                 <li><a href="#" id="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
-                                <li><a href="/settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
+                                <li><a href="${webdir}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
                                 <li><a href="#" id="btn-restart"><i class="icon-refresh"></i> Restart</a></li>
                                 <li><a href="#" id="btn-shutdown"><i class="icon-off"></i> Shutdown</a></li>
                             </ul>

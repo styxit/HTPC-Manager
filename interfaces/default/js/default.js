@@ -1,15 +1,15 @@
 var scriptArray = [
-    '/js/libs/bootstrap.min.js',
-    '/js/libs/jquery.form.js',
-    '/js/libs/jquery.cookie.js',
-    '/js/libs/jquery.metadata.js',
-    '/js/libs/jquery.tablesorter.min.js',
-    '/js/libs/jquery.raty.min.js',
-    '/js/libs/jquery.pnotify.min.js',
-    '/js/libs/holder.js',
-    '/js/functions/functions.xbmc.js',
-    '/js/functions/functions.sickbeard.js',
-    '/js/functions/functions.sabnzbd.js'
+    WEBDIR + 'js/libs/bootstrap.min.js',
+    WEBDIR + 'js/libs/jquery.form.js',
+    WEBDIR + 'js/libs/jquery.cookie.js',
+    WEBDIR + 'js/libs/jquery.metadata.js',
+    WEBDIR + 'js/libs/jquery.tablesorter.min.js',
+    WEBDIR + 'js/libs/jquery.raty.min.js',
+    WEBDIR + 'js/libs/jquery.pnotify.min.js',
+    WEBDIR + 'js/libs/holder.js',
+    WEBDIR + 'js/functions/functions.xbmc.js',
+    WEBDIR + 'js/functions/functions.sickbeard.js',
+    WEBDIR + 'js/functions/functions.sabnzbd.js'
 ];
 
 $.each(scriptArray, function (i, url) {
@@ -49,7 +49,7 @@ $(document).ready(function () {
     $('#btn-check-update').click(function (e) {
         e.preventDefault();
         notify('Update','Checking for update.','info');
-        $.get('/update/', function (update) {
+        $.get(WEBDIR + 'update/', function (update) {
             if (update.behind == 0) {
                 notify('Update','Already running latest version.','success');
             } else {
@@ -73,7 +73,7 @@ $(document).ready(function () {
         e.preventDefault();
         if (confirm('Restart?')) {
             notify('Restart','Restart command sent...','success')
-            $.get('/restart', function() {
+            $.get(WEBDIR + 'restart', function() {
                 // On restart
             }, 'json');
         }
@@ -82,7 +82,7 @@ $(document).ready(function () {
         e.preventDefault();
         if (confirm('Shutdown?')) {
             notify('Shutdown','Shutdown command sent.','success')
-            $.get('/shutdown', function() {
+            $.get(WEBDIR + 'shutdown', function() {
                 // On shutdown confirmed
             }, 'json');
         }

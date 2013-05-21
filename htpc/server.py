@@ -66,4 +66,6 @@ def start():
         })
 
     # Start the CherryPy server
-    cherrypy.quickstart(htpc.ROOT, config=app_config)
+    app = cherrypy.tree.mount(htpc.ROOT, htpc.WEBDIR, app_config)
+    cherrypy.server.start()
+    cherrypy.server.wait() 

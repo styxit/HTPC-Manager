@@ -1,6 +1,6 @@
 function loadShows() {
     $.ajax({
-        url: '/sickbeard/GetShowList',
+        url: WEBDIR + 'sickbeard/GetShowList',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -10,7 +10,7 @@ function loadShows() {
                 $('#tvshows_table_body').append(row);
             }
             $.each(result.data, function (showname, tvshow) {
-                var name = $('<a>').attr('href','/sickbeard/view/' + tvshow.tvdbid).text(showname);
+                var name = $('<a>').attr('href',WEBDIR + 'sickbeard/view/' + tvshow.tvdbid).text(showname);
                 var row = $('<tr>')
                 row.append(
                   $('<td>').html(name),
@@ -30,7 +30,7 @@ function loadShows() {
 
 function loadShow(tvdbid) {
     $.ajax({
-        url: '/sickbeard/GetShow?tvdbid=' + tvdbid,
+        url: WEBDIR + 'sickbeard/GetShow?tvdbid=' + tvdbid,
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -65,14 +65,14 @@ function loadShow(tvdbid) {
 
             modalContent = $('<div>');
             modalContent.append(
-              $('<img>').attr('src', '/sickbeard/GetBanner/'+tvdbid).addClass('img-rounded'),
+              $('<img>').attr('src', WEBDIR + 'sickbeard/GetBanner/'+tvdbid).addClass('img-rounded'),
               $('<hr>'),
               table
              );
 
             var modalButtons = {
               'Show' : function() {
-                window.location = '/sickbeard/view/' + tvdbid;
+                window.location = WEBDIR + 'sickbeard/view/' + tvdbid;
               }
             }
 
@@ -88,7 +88,7 @@ function loadNextAired(options) {
     $.extend(defaults, options);
 
     $.ajax({
-        url: '/sickbeard/GetNextAired',
+        url: WEBDIR + 'sickbeard/GetNextAired',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -131,7 +131,7 @@ function loadNextAired(options) {
 
 function loadSickbeardHistory(limit) {
     $.ajax({
-        url: '/sickbeard/GetHistory?limit=' + limit,
+        url: WEBDIR + 'sickbeard/GetHistory?limit=' + limit,
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -145,7 +145,7 @@ function loadSickbeardHistory(limit) {
                 var row = $('<tr>');
                 row.append(
                   $('<td>').html(tvshow.date),
-                  $('<td>').append($('<a>').text(tvshow.show_name).attr('href', '/sickbeard/view/'+tvshow.tvdbid)),
+                  $('<td>').append($('<a>').text(tvshow.show_name).attr('href', WEBDIR + 'sickbeard/view/'+tvshow.tvdbid)),
                   $('<td>').html(tvshow.season + 'x' + tvshow.episode),
                   $('<td>').append(sickbeardStatusLabel(tvshow.status)),
                   $('<td>').html(tvshow.quality)
@@ -160,7 +160,7 @@ function loadSickbeardHistory(limit) {
 
 function loadLogs() {
     $.ajax({
-        url: '/sickbeard/GetLogs',
+        url: WEBDIR + 'sickbeard/GetLogs',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -180,7 +180,7 @@ function loadLogs() {
 
 function searchTvDb(query) {
     $.ajax({
-        url: '/sickbeard/SearchShow?query=' + query,
+        url: WEBDIR + 'sickbeard/SearchShow?query=' + query,
         type: 'get',
         dataType: 'xml',
         success: function (result) {
@@ -210,7 +210,7 @@ function searchTvDb(query) {
 
 function addShow(tvdbid) {
     $.ajax({
-        url: '/sickbeard/AddShow?tvdbid=' + tvdbid,
+        url: WEBDIR + 'sickbeard/AddShow?tvdbid=' + tvdbid,
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -227,7 +227,7 @@ function searchEpisode(tvdbid, season, episode, name) {
   showModal('Searching episode '+season + 'x'+episode, modalcontent, {});
 
   $.ajax({
-    url: '/sickbeard/SearchEpisodeDownload?tvdbid=' + tvdbid +'&season=' + season +'&episode='+episode,
+    url: WEBDIR + 'sickbeard/SearchEpisodeDownload?tvdbid=' + tvdbid +'&season=' + season +'&episode='+episode,
     type: 'get',
     dataType: 'json',
     timeout: 40000,

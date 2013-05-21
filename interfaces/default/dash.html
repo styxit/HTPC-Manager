@@ -1,15 +1,22 @@
 <%inherit file="base.html"/>
-<%block name="header"><script src="/js/dash.js"></script></%block>
+<%block name="header">
 <%
 import htpc
 settings = htpc.settings.Settings()
+webdir = htpc.WEBDIR
+%>
+<script src="${webdir}js/dash.js"></script></%block>
+<%
+import htpc
+settings = htpc.settings.Settings()
+webdir = htpc.WEBDIR
 %>
 <div class="container dashboard">
     <div class="content">
         <div class="row-fluid">
             %if settings.get('dash_rec_movies', 0):
             <div class="span4">
-                <h3><a href="/xbmc/#movies">Recently added Movies</a></h3>
+                <h3><a href="${webdir}xbmc/#movies">Recently added Movies</a></h3>
                 <div id="movie-carousel" class="carousel slide hide">
                     <div class="carousel-inner"></div>
                     <a class="carousel-control left" href="#movie-carousel" data-slide="prev">&lsaquo;</a>
@@ -19,7 +26,7 @@ settings = htpc.settings.Settings()
             %endif
             %if settings.get('dash_rec_tv', 0):
             <div class="span4">
-                <h3><a href="/xbmc/#shows">Recently added TV Shows</a></h3>
+                <h3><a href="${webdir}xbmc/#shows">Recently added TV Shows</a></h3>
                 <div id="tvshow-carousel" class="carousel slide hide">
                     <div class="carousel-inner"></div>
                     <a class="carousel-control left" href="#tvshow-carousel" data-slide="prev">&lsaquo;</a>
@@ -29,7 +36,7 @@ settings = htpc.settings.Settings()
             %endif
             %if settings.get('dash_rec_music', 0):
             <div class="span4">
-                <h3><a href="/xbmc/#music">Recently added Music</a></h3>
+                <h3><a href="${webdir}xbmc/#music">Recently added Music</a></h3>
                 <div id="albums-content"></div>
             </div>
             %endif
@@ -37,7 +44,7 @@ settings = htpc.settings.Settings()
         <div class="row-fluid">
             %if settings.get('dash_sabnzbd', 0):
             <div class="span4">
-                <h3><a href="/sabnzbd/#history">Latest downloads</a></h3>
+                <h3><a href="${webdir}sabnzbd/#history">Latest downloads</a></h3>
                 <table class="table table-striped table-main">
                     <thead>
                         <tr>
@@ -51,7 +58,7 @@ settings = htpc.settings.Settings()
             %endif
             %if settings.get('dash_couchpotato', 0):
             <div class="span4">
-                <h3><a href="/couchpotato/#wanted">Wanted movies</a></h3>
+                <h3><a href="${webdir}couchpotato/#wanted">Wanted movies</a></h3>
                 <table class="table table-striped table-main">
                     <thead>
                         <tr>
@@ -65,7 +72,7 @@ settings = htpc.settings.Settings()
             %endif
             %if settings.get('dash_sickbeard', 0):
             <div class="span4">
-                <h3><a href="/sickbeard/#nextaired">Next aired</a></h3>
+                <h3><a href="${webdir}sickbeard/#nextaired">Next aired</a></h3>
                 <table class="table table-striped table-main">
                     <thead>
                         <tr>

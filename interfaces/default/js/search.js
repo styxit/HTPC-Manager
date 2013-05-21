@@ -1,6 +1,6 @@
 function getCategories() {
     $.ajax({
-        url: '/search/getcategories',
+        url: WEBDIR + 'search/getcategories',
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -27,7 +27,7 @@ function getCategories() {
 function search(query, catid) {
     if (query==undefined) return;
     $.ajax({
-        url: '/search/search?q='+query+'&cat='+catid,
+        url: WEBDIR + 'search/search?q='+query+'&cat='+catid,
         type: 'get',
         dataType: 'json',
         beforeSend: function () {
@@ -91,11 +91,11 @@ function showDetails(data) {
 
     var modalImage = '';
     if (data.attr["coverurl"]) {
-        var url = '/search/thumb?url='+data.attr['coverurl']+'&w=200&h=300';
+        var url = WEBDIR + 'search/thumb?url='+data.attr['coverurl']+'&w=200&h=300';
         var modalImage = $('<div>').addClass('thumbnail pull-left');
         modalImage.append($('<img>').attr('src', url));
     } else if (data.attr["rageid"]) {
-        var url = '/search/thumb?url=rageid'+data.attr['rageid']+'&w=200&h=300';
+        var url = WEBDIR + 'search/thumb?url=rageid'+data.attr['rageid']+'&w=200&h=300';
         var modalImage = $('<div>').addClass('thumbnail pull-left');
         modalImage.append($('<img>').attr('src', url));
     }
@@ -163,7 +163,7 @@ function showDetails(data) {
     }
 
     if (data.attr['backdropurl']) {
-        var url = '/search/thumb?url='+data.attr['backdropurl']+'&w=675&h=400&o=20';
+        var url = WEBDIR + 'search/thumb?url='+data.attr['backdropurl']+'&w=675&h=400&o=20';
         $('.modal-fanart').css({
             'background' : '#ffffff url('+url+') top center no-repeat',
             'background-size' : '100%'
@@ -174,7 +174,7 @@ function showDetails(data) {
 
 function sendToSab(url) {
     return $.ajax({
-        url: '/sabnzbd/AddNzbFromUrl',
+        url: WEBDIR + 'sabnzbd/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
         data: {nzb_url: url},

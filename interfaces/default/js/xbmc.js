@@ -5,10 +5,10 @@ $(document).ready(function() {
     loadXbmcShows();
     loadNowPlaying();
 
-    $.get('/xbmc/Servers', function(data) {
+    $.get(WEBDIR + 'xbmc/Servers', function(data) {
         if (data==null) return;
         var servers = $('<select>').change(function() {
-             $.get('/xbmc/Servers?server='+$(this).val(), function(data) {
+             $.get(WEBDIR + 'xbmc/Servers?server='+$(this).val(), function(data) {
                 notify('XBMC','Server change '+data,'info');
              });
         });
@@ -55,7 +55,7 @@ $(document).ready(function() {
     $('#xbmc-restart').click(function() {
         var answer = confirm("Reboot xbmc system?");
         if (answer) {
-          $.get('/xbmc/System?action=Reboot', function(data){
+          $.get(WEBDIR + 'xbmc/System?action=Reboot', function(data){
             notify('Reboot','Rebooting...','warning');
           });
         }
@@ -63,13 +63,13 @@ $(document).ready(function() {
     $('#xbmc-shutdown').click(function() {
         var answer = confirm("Shutdown xbmc system?");
         if (answer) {
-          $.get('/xbmc/System?action=Suspend', function(data){
+          $.get(WEBDIR + 'xbmc/System?action=Suspend', function(data){
             notify('Shutdown','Shutting down...','warning');
           });
         }
     });
     $('#xbmc-wake').click(function() {
-        $.get('/xbmc/Wake', function(data){
+        $.get(WEBDIR + 'xbmc/Wake', function(data){
             notify('Wake','Sending WakeOnLan packet...','warning');
         });
     });
