@@ -1,7 +1,9 @@
 HTPC Manager
 =====
 
-Start with ./Htpc.py -d
+A python based web application to manage the software on your Htpc. Htpc Manager combines all your favorite software into one slick interface.
 
-Windows users should install the PIL package from this site:
-http://www.lfd.uci.edu/~gohlke/pythonlibs/
+
+## See full installation instructions at [htpc.io](http://htpc.io/)
+
+Start with ```python Htpc.py```
