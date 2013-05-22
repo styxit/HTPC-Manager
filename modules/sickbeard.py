@@ -3,7 +3,6 @@ import htpc
 from urllib import quote
 from urllib2 import urlopen
 from json import loads
-from urllib2 import Request
 
 class Sickbeard:
     def __init__(self):
@@ -17,32 +16,32 @@ class Sickbeard:
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'sickbeard_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'sickbeard_port'},
                 {'type': 'text', 'label': 'API key', 'name': 'sickbeard_apikey'},
-		{'type': 'text', 'label': 'Basepath (with trailing slash)', 'name': 'sickbeard_basepath'}
+                {'type': 'text', 'label': 'Basepath (starts with a slash)', 'name': 'sickbeard_basepath'}
         ]})
 
     @cherrypy.expose()
     def index(self):
         return htpc.LOOKUP.get_template('sickbeard/index.html').render()
 
-    @cherrypy.expose()    
+    @cherrypy.expose()
     def view(self, tvdbid):
         if not (tvdbid.isdigit()):
           raise cherrypy.HTTPError("500 Error", "Invalid show ID.")
           return False
-          
-        return htpc.LOOKUP.get_template('sickbeard/view.html').render(tvdbid=tvdbid)    
+
+        return htpc.LOOKUP.get_template('sickbeard/view.html').render(tvdbid=tvdbid)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def ping(self, sickbeard_host, sickbeard_port, sickbeard_apikey, **kwargs):
+    def ping(self, sickbeard_host, sickbeard_port, sickbeard_apikey, sickbeard_basepath, **kwargs):
         try:
-            settings = htpc.settings.Settings()
-            sickbeard_basepath = settings.get('sickbeard_basepath', '/')
             if(sickbeard_basepath == ""):
-              sickbeard_basepath = "/"
+                sickbeard_basepath = "/"
+            if not (sickbeard_basepath.endswith('/')):
+              sickbeard_basepath += "/"
+
             url = 'http://' + sickbeard_host + ':' + sickbeard_port + sickbeard_basepath + 'api/' + sickbeard_apikey + '/?cmd='
-            request = Request(url + 'sb.ping')
-            response = loads(urlopen(request, timeout=10).read())
+            response = loads(urlopen(url + 'sb.ping', timeout=10).read())
             if response.get('result') == "success":
                 return response
         except:
@@ -92,7 +91,7 @@ class Sickbeard:
     @cherrypy.tools.json_out()
     def GetSeason(self, tvdbid, season):
         return self.fetch('show.seasons&tvdbid=' + tvdbid + '&season=' + season)
-        
+
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def SearchEpisodeDownload(self, tvdbid, season, episode):
@@ -115,13 +114,14 @@ class Sickbeard:
             sickbeard_basepath = settings.get('sickbeard_basepath', '/')
 
             if(sickbeard_basepath == ""):
-              sickbeard_basepath = "/"
+                sickbeard_basepath = "/"
+            if not (sickbeard_basepath.endswith('/')):
+              sickbeard_basepath += "/"
             url = 'http://' + host + ':' + str(port) + sickbeard_basepath + 'api/' + apikey + '/?cmd=' + cmd
-            request = Request(url)
 
             if (img == True):
-              return urlopen(request, timeout=timeout).read()
-              
-            return loads(urlopen(request, timeout=timeout).read())
+              return urlopen(url, timeout=timeout).read()
+
+            return loads(urlopen(url, timeout=timeout).read())
         except:
             return

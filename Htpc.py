@@ -28,7 +28,7 @@ def parse_arguments():
                         help='Generate PID file at location')
     parser.add_argument('--debug', action='store_true', default=False,
                         help='Print debug text')
-    parser.add_argument('--webdir', default="/",
+    parser.add_argument('--webdir', default=None,
                         help='Use a custom webdir')
     return parser.parse_args()
 
@@ -85,16 +85,18 @@ def main():
     # Initiate database connection
     sqlhub.processConnection = connectionForURI('sqlite:' + htpc.DB)
 
-    htpc.WEBDIR = "/"    
-    if args.webdir:
-        htpc.WEBDIR = args.webdir
-
-    # Inititialize root and settings page
-    load_modules()
-
     # Load settings from database
     from htpc.settings import Settings
     settings = Settings()
+
+    htpc.WEBDIR = settings.get('app_webdir', '/')
+    if args.webdir:
+        htpc.WEBDIR = args.webdir
+    if not(htpc.WEBDIR.endswith('/')):
+        htpc.WEBDIR += '/'
+
+    # Inititialize root and settings page
+    load_modules()
 
     htpc.TEMPLATE = os.path.join('interfaces/',
                                  settings.get('app_template', 'default'))

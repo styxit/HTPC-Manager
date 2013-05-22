@@ -5,6 +5,7 @@ DB = None
 DEBUG = None
 DAEMON = None
 PID = None
+WEBDIR = None
 ROOT = None
 MODULES = []
 TEMPLATE = None

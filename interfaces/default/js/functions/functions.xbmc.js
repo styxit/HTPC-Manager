@@ -107,6 +107,7 @@ function xbmcShowMovie(movie) {
     if(movie.rating) {
         var rating = $('<span>').raty({
             readOnly: true,
+            path: WEBDIR+'img',
             score: (movie.rating / 2),
         })
         modalMovieInfo.append(rating);
@@ -465,11 +466,11 @@ function loadNowPlaying() {
                   else if (data.itemInfo.item.type == 'song') {
                       thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=180&h=180&thumb='+encodeURIComponent(nowPlayingThumb));
                       thumbnail.attr('width', '180').attr('height', '180');
-                  } 
+                  }
                   else  {
                       thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=140&h=140&thumb='+encodeURIComponent(nowPlayingThumb));
                       thumbnail.attr('width', '140').attr('height', '140');
-                  } 
+                  }
                 }
                 var nowPlayingBackground = '?holder.js/1150x640/#f5f5f5:#f5f5f5';
                 if (data.itemInfo.item.fanart) {

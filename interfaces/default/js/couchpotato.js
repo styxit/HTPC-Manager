@@ -80,6 +80,7 @@ function showMovie(movie) {
     if (movie.library.info.rating.imdb) {
         var rating = $('<div>').raty({
             readOnly: true,
+            path: WEBDIR+'img',
             score: (movie.library.info.rating.imdb[0] / 2),
         })
         modalMovieInfo.append(rating);

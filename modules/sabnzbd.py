@@ -18,7 +18,7 @@ class Sabnzbd:
                 {'type': 'text', 'label': 'Port *', 'name': 'sabnzbd_port'},
                 {'type': 'text', 'label': 'API key', 'name': 'sabnzbd_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'sabnzbd_ssl'},
-		{'type': 'text', 'label': 'Basepath (with trailing slash)', 'name': 'sabnzbd_basepath'}
+                {'type': 'text', 'label': 'Basepath (starts with a slash)', 'name': 'sabnzbd_basepath'}
         ]})
 
     @cherrypy.expose()
@@ -27,12 +27,14 @@ class Sabnzbd:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def version(self, sabnzbd_host, sabnzbd_port, sabnzbd_apikey, sabnzbd_ssl=False, **kwargs):
+    def version(self, sabnzbd_host, sabnzbd_basepath, sabnzbd_port, sabnzbd_apikey, sabnzbd_ssl=False, **kwargs):
         ssl = 's' if sabnzbd_ssl else ''
-	settings = htpc.settings.Settings()
-	sabnzbd_basepath = settings.get('sabnzbd_basepath', '/sabnzbd/')
+
         if(sabnzbd_basepath == ""):
           sabnzbd_basepath = "/sabnzbd/"
+        if not(sabnzbd_basepath.endswith('/')):
+            sabnzbd_basepath += "/"
+
         url = 'http' + ssl + '://' + sabnzbd_host + ':' + sabnzbd_port + sabnzbd_basepath + 'api?output=json&apikey=' + sabnzbd_apikey
         try:
             return loads(urlopen(url + '&mode=version', timeout=10).read())
@@ -103,9 +105,13 @@ class Sabnzbd:
             port = str(settings.get('sabnzbd_port', ''))
             apikey = settings.get('sabnzbd_apikey', '')
             ssl = 's' if settings.get('sabnzbd_ssl', 0) else ''
-	    sabnzbd_basepath = settings.get('sabnzbd_basepath', '/sabnzbd/')
+
+            sabnzbd_basepath = settings.get('sabnzbd_basepath', '/sabnzbd/')
             if(sabnzbd_basepath == ""):
               sabnzbd_basepath = "/sabnzbd/"
+            if not(sabnzbd_basepath.endswith('/')):
+                sabnzbd_basepath += "/"
+
             url = 'http' + ssl + '://' + host + ':' + port + sabnzbd_basepath + 'api?output=json&apikey=' + apikey + path
             return loads(urlopen(url, timeout=10).read())
         except:
