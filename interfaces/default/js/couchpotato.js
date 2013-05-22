@@ -15,6 +15,7 @@ $(document).ready(function() {
     $('#search_movie_name').popover({
         placement: 'bottom',
         trigger: 'manual',
+        html: true,
         content: '<div class="spinner" id="searchspinner"></div><ul id="search-movie-list"></ul>'
     });
     $('html').click(function(){
