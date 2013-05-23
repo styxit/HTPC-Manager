@@ -50,7 +50,7 @@ class Settings:
     def get_templates(self):
         """ Get a list of available templates """
         templates = []
-        for template in os.listdir("interfaces/"):
+        for template in os.listdir(os.path.join(htpc.RUNDIR, "interfaces/")):
             current = bool(template == self.get('app_template', 'default'))
             templates.append({'name': template, 'value': template,
                 'selected': current})

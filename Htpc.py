@@ -98,7 +98,7 @@ def main():
     # Inititialize root and settings page
     load_modules()
 
-    htpc.TEMPLATE = os.path.join('interfaces/',
+    htpc.TEMPLATE = os.path.join(htpc.RUNDIR, 'interfaces/',
                                  settings.get('app_template', 'default'))
     htpc.LOOKUP = TemplateLookup(directories=[htpc.TEMPLATE])
 
