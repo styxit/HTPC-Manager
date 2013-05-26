@@ -14,7 +14,7 @@ webdir = htpc.WEBDIR
 <div class="container">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="http://${settings.get('couchpotato_host')}:${settings.get('couchpotato_port')}" target="_blank">${settings.get('couchpotato_name', 'CouchPotato')}</a>
+            <a href="http://${settings.get('couchpotato_host')}:${settings.get('couchpotato_port') + settings.get('couchpotato_basepath')}" target="_blank" title="Open original Couchpotato interface">${settings.get('couchpotato_name', 'CouchPotato')}</a>
         </h1>
         <form id="searchform" class="well form-inline">
             <input class="span6" id="search_movie_name" name="search_movie_name" type="text" />
