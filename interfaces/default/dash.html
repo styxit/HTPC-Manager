@@ -86,5 +86,31 @@ webdir = htpc.WEBDIR
             </div>
             %endif
         </div>
+        <%
+        dashcount = settings.get('dash_sickbeard', 0);
+        dashcount += settings.get('dash_couchpotato', 0);
+        dashcount += settings.get('dash_sabnzbd', 0);
+        dashcount += settings.get('dash_rec_music', 0);
+        dashcount += settings.get('dash_rec_tv', 0);
+        dashcount += settings.get('dash_rec_movies', 0);
+        %>
+        %if dashcount == 0:
+        <div class="row-fluid">
+            <h1 class="page-header page-title">
+                Welcome
+            </h1>
+        </div>
+        <div class="row-fluid">
+            <div class="span6">
+                <h2>Dashboard</h2>
+                <p>This is you dashboard for all your Htpc modules. You have no dashboard modules configured yet.</p>
+                <p>Add the api configurations for you modules in the <a href="${webdir}settings">settings</a> and enable them to show on the dashboard.</p>
+            </div>
+            <div class="span6">
+                <h2>Help</h2>
+                <p>If you need help configuring Htpc Manager, visit the webiste <a href="http://htpc.io/" target="_blank">htpc.io</a> or the <a href="http://forum.xbmc.org/showthread.php?tid=126297&action=lastpost" target="_blank">Xbmc forum</a>.</p>
+            </div>
+        </div>
+        %endif
     </div>
 </div>
