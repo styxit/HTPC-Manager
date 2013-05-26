@@ -230,7 +230,7 @@ function sabnzbdStatusLabel(text){
   var statusOK = ['Completed'];
   var statusInfo = ['Extracting', 'Running'];
   var statusError = ['Failed'];
-  var statusWarning = [];
+  var statusWarning = ['Verifying', 'Repairing'];
 
   var label = $('<span>').addClass('label').text(text);
 
@@ -258,12 +258,18 @@ function sabnzbdStatusIcon(iconText, white){
   var text =[
     'Completed',
     'Extracting',
-    'Running'
+    'Running',
+    'Verifying',
+    'Failed',
+    'Repairing'
   ];
   var icons = [
     'icon-ok',
     'icon-share',
-    'icon-play-circle'
+    'icon-play-circle',
+    'icon-exchange',
+    'icon-remove',
+    'icon-wrench'
   ];
 
   if (text.indexOf(iconText) != -1) {
