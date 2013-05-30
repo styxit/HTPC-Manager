@@ -65,7 +65,5 @@ def start():
             'tools.auth_digest.key': 'a565c27146791cfb'
         })
 
-    # Start the CherryPy server
-    app = cherrypy.tree.mount(htpc.ROOT, htpc.WEBDIR, app_config)
-    cherrypy.server.start()
-    cherrypy.server.wait()
+    # Start the CherryPy server (remove trailing slash from webdir)
+    cherrypy.quickstart(htpc.ROOT, htpc.WEBDIR[:-1], config=app_config)
