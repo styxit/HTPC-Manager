@@ -52,6 +52,8 @@ $(document).ready(function () {
         $.get(WEBDIR + 'update/', function (update) {
             if (update.behind == 0) {
                 notify('Update','Already running latest version.','success');
+            } else if (update.behind < 0) {
+                notify('Update','In app updating not supported. Git-command not found, or you are ahead of the master branch.','error');
             } else {
                 if (confirm('Your are '+update.behind+' versions behind. Update to latest version?')) {
                     showModal('Installing update', '<div class="spinner"></div>','');
