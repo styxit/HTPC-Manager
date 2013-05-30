@@ -56,7 +56,7 @@ $(document).ready(function () {
                 notify('Update','In app updating not supported. Git-command not found, or you are ahead of the master branch.','error');
             } else {
                 if (confirm('Your are '+update.behind+' versions behind. Update to latest version?')) {
-                    showModal('Installing update', '<div class="spinner"></div>','');
+                    showModal('Installing update', '<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>','');
                     $.post(WEBDIR + 'update/', function (data) {
                         hideModal();
                         if (data.completed) {
