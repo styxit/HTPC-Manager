@@ -55,7 +55,7 @@ $(document).ready(function () {
             } else {
                 if (confirm('Your are '+update.behind+' versions behind. Update to latest version?')) {
                     showModal('Installing update', '<div class="spinner"></div>','');
-                    $.post('/update/', function (data) {
+                    $.post(WEBDIR + 'update/', function (data) {
                         hideModal();
                         if (data.completed) {
                             notify('New version installed!','success');
