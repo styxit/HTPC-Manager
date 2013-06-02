@@ -19,7 +19,7 @@ function loadRecentMovies () {
                 var itemDiv = $('<div>').addClass('item');
                 if (i == 0) itemDiv.addClass('active');
                 
-                itemDiv.attr('style', "background-image: url(" + WEBDIR + "xbmc/GetThumb?h=240&w=430&thumb="+encodeURIComponent(movie.fanart)+ ");");
+                itemDiv.attr('style', 'background-image: url("' + WEBDIR + 'xbmc/GetThumb?h=240&w=430&thumb='+encodeURIComponent(movie.fanart)+ '");');
 
                 var itemCaption = $('<div>').addClass('carousel-caption').click(function() {
                     xbmcShowMovie(movie);
