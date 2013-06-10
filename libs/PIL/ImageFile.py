@@ -27,12 +27,15 @@
 # See the README file for information on usage and redistribution.
 #
 
-import Image
-import traceback, string, os
+from PIL import Image
+import traceback, os
+import io
 
 MAXBLOCK = 65536
 
 SAFEBLOCK = 1024*1024
+
+LOAD_TRUNCATED_IMAGES = False
 
 ERRORS = {
     -1: "image buffer overrun error",
@@ -55,9 +58,9 @@ def raise_ioerror(error):
 # --------------------------------------------------------------------
 # Helpers
 
-def _tilesort(t1, t2):
+def _tilesort(t):
     # sort on offset
-    return cmp(t1[2], t2[2])
+    return t[2]
 
 #
 # --------------------------------------------------------------------
@@ -89,25 +92,25 @@ class ImageFile(Image.Image):
 
         try:
             self._open()
-        except IndexError, v: # end of data
+        except IndexError as v: # end of data
             if Image.DEBUG > 1:
                 traceback.print_exc()
-            raise SyntaxError, v
-        except TypeError, v: # end of data (ord)
+            raise SyntaxError(v)
+        except TypeError as v: # end of data (ord)
             if Image.DEBUG > 1:
                 traceback.print_exc()
-            raise SyntaxError, v
-        except KeyError, v: # unsupported mode
+            raise SyntaxError(v)
+        except KeyError as v: # unsupported mode
             if Image.DEBUG > 1:
                 traceback.print_exc()
-            raise SyntaxError, v
-        except EOFError, v: # got header but not the first frame
+            raise SyntaxError(v)
+        except EOFError as v: # got header but not the first frame
             if Image.DEBUG > 1:
                 traceback.print_exc()
-            raise SyntaxError, v
+            raise SyntaxError(v)
 
         if not self.mode or self.size[0] <= 0:
-            raise SyntaxError, "not identified by this driver"
+            raise SyntaxError("not identified by this driver")
 
     def draft(self, mode, size):
         "Set draft mode"
@@ -177,13 +180,13 @@ class ImageFile(Image.Image):
         if not self.map:
 
             # sort tiles in file order
-            self.tile.sort(_tilesort)
+            self.tile.sort(key=_tilesort)
 
             try:
                 # FIXME: This is a hack to handle TIFF's JpegTables tag.
                 prefix = self.tile_prefix
             except AttributeError:
-                prefix = ""
+                prefix = b""
 
             for d, e, o, a in self.tile:
                 d = Image._getdecoder(self.mode, d, a, self.decoderconfig)
@@ -194,11 +197,23 @@ class ImageFile(Image.Image):
                     continue
                 b = prefix
                 t = len(b)
-                while 1:
-                    s = read(self.decodermaxblock)
-                    if not s:
+                while True:
+                    try:
+                        s = read(self.decodermaxblock)
+                    except IndexError as ie: # truncated png/gif
+                        if LOAD_TRUNCATED_IMAGES:
+                            break
+                        else:
+                            raise IndexError(ie)
+
+                    if not s: # truncated jpeg
                         self.tile = []
-                        raise IOError("image file is truncated (%d bytes not processed)" % len(b))
+
+                        if LOAD_TRUNCATED_IMAGES:
+                            break
+                        else:
+                            raise IOError("image file is truncated (%d bytes not processed)" % len(b))
+
                     b = b + s
                     n, e = d.decode(b)
                     if n < 0:
@@ -211,7 +226,8 @@ class ImageFile(Image.Image):
 
         self.fp = None # might be shared
 
-        if not self.map and e < 0:
+        if (not LOAD_TRUNCATED_IMAGES or t == 0) and not self.map and e < 0:
+            # still raised if decoder fails to return anything
             raise_ioerror(e)
 
         # post processing
@@ -276,52 +292,6 @@ class StubImageFile(ImageFile):
         raise NotImplementedError(
             "StubImageFile subclass must implement _load"
             )
-
-##
-# (Internal) Support class for the <b>Parser</b> file.
-
-class _ParserFile:
-    # parser support class.
-
-    def __init__(self, data):
-        self.data = data
-        self.offset = 0
-
-    def close(self):
-        self.data = self.offset = None
-
-    def tell(self):
-        return self.offset
-
-    def seek(self, offset, whence=0):
-        if whence == 0:
-            self.offset = offset
-        elif whence == 1:
-            self.offset = self.offset + offset
-        else:
-            # force error in Image.open
-            raise IOError("illegal argument to seek")
-
-    def read(self, bytes=0):
-        pos = self.offset
-        if bytes:
-            data = self.data[pos:pos+bytes]
-        else:
-            data = self.data[pos:]
-        self.offset = pos + len(data)
-        return data
-
-    def readline(self):
-        # FIXME: this is slow!
-        s = ""
-        while 1:
-            c = self.read(1)
-            if not c:
-                break
-            s = s + c
-            if c == "\n":
-                break
-        return s
 
 ##
 # Incremental image parser.  This class implements the standard
@@ -398,11 +368,12 @@ class Parser:
             # attempt to open this file
             try:
                 try:
-                    fp = _ParserFile(self.data)
+                    fp = io.BytesIO(self.data)
                     im = Image.open(fp)
                 finally:
                     fp.close() # explicitly close the virtual file
             except IOError:
+                # traceback.print_exc()
                 pass # not enough data
             else:
                 flag = hasattr(im, "load_seek") or hasattr(im, "load_read")
@@ -437,7 +408,7 @@ class Parser:
         # finish decoding
         if self.decoder:
             # get rid of what's left in the buffers
-            self.feed("")
+            self.feed(b"")
             self.data = self.decoder = None
             if not self.finished:
                 raise IOError("image was incomplete")
@@ -447,7 +418,7 @@ class Parser:
             # incremental parsing not possible; reopen the file
             # not that we have all data
             try:
-                fp = _ParserFile(self.data)
+                fp = io.BytesIO(self.data)
                 self.image = Image.open(fp)
             finally:
                 self.image.load()
@@ -469,20 +440,20 @@ def _save(im, fp, tile):
     im.load()
     if not hasattr(im, "encoderconfig"):
         im.encoderconfig = ()
-    tile.sort(_tilesort)
+    tile.sort(key=_tilesort)
     # FIXME: make MAXBLOCK a configuration parameter
     bufsize = max(MAXBLOCK, im.size[0] * 4) # see RawEncode.c
     try:
         fh = fp.fileno()
         fp.flush()
-    except AttributeError:
+    except (AttributeError, io.UnsupportedOperation):
         # compress to Python file-compatible object
         for e, b, o, a in tile:
             e = Image._getencoder(im.mode, e, a, im.encoderconfig)
             if o > 0:
                 fp.seek(o, 0)
             e.setimage(im.im, b)
-            while 1:
+            while True:
                 l, s, d = e.encode(bufsize)
                 fp.write(d)
                 if s:
@@ -515,7 +486,7 @@ def _save(im, fp, tile):
 
 def _safe_read(fp, size):
     if size <= 0:
-        return ""
+        return b""
     if size <= SAFEBLOCK:
         return fp.read(size)
     data = []
@@ -525,4 +496,4 @@ def _safe_read(fp, size):
             break
         data.append(block)
         size = size - len(block)
-    return string.join(data, "")
+    return b"".join(data)
