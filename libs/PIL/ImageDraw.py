@@ -30,7 +30,7 @@
 # See the README file for information on usage and redistribution.
 #
 
-import Image, ImageColor
+from PIL import Image, ImageColor
 
 try:
     import warnings
@@ -127,7 +127,7 @@ class ImageDraw:
     def getfont(self):
         if not self.font:
             # FIXME: should add a font repository
-            import ImageFont
+            from PIL import ImageFont
             self.font = ImageFont.load_default()
         return self.font
 
@@ -313,13 +313,11 @@ def getdraw(im=None, hints=None):
     handler = None
     if not hints or "nicest" in hints:
         try:
-            import _imagingagg
-            handler = _imagingagg
+            import _imagingagg as handler
         except ImportError:
             pass
     if handler is None:
-        import ImageDraw2
-        handler = ImageDraw2
+        from PIL import ImageDraw2 as handler
     if im:
         im = handler.Draw(im)
     return im, handler
