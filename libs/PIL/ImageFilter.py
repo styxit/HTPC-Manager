@@ -15,6 +15,8 @@
 # See the README file for information on usage and redistribution.
 #
 
+from functools import reduce
+
 class Filter:
     pass
 
@@ -52,7 +54,7 @@ class Kernel(Filter):
     def filter(self, image):
         if image.mode == "P":
             raise ValueError("cannot filter palette images")
-        return apply(image.filter, self.filterargs)
+        return image.filter(*self.filterargs)
 
 class BuiltinFilter(Kernel):
     def __init__(self):
@@ -80,7 +82,7 @@ class RankFilter(Filter):
     def filter(self, image):
         if image.mode == "P":
             raise ValueError("cannot filter palette images")
-        image = image.expand(self.size/2, self.size/2)
+        image = image.expand(self.size//2, self.size//2)
         return image.rankfilter(self.size, self.rank)
 
 ##
@@ -97,7 +99,7 @@ class MedianFilter(RankFilter):
 
     def __init__(self, size=3):
         self.size = size
-        self.rank = size*size/2
+        self.rank = size*size//2
 
 ##
 # Min filter.  Picks the lowest pixel value in a window with the given
@@ -157,7 +159,7 @@ class GaussianBlur(Filter):
     name = "GaussianBlur"
 
     def __init__(self, radius=2):
-        self.radius = 2
+        self.radius = radius
     def filter(self, image):
         return image.gaussian_blur(self.radius)
 
@@ -168,7 +170,7 @@ class UnsharpMask(Filter):
     name = "UnsharpMask"
 
     def __init__(self, radius=2, percent=150, threshold=3):
-        self.radius = 2
+        self.radius = radius
         self.percent = percent
         self.threshold = threshold
     def filter(self, image):

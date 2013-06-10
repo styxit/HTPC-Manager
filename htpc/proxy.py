@@ -9,6 +9,7 @@ try:
 except ImportError:
     from PIL import Image, ImageEnhance
 from urllib2 import Request, urlopen
+from cStringIO import StringIO
 
 
 def get_image(url, height=None, width=None, opacity=100, auth=None):
@@ -19,23 +20,27 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
         os.makedirs(imgdir)
 
     # Create a hash of the path to use as filename
-    imgname = hashlib.md5(url).hexdigest()
+    imghash = hashlib.md5(url).hexdigest()
 
-    original = resized = os.path.join(imgdir, imgname + '.png')
-    if height and width:
-        resized = os.path.join(imgdir,
-                original + '_' + width + '_' + height + '.png')
+    # Set filename and path
+    image = os.path.join(imgdir, imghash)
 
     # If there is no local copy of the original
-    if not os.path.isfile(original):
-        original = download_image(url, original, auth)
+    if not os.path.isfile(image):
+        download_image(url, image, auth)
 
-    # If there is no local resized copy
-    if not os.path.isfile(resized):
-        resized = resize_image(original, height, width, opacity, resized)
+    # Check if resize is needed
+    if height and width:
+        # Set filename for resized file
+        resized = image + '_' + width + '_' + height
+        # If there is no local resized copy
+        if not os.path.isfile(resized):
+            resize_image(image, height, width, opacity, resized)
+        # Serve the resized file
+        image = resized
 
     # Load file from disk
-    return serve_file(path=resized, content_type='image/png')
+    return serve_file(path=image + '.png', content_type='image/png')
 
 
 def download_image(url, dest, auth=None):
@@ -43,27 +48,18 @@ def download_image(url, dest, auth=None):
     request = Request(url)
     if (auth):
         request.add_header("Authorization", "Basic %s" % auth)
-    data = urlopen(request).read()
-    file_obj = open(dest, 'wb')
-    file_obj.write(data)
-    file_obj.close()
-    return dest
+    data = StringIO(urlopen(request).read())
+    im = Image.open(data)
+    im.save(dest + '.png', 'PNG')
 
 
 def resize_image(img, height, width, opacity, dest):
     """ Resize image, set opacity and save to disk """
-    height = int(height)
-    width = int(width)
-    opacity = float(opacity)
-    enhance = opacity / 100
-    try:
-        image = Image.open(img)
-        resized = image.resize((width, height),
-                               Image.ANTIALIAS).convert('RGBA')
-        alpha = resized.split()[3]
-        alpha = ImageEnhance.Brightness(alpha).enhance(enhance)
-        resized.putalpha(alpha)
-        resized.save(dest)
-        return dest
-    except ValueError:
-        return img
+    size = int(width), int(height)
+    enhance = float(opacity) / 100
+    im = Image.open(img + '.png')
+    im = im.resize(size, Image.ANTIALIAS).convert('RGBA')
+    alpha = ImageEnhance.Brightness(im.split()[3]).enhance(enhance)
+    im.putalpha(alpha)
+    im.save(dest + '.png', 'PNG')
+    return dest

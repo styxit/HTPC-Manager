@@ -12,7 +12,9 @@
 # See the README file for information on usage and redistribution.
 #
 
-import Image
+from __future__ import print_function
+
+from PIL import Image
 import os, sys
 
 _viewers = []
@@ -96,7 +98,8 @@ if sys.platform == "win32":
     class WindowsViewer(Viewer):
         format = "BMP"
         def get_command(self, file, **options):
-            return "start /wait %s && del /f %s" % (file, file)
+            return ("start /wait %s && ping -n 2 127.0.0.1 >NUL "
+                    "&& del /f %s" % (file, file))
 
     register(WindowsViewer)
 
@@ -160,4 +163,4 @@ else:
 
 if __name__ == "__main__":
     # usage: python ImageShow.py imagefile [title]
-    print show(Image.open(sys.argv[1]), *sys.argv[2:])
+    print(show(Image.open(sys.argv[1]), *sys.argv[2:]))
