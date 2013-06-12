@@ -36,16 +36,23 @@
 
   <div class="container"><!--main container-->
     <div class="row">
-      <div class="span7">
+      <div class="span7" id="content">
         {{content}}
       </div>
       <div class="span5">
-        <h3><i class="icon-rss"></i> Latest updates</h3>
-        <div class="well">
-          <ul id="github-commit-list" class="icons-ul">
-            <li><i class="icon-refresh icon-li"></i> Loading commits...</li>
-          </ul>
-          <a class="btn btn-success" href="https://github.com/styxit/HTPC-Manager/commits/master">Github commits <i class="icon-double-angle-right"></i></a>
+        <div>
+          <h3><i class="icon-list"></i> Jump quickly to...</h3>
+          <div id="toc">
+          </div>
+        </div>
+        <div>
+          <h3><i class="icon-rss"></i> Latest updates</h3>
+          <div class="well">
+            <ul id="github-commit-list" class="icons-ul">
+              <li><i class="icon-refresh icon-li"></i> Loading commits...</li>
+            </ul>
+            <a class="btn btn-success" href="https://github.com/styxit/HTPC-Manager/commits/master">Github commits <i class="icon-double-angle-right"></i></a>
+          </div>
         </div>
       </div>
     </div>
@@ -56,6 +63,15 @@
   <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
   <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="js/jquery.github.rss.js"></script>
+  <script type="text/javascript" src="js/jquery.toc.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function(){
+      $('#toc').toc({
+        'container': '#content'
+      });
+    });
+  </script>
 
   {% include analytics.html %}
 </body>
