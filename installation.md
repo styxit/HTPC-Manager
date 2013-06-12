@@ -25,15 +25,16 @@ python Htpc.py
 {% endhighlight %}
 
 #### Options:
-Parameter | Description                   | Default value
---------- | ----------------------------- | --------
-debug     | Run in debug mode             | none
-daemon    | Daemonize process             | none
-port      | Listen on specific port       | 8085
-db        | Use a custom database         | none
-datadir   | Set the datarirectory         | none
-host      | Use a specific host/IP        | None/any
-pid       | Location to generate pid file | false
+Parameter | Description                        | Default value
+--------- | ---------------------------------- | --------
+debug     | Run in debug mode                  | none
+daemon    | Daemonize process                  | none
+port      | Listen on specific port            | 8085
+db        | Use a custom database              | none
+datadir   | Set the datarirectory              | none
+host      | Use a specific host/IP             | None/any
+pid       | Location to generate pid file      | false
+webdir    | Mount Htpc Manager on a custom url | /
 
 
 ##### Combine any of the options on the commandline
