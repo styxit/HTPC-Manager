@@ -105,9 +105,9 @@ If everything went well, the Python Image Library is now installed. All images r
 ## Reverse proxy
 Htpc Manager supports the use of a reverse proxy. To use a reverse proxy Htpc Manager must run on a different webdir. By default Htpc Manager runs on it's ow port, in the root. If you want to use a reverse proxy you might want to set the webdir to /htpc. In the settings you can configure a custom webdir/basepath (restart required).
 
-A second option is to set the webdir from the commandline with the "webdir" parameter. ```Htpc.py --webdit "/htpc"```
+A second option is to set the webdir from the commandline with the "webdir" parameter. ```Htpc.py --webdir "/htpc"```
 
-From then on Htpc Manager rund on *localhost:8085/htpc*
+From then on Htpc Manager runs on *localhost:8085/htpc*
 
 If you use apache, this vhost config might help you get started. Remeber to activate mod_proxy for apache.
 
