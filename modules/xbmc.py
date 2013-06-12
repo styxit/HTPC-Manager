@@ -241,7 +241,7 @@ class Xbmc:
             return xbmc.AudioLibrary.GetArtists(properties=properties, limits=limits, sort=sort, filter=filter)
         except ValueError:
             return
-            
+
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetArtistDetails(self, artistid):
@@ -252,7 +252,7 @@ class Xbmc:
             return xbmc.AudioLibrary.GetArtistDetails(artistid=int(artistid), properties=properties)
         except ValueError:
             return
-    
+
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetAlbums(self, artistid):
@@ -270,7 +270,7 @@ class Xbmc:
     def PlayItem(self, item=None, type=None):
         """ Play a file in XBMC """
         xbmc = Server(self.url('/jsonrpc', True))
-        
+
         if type == 'movie':
             return xbmc.Player.Open(item={'movieid': int(item)})
         if type == 'episode':
@@ -279,7 +279,7 @@ class Xbmc:
             return xbmc.Player.Open(item={'artistid': int(item)})
         if type == 'song':
             return xbmc.Player.Open(item={'songid': int(item)})
-        
+
         return xbmc.Player.Open(item={'file': item})
 
     @cherrypy.expose()
@@ -293,10 +293,10 @@ class Xbmc:
             if playlist['type'] == type:
                 playlistId = playlist['playlistid']
                 print playlistId
-        
+
         if playlistId is not -1:
             return xbmc.Playlist.GetItems(playlistid=playlistId, properties=['artist', 'title', 'album'])
-        
+
         return
 
     @cherrypy.expose()
@@ -307,14 +307,14 @@ class Xbmc:
             xbmc = Server(self.url('/jsonrpc', True))
             player = xbmc.Player.GetActivePlayers()
             application = xbmc.Application.GetProperties(properties=['muted', 'volume', 'version'])
-            
+
             if player[0][u'type'] == 'video':
                 properties = ['speed', 'position', 'totaltime', 'time', 'percentage', 'subtitleenabled', 'currentsubtitle', 'subtitles',
                               'currentaudiostream', 'audiostreams']
                 playerInfo = xbmc.Player.GetProperties(playerid=player[0][u'playerid'], properties=properties)
                 itemInfo = xbmc.Player.GetItem(playerid=player[0][u'playerid'], properties=['thumbnail', 'showtitle', 'year', 'episode', 'season', 'fanart'])
                 return {'playerInfo': playerInfo, 'itemInfo': itemInfo, 'app': application}
-                
+
             elif player[0][u'type'] == 'audio':
                 properties = ['speed', 'position', 'totaltime', 'time', 'percentage',
                               'currentaudiostream', 'audiostreams']
@@ -453,7 +453,7 @@ class Xbmc:
     def Notify(self, text):
         """ Create popup in XBMC """
         xbmc = Server(self.url('/jsonrpc', True))
-        return xbmc.GUI.ShowNotification(title='HTPC manager', message=text, image='info')
+        return xbmc.GUI.ShowNotification(title='HTPC manager', message=text, image='https://raw.github.com/styxit/HTPC-Manager/master/interfaces/default/img/xbmc-logo.png')
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
