@@ -26,7 +26,7 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
     image = os.path.join(imgdir, imghash)
 
     # If there is no local copy of the original
-    if not os.path.isfile(image):
+    if not os.path.isfile(image + '.png'):
         download_image(url, image, auth)
 
     # Check if resize is needed
