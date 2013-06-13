@@ -194,7 +194,7 @@ function loadXbmcShows(options) {
             }
             if (data.tvshows != undefined) {
                 $.each(data.tvshows, function (i, show) {
-                    var showItem = $('<li>').addClass('show-item');
+                    var showItem = $('<li>').addClass('show-item').attr('title', show.title);
 
                     var showAnchor = $('<a>').attr('href', '#').click(function(e) {
                         e.preventDefault();
