@@ -32,7 +32,7 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
     # Check if resize is needed
     if height and width:
         # Set filename for resized file
-        resized = image + '_' + width + '_' + height
+        resized = image + '_w' + width + '_h' + height + '_o' + str(opacity)
         # If there is no local resized copy
         if not os.path.isfile(resized + '.png'):
             resize_image(image, height, width, opacity, resized)
