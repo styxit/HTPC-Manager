@@ -98,7 +98,39 @@ Execute your downloaded PIL installer and follow the instructions to complete th
 If everything went well, the Python Image Library is now installed. All images retieved from Xbmc should now show up nicely.
 
 ## Linux
-```Linux install guide comming soon```
+Htpc Manager works great on Linux with Python. use Python 2.7 if possible. Download the latest zip, tar.gz or do a Git-clone.
+Cd into the directory where you extracted the htpc-manager folder and from there, launch Htpc Manager
+```python Htpc.py```
+
+### Python Image library
+For the Xbmc images to work, you Need PIL. The Python Image Library. If you don't care about images or do not use Xbmc, you can skip this.
+
+PIL requires a few libraries, install with:
+{% highlight text %}
+sudo apt-get install libjpeg libjpeg-dev libpng-dev libfreetype6 libfreetype6-dev zlib1g-dev
+{% endhighlight %}
+
+PIL can be installed with PIP as [explained here](http://www.cyberciti.biz/faq/debian-ubuntu-centos-rhel-linux-install-pipclient/).
+{% highlight text %}
+sudo apt-get install python-pip
+{% endhighlight %}
+
+
+And finally, install PIL. Or follow [these instructions](http://askubuntu.com/questions/156484/how-do-i-install-python-imaging-library-pil)
+{% highlight text %}
+sudo pip install PIL
+{% endhighlight %}
+
+If all went well, PIL has been installed. Check the install message to see jpeg and png support.
+{% highlight text %}
+---------------------------------------------------------------
+*** TKINTER support available
+--- JPEG support available
+--- ZLIB (PNG/ZIP) support available
+--- FREETYPE2 support available
+*** LITTLECMS support not available
+---------------------------------------------------------------
+{% endhighlight %}
 
 #Configuration
 
