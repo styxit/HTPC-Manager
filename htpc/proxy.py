@@ -14,6 +14,7 @@ from cStringIO import StringIO
 
 def get_image(url, height=None, width=None, opacity=100, auth=None):
     """ Load image form cache if possible, else download. Resize if needed """
+	logger = logging.getLogger('htpc.proxy')
     # Create image directory if it doesnt exist
     imgdir = os.path.join(htpc.DATADIR, 'images/')
     if not os.path.exists(imgdir):
