@@ -152,7 +152,7 @@ def main():
     htpc.DEBUG = False
     if args.debug:
         logger.info("Enabling DEBUG-Messages")
-        logger.setLevel('debug')
+        logger.setLevel(logging.DEBUG)
         htpc.DEBUG = True
 
     from htpc.server import start
