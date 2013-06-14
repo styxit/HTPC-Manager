@@ -2,11 +2,14 @@
 import os
 import cherrypy
 import htpc
+import logging
 from cherrypy.process.plugins import Daemonizer, PIDFile
-
 
 def start():
     """ Main function for starting HTTP server """
+    logger = logging.getLogger('htpc.server')
+    logger.info("Initializing the server.")
+
     # Set server ip, port and root
     cherrypy.config.update({
         'server.socket_host': htpc.HOST,
@@ -66,4 +69,5 @@ def start():
         })
 
     # Start the CherryPy server (remove trailing slash from webdir)
+    logger.info("Starting CherryPy")
     cherrypy.quickstart(htpc.ROOT, htpc.WEBDIR[:-1], config=app_config)

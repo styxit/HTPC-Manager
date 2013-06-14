@@ -12,6 +12,7 @@ import re
 from json import loads
 import cherrypy
 import htpc
+import logging
 
 
 class Updater:
@@ -78,18 +79,23 @@ class Updater:
 
     def check_github(self):
         """ Check for updates """
+        logger = logging.getLogger('htpc.updater')
+        logger.info("Checking for updates.")
         current = self.current_commit()
         latest = self.latest_commit()
         if current == latest:
+            logger.info("HTPC-Manager is Up-To-Date.")
             return (0, '')
         else:
             behind = self.commits_behind(current, latest)
+            logger.info("HTPC-Manager needs an update. Currently " + str(behind) + " commits behind")
             htpc.UPDATE = (behind, 'https://github.com/%s/%s/compare/%s...%s'
                     % (self.user, self.repo, current, latest))
             return htpc.UPDATE
 
     def git_update(self):
         """ Do update through git """
+        logger.info("Updating through git.")
         output, err = self.run_git('pull origin %s' % self.branch)
 
         if not output:

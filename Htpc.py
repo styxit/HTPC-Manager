@@ -8,7 +8,9 @@ start function to start the server.
 import os
 import sys
 import htpc
+import logging
 
+logger = None
 
 def parse_arguments():
     """ Get variables from commandline """
@@ -35,6 +37,7 @@ def parse_arguments():
 
 def load_modules():
     """ Import the system modules """
+    logger.debug("Importing System modules.")
     from htpc.root import Root
     htpc.ROOT = Root()
     from htpc.settings import Settings
@@ -60,6 +63,21 @@ def main():
     Main function is called at startup.
     """
 
+    #Initialize the logger
+    global logger 
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    logfh = logging.FileHandler('htpc_manager.log')
+    logfh.setLevel(logging.INFO)
+    logch = logging.StreamHandler()
+    logch.setLevel(logging.INFO)
+    logformatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    logfh.setFormatter(logformatter)
+    logch.setFormatter(logformatter)
+    logger.addHandler(logfh)
+    logger.addHandler(logch)
+    logger.info("Starting HTPC-Manager.")
+    
     # Set root and insert bundled libraies into path
     htpc.RUNDIR = os.path.dirname(os.path.abspath(sys.argv[0]))
     sys.path.insert(0, os.path.join(htpc.RUNDIR, 'libs'))
@@ -76,12 +94,14 @@ def main():
     if not os.path.isdir(htpc.DATADIR):
         os.makedirs(htpc.DATADIR)
     if not os.access(htpc.DATADIR, os.W_OK):
+        logger.error("Cannot write to datadir " + htpc.DATADIR)
         sys.exit("No write access to datadir")
 
     # Set default database and overwrite if supplied through commandline
     htpc.DB = os.path.join(htpc.DATADIR, 'database.db')
     if args.db:
         htpc.DB = args.db
+        logger.info("Connecting to database " + htpc.DB)
     # Initiate database connection
     sqlhub.processConnection = connectionForURI('sqlite:' + htpc.DB)
 
@@ -92,6 +112,7 @@ def main():
     htpc.WEBDIR = settings.get('app_webdir', '/')
     if args.webdir:
         htpc.WEBDIR = args.webdir
+        logger.info("Using context root " + htpc.WEBDIR)
     if not(htpc.WEBDIR.endswith('/')):
         htpc.WEBDIR += '/'
 
@@ -112,12 +133,17 @@ def main():
     if args.port:
         htpc.PORT = args.port
 
+    logger.info("Starting on " + htpc.HOST + ":" +  str(htpc.PORT))
     htpc.USERNAME = settings.get('app_username')
     htpc.PASSWORD = settings.get('app_password')
 
     htpc.DAEMON = False
     if args.daemon and sys.platform != 'win32':
+        logger.info("Setting up as a daemon.")
         htpc.DAEMON = True
+    
+    if args.daemon and sys.platform == 'win32':
+        logger.error("You are using Windows - I cannot setup daemon mode. Please use the pythonw executable instead.")
 
     htpc.PID = False
     if args.pid:
@@ -125,6 +151,8 @@ def main():
 
     htpc.DEBUG = False
     if args.debug:
+        logger.info("Enabling DEBUG-Messages")
+        logger.setLevel('debug')
         htpc.DEBUG = True
 
     from htpc.server import start

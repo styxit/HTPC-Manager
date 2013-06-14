@@ -2,6 +2,7 @@
 import os
 import hashlib
 import htpc
+import logging
 from cherrypy.lib.static import serve_file
 try:
     import Image
@@ -11,12 +12,12 @@ except ImportError:
 from urllib2 import Request, urlopen
 from cStringIO import StringIO
 
-
 def get_image(url, height=None, width=None, opacity=100, auth=None):
     """ Load image form cache if possible, else download. Resize if needed """
     # Create image directory if it doesnt exist
     imgdir = os.path.join(htpc.DATADIR, 'images/')
     if not os.path.exists(imgdir):
+        logger.debug("Creating image directory at " + imgdir)
         os.makedirs(imgdir)
 
     # Create a hash of the path to use as filename
@@ -26,21 +27,21 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
     image = os.path.join(imgdir, imghash)
 
     # If there is no local copy of the original
-    if not os.path.isfile(image + '.jpg'):
+    if not os.path.isfile(image):
         download_image(url, image, auth)
 
     # Check if resize is needed
     if height and width:
         # Set filename for resized file
-        resized = image + '_w' + width + '_h' + height + '_o' + str(opacity)
+        resized = image + '_' + width + '_' + height
         # If there is no local resized copy
-        if not os.path.isfile(resized + '.jpg'):
+        if not os.path.isfile(resized):
             resize_image(image, height, width, opacity, resized)
         # Serve the resized file
         image = resized
 
     # Load file from disk
-    return serve_file(path=image + '.jpg', content_type='image/jpeg')
+    return serve_file(path=image + '.png', content_type='image/png')
 
 
 def download_image(url, dest, auth=None):
@@ -50,23 +51,16 @@ def download_image(url, dest, auth=None):
         request.add_header("Authorization", "Basic %s" % auth)
     data = StringIO(urlopen(request).read())
     im = Image.open(data)
-    im.save(dest + '.jpg', 'JPEG', quality=95)
+    im.save(dest + '.png', 'PNG')
 
 
 def resize_image(img, height, width, opacity, dest):
     """ Resize image, set opacity and save to disk """
     size = int(width), int(height)
-    im = Image.open(img + '.jpg')
-    im = im.resize(size, Image.ANTIALIAS)
-
-    # Apply overlay if opacity is set
-    opacity = float(opacity)
-    if (opacity < 100):
-        enhance = opacity / 100
-        # Create white overlay image
-        overlay = Image.new('RGB', size, '#FFFFFF')
-        #apply overlay to resized image
-        im = Image.blend(overlay, im, enhance)
-
-    im.save(dest + '.jpg', 'JPEG', quality=95)
+    enhance = float(opacity) / 100
+    im = Image.open(img + '.png')
+    im = im.resize(size, Image.ANTIALIAS).convert('RGBA')
+    alpha = ImageEnhance.Brightness(im.split()[3]).enhance(enhance)
+    im.putalpha(alpha)
+    im.save(dest + '.png', 'PNG')
     return dest
