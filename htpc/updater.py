@@ -22,7 +22,7 @@ class Updater:
         self.user = 'styxit'
         self.repo = 'htpc-manager'
         self.branch = 'master'
-        logger = logging.getLogger('htpc.updater')
+        self.logger = logging.getLogger('htpc.updater')
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -80,27 +80,27 @@ class Updater:
 
     def check_github(self):
         """ Check for updates """
-        logger.info("Checking for updates.")
+        self.logger.info("Checking for updates.")
         current = self.current_commit()
         latest = self.latest_commit()
         if current == latest:
-            logger.info("HTPC-Manager is Up-To-Date.")
+            self.logger.info("HTPC-Manager is Up-To-Date.")
             return (0, '')
         else:
             behind = self.commits_behind(current, latest)
-            logger.info("HTPC-Manager needs an update. Currently " + str(behind) + " commits behind")
+            self.logger.info("Currently " + str(behind) + " commits behind")
             htpc.UPDATE = (behind, 'https://github.com/%s/%s/compare/%s...%s'
                     % (self.user, self.repo, current, latest))
             return htpc.UPDATE
 
     def git_update(self):
         """ Do update through git """
-        logger.info("Updating through git.")
+        self.logger.info("Updating through git.")
         output, err = self.run_git('pull origin %s' % self.branch)
 
         if not output:
-            logger.error("Unable to update through git. Make sure that git is located in your path and can be accessed by this application.")
-            logger.error("Message received by system: " + err)
+            self.logger.error("Unable to update through git. Make sure that git is located in your path and can be accessed by this application.")
+            self.logger.error("Message received by system: " + err)
             return err            
 
         for line in output.split('\n'):
@@ -113,31 +113,31 @@ class Updater:
 
     def tar_update(self):
         """ Do update from tar file """
-        logger.info("Trying update through tar-download")
+        self.logger.info("Trying update through tar-download")
         tar_file = os.path.join(htpc.RUNDIR, '%s.tar.gz' % self.repo)
         update_folder = os.path.join(htpc.RUNDIR, 'update')
 
         try:
-            logger.debug("Downloading from https://github.com/%s/%s/tarball/%s"
+            self.logger.debug("Downloading from https://github.com/%s/%s/tarball/%s"
                     % (self.user, self.repo, self.branch))
-            logger.debug("Downloading to " + tar_file)
+            self.logger.debug("Downloading to " + tar_file)
             url = urllib2.urlopen('https://github.com/%s/%s/tarball/%s'
                     % (self.user, self.repo, self.branch))
             file_obj = open(tar_file, 'wb')
             file_obj.write(url.read())
             file_obj.close()
         except:
-            logger.error("Unable to fetch tar-file. Aborting and removing left overs.")
+            self.logger.error("Unable to fetch tar-file. Aborting and removing left overs.")
             self.remove_update_files()
             return False
 
         try:
-            logger.debug("Extracting tar file to " + update_folder)
+            self.logger.debug("Extracting tar file to " + update_folder)
             tar = tarfile.open(tar_file)
             tar.extractall(update_folder)
             tar.close()
         except:
-            logger.error("Unable to extract tar-file. Aborting and removing left overs.")
+            self.logger.error("Unable to extract tar-file. Aborting and removing left overs.")
             self.remove_update_files()
             return False
 
@@ -146,7 +146,7 @@ class Updater:
                 % (self.user, self.repo, latest[:7]))
 
         try:
-            logger.debug("Replacing the old files with the updated files.")
+            self.logger.debug("Replacing the old files with the updated files.")
             for src_dir, dirs, files in os.walk(root_src_dir):
                 dst_dir = src_dir.replace(root_src_dir, htpc.RUNDIR)
                 if not os.path.exists(dst_dir):
@@ -158,11 +158,11 @@ class Updater:
                         os.remove(dst_file)
                     shutil.move(src_file, dst_dir)
         except:
-            logger.debug("Unable to replace the old files. Aborting and removing left overs.")
+            self.logger.debug("Unable to replace the old files. Aborting and removing left overs.")
             self.remove_update_files()
             return False
 
-        logger.debug("Update successful. Removing left overs.")
+        self.logger.debug("Update successful. Removing left overs.")
         self.remove_update_files()
         return True
 

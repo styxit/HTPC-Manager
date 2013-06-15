@@ -71,8 +71,8 @@ def start():
 
     
 
-    # Silence cherrypy to errors only
-    # Somehow we have to define a logger for the access logs first
+    # When in INFO-mode, cherrypy will print out a ton of access messages
+    # Need a way to find out why it isn't logging in the level which is set for it
     if not htpc.DEBUG:
         logging.getLogger('cherrypy.error').setLevel(logging.ERROR)
         logger = logging.getLogger('cherrypy.access')
