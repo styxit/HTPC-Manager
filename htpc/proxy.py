@@ -2,6 +2,7 @@
 import os
 import hashlib
 import htpc
+import logging
 from cherrypy.lib.static import serve_file
 try:
     import Image
@@ -11,12 +12,13 @@ except ImportError:
 from urllib2 import Request, urlopen
 from cStringIO import StringIO
 
-
 def get_image(url, height=None, width=None, opacity=100, auth=None):
     """ Load image form cache if possible, else download. Resize if needed """
+    logger = logging.getLogger('htpc.proxy')
     # Create image directory if it doesnt exist
     imgdir = os.path.join(htpc.DATADIR, 'images/')
     if not os.path.exists(imgdir):
+        logger.debug("Creating image directory at " + imgdir)
         os.makedirs(imgdir)
 
     # Create a hash of the path to use as filename
@@ -27,6 +29,7 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
 
     # If there is no local copy of the original
     if not os.path.isfile(image + '.jpg'):
+        logger.debug("No local image found for " + image + ". Downloading")
         download_image(url, image, auth)
 
     # Check if resize is needed
@@ -46,8 +49,12 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
 def download_image(url, dest, auth=None):
     """ Download image and save to disk """
     request = Request(url)
+    logger = logging.getLogger('htpc.proxy')
+    logger.debug("Downloading image from " + url + " to " + dest)
+    
     if (auth):
         request.add_header("Authorization", "Basic %s" % auth)
+    
     data = StringIO(urlopen(request).read())
     im = Image.open(data)
     im.save(dest + '.jpg', 'JPEG', quality=95)

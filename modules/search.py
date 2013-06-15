@@ -5,9 +5,11 @@ from urllib import urlencode
 from urllib2 import urlopen, quote
 from re import findall
 from json import loads
+import logging
 
 class Search:
     def __init__(self):
+        self.logger = logging.getLogger('modules.search')
         htpc.MODULES.append({
             'name': 'Newznab',
             'id': 'nzbsearch',
@@ -25,6 +27,7 @@ class Search:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def ping(self, newznab_host, newznab_apikey, **kwargs):
+        self.logger.debug("Pinging newznab-host")
         return 1
 
     @cherrypy.expose()
@@ -32,12 +35,18 @@ class Search:
         if url.startswith('rageid'):
             settings = htpc.settings.Settings()
             host = settings.get('newznab_host', '')
-            url = 'http://' + host + '/covers/tv/' + url[6:] + '.jpg'
+            
+            if 'http://' in host:
+                url = host + '/covers/tv/' + url[6:] + '.jpg'
+            else:
+                url = 'http://' + host + '/covers/tv/' + url[6:] + '.jpg'
+
         return get_image(url, h, w, o)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def getcategories(self, **kwargs):
+        self.logger.debug("Fetching available categories")
         return self.fetch('caps')['categories']
 
     @cherrypy.expose()
@@ -52,12 +61,18 @@ class Search:
             return result
 
     def fetch(self, cmd):
-        settings = htpc.settings.Settings()
-        host = settings.get('newznab_host', '')
-        apikey = settings.get('newznab_apikey', '')
-        url = 'http://' + host + '/api?o=json&apikey=' + apikey + '&t=' + cmd
-        return loads(urlopen(url, timeout=10).read())
         try:
-            return
+            settings = htpc.settings.Settings()
+            host = settings.get('newznab_host', '')
+            apikey = settings.get('newznab_apikey', '')
+
+            if 'http://' in host:
+                url = host + '/api?o=json&apikey=' + apikey + '&t=' + cmd
+            else:
+                url = 'http://' + host + '/api?o=json&apikey=' + apikey + '&t=' + cmd
+            
+            self.logger.debug("Fetching information from: " + url)
+            return loads(urlopen(url, timeout=10).read())
         except:
+            self.logger.error("Unable to fetch information from: " + url)
             return
