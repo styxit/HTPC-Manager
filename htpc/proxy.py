@@ -29,6 +29,7 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
 
     # If there is no local copy of the original
     if not os.path.isfile(image + '.jpg'):
+        logger.debug("No local image found for " + image + ". Downloading")
         download_image(url, image, auth)
 
     # Check if resize is needed
@@ -48,8 +49,12 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
 def download_image(url, dest, auth=None):
     """ Download image and save to disk """
     request = Request(url)
+    logger = logging.getLogger('htpc.proxy')
+    logger.debug("Downloading image from " + url + " to " + dest)
+    
     if (auth):
         request.add_header("Authorization", "Basic %s" % auth)
+    
     data = StringIO(urlopen(request).read())
     im = Image.open(data)
     im.save(dest + '.jpg', 'JPEG', quality=95)

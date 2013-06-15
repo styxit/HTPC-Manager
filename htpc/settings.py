@@ -2,6 +2,7 @@
 import os
 import cherrypy
 import htpc
+import logging
 from sqlobject import SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol
 
@@ -18,6 +19,7 @@ class Settings:
     def __init__(self):
         """ Create table on load if table doesnt exist """
         Setting.createTable(ifNotExists=True)
+        self.logger = logging.getLogger('htpc.settings')
 
     @cherrypy.expose()
     def index(self, **kwargs):
@@ -37,6 +39,7 @@ class Settings:
                 return False
             return val
         except SQLObjectNotFound:
+            self.logger.debug("Unable to find the selected object: " + key)
             return defval
 
     def set(self, key, val):
@@ -44,7 +47,9 @@ class Settings:
         try:
             setting = Setting.selectBy(key=key).getOne()
             setting.val = val
+            self.logger.debug("Saving settings to the database.")
         except SQLObjectNotFound:
+            self.logger.error("Unable to save settings to the database.")
             Setting(key=key, val=val)
 
     def get_templates(self):

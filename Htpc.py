@@ -32,12 +32,13 @@ def parse_arguments():
                         help='Print debug text')
     parser.add_argument('--webdir', default=None,
                         help='Use a custom webdir')
+    parser.add_argument('--loglevel', default=None,
+                        help='Set a loglevel. Allowed values: DEBUG, INFO, WARNING, ERROR, CRITICAL')
     return parser.parse_args()
 
 
 def load_modules():
     """ Import the system modules """
-    logger.debug("Importing System modules.")
     from htpc.root import Root
     htpc.ROOT = Root()
     from htpc.settings import Settings
@@ -62,30 +63,70 @@ def main():
     """
     Main function is called at startup.
     """
-
     #Initialize the logger
-    global logger 
+    global logger
     logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
-    logfh = logging.FileHandler('htpc_manager.log')
-    logfh.setLevel(logging.INFO)
     logch = logging.StreamHandler()
-    logch.setLevel(logging.INFO)
-    logformatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    logfh.setFormatter(logformatter)
+    logfh = logging.FileHandler('htpc_manager.log')
+
+    logformatter = logging.Formatter('%(asctime)s :: %(name)s :: %(levelname)s :: %(message)s')
+    logfh.setFormatter(logformatter)    
     logch.setFormatter(logformatter)
+
+    args = parse_arguments()
+    loginfo = 'ERROR'
+    # Set a custom loglevel if supplied via the command line
+    if args.loglevel:
+        loglevels = ['DEBUG','INFO','WARNING','ERROR','CRITICAL']
+        if args.loglevel in loglevels:
+            if args.loglevel == 'DEBUG':
+                logger.setLevel(logging.DEBUG)
+                logch.setLevel(logging.DEBUG)
+                logfh.setLevel(logging.DEBUG)
+                loginfo = 'DEBUG'
+            elif args.loglevel == 'INFO':
+                logger.setLevel(logging.INFO)
+                logch.setLevel(logging.INFO)
+                logfh.setLevel(logging.INFO)
+                loginfo = 'INFO'
+            elif args.loglevel == 'WARNING':
+                logger.setLevel(logging.WARNING)
+                logch.setLevel(logging.WARNING)
+                logfh.setLevel(logging.WARNING)
+                loginfo = 'WARNING'
+            elif args.loglevel == 'ERROR':
+                logger.setLevel(logging.ERROR)
+                logch.setLevel(logging.ERROR)
+                logfh.setLevel(logging.ERROR)
+                loginfo = 'ERROR'
+            elif args.loglevel == 'CRITICAL':
+                logger.setLevel(logging.CRITICAL)
+                logch.setLevel(logging.CRITICAL)
+                logfh.setLevel(logging.CRITICAL)
+                loginfo = 'CRITICAL'
+        else:
+            logger.setLevel(logging.ERROR)
+            logch.setLevel(logging.ERROR)
+            logfh.setLevel(logging.ERROR)
+    else:
+        logger.setLevel(logging.ERROR)
+        logch.setLevel(logging.ERROR)
+        logfh.setLevel(logging.ERROR)
+    
     logger.addHandler(logfh)
     logger.addHandler(logch)
-    logger.info("Starting HTPC-Manager.")
     
+    logger.critical("------------------------")
+    logger.critical("Welcome to HTPC-Manager!")
+    logger.critical("------------------------")
+    logger.critical("Loglevel set to " + loginfo)
+
     # Set root and insert bundled libraies into path
     htpc.RUNDIR = os.path.dirname(os.path.abspath(sys.argv[0]))
     sys.path.insert(0, os.path.join(htpc.RUNDIR, 'libs'))
 
     from sqlobject import connectionForURI, sqlhub
-    from mako.lookup import TemplateLookup
-
-    args = parse_arguments()
+    from mako.lookup import TemplateLookup    
 
     # Set datadir, create if it doesn't exist and exit if it isn't writable.
     htpc.DATADIR = os.path.join(htpc.RUNDIR, 'userdata/')
@@ -139,11 +180,12 @@ def main():
 
     htpc.DAEMON = False
     if args.daemon and sys.platform != 'win32':
-        logger.info("Setting up as a daemon.")
+        logger.info("Setting up daemon-mode")
         htpc.DAEMON = True
     
     if args.daemon and sys.platform == 'win32':
         logger.error("You are using Windows - I cannot setup daemon mode. Please use the pythonw executable instead.")
+        logger.error("More information at http://docs.python.org/2/using/windows.html.")
 
     htpc.PID = False
     if args.pid:
