@@ -98,7 +98,7 @@ $(document).ready(function() {
     });
 
     $(window).scroll(function() {
-        if($(window).scrollTop() + $(window).height() >= $(document).height() - 10) {
+        if(!allMoviesLoaded && !moviesLoading && $(window).scrollTop() + $(window).height() >= $(document).height() - 10) {
             if ($('#movies').is(':visible')) {
                 loadMovies({
                     sortorder: $('.active-sortorder').attr('data-sortorder'),
