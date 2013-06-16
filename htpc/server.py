@@ -41,18 +41,41 @@ def start():
             'tools.gzip.on': True
         },
         '/js': {
+            'tools.caching.on' : True,
+            'tools.caching.force' : True,
+            'tools.caching.delay' : 0,
+            'tools.expires.on' : True,
+            'tools.expires.secs' : 60*60*6,
             'tools.staticdir.on': True,
             'tools.staticdir.dir': 'js'
         },
         '/css': {
+            'tools.caching.on' : True,
+            'tools.caching.force' : True,
+            'tools.caching.delay' : 0,
+            'tools.expires.on' : True,
+            'tools.expires.secs' : 60*60*6,
+            'tools.staticdir.on': True,
             'tools.staticdir.on': True,
             'tools.staticdir.dir': 'css'
         },
         '/img': {
+            'tools.caching.on' : True,
+            'tools.caching.force' : True,
+            'tools.caching.delay' : 0,
+            'tools.expires.on' : True,
+            'tools.expires.secs' : 60*60*6,
+            'tools.staticdir.on': True,
             'tools.staticdir.on': True,
             'tools.staticdir.dir': 'img'
         },
         '/favicon.ico': {
+            'tools.caching.on' : True,
+            'tools.caching.force' : True,
+            'tools.caching.delay' : 0,
+            'tools.expires.on' : True,
+            'tools.expires.secs' : 60*60*6,
+            'tools.staticdir.on': True,
             'tools.staticfile.on': True,
             'tools.staticfile.filename': favicon
         }
@@ -69,7 +92,7 @@ def start():
             'tools.auth_digest.key': 'a565c27146791cfb'
         })
 
-    
+
 
     # When in INFO-mode, cherrypy will print out a ton of access messages
     # Need a way to find out why it isn't logging in the level which is set for it

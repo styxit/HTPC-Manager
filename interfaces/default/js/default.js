@@ -1,23 +1,4 @@
-var scriptArray = [
-    WEBDIR + 'js/libs/bootstrap.min.js',
-    WEBDIR + 'js/libs/jquery.form.js',
-    WEBDIR + 'js/libs/jquery.cookie.js',
-    WEBDIR + 'js/libs/jquery.metadata.js',
-    WEBDIR + 'js/libs/jquery.tablesorter.min.js',
-    WEBDIR + 'js/libs/jquery.raty.min.js',
-    WEBDIR + 'js/libs/jquery.pnotify.min.js',
-    WEBDIR + 'js/libs/holder.js',
-    WEBDIR + 'js/functions/functions.xbmc.js',
-    WEBDIR + 'js/functions/functions.sickbeard.js',
-    WEBDIR + 'js/functions/functions.sabnzbd.js'
-];
-
-$.each(scriptArray, function (i, url) {
-    var script = $('<script>').attr('src', url);
-    $('head').append(script);
-});
-
-$.ajaxSetup({timeout: 5000})
+$.ajaxSetup({timeout: 5000});
 
 $(document).ready(function () {
     path = window.location.pathname.split('/');
