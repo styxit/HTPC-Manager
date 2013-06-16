@@ -56,7 +56,6 @@ def start():
             'tools.expires.on' : True,
             'tools.expires.secs' : 60*60*6,
             'tools.staticdir.on': True,
-            'tools.staticdir.on': True,
             'tools.staticdir.dir': 'css'
         },
         '/img': {
@@ -66,7 +65,6 @@ def start():
             'tools.expires.on' : True,
             'tools.expires.secs' : 60*60*6,
             'tools.staticdir.on': True,
-            'tools.staticdir.on': True,
             'tools.staticdir.dir': 'img'
         },
         '/favicon.ico': {
@@ -75,7 +73,6 @@ def start():
             'tools.caching.delay' : 0,
             'tools.expires.on' : True,
             'tools.expires.secs' : 60*60*6,
-            'tools.staticdir.on': True,
             'tools.staticfile.on': True,
             'tools.staticfile.filename': favicon
         }
