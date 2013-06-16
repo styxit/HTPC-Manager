@@ -18,24 +18,33 @@ html, body {
     -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
     box-shadow: 0 1px 2px rgba(0,0,0,.15);
 }
-.span4 thead {
-    display: none;
-}
 @media (min-width: 980px) {
     .content {
         margin: 0 0 20px 0;
         padding-top: 60px;
     }
 }
+.span4 thead {
+    display: none;
+}
+.right {
+    text-align: right !important;
+}
 
-/*
- * Prevent overflow on dashboard tables
- */
-.dashboard .span4 td{
-    overflow:hidden;
+.movie-poster {
+    height: 300px;
+    width: 200px;
+}
+.dashboard .albumart {
+    height: 45px;
+    width: 45px;
 }
 .dashboard .span4 table{
     table-layout: fixed;
+}
+.dashboard .span4 td{
+    overflow: hidden;
+    white-space: nowrap;
 }
 .dashboard .span4 #downloads_table_body td:last-child {
     width: 14px;
@@ -149,6 +158,10 @@ h6.movie-title, h6.show-title, h6.album-title {
 #show-seasons .thumbnail,
 #show-season .thumbnail img {
     height: 85px;
+    width: 150px;
+}
+.artist-albums .albumart {
+    height: 150px;
     width: 150px;
 }
 .modal-movieinfo {

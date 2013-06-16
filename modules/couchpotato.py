@@ -44,7 +44,7 @@ class Couchpotato:
             return
 
     @cherrypy.expose()
-    def GetImage(self, url, h=None, w=None, o=None):
+    def GetImage(self, url, h=None, w=None, o=100):
         return get_image(url, h, w, o)
 
     @cherrypy.expose()
