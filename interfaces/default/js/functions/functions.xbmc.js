@@ -87,8 +87,11 @@ function loadMovies(options) {
 }
 
 function xbmcShowMovie(movie) {
+    var modalMoviePoster = $('<img>').attr('src', WEBDIR + 'xbmc/GetThumb?w=200&h=300&thumb='+encodeURIComponent(movie.thumbnail));
+    modalMoviePoster.addClass('movie-poster')
+
     var modalMovieAnchor = $('<div>').addClass('thumbnail pull-left');
-    modalMovieAnchor.append($('<img>').attr('src', WEBDIR + 'xbmc/GetThumb?w=200&h=300&thumb='+encodeURIComponent(movie.thumbnail)));
+    modalMovieAnchor.append(modalMoviePoster);
 
     var modalMovieInfo = $('<div>').addClass('modal-movieinfo');
     if(movie.streamdetails && movie.streamdetails.video[0]) {
@@ -340,7 +343,7 @@ function xbmcLoadAlbums(artistid){
         if (album.thumbnail == '') {
          li.append($('<img>').attr('src', '?holder.js/150x150/text:'+album.label).attr('title', album.label).addClass('img-rounded img-polaroid'));
         } else {
-          li.append($('<img>').attr('src', WEBDIR + 'xbmc/GetThumb?w=150&h=150&thumb='+encodeURIComponent(album.thumbnail)).attr('title', album.label).addClass('img-rounded img-polaroid'));
+          li.append($('<img>').attr('src', WEBDIR + 'xbmc/GetThumb?w=150&h=150&thumb='+encodeURIComponent(album.thumbnail)).attr('title', album.label).addClass('img-rounded img-polaroid albumart'));
         }
         li.append($('<h6>').addClass('album-title').html(shortenText(album.label, 21)));
         albumContainer.append(li);
