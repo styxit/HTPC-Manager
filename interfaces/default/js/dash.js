@@ -75,45 +75,25 @@ function loadRecentAlbums () {
                 
                 // Frodo fix artist is now a list. Use the first.
                 if($.isArray(album.artist)) album.artist = album.artist[0]
+                year = '';
+                if (album.year != '0') {
+                    year = ' (' + album.year + ')';
+                }
                 
                 var row = $('<div>').addClass('media');
                 row.append(
-                  $('<a>').addClass('pull-left').attr('href', '#').append(
+                  $('<a>').addClass('pull-left albumart').attr('href', '#').append(
                     $('<img>').addClass('media-object').attr('src', imageSrc)
                   ),
                   $('<div>').addClass('media-body').append(
-                    $('<h5>').addClass('media-heading').html(album.label),
-                    album.artist + ' - ' + album.label + ' ',
-                    $('<b>').text(album.year)
+                    $('<h5>').addClass('media-heading').html(album.label + year),
+                    album.artist
                   )
                 ); 
                 $('#albums-content').append(row);       
             });
             
             Holder.run();
-        }
-    });
-}
-
-function loadWantedMovies(limit) {
-    $.ajax({
-        url: WEBDIR + 'couchpotato/GetMovieList?limit='+limit,
-        type: 'get',
-        dataType: 'json',
-        success: function (result) {
-            if (result == null) {
-                var row = $('<tr>')
-                row.append($('<td>').html('No wanted movies found').attr('colspan', '2'));
-                $('#wantedmovies_table_body').append(row);
-                return false;
-            }
-            $.each(result.movies, function(i, item) {
-                var row = $('<tr>');
-                row.append($('<td>').html(item.library.info.original_title));
-                row.append($('<td>').html(item.library.year));
-
-                $('#wantedmovies_table_body').append(row);
-            });
         }
     });
 }
@@ -136,6 +116,29 @@ function loadDownloadHistory() {
                 row.append($('<td>').html(slot.name).attr('title', slot.name));
                 row.append($('<td>').html(status));
                 $('#downloads_table_body').append(row);
+            });
+        }
+    });
+}
+
+function loadWantedMovies(limit) {
+    $.ajax({
+        url: WEBDIR + 'couchpotato/GetMovieList?limit='+limit,
+        type: 'get',
+        dataType: 'json',
+        success: function (result) {
+            if (result == null) {
+                var row = $('<tr>')
+                row.append($('<td>').html('No wanted movies found').attr('colspan', '2'));
+                $('#wantedmovies_table_body').append(row);
+                return false;
+            }
+            $.each(result.movies, function(i, item) {
+                var row = $('<tr>');
+                row.append($('<td>').html(item.library.info.original_title));
+                row.append($('<td>').addClass('right').html(item.library.year));
+
+                $('#wantedmovies_table_body').append(row);
             });
         }
     });
