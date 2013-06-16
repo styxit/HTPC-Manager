@@ -2,11 +2,14 @@
 import os
 import cherrypy
 import htpc
+import logging
 from cherrypy.process.plugins import Daemonizer, PIDFile
-
 
 def start():
     """ Main function for starting HTTP server """
+    logger = logging.getLogger('htpc.server')
+    logger.debug("Setting up to start cherrypy")
+
     # Set server ip, port and root
     cherrypy.config.update({
         'server.socket_host': htpc.HOST,
@@ -56,6 +59,7 @@ def start():
     }
     # Require username and password if they are set
     if htpc.USERNAME and htpc.PASSWORD:
+        logger.debug("Enabling username/password access")
         userpassdict = {htpc.USERNAME: htpc.PASSWORD}
         get_ha1 = cherrypy.lib.auth_digest.get_ha1_dict_plain(userpassdict)
         app_config['/'].update({
@@ -65,5 +69,21 @@ def start():
             'tools.auth_digest.key': 'a565c27146791cfb'
         })
 
+    
+
+    # When in INFO-mode, cherrypy will print out a ton of access messages
+    # Need a way to find out why it isn't logging in the level which is set for it
+    if not htpc.DEBUG:
+        logging.getLogger('cherrypy.error').setLevel(logging.ERROR)
+        logger = logging.getLogger('cherrypy.access')
+        logger.setLevel(logging.ERROR)
+        cherrypy.log.access_log = logger
+    else:
+        logging.getLogger('cherrypy.error').setLevel(logging.DEBUG)
+        logger = logging.getLogger('cherrypy.access')
+        logger.setLevel(logging.DEBUG)
+        cherrypy.log.access_log = logger
+
     # Start the CherryPy server (remove trailing slash from webdir)
+    logger.info("Starting up webserver")
     cherrypy.quickstart(htpc.ROOT, htpc.WEBDIR[:-1], config=app_config)
