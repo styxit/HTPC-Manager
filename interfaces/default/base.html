@@ -47,16 +47,19 @@ webdir = htpc.WEBDIR
                     <form class="navbar-form pull-right">
                     %endif
                     <input type="text" name="query" id="search" class="span3" accesskey="s" placeholder="Search">
-                        <span class="dropdown">
-                            <button type="button" class="btn" data-toggle="dropdown"><i class="icon-cog"></i></button>
-                            <ul class="dropdown-menu pull-right">
-                                <li><a href="http://github.com/styxit/HTPC-Manager"><i class="icon-github"></i> Github project</a></li>
-                                <li><a href="#" id="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
-                                <li><a href="${webdir}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
-                                <li><a href="#" id="btn-restart"><i class="icon-refresh"></i> Restart</a></li>
-                                <li><a href="#" id="btn-shutdown"><i class="icon-off"></i> Shutdown</a></li>
-                            </ul>
-                        </span>
+                        <div class="btn-group">
+                          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="icon-cogs"></i>
+                            <span class="caret"></span>
+                          </a>
+                          <ul class="dropdown-menu pull-right">
+                            <li><a href="http://github.com/styxit/HTPC-Manager"><i class="icon-github"></i> Github project</a></li>
+                            <li><a href="#" id="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
+                            <li><a href="${webdir}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
+                            <li><a href="#" id="btn-restart"><i class="icon-refresh"></i> Restart</a></li>
+                            <li><a href="#" id="btn-shutdown"><i class="icon-off"></i> Shutdown</a></li>
+                          </ul>
+                        </div>
                     </form>
                 </div>
             </div>
