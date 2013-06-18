@@ -525,7 +525,7 @@ class Xbmc:
         self.logger.debug("Fetching recently added TV Shows")
         try:
             xbmc = Server(self.url('/jsonrpc', True))
-            properties = ['episode', 'season', 'thumbnail', 'plot', 'fanart', 'title', 'file']
+            properties = ['showtitle', 'season', 'episode', 'title', 'thumbnail', 'plot', 'fanart', 'file']
             limits = {'start': 0, 'end': int(limit)}
             return xbmc.VideoLibrary.GetRecentlyAddedEpisodes(properties=properties, limits=limits)
         except:
