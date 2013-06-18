@@ -24,8 +24,8 @@ function loadRecentMovies () {
                 var itemCaption = $('<div>').addClass('carousel-caption').click(function() {
                     xbmcShowMovie(movie);
                 });
-                itemCaption.append($('<h4>').html(movie.title));
-                itemCaption.append($('<p>').html(shortenText(movie.plot, 90)));
+                itemCaption.append($('<h4>').html(movie.title + ' (' + movie.year + ')'));
+                itemCaption.append($('<p>').html(movie.plot));
                 itemDiv.append(itemCaption);
                 $('#movie-carousel .carousel-inner').append(itemDiv);
             });
@@ -42,15 +42,16 @@ function loadRecentTVshows () {
             if (data == null) return;
             $('#tvshow-carousel').show();
             $.each(data.episodes, function (i, episode) {
-                var epTitle = episode.label;
-                var itemDiv = $('<div>').addClass('item');
+                var epTitle = episode.showtitle + ': ' + episode.season + 'x' + episode.episode + ' - ' + episode.title;
+                var epTitle = episode.showtitle + ': ' + episode.label;
+                var itemDiv = $('<div>').addClass('item ');
                 if (i == 0) itemDiv.addClass('active');
                 itemDiv.attr('style', "background-image: url(" + WEBDIR + "xbmc/GetThumb?h=240&w=430&thumb="+encodeURIComponent(episode.fanart)+ ");");
                 var itemCaption = $('<div>').addClass('carousel-caption').click(function() {
                     xbmcShowEpisode(episode)
                 });
                 itemCaption.append($('<h4>').html(epTitle));
-                itemCaption.append($('<p>').html(shortenText(episode.plot, 90)));
+                itemCaption.append($('<p>').html(episode.plot));
                 itemDiv.append(itemCaption);
                 $('#tvshow-carousel .carousel-inner').append(itemDiv);
             });
