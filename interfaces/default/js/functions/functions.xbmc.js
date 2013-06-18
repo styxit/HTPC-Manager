@@ -246,13 +246,15 @@ function xbmcShowEpisode(episode) {
     modalshowAnchor.css('margin-right', '20px')
     modalshowAnchor.append(modalshowPicture);
 
+    var modalHeader = episode.showtitle + ': ' + episode.label
+
     var modalPlot = $('<p>').html(episode.plot);
 
     var modalEpisodeInfo = $('<div>');
     modalEpisodeInfo.append(modalshowAnchor);
     modalEpisodeInfo.append(modalPlot);
 
-    showModal(episode.label, modalEpisodeInfo, {
+    showModal(modalHeader, modalEpisodeInfo, {
         'Play' : function () {
             playItem(episode.file);
             hideModal();

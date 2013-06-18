@@ -31,6 +31,16 @@ html, body {
     text-align: right !important;
 }
 
+.carousel-caption p {
+    display: none;
+    font-size: smaller;
+    height: 60px;
+    overflow: hidden;
+}
+.carousel:hover .carousel-caption p {
+    display: block;
+}
+
 .movie-poster {
     height: 300px;
     width: 200px;
