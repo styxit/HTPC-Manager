@@ -25,7 +25,10 @@ function loadRecentMovies () {
                     xbmcShowMovie(movie);
                 });
                 itemCaption.append($('<h4>').html(movie.title + ' (' + movie.year + ')'));
-                itemCaption.append($('<p>').html(movie.plot));
+                itemCaption.append($('<p>').html(movie.plot).hide());
+                itemCaption.hover(function() {
+                    $(this).children('p').slideToggle();
+                });
                 itemDiv.append(itemCaption);
                 $('#movie-carousel .carousel-inner').append(itemDiv);
             });
@@ -50,7 +53,10 @@ function loadRecentTVshows () {
                     xbmcShowEpisode(episode)
                 });
                 itemCaption.append($('<h4>').html(epTitle));
-                itemCaption.append($('<p>').html(episode.plot));
+                itemCaption.append($('<p>').html(episode.plot).hide());
+                itemCaption.hover(function() {
+                    $(this).children('p').slideToggle();
+                });
                 itemDiv.append(itemCaption);
                 $('#tvshow-carousel .carousel-inner').append(itemDiv);
             });
@@ -136,7 +142,7 @@ function loadWantedMovies(limit) {
             $.each(result.movies, function(i, item) {
                 var row = $('<tr>');
                 row.append($('<td>').html(item.library.info.original_title));
-                row.append($('<td>').addClass('right').html(item.library.year));
+                row.append($('<td>').addClass('alignright').html(item.library.year));
 
                 $('#wantedmovies_table_body').append(row);
             });
