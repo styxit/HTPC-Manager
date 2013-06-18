@@ -42,7 +42,6 @@ function loadRecentTVshows () {
             if (data == null) return;
             $('#tvshow-carousel').show();
             $.each(data.episodes, function (i, episode) {
-                var epTitle = episode.showtitle + ': ' + episode.season + 'x' + episode.episode + ' - ' + episode.title;
                 var epTitle = episode.showtitle + ': ' + episode.label;
                 var itemDiv = $('<div>').addClass('item ');
                 if (i == 0) itemDiv.addClass('active');
