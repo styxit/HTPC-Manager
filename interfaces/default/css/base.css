@@ -27,18 +27,14 @@ html, body {
 .span4 thead {
     display: none;
 }
-.right {
+.alignright {
     text-align: right !important;
 }
 
 .carousel-caption p {
-    display: none;
     font-size: smaller;
     height: 60px;
     overflow: hidden;
-}
-.carousel:hover .carousel-caption p {
-    display: block;
 }
 
 .movie-poster {
