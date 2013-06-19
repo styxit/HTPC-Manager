@@ -63,17 +63,32 @@ def main():
     """
     Main function is called at startup.
     """
+    # Parse runtime arguments
+    args = parse_arguments()
+
+    # Set root and insert bundled libraies into path
+    htpc.RUNDIR = os.path.dirname(os.path.abspath(sys.argv[0]))
+    sys.path.insert(0, os.path.join(htpc.RUNDIR, 'libs'))
+
+    # Set datadir, create if it doesn't exist and exit if it isn't writable.
+    htpc.DATADIR = os.path.join(htpc.RUNDIR, 'userdata/')
+    if args.datadir:
+        htpc.DATADIR = args.datadir
+    if not os.path.isdir(htpc.DATADIR):
+        os.makedirs(htpc.DATADIR)
+    if not os.access(htpc.DATADIR, os.W_OK):
+        sys.exit("No write access to userdata folder")
+
     #Initialize the logger
     global logger
     logger = logging.getLogger()
     logch = logging.StreamHandler()
-    logfh = logging.FileHandler('htpc_manager.log')
+    logfh = logging.FileHandler(os.path.join(htpc.DATADIR, 'htpcmanager.log'))
 
     logformatter = logging.Formatter('%(asctime)s :: %(name)s :: %(levelname)s :: %(message)s')
-    logfh.setFormatter(logformatter)    
+    logfh.setFormatter(logformatter)
     logch.setFormatter(logformatter)
 
-    args = parse_arguments()
     loginfo = 'ERROR'
     # Set a custom loglevel if supplied via the command line
     if args.loglevel:
@@ -112,31 +127,17 @@ def main():
         logger.setLevel(logging.ERROR)
         logch.setLevel(logging.ERROR)
         logfh.setLevel(logging.ERROR)
-    
+
     logger.addHandler(logfh)
     logger.addHandler(logch)
-    
+
     logger.critical("------------------------")
     logger.critical("Welcome to HTPC-Manager!")
     logger.critical("------------------------")
     logger.critical("Loglevel set to " + loginfo)
 
-    # Set root and insert bundled libraies into path
-    htpc.RUNDIR = os.path.dirname(os.path.abspath(sys.argv[0]))
-    sys.path.insert(0, os.path.join(htpc.RUNDIR, 'libs'))
-
     from sqlobject import connectionForURI, sqlhub
-    from mako.lookup import TemplateLookup    
-
-    # Set datadir, create if it doesn't exist and exit if it isn't writable.
-    htpc.DATADIR = os.path.join(htpc.RUNDIR, 'userdata/')
-    if args.datadir:
-        htpc.DATADIR = args.datadir
-    if not os.path.isdir(htpc.DATADIR):
-        os.makedirs(htpc.DATADIR)
-    if not os.access(htpc.DATADIR, os.W_OK):
-        logger.error("Cannot write to datadir " + htpc.DATADIR)
-        sys.exit("No write access to datadir")
+    from mako.lookup import TemplateLookup
 
     # Set default database and overwrite if supplied through commandline
     htpc.DB = os.path.join(htpc.DATADIR, 'database.db')
