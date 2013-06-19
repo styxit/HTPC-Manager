@@ -352,7 +352,7 @@ class Xbmc:
 
                 return {'playerInfo': playerInfo, 'itemInfo': itemInfo, 'app': application}
         except:
-            self.logger.error("Unable to fetch currently playing information!")
+            self.logger.debug("Unable to fetch currently playing information!")
             return
 
     @cherrypy.expose()
