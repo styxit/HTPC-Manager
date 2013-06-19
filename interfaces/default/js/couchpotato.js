@@ -47,7 +47,7 @@ function getMovieList() {
 
                 var movieAnchor = $('<a>').attr('href', '#');
                 movieAnchor.addClass('thumbnail');
-                movieAnchor.append($('<img>').attr('src', WEBDIR + 'couchpotato/GetImage?url='+movie.library.info.images.poster[0]));
+                movieAnchor.append($('<img>').attr('src', WEBDIR + 'couchpotato/GetImage?url=' + movie.library.info.images.poster[0]));
                 movieAnchor.click(function(e) {
                     e.preventDefault();
                     showMovie(movie);
@@ -65,7 +65,7 @@ function getMovieList() {
 function showMovie(movie) {
     var movieTitle = movie.library.info.original_title
     var modalMovieAnchor = $('<div>').addClass('thumbnail pull-left');
-    modalMovieAnchor.append($('<img>').attr('src', movie.library.info.images.poster[0]));
+    modalMovieAnchor.append($('<img>').attr('src', WEBDIR + 'couchpotato/GetImage?url=' + movie.library.info.images.poster[0]));
 
     var modalMovieInfo = $('<div>').addClass('modal-movieinfo');
     if (movie.library.info.runtime) {
