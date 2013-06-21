@@ -1,12 +1,14 @@
 <%def name="buildForm(action='', method='POST', id='', classes='form-horizontal', legend='', fields=[], buttons=[
-    {'name':'Save changes', 'type':'submit', 'classes':'btn-primary'},
+    {'name':'Save', 'type':'submit', 'classes':'btn-primary'},
     {'name':'Clear', 'type':'reset'}
 ])"><%
 import htpc
 settings = htpc.settings.Settings()
 %><form${' action="'+action+'"' if action else ''} method="${method}" id="${id}"${' class="'+classes+'"' if classes else ''}>
     <fieldset>
+        % if legend:
         <legend>${legend}</legend>
+        % endif
         % for field in fields:
         <div class="control-group">
             <label for="${field.get('name')}" class="control-label">${field.get('label')}</label>

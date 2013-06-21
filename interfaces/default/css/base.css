@@ -226,9 +226,6 @@ h6.movie-title, h6.show-title, h6.album-title {
 #nowplaying #player-progressbar {
     cursor: pointer;
 }
-legend {
-    margin: 0;
-}
 .spinner {
     display: none;
     background: url('../img/loader.gif') 50% 50% no-repeat;

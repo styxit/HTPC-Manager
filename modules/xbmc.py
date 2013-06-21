@@ -7,6 +7,7 @@ import struct
 from urllib2 import quote, unquote
 from jsonrpclib import Server
 from xmlrpclib import ProtocolError
+from httplib import InvalidURL
 from sqlobject import SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol, IntCol
 from htpc.proxy import get_image
@@ -38,13 +39,7 @@ class Xbmc:
                  'name':'xbmc_enable'},
                 {'type':'text',
                  'label':'Menu name',
-                 'name':'xbmc_name'},
-                {'type':'bool',
-                 'label':'Use banners',
-                 'name':'xbmc_show_banners'},
-                {'type':'bool',
-                 'label':'Hide watched',
-                  'name':'xbmc_hide_watched'}
+                 'name':'xbmc_name'}
         ]})
         htpc.MODULES.append({
             'name': 'XBMC Servers',
@@ -104,14 +99,13 @@ class Xbmc:
             return
         try:
             url = xbmc_server_host + ':' + xbmc_server_port
-            auth = ''
             if xbmc_server_username and xbmc_server_password:
-                auth = xbmc_server_username + ':' + xbmc_server_password + '@'
-            xbmc = Server('http://' + auth + url + '/jsonrpc')
-            self.logger.debug("Trying to contact xbmc via " + xbmc)
+                url = xbmc_server_username + ':' + xbmc_server_password + '@' + url
+            xbmc = Server('http://' + url + '/jsonrpc')
+            self.logger.debug("Trying to contact xbmc via " + url)
             return xbmc.JSONRPC.Ping()
-        except ProtocolError:
-            self.logger.error("Unable to contact XBMC via " + xbmc)
+        except (ProtocolError, InvalidURL) as e:
+            self.logger.error("Unable to contact XBMC via " + url)
             return
 
     @cherrypy.expose()

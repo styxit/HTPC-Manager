@@ -17,9 +17,9 @@ class Sabnzbd:
                 {'type': 'text', 'label': 'Menu name', 'name': 'sabnzbd_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'sabnzbd_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'sabnzbd_port'},
+                {'type': 'text', 'label': 'Basepath', 'name': 'sabnzbd_basepath'},
                 {'type': 'text', 'label': 'API key', 'name': 'sabnzbd_apikey'},
-                {'type': 'bool', 'label': 'Use SSL', 'name': 'sabnzbd_ssl'},
-                {'type': 'text', 'label': 'Basepath (starts with a slash)', 'name': 'sabnzbd_basepath'}
+                {'type': 'bool', 'label': 'Use SSL', 'name': 'sabnzbd_ssl'}
         ]})
 
     @cherrypy.expose()
