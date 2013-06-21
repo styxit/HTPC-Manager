@@ -8,11 +8,12 @@ webdir = htpc.WEBDIR
     <meta charset="utf-8" />
     <title>HTPC Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
-    <link href="${webdir}css/bootstrap.min.css" rel="stylesheet">
+    <!--<link href="${webdir}css/bootstrap.min.css" rel="stylesheet">-->
+    <link href="${webdir}css/themes/${settings.get('app_theme','default')}/bootstrap.min.css" rel="stylesheet">
+    <link href="${webdir}css/themes/${settings.get('app_theme','default')}/style.css" rel="stylesheet">
     <link href="${webdir}css/bootstrap-responsive.min.css" rel="stylesheet">
     <link href="${webdir}css/jquery.pnotify.default.css" rel="stylesheet">
     <link href="${webdir}css/base.css" rel="stylesheet">
-    <link href="${webdir}css/themes/${settings.get('app_theme','default.css')}" rel="stylesheet">
     <script type="text/javascript">
       var WEBDIR = "${webdir}";
     </script>
