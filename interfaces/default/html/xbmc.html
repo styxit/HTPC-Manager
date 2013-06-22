@@ -1,16 +1,5 @@
-<%inherit file="../base.html"/>
-<%block name="header">
-<%
-import htpc
-settings = htpc.settings.Settings()
-webdir = htpc.WEBDIR
-%>
-<script src="${webdir}js/xbmc.js"></script><script src="${webdir}js/libs/jquery.pager.js"></script></%block>
-<%
-import htpc
-settings = htpc.settings.Settings()
-webdir = htpc.WEBDIR
-%>
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
 <div class="container">
     <div class="content">
         <h1 class="page-header page-title">
@@ -31,8 +20,8 @@ webdir = htpc.WEBDIR
                 </div>
                 <div class="span9">
                     <h2>
-                        <span id="player-item-title"></span>
-                        &nbsp;<small id="player-item-subtitle" class="muted"></small>
+                        <span id="player-item-title"></span>&nbsp;
+                        <small id="player-item-subtitle" class="muted"></small>
                     </h2>
                     <h2><small id="player-item-time"></small></h2>
                     <div class="progress" id="player-progressbar">
@@ -56,11 +45,6 @@ webdir = htpc.WEBDIR
                                 <ul class="dropdown-menu" id="audio"></ul>
                             </span>
                         </div>
-
-                        <div class="btn-group pull-right" id="playlistLoader">
-                            <a href="${webdir}xbmc" class="btn btn-small active"><i class="icon-th"></i> Library</a>
-                            <a href="${webdir}xbmc/playlist" class="btn btn-small"><i class="icon-list-ol"></i> playlist</a>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -69,6 +53,7 @@ webdir = htpc.WEBDIR
             <li class="active"><a href="#movies" data-toggle="tab">Movies</a></li>
             <li><a href="#shows" data-toggle="tab">TV Shows</a></li>
             <li><a href="#music" data-toggle="tab">Music</a></li>
+            <li><a href="#playlist" data-toggle="tab">Playlist</a></li>
         </ul>
         <div class="tab-content">
             <div id="movies" class="active tab-pane">
@@ -116,23 +101,29 @@ webdir = htpc.WEBDIR
                         </div>
                     </div>
                 </div>
-                %if settings.get('xbmc_show_banners', 0):
-                <ul id="show-grid" class="thumbnails filter banners" data-scroll-limit="${settings.get('xbmc_scroll_limit', '0')}"></ul>
-                %else:
                 <ul id="show-grid" class="thumbnails filter" data-scroll-limit="${settings.get('xbmc_scroll_limit', '0')}"></ul>
-                %endif
                 <ul id="show-seasons" class="filter hide" data-scroll-limit="${settings.get('xbmc_scroll_limit', '0')}"></ul>
             </div>
             <div id="music" class="tab-pane">
-              <div class="pull-right input-prepend">
-                <span class="add-on"><i class="icon-search"></i></span>
-                <input type="text" class="span2" placeholder="Filter" id="xbmc-filter-artists" name="artist-query"/>
-              </div>
-              <div id="artistPager" class="pagination"></div>
-              <table id="artist-grid" class="filter table table-condensed table-striped table-bordered" data-scroll-limit="${settings.get('xbmc_scroll_limit', '0')}"></table>
+                <div class="pull-right input-prepend">
+                    <span class="add-on"><i class="icon-search"></i></span>
+                    <input type="text" class="span2" placeholder="Filter" id="xbmc-filter-artists" name="artist-query"/>
+                </div>
+                <div id="artistPager" class="pagination"></div>
+                <table id="artist-grid" class="filter table table-condensed table-striped table-bordered" data-scroll-limit="${settings.get('xbmc_scroll_limit', '0')}"></table>
+            </div>
+            <div id="playlist" class="tab-pane">
+                <ol id="playlist-video" class="playlist"></ol>
+                <table id ="playlist-audio" class="playlist table table-striped table-hover">
+                    <tr>
+                        <th>Title</th>
+                        <th>Artist</th>
+                        <th>Album</th>
+                        <th>Duration</th>
+                    </tr>
+                </table> 
             </div>
         </div>
         <div class="spinner"></div>
-        <button id="xbmc-wake" class="btn hide" title="Wake on Lan"><i class="icon-off"></i> Send WakeOnLan packet</button>
     </div>
 </div>

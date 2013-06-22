@@ -24,7 +24,7 @@ class Sabnzbd:
 
     @cherrypy.expose()
     def index(self):
-        return htpc.LOOKUP.get_template('sabnzbd.html').render()
+        return htpc.LOOKUP.get_template('sabnzbd.html').render(scriptname='sabnzbd')
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()

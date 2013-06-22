@@ -163,7 +163,7 @@ def main():
 
     htpc.TEMPLATE = os.path.join(htpc.RUNDIR, 'interfaces/',
                                  settings.get('app_template', 'default'))
-    htpc.LOOKUP = TemplateLookup(directories=[htpc.TEMPLATE])
+    htpc.LOOKUP = TemplateLookup(directories=[os.path.join(htpc.TEMPLATE,'html/')])
 
     # Overwrite host setting if supplied through commandline
     htpc.HOST = settings.get('app_host', '0.0.0.0')
@@ -183,7 +183,7 @@ def main():
     if args.daemon and sys.platform != 'win32':
         logger.info("Setting up daemon-mode")
         htpc.DAEMON = True
-    
+
     if args.daemon and sys.platform == 'win32':
         logger.error("You are using Windows - I cannot setup daemon mode. Please use the pythonw executable instead.")
         logger.error("More information at http://docs.python.org/2/using/windows.html.")

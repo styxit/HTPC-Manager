@@ -149,3 +149,50 @@ function loadWantedMovies(limit) {
         }
     });
 }
+
+function loadNextAired(options) {
+    var defaults = {
+       limit : 0
+    };
+    $.extend(defaults, options);
+
+    $.ajax({
+        url: WEBDIR + 'sickbeard/GetNextAired',
+        type: 'get',
+        dataType: 'json',
+        success: function (result) {
+            if (result == null) return false;
+
+            if (result.data.soon.legth == 0) {
+                var row = $('<tr>')
+                row.append($('<td>').html('No future episodes found'));
+                $('#nextaired_table_body').append(row);
+                return false;
+            }
+
+            var soonaired = result.data.soon;
+            var todayaired = result.data.today;
+            var nextaired = todayaired.concat(soonaired);
+
+            $.each(nextaired, function (i, tvshow) {
+                if (defaults.limit != 0 && i == defaults.limit) {
+                    return false;
+                }
+                var row = $('<tr>');
+                var name = $('<a>').attr('href','#').html(tvshow.show_name).click(function(e){
+                    loadShow(tvshow.tvdbid);
+                });
+
+                row.append(
+                  $('<td>').append(name),
+                  $('<td>').html(tvshow.ep_name),
+                  $('<td>').html(tvshow.airdate)
+                );
+
+                $('#nextaired_table_body').append(row);
+            });
+
+            $('#nextaired_table_body').parent().trigger('update');
+        }
+    });
+}

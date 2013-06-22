@@ -21,7 +21,7 @@ class Squeezebox:
 
     @cherrypy.expose()
     def index(self):
-        return htpc.LOOKUP.get_template('squeezebox.html').render()
+        return htpc.LOOKUP.get_template('squeezebox.html').render(scriptname='squeezebox')
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()

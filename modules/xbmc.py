@@ -81,16 +81,12 @@ class Xbmc:
             self.logger.debug("No XBMC-Server found in database.")
             self.current = None
 
+
     @cherrypy.expose()
     def index(self):
         """ Generate page from template """
-        return htpc.LOOKUP.get_template('xbmc/index.html').render()
+        return htpc.LOOKUP.get_template('xbmc.html').render(scriptname='xbmc')
 
-    @cherrypy.expose()
-    def playlist(self):
-        """ Generate page from template """
-        self.logger.debug("Generating Playlist-Page")
-        return htpc.LOOKUP.get_template('xbmc/playlist.html').render()
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -268,7 +264,7 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetArtistDetails(self, artistid):
+    def GetArtistDetails(self, artistid=None):
         """ Get artist details from xbmc """
         self.logger.debug("Loading information for ARTISTID " + artistid)
         try:
@@ -280,14 +276,17 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetAlbums(self, artistid):
+    def GetAlbums(self, artistid=None):
         """ Get a list of all albums for artist """
-        self.logger.debug("Loading all albums for ARTISTID " + artistid)
+        self.logger.debug("Loading all albums for ARTISTID " + str(artistid))
         try:
             xbmc = Server(self.url('/jsonrpc', True))
             properties=['artist', 'albumlabel', 'year', 'description', 'thumbnail']
-            filter = {'artistid': int(artistid)}
-            return xbmc.AudioLibrary.GetAlbums(filter=filter, properties=properties)
+            if artistid is not None:
+                filter = {'artistid': int(artistid)}
+                return xbmc.AudioLibrary.GetAlbums(filter=filter, properties=properties)
+            else:
+                return xbmc.AudioLibrary.GetAlbums(properties=properties)
         except ValueError:
             return
 
@@ -323,7 +322,7 @@ class Xbmc:
                 print playlistId
 
         if playlistId is not -1:
-            return xbmc.Playlist.GetItems(playlistid=playlistId, properties=['artist', 'title', 'album'])
+            return xbmc.Playlist.GetItems(playlistid=playlistId, properties=['artist', 'title', 'album', 'duration'])
 
         return
 
