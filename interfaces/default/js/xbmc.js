@@ -85,6 +85,17 @@ $(document).ready(function() {
         });
     });
 
+    var subtitles = $('#subtitles').change(function() {
+        $.get(WEBDIR + 'xbmc/Subtitles?subtitle='+$(this).val(), function (data) {
+            notify('Subtitles','Change successful','info');
+        });
+    });
+    var audio = $('#audio').change(function() {
+        $.get(WEBDIR + 'xbmc/Audio?audio='+$(this).val(), function (data) {
+            notify('Audio','Change successful','info');
+        });
+    });
+
     $(window).scroll(function() {
         if(!allMoviesLoaded && !moviesLoading && $(window).scrollTop() + $(window).height() >= $(document).height() - 10) {
             if ($('#movies').is(':visible')) {
@@ -130,7 +141,7 @@ var lastMovieLoaded = 0;
 var allMoviesLoaded = false;
 var moviesLoading = false;
 var movieRequest = null;
-var movieLimit = 99999;
+var movieLimit = 50;
 function loadMovies(options) {
     if ($('#movie-grid').attr('data-scroll-limit') !== 0) {
         movieLimit = parseInt($('#movie-grid').attr('data-scroll-limit'));
@@ -269,7 +280,7 @@ function xbmcShowMovie(movie) {
     });
 }
 
-var showSteps = 99999;
+var showSteps = 50;
 var lastShowLoaded = 0;
 var allShowsLoaded = false;
 var showsLoading = false;
@@ -450,7 +461,7 @@ function xbmcLoadAlbums(artistid, elem){
         dataType: 'json',
         success: function(albums){
             // container, holding albums
-            var albumContainer = $('<ul>').addClass('artist-albums').addClass('thumbnails').hide();
+            var albumContainer = $('<ul>').addClass('artist-albums thumbnails').hide();
 
             // Loop albums
             $.each(albums.albums, function (i, album) {
@@ -461,10 +472,14 @@ function xbmcLoadAlbums(artistid, elem){
                     li.append($('<img>').attr('src', 'holder.js/150x150/text:'+album.label).attr('title', album.label).addClass('img-rounded img-polaroid'));
                 }
                 li.append($('<h6>').addClass('album-title').html(shortenText(album.label, 21)));
+                li.click(function(){
+                    playItem(album.albumid, 'album');
+                });
                 albumContainer.append(li);
             });
-            elem.addClass('artist-albums-loaded').after(albumContainer);
-            elem.parent().find('.artist-albums').show(300);
+            elem.addClass('artist-albums-loaded').append(albumContainer);
+            albumContainer.slideDown();
+
             Holder.run();
         }
     });
@@ -634,38 +649,31 @@ function loadNowPlaying() {
             var progressBar = $('#nowplaying #player-progressbar').find('.bar');
             progressBar.css('width', data.playerInfo.percentage + '%');
 
-            if (data.playerInfo.subtitles) {
-                var subtitles = $('#subtitles').empty();
-                data.playerInfo.subtitles.push({'index':'off','name':'None'});
+            var select = $('#audio').html('')
+            select.parent().hide();
+            if (data.playerInfo.audiostreams > 1) {
+                var current = data.playerInfo.currentaudiostream.index;
+                $.each(data.playerInfo.audiostreams, function (i, item) {
+                    var option = $('<option>').html(item.name).val(item.index);
+                    if (item.index==current) option.attr('selected','selected');
+                    select.append(option);
+                });
+                select.parent().show();
+            }
+            var select = $('#subtitles').html('')
+            select.parent().hide();
+            if (data.playerInfo.subtitles && data.playerInfo.subtitles.length > 0) {
+                data.playerInfo.subtitles.unshift({'index':'off','name':'None'});
                 var current = data.playerInfo.currentsubtitle.index;
                 if (data.playerInfo.subtitleenabled==false || current==='') current = 'off';
                 $.each(data.playerInfo.subtitles, function (i, item) {
-                    var link = $('<a>').attr('href','#').text(item.name).click(function(e) {
-                        e.preventDefault();
-                        $.get(WEBDIR + 'xbmc/Subtitles?subtitle='+item.index, function (data) {
-                            notify('Subtitles','Change successful','info');
-                        });
-                    });
-                    if (item.index==current) link.prepend($('<i>').addClass('icon-ok'));
-                    subtitles.append($('<li>').append(link));
+                    var name = item.name;
+                    if (item.language && item.name != item.language) name += ' [' + item.language + ']'
+                    var option = $('<option>').html(name).val(item.index);
+                    if (item.index==current) option.attr('selected','selected');
+                    select.append(option);
                 });
-
-                var audio = $('#audio').empty();
-                var current = data.playerInfo.currentaudiostream.index;
-                $.each(data.playerInfo.audiostreams, function (i, item) {
-                    var link = $('<a>').attr('href','#').text(item.name).click(function(e) {
-                        e.preventDefault();
-                        $.get(WEBDIR + 'xbmc/Audio?audio='+item.index, function (data) {
-                            notify('Audio','Change successful','info');
-                        });
-                    });
-                    if (item.index==current) link.prepend($('<i>').addClass('icon-ok'));
-                    audio.append($('<li>').append(link));
-                });
-                //show subtitle/audio buttons
-                $('#subtitles').closest('.btn-group').show();
-            } else {
-                $('#subtitles').closest('.btn-group').hide();
+                select.parent().show();
             }
 
             $('[data-player-control]').attr('disabled', false);
@@ -683,48 +691,43 @@ function loadPlaylist(type){
         type: 'get',
         dataType: 'json',
         success: function(data) {
-            var playlist_audio = $('#playlist-audio tbody').html('');
-            var playlist_video = $('#playlist-video').html('');
+            var playlist = $('#playlist-table tbody').html('');
 
             if (data.items == undefined || data.limits.total == 0) {
-                playlist_audio.html('<tr><td colspan="4">Playlist is empty</td></tr>');
+                playlist.html('<tr><td colspan="4">Playlist is empty</td></tr>');
                 return;
             }
 
             $.each(data.items, function(i, item){
+                var listItem = $('<tr>').click(function(e) {
+                    e.preventDefault();
+                    playlistJump(i);
+                });
+
+                if (item.id == nowPlayingId) {
+                    listItem.addClass('info active');
+                }
+
                 if (item.type == 'song') {
-                    var listItem = $('<tr>').click(function(e) {
-                        e.preventDefault();
-                        playlistJump(i);
-                    });
-
-                    if (item.id == nowPlayingId) {
-                        listItem.addClass('info active');
-                    }
-
                     listItem.append(
                         $('<td>').html(item.title),
                         $('<td>').html(item.artist[0]),
                         $('<td>').html(item.album),
                         $('<td>').html(parseSec(item.duration))
                     );
-                    playlist_audio.append(listItem);
                 } else {
-                    var listItem = $('<li>').html(item.label).click(function(e) {
-                        e.preventDefault();
-                        playlistJump(i);
-                    });
-                    playlist_video.append(listItem);
+                    var label = item.label + ' (' + item.year + ')';
+                    if (item.episode != -1) {
+                        label = item.showtitle + ': ' + 
+                                item.season + 'x' + item.episode + '. ' +
+                                item.label
+                    }
+                    listItem.append(
+                        $('<td>').html(label).attr('colspan','3'),
+                        $('<td>').html(parseSec(item.runtime))
+                    );
                 }
-
-                /*
-                // Add controls to playitem
-                var controls = $('<span>').addClass('playlist-controls pull-right');
-                controls.append($('<i>').addClass('icon-chevron-up'));
-                controls.append($('<i>').addClass('icon-chevron-down'));
-                controls.append($('<i>').addClass('icon-remove'));
-                listItem.append(controls);
-                */
+                playlist.append(listItem);
             });
         }
     });

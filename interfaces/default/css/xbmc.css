@@ -51,9 +51,6 @@ h6.movie-title, h6.show-title, h6.album-title {
     height: 375px;
     width: 670px;
 }
-#subtitles, #audio {
-    text-align: left;
-}
 #playlist_table td i {
     float: right;
     display: none;
@@ -61,9 +58,8 @@ h6.movie-title, h6.show-title, h6.album-title {
 #playlist_table td:hover i {
     display: block;
 }
-#nowplaying #player-progressbar {
-    cursor: pointer;
-}
-#playlist tr td {
+#nowplaying #player-progressbar,
+#playlist tr td
+ul.artist-albums li {
     cursor: pointer;
 }
