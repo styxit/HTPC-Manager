@@ -68,7 +68,6 @@ h6.movie-title, h6.show-title, h6.album-title {
     display: block;
 }
 #nowplaying #player-progressbar,
-#playlist tr td
-ul.artist-albums li {
+#playlist tr td {
     cursor: pointer;
 }
