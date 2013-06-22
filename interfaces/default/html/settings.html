@@ -3,40 +3,42 @@
 <% settings = self.attr.settings %>
 <div class="container">
     <div class="content maincontent">
-        <ul class="nav nav-tabs">
-            <li class="active"><a href="#general" data-toggle="tab">General</a></li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modules <b class="caret"></b></a>
-                <ul class="dropdown-menu">
+        <h1 class="page-header page-title">Settings</h1>
+
+        <div class="tabbable tabs-left">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#general" data-toggle="tab">General</a></li>
                 % for m in htpc.MODULES:
-                    <li><a href="#${m.get('id')}" data-toggle="tab">${m.get('name')}</a></li>
+                <li><a href="#${m.get('id')}" data-toggle="tab">${m.get('name')}</a></li>
                 % endfor
-                </ul>
-            </li>
-            <li><a href="#dashboard" data-toggle="tab">Dashboard</a></li>
-        </ul>
-        <div class="tab-content">
-            <div id="general" class="row-fluid tab-pane active">
-                ${form.buildForm(id='server', classes='form-horizontal span6', legend='General settings', fields=[
-                    {'type':'text', 'label':'IP / Host *', 'name':'app_host', 'value':settings.get('app_host', '0.0.0.0')},
-                    {'type':'text', 'label':'Port *', 'name':'app_port', 'value':settings.get('app_port', 8085)},
-                    {'type':'text', 'label':'Webdir *', 'name':'app_webdir', 'value':settings.get('app_webdir', '/')},
-                    {'type':'text', 'label':'Username *', 'name':'app_username', 'value':settings.get('app_username')},
-                    {'type':'password', 'label':'Password *', 'name':'app_password', 'value':settings.get('app_password')}
-                ])}
-                ${form.buildForm(id='style', classes='form-horizontal span6', legend='Style', fields=[
-                    {'type':'select', 'label':'Template *', 'name':'app_template', 'options':settings.get_templates()},
-                    {'type':'select', 'label':'Theme', 'name':'app_theme', 'options':settings.get_themes()}
-                ])}
-            </div>
-            % for m in htpc.MODULES:
-            ${form.buildForm(action=m.get('action'), id=m.get('id'), classes='form-horizontal tab-pane', legend=m.get('name'),
-                             fields=m.get('fields'), buttons=[
-                {'name':'Save changes', 'type':'submit', 'classes':'btn-primary'},
-                {'name':'Clear', 'type':'reset'},
-                {'name':'Test', 'type':'button', 'classes':'btn-test', 'test':m.get('test')}
+                <li><a href="#dashboard" data-toggle="tab">Dashboard</a></li>
+                <li><a href="#style" data-toggle="tab">Style</a></li>
+            </ul>
+
+            <div class="tab-content">
+            ${form.buildForm(id='general', classes='form-horizontal tab-pane active', legend='General',  fields=[
+                {'type':'text', 'label':'IP / Host *', 'name':'app_host', 'value':settings.get('app_host', '0.0.0.0')},
+                {'type':'text', 'label':'Port *', 'name':'app_port', 'value':settings.get('app_port', 8085)},
+                {'type':'text', 'label':'Webdir *', 'name':'app_webdir', 'value':settings.get('app_webdir', '/')},
+                {'type':'text', 'label':'Username *', 'name':'app_username', 'value':settings.get('app_username')},
+                {'type':'password', 'label':'Password *', 'name':'app_password', 'value':settings.get('app_password')}
             ])}
+            % for m in htpc.MODULES:
+                % if m.get('test'):
+                    ${form.buildForm(action=m.get('action'), id=m.get('id'), classes='form-horizontal tab-pane', legend=m.get('name'),
+                                     fields=m.get('fields'), buttons=[
+                                         {'name':'Save changes', 'type':'submit', 'classes':'btn-primary'},
+                                         {'name':'Clear', 'type':'reset'},
+                                         {'name':'Test', 'type':'button', 'classes':'btn-test', 'test':m.get('test')}])}
+                % else:
+                    ${form.buildForm(action=m.get('action'), id=m.get('id'), classes='form-horizontal tab-pane', legend=m.get('name'),
+                                     fields=m.get('fields'))}
+                % endif
             % endfor
+            ${form.buildForm(id='style', classes='form-horizontal tab-pane', legend='Style', fields=[
+                {'type':'select', 'label':'Template *', 'name':'app_template', 'options':settings.get_templates()},
+                {'type':'select', 'label':'Theme', 'name':'app_theme', 'options':settings.get_themes()}
+            ])}
             ${form.buildForm(id='dashboard', classes='form-horizontal tab-pane', legend='Dashboard', fields=[
                 {'type':'bool', 'label':'Show recent movies', 'name':'dash_rec_movies',
                  'checked':bool(settings.get('dash_rec_movies', 0))},
@@ -51,6 +53,7 @@
                 {'type':'bool', 'label':'Show SABnzbd', 'name':'dash_sabnzbd',
                  'checked':bool(settings.get('dash_sabnzbd', 0))}
             ])}
+            </div>
         </div>
     </div>
 </div>

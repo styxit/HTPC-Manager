@@ -17,8 +17,8 @@ class Couchpotato:
                 {'type': 'text', 'label': 'Menu name', 'name': 'couchpotato_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'couchpotato_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'couchpotato_port'},
-                {'type': 'text', 'label': 'API key', 'name': 'couchpotato_apikey'},
-                {'type': 'text', 'label': 'Basepath (starts with a slash)', 'name': 'couchpotato_basepath'}
+                {'type': 'text', 'label': 'Basepath', 'name': 'couchpotato_basepath'},
+                {'type': 'text', 'label': 'API key', 'name': 'couchpotato_apikey'}
         ]})
 
     @cherrypy.expose()

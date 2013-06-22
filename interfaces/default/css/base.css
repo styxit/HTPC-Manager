@@ -19,9 +19,6 @@ h2{
     padding: 0;
     font-size: 1.5em;
 }
-legend {
-    margin: 0;
-}
 .spinner {
     display: none;
     background: url('../img/loader.gif') 50% 50% no-repeat;

@@ -6,11 +6,7 @@ $(document).ready(function () {
         var data = btn.parents('form:first').serialize();
         $.post(action, data, function(data) {
             btn.button('reset')
-            if (data!=null) {
-                btn.addClass('btn-success').append(' ').append($('<i>').addClass('icon-white icon-ok'));
-            } else {
-                btn.addClass('btn-danger').append(' ').append($('<i>').addClass('icon-white icon-exclamation-sign'));
-            }
+            xbmc_server_test(btn, data!=null);
         });
     });
     $('input, radio, select, button').bind('change keydown', function(e) {
@@ -27,33 +23,10 @@ $(document).ready(function () {
         $.post(action, data, function(data) {
             msg = data ? 'Save successful' : 'Save failed';
             notify('Settings', msg, 'info');
+        }).success(function() {
+            xbmc_update_servers(0);
         });
     });
-    $.get(WEBDIR + 'xbmc/Servers', function(data) {
-        if (data==null) return;
-        var servers = $('#xbmc_server_id').change(function() {
-            var item = $(this);
-            $.get(WEBDIR + 'xbmc/getserver?id='+item.val(), function(data) {
-                if (data==null) return item.parents('form:first').get(0).reset();
-                $('#xbmc_server_name').val(data.name);
-                $('#xbmc_server_host').val(data.host);
-                $('#xbmc_server_port').val(data.port);
-                $('#xbmc_server_username').val(data.username);
-                $('#xbmc_server_password').val(data.password);
-            });
-        });
-        $.each(data.servers, function(i, item) {
-            var server = $('<option>').text(item.name).val(item.id);
-            servers.append(server);
-        });
-        var removeIcon = $('<i>').addClass('icon-remove');
-        var removeBtn = $('<button>').addClass('btn').html(removeIcon).click(function(e){
-            id = $('#xbmc_server_id').val()
-            $.get(WEBDIR + 'xbmc/delserver?id='+id, function(data) {
-                notify('Settings', 'Server deleted', 'info');
-            });
-        }).insertAfter(servers);
-    }, 'json');
     $('input.enable-module').change(function() {
         var clickItem = $(this);
         var disabled = !clickItem.is(':checked');
@@ -63,4 +36,51 @@ $(document).ready(function () {
         clickItem.attr('disabled', false);
         clickItem.attr('readonly', false);
     });
+    $('#xbmc_server_id').change(function() {
+        var item = $(this);
+        $.get(WEBDIR + 'xbmc/getserver?id='+item.val(), function(data) {
+            if (data==null) {
+                $("button:reset:visible").html('Clear').removeClass('btn-danger').unbind().trigger('click');
+                return;
+            }
+            $('#xbmc_server_name').val(data.name);
+            $('#xbmc_server_host').val(data.host);
+            $('#xbmc_server_port').val(data.port);
+            $('#xbmc_server_username').val(data.username);
+            $('#xbmc_server_password').val(data.password);
+            $("button:reset:visible").html('Delete').addClass('btn-danger').click(function(e) {
+                e.preventDefault();
+                var id = $('#xbmc_server_id').val()
+                var name = $("#xbmc_server_id option:selected").text();
+                if (!confirm('Delete ' + name)) return;
+                $.get(WEBDIR + 'xbmc/delserver?id='+id, function(data) {
+                    notify('Settings', 'Server deleted', 'info');
+                }).success(function() {
+                    xbmc_update_servers(id);
+                });
+            });
+        });
+    });
+    xbmc_update_servers(0);
 });
+
+function xbmc_update_servers(id) {
+    if ($("#xbmc_server_id").is(":visible") ) {
+        $.get(WEBDIR + 'xbmc/Servers', function(data) {
+            if (data==null) return;
+            var servers = $('#xbmc_server_id').empty().append($('<option>').text('New').val(0));
+            $.each(data.servers, function(i, item) {
+                servers.append($('<option>').text(item.name).val(item.id));
+            });
+            servers.val(id).trigger('change');
+        }, 'json');
+    }
+}
+
+function xbmc_server_test(btn, status) {
+    if (status == 1) {
+        btn.addClass('btn-success').append(' ').append($('<i>').addClass('icon-white icon-ok'));
+    } else {
+        btn.addClass('btn-danger').append(' ').append($('<i>').addClass('icon-white icon-exclamation-sign'));
+    }
+}

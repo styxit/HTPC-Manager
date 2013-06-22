@@ -13,7 +13,6 @@ class Search:
         htpc.MODULES.append({
             'name': 'Newznab',
             'id': 'nzbsearch',
-            'test': htpc.WEBDIR + 'search/ping',
             'fields': [
                 {'type':'bool', 'label':'Enable', 'name':'nzbsearch_enable'},
                 {'type':'text', 'label':'Host', 'name':'newznab_host'},
@@ -24,11 +23,14 @@ class Search:
     def index(self, query='', **kwargs):
         return htpc.LOOKUP.get_template('search.html').render(query=query, scriptname='search')
 
+    """
+    NOT IMPLEMENTET
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def ping(self, newznab_host, newznab_apikey, **kwargs):
         self.logger.debug("Pinging newznab-host")
         return 1
+    """
 
     @cherrypy.expose()
     def thumb(self, url, h=None, w=None, o=100):
