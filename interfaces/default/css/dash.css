@@ -7,7 +7,7 @@
 
 .carousel-caption p {
     font-size: smaller;
-    height: 60px;
+    height: 150px;
     overflow: hidden;
 }
 
@@ -30,7 +30,8 @@
     width: 14px;
 }
 
-.carousel-caption {
+.carousel-caption,
+div.media {
     cursor: pointer;
 }
 
