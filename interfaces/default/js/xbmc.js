@@ -441,32 +441,34 @@ function loadXBMCShow(show) {
     });
 }
 
+var currentArtist = ''
 function xbmcLoadAlbums(artistid, elem){
-    // Check if current artist-albums are already showing
-    var isLoaded = elem.hasClass('artist-albums-loaded');
-
     // Hide all albums
-    var openArtists = $('#artist-grid .artist-albums');
-    openArtists.slideUp(300, function() {
-        $(this).remove();
-    });
-    elem.removeClass('artist-albums-loaded');
+    $('#artist-grid .artist-albums').slideUp(300);
 
     // If currently clicked artist had albums showing; do nothing (hide albums only)
-    if (isLoaded == true) return;
+    if (currentArtist == artistid) {
+        currentArtist = '';
+        return;
+    }
 
     $.ajax({
         url: WEBDIR + 'xbmc/GetAlbums/' + artistid,
         type: 'get',
         dataType: 'json',
         success: function(albums){
+            // If artist has already been loaded just show
+            if (elem.hasClass('albums-loaded')) {
+                albumContainer.slideDown();
+                return;
+            }
+
             // container, holding albums
             var albumContainer = $('<ul>').addClass('artist-albums thumbnails').hide();
 
             // Loop albums
             $.each(albums.albums, function (i, album) {
-                var li = $('<li>').attr('title', album.label);
-                var link = $('<a>').attr('href', '#').addClass('thumbnail').click(function(){
+                var link = $('<a>').attr('href', '#').attr('title', album.label).addClass('thumbnail').click(function(){
                     playItem(album.albumid, 'album');
                 });
 
@@ -477,10 +479,11 @@ function xbmcLoadAlbums(artistid, elem){
                 }
                 link.append($('<h6>').addClass('album-title').html(shortenText(album.label, 21)));
 
-                albumContainer.append(li.append(link));
+                albumContainer.append($('<li>').append(link));
             });
-            elem.addClass('artist-albums-loaded').append(albumContainer);
+            elem.append(albumContainer.addClass('albums-loaded'));
             albumContainer.slideDown();
+            currentArtist = artistid;
 
             Holder.run();
         }
