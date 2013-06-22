@@ -95,16 +95,17 @@ function loadRecentAlbums () {
                     year = ' (' + album.year + ')';
                 }
                 
-                var row = $('<div>').addClass('media');
-                row.append(
-                  $('<a>').addClass('pull-left albumart').attr('href', '#').append(
-                    $('<img>').addClass('media-object').attr('src', imageSrc)
-                  ),
-                  $('<div>').addClass('media-body').append(
-                    $('<h5>').addClass('media-heading').html(album.label + year),
-                    album.artist
-                  )
-                ); 
+                var row = $('<div>').addClass('media').append(
+                    $('<div>').addClass('pull-left albumart').append(
+                        $('<img>').addClass('media-object').attr('src', imageSrc)
+                    ),
+                    $('<div>').addClass('media-body').append(
+                        $('<h5>').addClass('media-heading').html(album.label + year),
+                        album.artist
+                    )
+                ).click(function(e) {
+                    location.href = 'xbmc/#music';
+                });
                 $('#albums-content').append(row);       
             });
             

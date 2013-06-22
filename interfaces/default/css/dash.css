@@ -30,7 +30,8 @@
     width: 14px;
 }
 
-.carousel-caption {
+.carousel-caption,
+div.media {
     cursor: pointer;
 }
 
