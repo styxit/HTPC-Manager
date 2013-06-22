@@ -51,6 +51,15 @@ h6.movie-title, h6.show-title, h6.album-title {
     height: 375px;
     width: 670px;
 }
+#artist-grid tr td:first-child {
+    width: 15px;
+}
+#artist-grid tr td a {
+    display: block;
+}
+#artist-grid tr td a:Hover {
+    text-decoration: none;
+}
 #playlist_table td i {
     float: right;
     display: none;
