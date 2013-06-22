@@ -465,17 +465,19 @@ function xbmcLoadAlbums(artistid, elem){
 
             // Loop albums
             $.each(albums.albums, function (i, album) {
-                var li = $('<li>');
-                if (album.thumbnail) {
-                    li.append($('<img>').attr('src', WEBDIR + 'xbmc/GetThumb?w=150&h=150&thumb='+encodeURIComponent(album.thumbnail)).attr('title', album.label).addClass('img-rounded img-polaroid albumart'));
-                } else {
-                    li.append($('<img>').attr('src', 'holder.js/150x150/text:'+album.label).attr('title', album.label).addClass('img-rounded img-polaroid'));
-                }
-                li.append($('<h6>').addClass('album-title').html(shortenText(album.label, 21)));
-                li.click(function(){
+                var li = $('<li>').attr('title', album.label);
+                var link = $('<a>').attr('href', '#').addClass('thumbnail').click(function(){
                     playItem(album.albumid, 'album');
                 });
-                albumContainer.append(li);
+
+                if (album.thumbnail) {
+                    link.append($('<img>').attr('src', WEBDIR + 'xbmc/GetThumb?w=150&h=150&thumb='+encodeURIComponent(album.thumbnail)).addClass('albumart'));
+                } else {
+                    link.append($('<img>').attr('src', 'holder.js/150x150/text:'+album.label).attr('title', album.label));
+                }
+                link.append($('<h6>').addClass('album-title').html(shortenText(album.label, 21)));
+
+                albumContainer.append(li.append(link));
             });
             elem.addClass('artist-albums-loaded').append(albumContainer);
             albumContainer.slideDown();
@@ -517,7 +519,7 @@ function loadArtists(options) {
                         })),
                         $('<td>').append($('<a>').attr('href','#').html(artist.label).click(function(e) {
                             e.preventDefault(e);
-                            xbmcLoadAlbums(artist.artistid, $(this));
+                            xbmcLoadAlbums(artist.artistid, $(this).parent());
                         }))
                     ));
                 });
