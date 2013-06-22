@@ -1,31 +1,18 @@
-<%inherit file="../base.html"/>
-<%block name="header">
-<%
-import htpc
-settings = htpc.settings.Settings()
-webdir = htpc.WEBDIR
-%>
-  <script src="${webdir}js/sickbeard_view.js"></script>
-  <link rel="stylesheet" type="text/css" href="${webdir}css/sickbeard_view.css" />
-</%block>
-<%
-import htpc
-settings = htpc.settings.Settings()
-webdir = htpc.WEBDIR
-%>
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
 <div class="container">
     <div class="content maincontent sickbeard_show">
-        <h1 class="page-header page-title">
+        <h1 class="page-header page-title" data-showid="${tvdbid}">
             <span class="sickbeard_showname">Show details</span>
         </h1>
         
         <ul class="breadcrumb">
-          <li><a href="${webdir}">Home</a> <span class="divider">/</span></li>
-          <li><a href="${webdir}sickbeard">${settings.get('sickbeard_name', 'Sickbeard')}</a> <span class="divider">/</span></li>
+          <li><a href="${self.attr.webdir}">Home</a> <span class="divider">/</span></li>
+          <li><a href="${self.attr.webdir}sickbeard">${settings.get('sickbeard_name', 'Sickbeard')}</a> <span class="divider">/</span></li>
           <li class="active sickbeard_showname">Show details</li>
         </ul>     
         
-        <div class="row-fluid banner" style="background-image:url(${webdir}sickbeard/GetBanner/${tvdbid});">
+        <div id="banner" class="row-fluid banner">
             <div class="span8" style="min-height: 0px;"></div>
             <div class="show_details span4 pull-right">
                 <div id="show_details_top" class="span4"></div>
@@ -73,8 +60,3 @@ webdir = htpc.WEBDIR
         
     </div>
 </div>
-<script type="text/javascript">
-  jQuery(document).ready(function () {
-    loadShowData(${tvdbid});
-  });
-</script>

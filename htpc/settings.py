@@ -27,7 +27,7 @@ class Settings:
         if kwargs:
             for key, val in kwargs.items():
                 self.set(key, val)
-        return htpc.LOOKUP.get_template('settings.html').render()
+        return htpc.LOOKUP.get_template('settings.html').render(scriptname='settings', htpc=htpc)
 
     def get(self, key, defval=''):
         """ Get a setting from the database """
@@ -63,8 +63,11 @@ class Settings:
 
     def get_themes(self):
         """ Get a list of available themes """
+        path = os.path.join(htpc.TEMPLATE, "css/themes/")
         themes = []
-        for theme in os.listdir(os.path.join(htpc.TEMPLATE, "css/themes/")):
-            current = bool(theme == self.get('app_theme', 'default.css'))
+        dirs = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
+        print dirs
+        for theme in dirs:
+            current = bool(theme == self.get('app_theme', 'default'))
             themes.append({'name': theme, 'value': theme, 'selected': current})
         return themes

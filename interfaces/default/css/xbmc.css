@@ -1,0 +1,69 @@
+#movie-grid img,
+#movie-grid .thumbnail {
+    position: relative;
+    height: 150px;
+    width: 100px;
+}
+#movie-grid i{
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 16px; 
+    height: 16px;
+}
+h6.movie-title, h6.show-title, h6.album-title {
+    color: #555555;
+    text-align: center;
+    margin: 0;
+    padding-top: 4px;
+}
+#show-grid img {
+    height: 150px;
+    width: 100px;
+}
+#show-grid.banners img {
+    height: 90px;
+    width: 500px;
+}
+#show-seasons {
+    margin: 0;
+    padding: 0;
+}
+#show-seasons .season-header {
+    font-weight: bold;
+    font-size: 1.5em;
+    display: block;
+}
+#show-seasons .thumbnail,
+#show-season .thumbnail img {
+    height: 85px;
+    width: 150px;
+}
+.artist-albums .albumart {
+    height: 150px;
+    width: 150px;
+}
+.modal-movieinfo {
+    margin-left: 230px;
+}
+.modal-youtube {
+    border: 0;
+    height: 375px;
+    width: 670px;
+}
+#subtitles, #audio {
+    text-align: left;
+}
+#playlist_table td i {
+    float: right;
+    display: none;
+}
+#playlist_table td:hover i {
+    display: block;
+}
+#nowplaying #player-progressbar {
+    cursor: pointer;
+}
+#playlist tr td {
+    cursor: pointer;
+}

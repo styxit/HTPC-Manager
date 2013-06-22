@@ -1,22 +1,11 @@
-<%inherit file="base.html"/>
-<%block name="header">
-<%
-import htpc
-settings = htpc.settings.Settings()
-webdir = htpc.WEBDIR
-%>
-<script src="${webdir}js/dash.js"></script></%block>
-<%
-import htpc
-settings = htpc.settings.Settings()
-webdir = htpc.WEBDIR
-%>
-<div class="container dashboard">
+<%inherit file="base.html"/><%
+settings = self.attr.settings
+%><div class="container dashboard">
     <div class="content">
         <div class="row-fluid">
             %if settings.get('dash_rec_movies', 0):
             <div class="span4">
-                <h3><a href="${webdir}xbmc/#movies">Latest Movies</a></h3>
+                <h3><a href="xbmc/#movies">Latest Movies</a></h3>
                 <div id="movie-carousel" class="carousel slide hide">
                     <div class="carousel-inner"></div>
                     <a class="carousel-control left" href="#movie-carousel" data-slide="prev">&lsaquo;</a>
@@ -26,7 +15,7 @@ webdir = htpc.WEBDIR
             %endif
             %if settings.get('dash_rec_tv', 0):
             <div class="span4">
-                <h3><a href="${webdir}xbmc/#shows">Latest TV Shows</a></h3>
+                <h3><a href="xbmc/#shows">Latest TV Shows</a></h3>
                 <div id="tvshow-carousel" class="carousel slide hide">
                     <div class="carousel-inner"></div>
                     <a class="carousel-control left" href="#tvshow-carousel" data-slide="prev">&lsaquo;</a>
@@ -36,7 +25,7 @@ webdir = htpc.WEBDIR
             %endif
             %if settings.get('dash_rec_music', 0):
             <div class="span4">
-                <h3><a href="${webdir}xbmc/#music">Latest Music</a></h3>
+                <h3><a href="xbmc/#music">Latest Music</a></h3>
                 <div id="albums-content"></div>
             </div>
             %endif
@@ -44,7 +33,7 @@ webdir = htpc.WEBDIR
         <div class="row-fluid">
             %if settings.get('dash_sabnzbd', 0):
             <div class="span4">
-                <h3><a href="${webdir}sabnzbd/#history">Latest Downloads</a></h3>
+                <h3><a href="sabnzbd/#history">Latest Downloads</a></h3>
                 <table class="table table-striped table-main">
                     <thead>
                         <tr>
@@ -58,7 +47,7 @@ webdir = htpc.WEBDIR
             %endif
             %if settings.get('dash_couchpotato', 0):
             <div class="span4">
-                <h3><a href="${webdir}couchpotato/#wanted">Wanted Movies</a></h3>
+                <h3><a href="couchpotato/#wanted">Wanted Movies</a></h3>
                 <table class="table table-striped table-main">
                     <thead>
                         <tr>
@@ -72,7 +61,7 @@ webdir = htpc.WEBDIR
             %endif
             %if settings.get('dash_sickbeard', 0):
             <div class="span4">
-                <h3><a href="${webdir}sickbeard/#nextaired">Next Aired</a></h3>
+                <h3><a href="sickbeard/#nextaired">Next Aired</a></h3>
                 <table class="table table-striped table-main">
                     <thead>
                         <tr>
@@ -104,7 +93,7 @@ webdir = htpc.WEBDIR
             <div class="span6">
                 <h2>Dashboard</h2>
                 <p>This is you dashboard for all your Htpc modules. You have no dashboard modules configured yet.</p>
-                <p>Add the api configurations for you modules in the <a href="${webdir}settings">settings</a> and enable them to show on the dashboard.</p>
+                <p>Add the api configurations for you modules in the <a href="settings">settings</a> and enable them to show on the dashboard.</p>
             </div>
             <div class="span6">
                 <h2>Help</h2>

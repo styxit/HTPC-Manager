@@ -1,0 +1,35 @@
+.artist-list, .artist-list ul,
+.album-list, .album-list ul {
+    margin: 0;
+    padding: 0;
+}
+.artist-list li,
+.album-list li {
+    list-style: none;
+    margin: 0;
+    padding: 5px 15px;
+    width: 250px;
+    float: left;
+}
+.artist-list li li,
+.album-list li li {
+    width: 235px;
+}
+.artist-list li>a,
+.album-list li>a {
+    display: block;
+}
+.artist-list li:hover,
+.album-list li:hover {
+    background: #eee;
+    border-radius: 5px;
+}
+.artist-list li .control,
+.album-list li .control {
+    display: none;
+    float: right;
+}
+.artist-list li:hover .control,
+.album-list li:hover .control {
+    display: block;
+}
