@@ -297,6 +297,8 @@ class Xbmc:
             return xbmc.Player.Open(item={'episodeid': int(item)})
         if type == 'artist':
             return xbmc.Player.Open(item={'artistid': int(item)})
+        if type == 'album':
+            return xbmc.Player.Open(item={'albumid': int(item)})
         if type == 'song':
             return xbmc.Player.Open(item={'songid': int(item)})
 
@@ -308,17 +310,10 @@ class Xbmc:
         """ Get a playlist from XBMC """
         self.logger.debug("Loading Playlist of type " + type)
         xbmc = Server(self.url('/jsonrpc', True))
-        playlists = xbmc.Playlist.GetPlaylists()
-        playlistId = -1
-        for playlist in playlists:
-            if playlist['type'] == type:
-                playlistId = playlist['playlistid']
-                print playlistId
+        if type == 'video':
+            return xbmc.Playlist.GetItems(playlistid=1, properties=['year', 'showtitle', 'season', 'episode', 'runtime'])
 
-        if playlistId is not -1:
-            return xbmc.Playlist.GetItems(playlistid=playlistId, properties=['artist', 'title', 'album', 'duration'])
-
-        return
+        return xbmc.Playlist.GetItems(playlistid=0, properties=['artist', 'title', 'album', 'duration'])
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
