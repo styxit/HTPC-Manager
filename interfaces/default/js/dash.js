@@ -17,19 +17,23 @@ function loadRecentMovies () {
             $('#movie-carousel').show();
             $.each(data.movies, function (i, movie) {
                 var itemDiv = $('<div>').addClass('item');
+
                 if (i == 0) itemDiv.addClass('active');
                 
                 itemDiv.attr('style', 'background-image: url("' + WEBDIR + 'xbmc/GetThumb?h=240&w=430&thumb='+encodeURIComponent(movie.fanart)+ '");');
 
-                var itemCaption = $('<div>').addClass('carousel-caption').click(function() {
-                    xbmcShowMovie(movie);
-                });
-                itemCaption.append($('<h4>').html(movie.title + ' (' + movie.year + ')'));
-                itemCaption.append($('<p>').html(movie.plot).hide());
-                itemCaption.hover(function() {
-                    $(this).children('p').slideToggle();
-                });
-                itemDiv.append(itemCaption);
+                itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
+                    location.href = 'xbmc/#movies';
+                }).hover(function() {
+                    var text = $(this).children('p').slideToggle()
+                }).append(
+                    $('<h4>').html(movie.title + ' (' + movie.year + ')'),
+                    $('<p>').html(
+                        '<b>Runtime</b>: ' + parseSec(movie.runtime) + '<br />' + 
+                        '<b>Genre</b>: ' + movie.genre.join(', ') + '<br />' + 
+                        movie.plot
+                    ).hide()
+                ));
                 $('#movie-carousel .carousel-inner').append(itemDiv);
             });
         }
@@ -45,19 +49,24 @@ function loadRecentTVshows () {
             if (data == null) return;
             $('#tvshow-carousel').show();
             $.each(data.episodes, function (i, episode) {
-                var epTitle = episode.showtitle + ': ' + episode.label;
                 var itemDiv = $('<div>').addClass('item ');
+
                 if (i == 0) itemDiv.addClass('active');
+
                 itemDiv.attr('style', "background-image: url(" + WEBDIR + "xbmc/GetThumb?h=240&w=430&thumb="+encodeURIComponent(episode.fanart)+ ");");
-                var itemCaption = $('<div>').addClass('carousel-caption').click(function() {
-                    xbmcShowEpisode(episode)
-                });
-                itemCaption.append($('<h4>').html(epTitle));
-                itemCaption.append($('<p>').html(episode.plot).hide());
-                itemCaption.hover(function() {
-                    $(this).children('p').slideToggle();
-                });
-                itemDiv.append(itemCaption);
+
+                itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
+                    location.href = 'xbmc/#shows';
+                }).hover(function() {
+                    var text = $(this).children('p').slideToggle();
+                }).append(
+                    $('<h4>').html(episode.showtitle + ': ' + episode.label),
+                    $('<p>').html(
+                        '<b>Runtime</b>: ' + parseSec(episode.runtime) + '<br />' + 
+                        episode.plot
+                    ).hide()
+                ));
+
                 $('#tvshow-carousel .carousel-inner').append(itemDiv);
             });
         }
@@ -86,16 +95,17 @@ function loadRecentAlbums () {
                     year = ' (' + album.year + ')';
                 }
                 
-                var row = $('<div>').addClass('media');
-                row.append(
-                  $('<a>').addClass('pull-left albumart').attr('href', '#').append(
-                    $('<img>').addClass('media-object').attr('src', imageSrc)
-                  ),
-                  $('<div>').addClass('media-body').append(
-                    $('<h5>').addClass('media-heading').html(album.label + year),
-                    album.artist
-                  )
-                ); 
+                var row = $('<div>').addClass('media').append(
+                    $('<div>').addClass('pull-left albumart').append(
+                        $('<img>').addClass('media-object').attr('src', imageSrc)
+                    ),
+                    $('<div>').addClass('media-body').append(
+                        $('<h5>').addClass('media-heading').html(album.label + year),
+                        album.artist
+                    )
+                ).click(function(e) {
+                    location.href = 'xbmc/#music';
+                });
                 $('#albums-content').append(row);       
             });
             

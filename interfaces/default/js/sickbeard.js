@@ -240,38 +240,6 @@ function addShow(tvdbid) {
     });
 }
 
-function searchEpisode(tvdbid, season, episode, name) {
-  var modalcontent = $('<div>');
-  modalcontent.append($('<p>').html('Looking for episode &quot;'+ name +'&quot;.'));
-  modalcontent.append($('<div>').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'));
-  showModal('Searching episode '+season + 'x'+episode, modalcontent, {});
-
-  $.ajax({
-    url: WEBDIR + 'sickbeard/SearchEpisodeDownload?tvdbid=' + tvdbid +'&season=' + season +'&episode='+episode,
-    type: 'get',
-    dataType: 'json',
-    timeout: 40000,
-    success: function (data) {
-      // If result is not 'succes' it must be a failure
-      if (data.result != 'success') {
-        notify('Error', data.message, 'error');
-        return;
-      } else {
-        notify('OK', name+ ' ' + season + 'x'+episode+' found. ' + data.message, 'success');
-        return;
-      }
-    },
-    error: function (data) {
-      notify('Error', 'Episode not found.', 'error', 1);
-    },
-    complete: function (data) {
-      hideModal();
-      // Trigger latest season
-      $('#season-list li.active a').trigger('click');
-    }
-  });
-}
-
 function cancelAddShow() {
     $('#add_show_name').val('');
     $('#add_show_select').hide();
