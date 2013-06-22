@@ -1,4 +1,4 @@
-$.ajaxSetup({timeout: 5000});
+$.ajaxSetup({timeout: 3000});
 
 $(document).ready(function () {
     path = window.location.pathname.split('/');
@@ -23,9 +23,6 @@ $(document).ready(function () {
     });
     active_tab = (location.hash) ? location.hash : $.cookie('active_tab');
     $('[href='+active_tab+']').trigger('click');
-
-    $('#xbmc-player').tooltip({trigger : 'manual'});
-    $('#xbmc-player').tooltip('show');
 
     $('#btn-check-update').click(function (e) {
         e.preventDefault();
@@ -116,7 +113,6 @@ function parseSec(sec) {
     var s = pad(Math.floor(sec % 60), 2);
     return ((h>0) ? h+':'+pad(m, 2) : m) + ':' + s;
 }
-var stack_bottomright = {"dir1": "up", "dir2": "left", push: 'top'};
 function notify(title, text, type, time) {
     $.pnotify({
         title: title,
@@ -126,7 +122,7 @@ function notify(title, text, type, time) {
         sticker: false,
         closer_hover: false,
         addclass: "stack-bottomright",
-        stack: stack_bottomright
+        stack: {"dir1": "up", "dir2": "left", push: 'top'}
     });
 }
 
@@ -148,7 +144,6 @@ function showModal(title, content, buttons) {
     var button = $('<button>');
     button.html('Close');
     button.addClass('btn');
-    //button.attr('data-dismiss', 'modal');
     button.click(function () {
         hideModal()
     });

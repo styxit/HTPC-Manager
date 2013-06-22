@@ -23,7 +23,7 @@ class Couchpotato:
 
     @cherrypy.expose()
     def index(self):
-        return htpc.LOOKUP.get_template('couchpotato.html').render()
+        return htpc.LOOKUP.get_template('couchpotato.html').render(scriptname='couchpotato')
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()

@@ -1,16 +1,5 @@
 <%inherit file="base.html"/>
-<%block name="header">
-<%
-import htpc
-settings = htpc.settings.Settings()
-webdir = htpc.WEBDIR
-%>
-<script src="${webdir}js/sabnzbd.js"></script></%block>
-<%
-import htpc
-settings = htpc.settings.Settings()
-webdir = htpc.WEBDIR
-%>
+<% settings = self.attr.settings %>
 <div class="container">
     <div class="content maincontent">
         <h1 class="page-header page-title">

@@ -1,0 +1,43 @@
+.span4 thead {
+    display: none;
+}
+.alignright {
+    text-align: right !important;
+}
+
+.carousel-caption p {
+    font-size: smaller;
+    height: 60px;
+    overflow: hidden;
+}
+
+.movie-poster {
+    height: 300px;
+    width: 200px;
+}
+.dashboard .albumart {
+    height: 45px;
+    width: 45px;
+}
+.dashboard .span4 table{
+    table-layout: fixed;
+}
+.dashboard .span4 td{
+    overflow: hidden;
+    white-space: nowrap;
+}
+.dashboard .span4 #downloads_table_body td:last-child {
+    width: 14px;
+}
+
+.carousel-caption {
+    cursor: pointer;
+}
+
+#tvshow-carousel .item,
+#movie-carousel .item {
+  height: 200px;
+  background-position: center 20%;
+  background-size: cover;
+  background-repeat: no-repeat; 
+}

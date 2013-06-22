@@ -18,7 +18,7 @@ class Root:
     @cherrypy.expose()
     def index(self):
         """ Load template for frontpage """
-        return htpc.LOOKUP.get_template('dash.html').render()
+        return htpc.LOOKUP.get_template('dash.html').render(scriptname='dash')
 
     @cherrypy.expose()
     def default(self, *args, **kwargs):

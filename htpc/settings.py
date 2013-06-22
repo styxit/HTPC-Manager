@@ -27,7 +27,7 @@ class Settings:
         if kwargs:
             for key, val in kwargs.items():
                 self.set(key, val)
-        return htpc.LOOKUP.get_template('settings.html').render()
+        return htpc.LOOKUP.get_template('settings.html').render(scriptname='settings', htpc=htpc)
 
     def get(self, key, defval=''):
         """ Get a setting from the database """

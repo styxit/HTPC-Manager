@@ -23,7 +23,7 @@ class Sickbeard:
 
     @cherrypy.expose()
     def index(self):
-        return htpc.LOOKUP.get_template('sickbeard/index.html').render()
+        return htpc.LOOKUP.get_template('sickbeard.html').render(scriptname='sickbeard')
 
     @cherrypy.expose()
     def view(self, tvdbid):
@@ -32,7 +32,7 @@ class Sickbeard:
           self.logger.error("Invalid show ID was supplied: " + str(tvdbid))
           return False
 
-        return htpc.LOOKUP.get_template('sickbeard/view.html').render(tvdbid=tvdbid)
+        return htpc.LOOKUP.get_template('sickbeard_view.html').render(scriptname='sickbeard_view', tvdbid=tvdbid)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()

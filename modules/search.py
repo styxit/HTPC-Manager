@@ -22,7 +22,7 @@ class Search:
 
     @cherrypy.expose()
     def index(self, query='', **kwargs):
-        return htpc.LOOKUP.get_template('search.html').render(query=query)
+        return htpc.LOOKUP.get_template('search.html').render(query=query, scriptname='search')
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -35,7 +35,7 @@ class Search:
         if url.startswith('rageid'):
             settings = htpc.settings.Settings()
             host = settings.get('newznab_host', '')
-            
+
             if 'http://' in host:
                 url = host + '/covers/tv/' + url[6:] + '.jpg'
             else:
@@ -70,7 +70,7 @@ class Search:
                 url = host + '/api?o=json&apikey=' + apikey + '&t=' + cmd
             else:
                 url = 'http://' + host + '/api?o=json&apikey=' + apikey + '&t=' + cmd
-            
+
             self.logger.debug("Fetching information from: " + url)
             return loads(urlopen(url, timeout=10).read())
         except:
