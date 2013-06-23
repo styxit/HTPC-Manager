@@ -125,8 +125,29 @@ function loadNextAired(options) {
             var soonaired = result.data.soon;
             var todayaired = result.data.today;
             var nextaired = todayaired.concat(soonaired);
+            var lateraired = result.data.later;
 
+            // Loop next airing episodes
             $.each(nextaired, function (i, tvshow) {
+                if (defaults.limit != 0 && i == defaults.limit) {
+                    return false;
+                }
+                var row = $('<tr>');
+                var name = $('<a>').attr('href','#').html(tvshow.show_name).click(function(e){
+                    loadShow(tvshow.tvdbid);
+                });
+
+                row.append(
+                  $('<td>').append(name),
+                  $('<td>').html(tvshow.ep_name),
+                  $('<td>').html(tvshow.airdate)
+                );
+
+                $('#nextaired_table_body').append(row);
+            });
+
+            // Loop later airing episodes
+            $.each(lateraired, function (i, tvshow) {
                 if (defaults.limit != 0 && i == defaults.limit) {
                     return false;
                 }
