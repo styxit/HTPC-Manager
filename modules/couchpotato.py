@@ -37,7 +37,7 @@ class Couchpotato:
 
         url = 'http://' + couchpotato_host + ':' + couchpotato_port + couchpotato_basepath + 'api/' + couchpotato_apikey
         try:
-            return loads(urlopen(url + '/app.available', timeout=10).read())
+            return loads(urlopen(url + '/app.available/', timeout=10).read())
         except:
             self.logger.error("Unable to connect to couchpotato")
             self.logger.debug("connection-URL: " + url)
@@ -51,13 +51,13 @@ class Couchpotato:
     @cherrypy.tools.json_out()
     def GetMovieList(self, limit=''):
         self.logger.debug("Fetching Movies")
-        return self.fetch('movie.list?status=active&limit_offset=' + limit)
+        return self.fetch('movie.list/?status=active&limit_offset=' + limit)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetNotificationList(self, limit='20'):
         self.logger.debug("Fetching Notification")
-        data = self.fetch('notification.list?limit_offset=' + limit)
+        data = self.fetch('notification.list/?limit_offset=' + limit)
         self.fetch('notification.markread')
         return data
 
@@ -89,7 +89,7 @@ class Couchpotato:
     @cherrypy.tools.json_out()
     def GetProfiles(self):
         self.logger.debug("Fetching available profiles")
-        return self.fetch('profile.list')
+        return self.fetch('profile.list/')
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
