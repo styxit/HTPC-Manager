@@ -115,7 +115,7 @@ function loadNextAired(options) {
             // If sickbeard not configured, return false (Dashboard)
             if (result == null) return false;
 
-            if (result.data.soon.legth == 0) {
+            if (result.data.soon.length == 0) {
                 var row = $('<tr>')
                 row.append($('<td>').html('No future episodes found'));
                 $('#nextaired_table_body').append(row);
