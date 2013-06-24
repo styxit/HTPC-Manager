@@ -84,6 +84,12 @@ class Xbmc:
 
 
     @cherrypy.expose()
+    def webinterface(self):
+        """ Generate page from template """
+        raise cherrypy.HTTPRedirect(self.url('', True))
+
+
+    @cherrypy.expose()
     @cherrypy.tools.json_out()
     def ping(self, xbmc_server_host='', xbmc_server_port='',
             xbmc_server_username='', xbmc_server_password='', **kwargs):
@@ -189,8 +195,7 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetMovies(self, start=0, end=0, sortmethod='title',
-            sortorder='ascending'):
+    def GetMovies(self, start=0, end=0, sortmethod='title', sortorder='ascending', filter=''):
         """ Get a list of all movies """
         self.logger.debug("Fetching Movies")
         try:
@@ -199,14 +204,15 @@ class Xbmc:
             properties = ['title', 'year', 'plot', 'thumbnail', 'file', 'fanart', 'studio', 'trailer',
                     'imdbnumber', 'genre', 'rating', 'streamdetails', 'playcount']
             limits = {'start': int(start), 'end': int(end)}
-            return xbmc.VideoLibrary.GetMovies(sort=sort, properties=properties, limits=limits)
+            filter = {'field': 'title', 'operator': 'contains', 'value': filter}
+            return xbmc.VideoLibrary.GetMovies(sort=sort, properties=properties, limits=limits, filter=filter)
         except ValueError:
             self.logger.error("Unable to fetch movies!")
             return
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetShows(self, start=0, end=0, sortmethod='title', sortorder='ascending', hidewatched=False):
+    def GetShows(self, start=0, end=0, sortmethod='title', sortorder='ascending', hidewatched=0, filter=''):
         """ Get a list of all the TV Shows """
         self.logger.debug("Fetching TV Shows")
         try:
@@ -214,9 +220,10 @@ class Xbmc:
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
             properties = ['title', 'year', 'plot', 'thumbnail', 'playcount']
             limits = {'start': int(start), 'end': int(end)}
-            shows = xbmc.VideoLibrary.GetTVShows(sort=sort, properties=properties, limits=limits)
+            filter = {'field': 'title', 'operator': 'contains', 'value': filter}
             if hidewatched == "1":
-                shows['tvshows'] = filter(lambda i: i['playcount'] == 0, shows['tvshows'])
+                filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
+            shows = xbmc.VideoLibrary.GetTVShows(sort=sort,properties=properties, limits=limits, filter=filter)
             return shows
         except:
             self.logger.error("Unable to fetch TV Shows")
@@ -224,21 +231,17 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetShow(self, tvshowid=None, hidewatched=False):
+    def GetShow(self, tvshowid=None, sortmethod='episode', sortorder='ascending', hidewatched=False, filter=''):
         """ Get information about a single TV Show """
         self.logger.debug("Loading information for TVID" + str(tvshowid))
         xbmc = Server(self.url('/jsonrpc', True))
-        showinfo = xbmc.VideoLibrary.GetTVShowDetails(tvshowid=int(tvshowid), properties=['title', 'thumbnail'])
-        episodes = xbmc.VideoLibrary.GetEpisodes(tvshowid=int(tvshowid), properties=['episode', 'season', 'thumbnail', 'plot', 'file', 'playcount'])
-        episodes = episodes[u'episodes']
-        seasons = {}
+        sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
+        properties = ['episode', 'season', 'thumbnail', 'plot', 'file', 'playcount']
+        filter = {'field': 'title', 'operator': 'contains', 'value': filter}
         if hidewatched == "1":
-            episodes = filter(lambda i: i['playcount'] == 0, episodes)
-        for episode in episodes:
-            if not episode['season'] in seasons:
-                seasons[episode[u'season']] = {}
-            seasons[episode[u'season']][episode[u'episode']] = episode
-        return {'show': showinfo, 'seasons': seasons}
+            filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
+        episodes = xbmc.VideoLibrary.GetEpisodes(sort=sort, tvshowid=int(tvshowid), properties=properties, filter=filter)
+        return episodes
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
