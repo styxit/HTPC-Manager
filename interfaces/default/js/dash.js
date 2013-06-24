@@ -19,7 +19,7 @@ function loadRecentMovies () {
                 var itemDiv = $('<div>').addClass('item');
 
                 if (i == 0) itemDiv.addClass('active');
-                
+
                 itemDiv.attr('style', 'background-image: url("' + WEBDIR + 'xbmc/GetThumb?h=240&w=430&thumb='+encodeURIComponent(movie.fanart)+ '");');
 
                 itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
@@ -29,9 +29,7 @@ function loadRecentMovies () {
                 }).append(
                     $('<h4>').html(movie.title + ' (' + movie.year + ')'),
                     $('<p>').html(
-                        '<b>Runtime</b>: ' + parseSec(movie.runtime) + '<br />' + 
-                        '<b>Genre</b>: ' + movie.genre.join(', ') + '<br />' + 
-                        movie.plot
+                        '<b>Runtime</b>: ' + parseSec(movie.runtime) + '<br />' + '<b>Genre</b>: ' + movie.genre.join(', ') + '<br />' + movie.plot
                     ).hide()
                 ));
                 $('#movie-carousel .carousel-inner').append(itemDiv);
@@ -62,8 +60,7 @@ function loadRecentTVshows () {
                 }).append(
                     $('<h4>').html(episode.showtitle + ': ' + episode.label),
                     $('<p>').html(
-                        '<b>Runtime</b>: ' + parseSec(episode.runtime) + '<br />' + 
-                        episode.plot
+                        '<b>Runtime</b>: ' + parseSec(episode.runtime) + '<br />' + episode.plot
                     ).hide()
                 ));
 
@@ -87,14 +84,14 @@ function loadRecentAlbums () {
                 } else {
                   imageSrc = WEBDIR + 'js/libs/holder.js/45x45/text:No cover';
                 }
-                
+
                 // Frodo fix artist is now a list. Use the first.
                 if($.isArray(album.artist)) album.artist = album.artist[0]
                 year = '';
                 if (album.year != '0') {
                     year = ' (' + album.year + ')';
                 }
-                
+
                 var row = $('<div>').addClass('media').append(
                     $('<div>').addClass('pull-left albumart').append(
                         $('<img>').addClass('media-object').attr('src', imageSrc)
@@ -106,9 +103,9 @@ function loadRecentAlbums () {
                 ).click(function(e) {
                     location.href = 'xbmc/#music';
                 });
-                $('#albums-content').append(row);       
+                $('#albums-content').append(row);
             });
-            
+
             Holder.run();
         }
     });
@@ -189,9 +186,7 @@ function loadNextAired(options) {
                     return false;
                 }
                 var row = $('<tr>');
-                var name = $('<a>').attr('href','#').html(tvshow.show_name).click(function(e){
-                    loadShow(tvshow.tvdbid);
-                });
+                var name = $('<a>').attr('href', WEBDIR + 'sickbeard/view/' + tvshow.tvdbid).html(tvshow.show_name);
 
                 row.append(
                   $('<td>').append(name),
