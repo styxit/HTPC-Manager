@@ -2,6 +2,7 @@
 import os
 import hashlib
 import htpc
+import imghdr
 import logging
 from cherrypy.lib.static import serve_file
 from urllib2 import Request, urlopen
@@ -53,7 +54,8 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
                 image = os.path.join(htpc.RUNDIR,'interfaces/default/img/fff_20.png')
 
     # Load file from disk
-    return serve_file(path=image, content_type='image/jpeg')
+    imagetype = imghdr.what(image)
+    return serve_file(path=image, content_type='image/' + imagetype)
 
 
 def download_image(url, dest, auth=None):
@@ -69,10 +71,10 @@ def download_image(url, dest, auth=None):
     with open(dest, "wb") as local_file:
         local_file.write(urlopen(request).read())
 
-
 def resize_image(img, height, width, opacity, dest):
         """ Resize image, set opacity and save to disk """
         size = int(width), int(height)
+        imagetype = imghdr.what(img)
         im = Image.open(img)
         im = im.resize(size, Image.ANTIALIAS)
 
@@ -85,5 +87,7 @@ def resize_image(img, height, width, opacity, dest):
             #apply overlay to resized image
             im = Image.blend(overlay, im, enhance)
 
-        im.save(dest, 'JPEG', quality=95)
+        if imagetype == 'jpeg':
+            im.save(dest, 'JPEG', quality=95)
+        im.save(dest, imagetype)
         return dest
