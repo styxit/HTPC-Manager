@@ -28,9 +28,10 @@ $(document).ready(function() {
     $.get(WEBDIR + 'xbmc/Servers', function(data) {
         if (data==null) return;
         $.each(data.servers, function(i, item) {
-            servers.append($('<option>').text(item.name).val(item.id));
+            server = $('<option>').text(item.name).val(item.id);
+            if (item.id == data.current) server.attr('selected','selected');
+            servers.append(server);
         });
-        servers.val(data.current);
     }, 'json');
 
     // Enable player controls
@@ -536,6 +537,34 @@ function loadArtists(options) {
     });
 }
 
+function loadChannels(){
+    $.ajax({
+        url: WEBDIR + 'xbmc/GetChannels',
+        type: 'get',
+        dataType: 'json',
+        success: function(channels){
+            var list = $('#pvr-grid');
+
+            $.each(channels.channels, function (i, channel) {
+                var link = $('<a>').attr('href', '#').attr('title', channel.label).addClass('thumbnail').click(function(e) {
+                    e.preventDefault();
+                });
+
+                if (channel.thumbnail) {
+                    link.append($('<img>').attr('src', WEBDIR + 'xbmc/GetThumb?w=75&h=75&thumb='+encodeURIComponent(channel.thumbnail)).addClass('channellogo'));
+                } else {
+                    link.append($('<img>').attr('src', 'holder.js/75x75/text:'+channel.label).attr('title', channel.label));
+                }
+                link.append($('<h6>').html(shortenText(channel.label, 21)));
+
+                list.append($('<li>').append(link));
+            });
+
+            Holder.run();
+        }
+    });
+}
+
 var nowPlayingId = ''
 var nowPlayingThumb = 'empty-image';
 function loadNowPlaying() {
@@ -757,5 +786,7 @@ function reloadTab() {
         }
     } else if ($('#music').is(':visible')) {
         loadArtists({'filter': searchString});
+    } else if ($('#pvr').is(':visible')) {
+        loadChannels();
     }
 }

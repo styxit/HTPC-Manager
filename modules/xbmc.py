@@ -294,6 +294,29 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    def GetChannelGroups(self, type='tv'):
+        """ Get PVR channel list from xbmc """
+        self.logger.debug("Loading XBMC PVC channel list.")
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            return xbmc.PVR.GetChannelGroups(channeltype=type)
+        except ValueError:
+            return
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetChannels(self, type='tv', group=2):
+        """ Get PVR channel list from xbmc """
+        self.logger.debug("Loading XBMC PVC channel list.")
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            properties = ['thumbnail']
+            return xbmc.PVR.GetChannels(channelgroupid=int(group), properties=properties)
+        except ValueError:
+            return
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def PlayItem(self, item=None, type=None):
         """ Play a file in XBMC """
         xbmc = Server(self.url('/jsonrpc', True))
