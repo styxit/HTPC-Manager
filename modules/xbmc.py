@@ -332,6 +332,8 @@ class Xbmc:
             return xbmc.Player.Open(item={'albumid': int(item)})
         if type == 'song':
             return xbmc.Player.Open(item={'songid': int(item)})
+        if type == 'channel':
+            return xbmc.Player.Open(item={'channelid': int(item)})
 
         return xbmc.Player.Open(item={'file': item})
 

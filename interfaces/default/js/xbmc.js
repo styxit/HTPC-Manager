@@ -548,6 +548,7 @@ function loadChannels(){
             $.each(channels.channels, function (i, channel) {
                 var link = $('<a>').attr('href', '#').attr('title', channel.label).addClass('thumbnail').click(function(e) {
                     e.preventDefault();
+                    playItem(channel.channelid, 'channel');
                 });
 
                 if (channel.thumbnail) {
