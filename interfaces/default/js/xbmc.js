@@ -4,7 +4,7 @@ $(document).ready(function() {
 
     // Load data on tab display
     $('a[data-toggle="tab"]').on('shown', reloadTab);
-    toggleTab()
+    toggleTab();
 
     // Catch keyboard event and send to XBMC
     $(document).keydown(function(e) {
