@@ -1,3 +1,7 @@
+.dropdown-menu li {
+    font-size: smaller;
+}
+
 #movie-grid img,
 #movie-grid .thumbnail {
     position: relative;

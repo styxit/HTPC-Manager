@@ -9,16 +9,27 @@ $(document).ready(function () {
     $('.tabs').tab();
     $(window).on('hashchange', toggleTab);
     $('a[data-toggle="tab"]').on('click', function(e) {
+        var yScroll = $(window).scrollTop();
         location.hash = $(e.target).attr('href');;
-        $("#search").val('').trigger('keyup');
+        $(window).scrollTop(yScroll);
     });
 
     $('a.ajax-link').click(function (e) {
-        var link = $(this);
         e.preventDefault();
+        var link = $(this);
         $.get(link.attr('href'), function(data) {
-            notify(link.text(),link.text() + ': ' + data,'success');
+            notify(link.text(), data, 'success');
         }, 'json');
+    });
+
+    $('a.ajax-confirm').click(function (e) {
+        e.preventDefault();
+        var link = $(this);
+        if (confirm(link.attr('title') + '?')) {
+          $.get(link.attr('href'), function(data){
+            notify(link.attr('title'), data, 'warning');
+          }, 'json');
+        }
     });
 
     $('#btn-check-update').click(function (e) {
@@ -72,13 +83,11 @@ $(document).ready(function () {
 });
 
 function toggleTab() {
-    var yScroll = $(window).scrollTop();
     if (location.hash) {
         $('a[href='+location.hash+']').tab('show');
     } else {
         $('a[data-toggle="tab"]:first').tab('show')
     }
-    $(window).scrollTop(yScroll);
 }
 
 function makeIcon(iconClass, title) {
