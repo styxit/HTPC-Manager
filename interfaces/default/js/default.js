@@ -21,7 +21,6 @@ $(document).ready(function () {
             notify(link.text(), data, 'success');
         }, 'json');
     });
-
     $('a.ajax-confirm').click(function (e) {
         e.preventDefault();
         var link = $(this);
@@ -30,6 +29,9 @@ $(document).ready(function () {
             notify(link.attr('title'), data, 'warning');
           }, 'json');
         }
+    });
+    $('a.confirm').click(function (e) {
+        return(confirm($(this).attr('title') + '?'));
     });
 
     $('#btn-check-update').click(function (e) {
@@ -56,24 +58,6 @@ $(document).ready(function () {
                 }
             }
         }, 'json');
-    });
-    $('#btn-restart').click(function (e) {
-        e.preventDefault();
-        if (confirm('Restart?')) {
-            notify('Restart','Restart command sent...','success')
-            $.get(WEBDIR + 'restart', function() {
-                // On restart
-            }, 'json');
-        }
-    });
-    $('#btn-shutdown').click(function (e) {
-        e.preventDefault();
-        if (confirm('Shutdown?')) {
-            notify('Shutdown','Shutdown command sent.','success')
-            $.get(WEBDIR + 'shutdown', function() {
-                // On shutdown confirmed
-            }, 'json');
-        }
     });
 
     $('#modal_dialog').on('hidden', function () {
