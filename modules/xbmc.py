@@ -39,7 +39,10 @@ class Xbmc:
                  'name':'xbmc_enable'},
                 {'type':'text',
                  'label':'Menu name',
-                 'name':'xbmc_name'}
+                 'name':'xbmc_name'},
+                {'type':'bool',
+                 'label':'Hide watched',
+                 'name':'xbmc_hide_watched'}
         ]})
         htpc.MODULES.append({
             'name': 'XBMC Servers',
@@ -81,6 +84,12 @@ class Xbmc:
     def index(self):
         """ Generate page from template """
         return htpc.LOOKUP.get_template('xbmc.html').render(scriptname='xbmc')
+
+
+    @cherrypy.expose()
+    def webinterface(self):
+        """ Generate page from template """
+        raise cherrypy.HTTPRedirect(self.url('', True))
 
 
     @cherrypy.expose()
@@ -189,8 +198,7 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetMovies(self, start=0, end=0, sortmethod='title',
-            sortorder='ascending'):
+    def GetMovies(self, start=0, end=0, sortmethod='title', sortorder='ascending', hidewatched=0, filter=''):
         """ Get a list of all movies """
         self.logger.debug("Fetching Movies")
         try:
@@ -199,14 +207,17 @@ class Xbmc:
             properties = ['title', 'year', 'plot', 'thumbnail', 'file', 'fanart', 'studio', 'trailer',
                     'imdbnumber', 'genre', 'rating', 'streamdetails', 'playcount']
             limits = {'start': int(start), 'end': int(end)}
-            return xbmc.VideoLibrary.GetMovies(sort=sort, properties=properties, limits=limits)
+            filter = {'field': 'title', 'operator': 'contains', 'value': filter}
+            if hidewatched == "1":
+                filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
+            return xbmc.VideoLibrary.GetMovies(sort=sort, properties=properties, limits=limits, filter=filter)
         except ValueError:
             self.logger.error("Unable to fetch movies!")
             return
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetShows(self, start=0, end=0, sortmethod='title', sortorder='ascending', hidewatched=False):
+    def GetShows(self, start=0, end=0, sortmethod='title', sortorder='ascending', hidewatched=0, filter=''):
         """ Get a list of all the TV Shows """
         self.logger.debug("Fetching TV Shows")
         try:
@@ -214,9 +225,10 @@ class Xbmc:
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
             properties = ['title', 'year', 'plot', 'thumbnail', 'playcount']
             limits = {'start': int(start), 'end': int(end)}
-            shows = xbmc.VideoLibrary.GetTVShows(sort=sort, properties=properties, limits=limits)
+            filter = {'field': 'title', 'operator': 'contains', 'value': filter}
             if hidewatched == "1":
-                shows['tvshows'] = filter(lambda i: i['playcount'] == 0, shows['tvshows'])
+                filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
+            shows = xbmc.VideoLibrary.GetTVShows(sort=sort,properties=properties, limits=limits, filter=filter)
             return shows
         except:
             self.logger.error("Unable to fetch TV Shows")
@@ -224,21 +236,17 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetShow(self, tvshowid=None, hidewatched=False):
+    def GetShow(self, tvshowid=None, sortmethod='episode', sortorder='ascending', hidewatched=False, filter=''):
         """ Get information about a single TV Show """
         self.logger.debug("Loading information for TVID" + str(tvshowid))
         xbmc = Server(self.url('/jsonrpc', True))
-        showinfo = xbmc.VideoLibrary.GetTVShowDetails(tvshowid=int(tvshowid), properties=['title', 'thumbnail'])
-        episodes = xbmc.VideoLibrary.GetEpisodes(tvshowid=int(tvshowid), properties=['episode', 'season', 'thumbnail', 'plot', 'file', 'playcount'])
-        episodes = episodes[u'episodes']
-        seasons = {}
+        sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
+        properties = ['episode', 'season', 'thumbnail', 'plot', 'file', 'playcount']
+        filter = {'field': 'title', 'operator': 'contains', 'value': filter}
         if hidewatched == "1":
-            episodes = filter(lambda i: i['playcount'] == 0, episodes)
-        for episode in episodes:
-            if not episode['season'] in seasons:
-                seasons[episode[u'season']] = {}
-            seasons[episode[u'season']][episode[u'episode']] = episode
-        return {'show': showinfo, 'seasons': seasons}
+            filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
+        episodes = xbmc.VideoLibrary.GetEpisodes(sort=sort, tvshowid=int(tvshowid), properties=properties, filter=filter)
+        return episodes
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -270,7 +278,7 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetAlbums(self, artistid=None):
+    def GetAlbums(self, artistid=None, filter=''):
         """ Get a list of all albums for artist """
         self.logger.debug("Loading all albums for ARTISTID " + str(artistid))
         try:
@@ -278,9 +286,9 @@ class Xbmc:
             properties=['artist', 'albumlabel', 'year', 'description', 'thumbnail']
             if artistid is not None:
                 filter = {'artistid': int(artistid)}
-                return xbmc.AudioLibrary.GetAlbums(filter=filter, properties=properties)
             else:
-                return xbmc.AudioLibrary.GetAlbums(properties=properties)
+                filter = {'field': 'label', 'operator': 'contains', 'value': filter}
+            return xbmc.AudioLibrary.GetAlbums(properties=properties, filter=filter)
         except ValueError:
             return
 
@@ -453,13 +461,16 @@ class Xbmc:
         xbmc = Server(self.url('/jsonrpc', True))
         if action == 'Shutdown':
             self.logger.info("Shutting down XBMC")
-            return xbmc.System.Shutdown()
+            xbmc.System.Shutdown()
+            return 'Shutting down XBMC.'
         elif action == 'Suspend':
             self.logger.info("Suspending XBMC")
-            return xbmc.System.Suspend()
+            xbmc.System.Suspend()
+            return 'Suspending XBMC.'
         elif action == 'Reboot':
             self.logger.info("Rebooting XBMC")
-            return xbmc.System.Reboot()
+            xbmc.System.Reboot()
+            return 'Rebooting XBMC.'
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -490,7 +501,8 @@ class Xbmc:
         """ Create popup in XBMC """
         self.logger.debug("Sending notification to XBMC: " + text)
         xbmc = Server(self.url('/jsonrpc', True))
-        return xbmc.GUI.ShowNotification(title='HTPC manager', message=text, image='https://raw.github.com/styxit/HTPC-Manager/master/interfaces/default/img/xbmc-logo.png')
+        image='https://raw.github.com/styxit/HTPC-Manager/master/interfaces/default/img/xbmc-logo.png'
+        return xbmc.GUI.ShowNotification(title='HTPC manager', message=text, image=image)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()

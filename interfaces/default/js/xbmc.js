@@ -1,139 +1,94 @@
+var searchString = '';
 $(document).ready(function() {
-    enablePlayerControls();
-    loadMovies();
-    loadXbmcShows();
-    loadPlaylist('audio');
-    loadArtists();
     loadNowPlaying();
 
+    // Load data on tab display
+    $('a[data-toggle="tab"]').on('shown', reloadTab);
+    toggleTab();
+
+    // Catch keyboard event and send to XBMC
     $(document).keydown(function(e) {
         if (!$('input').is(":focus")) {
             arrow = {8: 'Back', 27: 'Back', 13: 'Select', 37: 'Left', 38: 'Up', 39: 'Right', 40: 'Down',
                      88: 'Stop', 32: 'PlayPause'};
             command = arrow[e.which];
             if (command) {
-                e.preventDefault();
                 $.get(WEBDIR + 'xbmc/ControlPlayer?action='+command);
+                e.preventDefault();
             }
         }
     });
 
+    // Load serverlist and send command on change.
+    var servers = $('#servers').change(function() {
+         $.get(WEBDIR + 'xbmc/Servers?server='+$(this).val(), function(data) {
+            notify('XBMC','Server change '+data,'info');
+         });
+    });
     $.get(WEBDIR + 'xbmc/Servers', function(data) {
         if (data==null) return;
-        var servers = $('<select>').change(function() {
-             $.get(WEBDIR + 'xbmc/Servers?server='+$(this).val(), function(data) {
-                notify('XBMC','Server change '+data,'info');
-             });
-        });
         $.each(data.servers, function(i, item) {
-            var server = $('<option>').text(item.name).val(item.id);
-            servers.append(server);
+            servers.append($('<option>').text(item.name).val(item.id));
         });
         servers.val(data.current);
-        $('#servers').append(servers);
     }, 'json');
 
-    $('#hidewatched').click(function() {
-        $(this).toggleClass('hidewatched');
-        $('#show-seasons').hide();
-        $('#show-grid').empty();
-        allShowsLoaded = false;
-        loadXbmcShows();
-        $('#show-grid').show();
+    // Enable player controls
+    $('[data-player-control]').click(function () {
+        var action = $(this).attr('data-player-control');
+        $.get(WEBDIR + 'xbmc/ControlPlayer?action='+action);
     });
+
+    // Toggle wether to show already seen episodes
+    $('#hidewatched').click(function(e) {
+        e.preventDefault();
+        $(this).toggleClass('active');
+        var hideWatched = $(this).hasClass('active')?1:0;
+        $(this).text(hideWatched?'Show Watched':'Hide Watched')
+        $.get(WEBDIR + 'settings?xbmc_hide_watched='+hideWatched);
+        reloadTab();
+    });
+
+    // Send notification to XBMC
     $('#xbmc-notify').click(function() {
         msg = prompt("Message");
-        if (msg) sendNotification(msg);
-    });
-    $('#xbmc-restart').click(function() {
-        var answer = confirm("Reboot xbmc system?");
-        if (answer) {
-          $.get(WEBDIR + 'xbmc/System?action=Reboot', function(data){
-            notify('Reboot','Rebooting...','warning');
-          });
+        if (msg) {
+            $.post(WEBDIR + 'xbmc/Notify',{'text': msg}, function(data) {
+                notify('XBMC', 'Notification sent successfully', 'info');
+            });
         }
     });
-    $('#xbmc-shutdown').click(function() {
-        var answer = confirm("Shutdown xbmc system?");
-        if (answer) {
-          $.get(WEBDIR + 'xbmc/System?action=Suspend', function(data){
-            notify('Shutdown','Shutting down...','warning');
-          });
-        }
-    });
-    $('.clean-video-lib').click(function(e) {
-        e.preventDefault();
-        xbmcClean('video');
-    });
-    $('.scan-video-lib').click(function(e) {
-        e.preventDefault();
-        xbmcScan('video');
-    });
-    $('.clean-audio-lib').click(function(e) {
-        e.preventDefault();
-        xbmcClean('audio');
-    });
-    $('.scan-audio-lib').click(function(e) {
-        e.preventDefault();
-        xbmcScan('audio');
-    });
 
-    // Audio search artist
-    $('#xbmc-filter-artists').keyup(function(){
-        loadArtists({
-            'filter': $(this).val()
-        });
-    });
-
+    // Show subtitle selector if current has a subtitle track
     var subtitles = $('#subtitles').change(function() {
         $.get(WEBDIR + 'xbmc/Subtitles?subtitle='+$(this).val(), function (data) {
             notify('Subtitles','Change successful','info');
         });
     });
+    // Show audio selector if current has multiple subtitles tracks
     var audio = $('#audio').change(function() {
         $.get(WEBDIR + 'xbmc/Audio?audio='+$(this).val(), function (data) {
             notify('Audio','Change successful','info');
         });
     });
 
+    // Filter on searchfield changes
+    $("#search").keyup(function (e) {
+        if ($(this).val() == searchString) return;
+        searchString = $(this).val();
+        reloadTab();
+    });
+
+    // Load more titles on scroll
     $(window).scroll(function() {
-        if(!allMoviesLoaded && !moviesLoading && $(window).scrollTop() + $(window).height() >= $(document).height() - 10) {
-            if ($('#movies').is(':visible')) {
-                loadMovies({
-                    sortorder: $('.active-sortorder').attr('data-sortorder'),
-                    sortmethod: $('.active-sortmethod').attr('data-sortmethod')
-                });
-            }
-            if ($('#shows').is(':visible')) {
-                loadXbmcShows();
-            }
+        var scroll = $(window).scrollTop() + $(window).height() >= $(document).height() - 10;
+        if ($('#movies').is(':visible') && !allMoviesLoaded && !moviesLoading && scroll) {
+            loadMovies();
+        } else if ($('#shows').is(':visible') && !allShowsLoaded && !showsLoading && scroll) {
+            loadXbmcShows();
+        } else if ($('#music').is(':visible') && !allArtistsLoaded && !artistsLoading && scroll) {
+            loadArtists();
         }
-    });
-    $('[data-sortmethod]').click(function() {
-        $('#movie-grid').html('');
-        lastMovieLoaded = 0;
-        allMoviesLoaded = false;
-        var clickItem = $(this);
-        $('.active-sortmethod i').remove();
-        $('.active-sortmethod').removeClass('active-sortmethod');
-        clickItem.addClass('active-sortmethod').prepend($('<i>').addClass('icon-ok'));
-        loadMovies({
-            sortorder: $('.active-sortorder').attr('data-sortorder'),
-            sortmethod: $('.active-sortmethod').attr('data-sortmethod')
-        });
-    });
-    $('[data-sortorder]').click(function() {
-        $('#movie-grid').html('');
-        lastMovieLoaded = 0;
-        allMoviesLoaded = false;
-        var clickItem = $(this);
-        $('.active-sortorder i').remove();
-        $('.active-sortorder').removeClass('active-sortorder');
-        clickItem.addClass('active-sortorder').prepend($('<i>').addClass('icon-ok'));
-        loadMovies({
-            sortorder: $('.active-sortorder').attr('data-sortorder'),
-            sortmethod: $('.active-sortmethod').attr('data-sortmethod')
-        });
     });
 });
 
@@ -150,11 +105,16 @@ function loadMovies(options) {
         movieRequest.abort();
         moviesLoading = false;
     }
+    if (options) {
+        lastMovieLoaded = 0;
+        allMoviesLoaded = false;
+        $('#movie-grid').html('');
+    }
+    hidewatched = $('#hidewatched').hasClass('active')?1:0
     var sendData = {
         start: lastMovieLoaded,
         end: (lastMovieLoaded + movieLimit),
-        sortorder: 'ascending',
-        sortmethod: 'title'
+        hidewatched: hidewatched
     };
     $.extend(sendData, options);
     if (allMoviesLoaded) return;
@@ -294,11 +254,19 @@ function loadXbmcShows(options) {
         showRequest.abort();
         showsLoading = false;
     }
-    hidewatched = $('#hidewatched').hasClass('hidewatched')?1:0
+
+    if (options) {
+        lastShowLoaded = 0;
+        allShowsLoaded = false;
+        $('#show-grid').html('');
+    }
+
+    hidewatched = $('#hidewatched').hasClass('active')?1:0
+
     var sendData = {
         start: lastShowLoaded,
         end: (lastShowLoaded + showSteps),
-        hidewatched: hidewatched,
+        hidewatched: hidewatched
     };
     $.extend(sendData, options);
 
@@ -325,7 +293,7 @@ function loadXbmcShows(options) {
                 $.each(data.tvshows, function (i, show) {
                     var showItem = $('<li>').addClass('show-item').attr('title', show.title);
 
-                    var showAnchor = $('<a>').attr('href', '#').click(function(e) {
+                    var showAnchor = $('<a>').attr('href', '#').attr('title',show.plot).click(function(e) {
                         e.preventDefault();
                         loadXBMCShow(show);
                     });
@@ -393,8 +361,9 @@ function xbmcShowEpisode(episode) {
     });
 }
 
+var currentShow = ''
 function loadXBMCShow(show) {
-    hidewatched = $('#hidewatched').hasClass('hidewatched')?1:0
+    hidewatched = $('#hidewatched').hasClass('active')?1:0
     $('.spinner').show();
     $('#show-grid').hide();
     $('#show-seasons').empty();
@@ -403,37 +372,42 @@ function loadXBMCShow(show) {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            seasonCounter = 0;
-            $.each(data.seasons, function (i, season) {
-                var seasonItem = $('<li>');
-                var seasonLink = $('<a>').attr('href','#season'+i).html('Season '+i);
-                seasonLink.attr('data-toggle','collapse');
-                seasonLink.addClass('season-header well');
-                var backBtn = $('<a>').attr('href','#').html('Back').addClass('btn pull-right').click(function(e) {
-                    $('#show-grid').show();
-                    $('#show-seasons').hide();
-                });
-                seasonLink.prepend(backBtn);
-                seasonItem.append(seasonLink);
-                var episodeList = $('<ul>').attr('id','season'+i).addClass('thumbnails collapse');
-                if (seasonCounter == 0) episodeList.addClass('in');
-                seasonCounter++;
-                $.each(season, function (i, episode) {
-                    var episodeItem = $('<li>');
-                    var episodeAnchor = $('<a>').attr('href', '#').addClass('thumbnail');
-                    episodeAnchor.attr('title', episode.plot);
-                    var src = WEBDIR + 'xbmc/GetThumb?w=150&h=85&thumb='+encodeURIComponent(episode.thumbnail)
-                    episodeAnchor.append($('<img>').attr('src', src));
-                    episodeAnchor.click(function(e) {
+            if (data == null || data.limits.total == 0) {
+                $('#show-grid').show();
+                $('#show-seasons').hide();
+                reloadTab();
+                return;
+            };
+            currentShow = show;
+            var seasons = 0;
+            $.each(data.episodes, function (i, episode) {
+                if ($('#season' + episode.season).length == 0){
+                    var seasonItem = $('<li>');
+                    var seasonLink = $('<a>').attr('href','#season' + episode.season).html('Season ' + episode.season);
+                    seasonLink.attr('data-toggle','collapse');
+                    seasonLink.addClass('season-header well');
+                    seasonItem.prepend($('<a>').attr('href','#').html('Back').addClass('btn pull-right').click(function(e) {
                         e.preventDefault();
-                        playItem(episode.episodeid, 'episode');
-                    });
-                    episodeItem.append(episodeAnchor);
-                    episodeItem.append($('<h6>').addClass('show-title').html(shortenText(episode.label, 20)));
-                    episodeList.append(episodeItem);
-                });
-                seasonItem.append(episodeList);
-                $('#show-seasons').append(seasonItem);
+                        $('#show-grid').show();
+                        $('#show-seasons').hide();
+                        reloadTab();
+                    }));
+                    seasonItem.append(seasonLink);
+                    var seasonList = $('<ul>').attr('id','season' + episode.season).addClass('thumbnails')
+                    if (seasons > 0) seasonList.addClass('collapse')
+                    $('#show-seasons').append(seasonItem.append(seasonList));
+                    seasons++;
+                }
+                var episodeItem = $('<li>');
+                var episodeThumb = WEBDIR + 'xbmc/GetThumb?w=150&h=85&thumb='+encodeURIComponent(episode.thumbnail)
+                var episodeLink = $('<a>').attr('href', '#').attr('title', episode.plot).addClass('thumbnail').click(function(e) {
+                    e.preventDefault();
+                    playItem(episode.episodeid, 'episode');
+                }).append($('<img>').attr('src', episodeThumb));
+                episodeItem.append(episodeLink);
+                episodeItem.append($('<h6>').addClass('show-title').html(shortenText(episode.label, 20)));
+                
+                $('#season' + episode.season).append(episodeItem);
             });
             $('.spinner').hide();
             $('#show-seasons').show();
@@ -468,8 +442,10 @@ function xbmcLoadAlbums(artistid, elem){
 
             // Loop albums
             $.each(albums.albums, function (i, album) {
-                var link = $('<a>').attr('href', '#').attr('title', album.label).addClass('thumbnail').click(function(){
+                var link = $('<a>').attr('href', '#').attr('title', album.label).addClass('thumbnail').click(function(e) {
+                    e.preventDefault();
                     playItem(album.albumid, 'album');
+                    $('a[href=#playlist]').tab('show');
                 });
 
                 if (album.thumbnail) {
@@ -490,15 +466,37 @@ function xbmcLoadAlbums(artistid, elem){
     });
 }
 
+var artistSteps = 20;
+var lastArtistLoaded = 0;
+var allArtistsLoaded = false;
+var artistsLoading = false;
+var artistRequest = null;
 function loadArtists(options) {
+    if ($('#artist-grid').attr('data-scroll-limit') !== 0) {
+       artistSteps = parseInt($('#artist-grid').attr('data-scroll-limit'));
+    }
+
+    if (artistRequest != null) {
+        artistRequest.abort();
+        artistsLoading = false;
+    }
+
+    if (options) {
+        lastArtistLoaded = 0;
+        allArtistsLoaded = false;
+        $('#artist-grid').html('');
+    }
+
     var sendData = {
-        start: 0,
-        end: 25,
-        sortorder: 'ascending',
-        sortmethod: 'artist',
-        filter: ''
+        start: lastArtistLoaded,
+        end: (lastArtistLoaded + artistSteps),
     };
     $.extend(sendData, options);
+
+    if (allArtistsLoaded) return;
+    if (artistsLoading) return;
+
+    artistsLoading = true;
 
     $('.spinner').show();
     artistRequest = $.ajax({
@@ -508,17 +506,21 @@ function loadArtists(options) {
         dataType: 'json',
         success: function (data) {
             $('.spinner').hide();
+            lastArtistLoaded += artistSteps;
 
             if (data == null) return errorHandler();
 
+            if (data.limits.end == data.limits.total) {
+                allArtistsLoaded = true;
+            }
+
             if (data.artists != undefined) {
-                $('#artist-grid').html('');
                 $.each(data.artists, function (i, artist) {
                     $('#artist-grid').append($('<tr>').append(
                         $('<td>').append($('<a>').attr('href','#').attr('title', 'Play all songs for this artist').html('<i class="icon-play-circle">').click(function(e) {
                             e.preventDefault();
                             playItem(artist.artistid, 'artist');
-                            notify('OK', artist.label + ' playing now.', 'success');
+                            $('a[href=#playlist]').tab('show');
                         })),
                         $('<td>').append($('<a>').attr('href','#').html(artist.label).click(function(e) {
                             e.preventDefault(e);
@@ -527,23 +529,9 @@ function loadArtists(options) {
                     ));
                 });
             }
-            paginateArtists(data.limits)
+            artistsLoading = false;
         },error: function() {
             errorHandler();
-        }
-    });
-}
-
-function paginateArtists(limit){
-    current = limit.start/25
-    $('#artistPager').pagination(limit.total,{
-        current_page: current,
-        num_edge_entries:1,
-        items_per_page:25,
-        num_display_entries:4,
-        ellipse_text:'<a href="#">...</a>',
-        callback:function(page,component){
-            loadArtists({start: (page*25), end: (page*25+25), filter: $('#xbmc-filter-artists').val()});
         }
     });
 }
@@ -560,7 +548,10 @@ function loadNowPlaying() {
         },
         success: function(data) {
             if (data == null) {
+                // Hide how playing and playlist link
                 $('#nowplaying').hide();
+                $('a[href=#playlist]').parent().hide();
+                $('#playlist-table tbody').html('');
                 return;
             }
             $('#nowplaying').show();
@@ -696,6 +687,7 @@ function loadPlaylist(type){
         type: 'get',
         dataType: 'json',
         success: function(data) {
+            $('a[href=#playlist]').parent().show();
             var playlist = $('#playlist-table tbody').html('');
 
             if (data.items == undefined || data.limits.total == 0) {
@@ -704,7 +696,7 @@ function loadPlaylist(type){
             }
 
             $.each(data.items, function(i, item){
-                var listItem = $('<tr>').click(function(e) {
+                var listItem = $('<tr>').attr('title',item.title).click(function(e) {
                     e.preventDefault();
                     playlistJump(i);
                 });
@@ -715,7 +707,7 @@ function loadPlaylist(type){
 
                 if (item.type == 'song') {
                     listItem.append(
-                        $('<td>').html(item.title),
+                        $('<td>').html(shortenText(item.title,90)),
                         $('<td>').html(item.artist[0]),
                         $('<td>').html(item.album),
                         $('<td>').html(parseSec(item.duration))
@@ -747,34 +739,23 @@ function playlistJump(position) {
     $.get(WEBDIR + 'xbmc/ControlPlayer/JumpItem/'+position);
 }
 
-function enablePlayerControls() {
-    $('[data-player-control]').click(function () {
-        var action = $(this).attr('data-player-control');
-        $.get(WEBDIR + 'xbmc/ControlPlayer?action='+action);
-    });
-}
-
-function sendNotification(string) {
-    $.post(WEBDIR + 'xbmc/Notify',{'text': string}, function(data) {
-        notify('XBMC', 'Notification sent successfully', 'info');
-    });
-}
-
-function xbmcClean(lib) {
-    $.get(WEBDIR + 'xbmc/Clean?lib='+lib, function(data) {
-        notify('XBMC', 'Library clean sent successfully', 'info');
-    });
-}
-
-function xbmcScan(lib) {
-    $.get(WEBDIR + 'xbmc/Scan?lib='+lib, function(data) {
-        notify('XBMC', 'Library update sent successfully', 'info');
-    });
-}
-
 function errorHandler() {
     $('.spinner').hide();
     notify('Error','Error connecting to XBMC','error');
     moviesLoading = false;
     return false;
+}
+
+function reloadTab() {
+    if ($('#movies').is(':visible')) {
+        loadMovies({'filter': searchString});
+    } else if ($('#shows').is(':visible')) {
+        if ($('#show-seasons').is(':visible')) {
+            loadXBMCShow(currentShow);
+        } else {
+            loadXbmcShows({'filter': searchString});
+        }
+    } else if ($('#music').is(':visible')) {
+        loadArtists({'filter': searchString});
+    }
 }
