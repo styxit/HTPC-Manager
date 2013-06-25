@@ -39,7 +39,10 @@ class Xbmc:
                  'name':'xbmc_enable'},
                 {'type':'text',
                  'label':'Menu name',
-                 'name':'xbmc_name'}
+                 'name':'xbmc_name'},
+                {'type':'bool',
+                 'label':'Hide watched',
+                 'name':'xbmc_hide_watched'}
         ]})
         htpc.MODULES.append({
             'name': 'XBMC Servers',
@@ -195,7 +198,7 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetMovies(self, start=0, end=0, sortmethod='title', sortorder='ascending', filter=''):
+    def GetMovies(self, start=0, end=0, sortmethod='title', sortorder='ascending', hidewatched=0, filter=''):
         """ Get a list of all movies """
         self.logger.debug("Fetching Movies")
         try:
@@ -205,6 +208,8 @@ class Xbmc:
                     'imdbnumber', 'genre', 'rating', 'streamdetails', 'playcount']
             limits = {'start': int(start), 'end': int(end)}
             filter = {'field': 'title', 'operator': 'contains', 'value': filter}
+            if hidewatched == "1":
+                filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
             return xbmc.VideoLibrary.GetMovies(sort=sort, properties=properties, limits=limits, filter=filter)
         except ValueError:
             self.logger.error("Unable to fetch movies!")
@@ -273,7 +278,7 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetAlbums(self, artistid=None):
+    def GetAlbums(self, artistid=None, filter=''):
         """ Get a list of all albums for artist """
         self.logger.debug("Loading all albums for ARTISTID " + str(artistid))
         try:
@@ -281,9 +286,9 @@ class Xbmc:
             properties=['artist', 'albumlabel', 'year', 'description', 'thumbnail']
             if artistid is not None:
                 filter = {'artistid': int(artistid)}
-                return xbmc.AudioLibrary.GetAlbums(filter=filter, properties=properties)
             else:
-                return xbmc.AudioLibrary.GetAlbums(properties=properties)
+                filter = {'field': 'label', 'operator': 'contains', 'value': filter}
+            return xbmc.AudioLibrary.GetAlbums(properties=properties, filter=filter)
         except ValueError:
             return
 
@@ -456,13 +461,16 @@ class Xbmc:
         xbmc = Server(self.url('/jsonrpc', True))
         if action == 'Shutdown':
             self.logger.info("Shutting down XBMC")
-            return xbmc.System.Shutdown()
+            xbmc.System.Shutdown()
+            return 'Shutting down XBMC.'
         elif action == 'Suspend':
             self.logger.info("Suspending XBMC")
-            return xbmc.System.Suspend()
+            xbmc.System.Suspend()
+            return 'Suspending XBMC.'
         elif action == 'Reboot':
             self.logger.info("Rebooting XBMC")
-            return xbmc.System.Reboot()
+            xbmc.System.Reboot()
+            return 'Rebooting XBMC.'
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -493,7 +501,8 @@ class Xbmc:
         """ Create popup in XBMC """
         self.logger.debug("Sending notification to XBMC: " + text)
         xbmc = Server(self.url('/jsonrpc', True))
-        return xbmc.GUI.ShowNotification(title='HTPC manager', message=text, image='https://raw.github.com/styxit/HTPC-Manager/master/interfaces/default/img/xbmc-logo.png')
+        image='https://raw.github.com/styxit/HTPC-Manager/master/interfaces/default/img/xbmc-logo.png'
+        return xbmc.GUI.ShowNotification(title='HTPC manager', message=text, image=image)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
