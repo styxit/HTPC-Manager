@@ -4,25 +4,33 @@ $(document).ready(function () {
     path = window.location.pathname.split('/');
     $('#nav-'+path[1]).addClass('active');
 
-    $("#search").keyup(function (e) {
-        var filter = $(this).val()
-        $(".filter:visible:first li").each(function () {
-            var shown = ($(this).text().toUpperCase().indexOf(filter.toUpperCase()) >= 0);
-            $(this).toggle(shown);
-        });
-    }).keydown(function (e) {
-        e.stopPropagation();
-    });
     $('.carousel').carousel();
     $(".table-sortable").tablesorter();
     $('.tabs').tab();
-    $('a[data-toggle="tab"]').on('shown', function(e) {
-        var current_tab = $(e.target).attr('href');
-        $.cookie('active_tab', current_tab);
-        $(".search-query").val('').trigger('keyup');
+    $(window).on('hashchange', toggleTab);
+    $('a[data-toggle="tab"]').on('click', function(e) {
+        var yScroll = $(window).scrollTop();
+        location.hash = $(e.target).attr('href');;
+        $(window).scrollTop(yScroll);
     });
-    active_tab = (location.hash) ? location.hash : $.cookie('active_tab');
-    $('[href='+active_tab+']').trigger('click');
+
+    $('a.ajax-link').click(function (e) {
+        e.preventDefault();
+        var link = $(this);
+        $.get(link.attr('href'), function(data) {
+            notify(link.text(), data, 'success');
+        }, 'json');
+    });
+
+    $('a.ajax-confirm').click(function (e) {
+        e.preventDefault();
+        var link = $(this);
+        if (confirm(link.attr('title') + '?')) {
+          $.get(link.attr('href'), function(data){
+            notify(link.attr('title'), data, 'warning');
+          }, 'json');
+        }
+    });
 
     $('#btn-check-update').click(function (e) {
         e.preventDefault();
@@ -73,6 +81,14 @@ $(document).ready(function () {
         $('#modal_dialog .modal-fanart').css('background', '#ffffff');
     })
 });
+
+function toggleTab() {
+    if (location.hash) {
+        $('a[href='+location.hash+']').tab('show');
+    } else {
+        $('a[data-toggle="tab"]:first').tab('show')
+    }
+}
 
 function makeIcon(iconClass, title) {
     var icon = $('<i>');
