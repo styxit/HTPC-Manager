@@ -74,20 +74,35 @@
         <ul class="nav nav-tabs">
             <li><a href="#movies" data-toggle="tab">Movies</a></li>
             <li><a href="#shows" data-toggle="tab">TV Shows</a></li>
-            <li><a href="#music" data-toggle="tab">Music</a></li>
+            <li class="hide"><a href="#episodes" data-toggle="tab">Episodes</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Music
+                <i class="caret"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#artists" data-toggle="tab">Artists</a></li>
+                    <li><a href="#albums" data-toggle="tab">Album</a></li>
+                </ul>
+            </li>
+            %if settings.get('xbmc_enable_pvr', 0):
             <li><a href="#pvr" data-toggle="tab">PVR</a></li>
+            %endif
             <li class="hide"><a href="#playlist" data-toggle="tab">Playlist</a></li>
         </ul>
         <div class="tab-content">
             <div id="movies" class="tab-pane">
-                <ul id="movie-grid" class="thumbnails" data-scroll-limit="${settings.get('xbmc_scroll_limit', '50')}"></ul>
+                <ul id="movie-grid" class="thumbnails"></ul>
             </div>
             <div id="shows" class="tab-pane">
-                <ul id="show-grid" class="thumbnails" data-scroll-limit="${settings.get('xbmc_scroll_limit', '0')}"></ul>
-                <ul id="show-seasons" class="hide" data-scroll-limit="${settings.get('xbmc_scroll_limit', '0')}"></ul>
+                <ul id="show-grid" class="thumbnails"></ul>
             </div>
-            <div id="music" class="tab-pane">
-                <table id="artist-grid" class="table table-striped table-hover" data-scroll-limit="${settings.get('xbmc_scroll_limit', '50')}"></table>
+            <div id="episodes" class="tab-pane">
+                <ul id="episode-grid" class="thumbnails"></ul>
+            </div>
+            <div id="artists" class="tab-pane">
+                <table id="artist-grid" class="table table-striped table-hover"></table>
+            </div>
+            <div id="albums" class="tab-pane">
+                <ul id="album-grid" class="artist-albums thumbnails"></ul>
             </div>
             <div id="playlist" class="tab-pane">
                 <table id ="playlist-table" class="playlist table table-striped table-hover">

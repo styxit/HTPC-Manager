@@ -41,6 +41,9 @@ class Xbmc:
                  'label':'Menu name',
                  'name':'xbmc_name'},
                 {'type':'bool',
+                 'label':'Enable PVR',
+                 'name':'xbmc_enable_pvr'},
+                {'type':'bool',
                  'label':'Hide watched',
                  'name':'xbmc_hide_watched'}
         ]})
@@ -70,7 +73,10 @@ class Xbmc:
                  'name':'xbmc_server_username'},
                 {'type':'password',
                  'label':'Password',
-                 'name':'xbmc_server_password'}
+                 'name':'xbmc_server_password'},
+                {'type':'text',
+                 'label':'Mac addr.',
+                 'name':'xbmc_server_mac'}
         ]})
         # Set current server to the first one in database
         try:
@@ -211,7 +217,7 @@ class Xbmc:
             if hidewatched == "1":
                 filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
             return xbmc.VideoLibrary.GetMovies(sort=sort, properties=properties, limits=limits, filter=filter)
-        except ValueError:
+        except:
             self.logger.error("Unable to fetch movies!")
             return
 
@@ -236,16 +242,17 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetShow(self, tvshowid=None, sortmethod='episode', sortorder='ascending', hidewatched=False, filter=''):
+    def GetEpisodes(self, start=0, end=0, sortmethod='episode', sortorder='ascending', tvshowid=None, hidewatched=False, filter=''):
         """ Get information about a single TV Show """
         self.logger.debug("Loading information for TVID" + str(tvshowid))
         xbmc = Server(self.url('/jsonrpc', True))
         sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
         properties = ['episode', 'season', 'thumbnail', 'plot', 'file', 'playcount']
+        limits = {'start': int(start), 'end': int(end)}
         filter = {'field': 'title', 'operator': 'contains', 'value': filter}
         if hidewatched == "1":
-            filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
-        episodes = xbmc.VideoLibrary.GetEpisodes(sort=sort, tvshowid=int(tvshowid), properties=properties, filter=filter)
+            filter = {"and": [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
+        episodes = xbmc.VideoLibrary.GetEpisodes(sort=sort, tvshowid=int(tvshowid), properties=properties, limits=limits, filter=filter)
         return episodes
 
     @cherrypy.expose()
@@ -266,29 +273,22 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetArtistDetails(self, artistid=None):
-        """ Get artist details from xbmc """
-        self.logger.debug("Loading information for ARTISTID " + artistid)
-        try:
-            xbmc = Server(self.url('/jsonrpc', True))
-            properties = ['thumbnail', 'fanart', 'description']
-            return xbmc.AudioLibrary.GetArtistDetails(artistid=int(artistid), properties=properties)
-        except ValueError:
-            return
-
-    @cherrypy.expose()
-    @cherrypy.tools.json_out()
-    def GetAlbums(self, artistid=None, filter=''):
+    def GetAlbums(self, start=0, end=0, sortmethod='label', sortorder='ascending', filter='', artistid=None):
         """ Get a list of all albums for artist """
         self.logger.debug("Loading all albums for ARTISTID " + str(artistid))
         try:
             xbmc = Server(self.url('/jsonrpc', True))
-            properties=['artist', 'albumlabel', 'year', 'description', 'thumbnail']
+            sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
+            properties=['artist', 'title', 'year', 'description', 'thumbnail']
+            limits = {'start': int(start), 'end': int(end)}
             if artistid is not None:
                 filter = {'artistid': int(artistid)}
             else:
-                filter = {'field': 'label', 'operator': 'contains', 'value': filter}
-            return xbmc.AudioLibrary.GetAlbums(properties=properties, filter=filter)
+                filter = {'or': [
+                             {'field': 'album', 'operator': 'contains', 'value': filter},
+                             {'field': 'artist', 'operator': 'contains', 'value': filter}
+                         ]}
+            return xbmc.AudioLibrary.GetAlbums(properties=properties, limits=limits, sort=sort, filter=filter)
         except ValueError:
             return
 
@@ -310,9 +310,8 @@ class Xbmc:
         self.logger.debug("Loading XBMC PVC channel list.")
         try:
             xbmc = Server(self.url('/jsonrpc', True))
-            properties = ['thumbnail']
-            return xbmc.PVR.GetChannels(channelgroupid=int(group), properties=properties)
-        except ValueError:
+            return xbmc.PVR.GetChannels(channelgroupid=int(group), properties=['thumbnail'])
+        except:
             return
 
     @cherrypy.expose()

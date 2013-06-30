@@ -1,68 +1,55 @@
 .dropdown-menu li {
     font-size: smaller;
 }
-
+a.thumbnail:Hover,
+#artist-grid a:Hover {
+    text-decoration: none;
+}
 #movie-grid img,
-#movie-grid .thumbnail {
+#movie-grid .thumbnail,
+#show-grid img,
+#show-grid .thumbnail {
     position: relative;
     height: 150px;
     width: 100px;
 }
-#movie-grid i{
+#episode-grid .thumbnail,
+#episode-grid .thumbnail img {
+    position: relative;
+    height: 85px;
+    width: 150px;
+}
+#show-grid.banners img {
+    height: 90px;
+    width: 500px;
+}
+#movie-grid i,
+#show-grid i,
+#episode-grid i {
     position: absolute;
     bottom: 5px;
     right: 5px;
     width: 16px; 
     height: 16px;
 }
-h6.movie-title, h6.show-title, h6.album-title {
+h6.movie-title,
+h6.show-title,
+h6.album-title,
+h6.episode-title {
     color: #555555;
     text-align: center;
     margin: 0;
     padding-top: 4px;
 }
-#show-grid img {
-    height: 150px;
-    width: 100px;
-}
-#show-grid.banners img {
-    height: 90px;
-    width: 500px;
-}
-#show-seasons {
-    margin: 0;
-    padding: 0;
-}
-#show-seasons .season-header {
-    font-weight: bold;
-    font-size: 1.5em;
-    display: block;
-}
-#show-seasons .thumbnail,
-#show-season .thumbnail img {
-    height: 85px;
-    width: 150px;
-}
 .artist-albums .albumart {
     height: 150px;
     width: 150px;
-}
-.modal-movieinfo {
-    margin-left: 230px;
-}
-.modal-youtube {
-    border: 0;
-    height: 375px;
-    width: 670px;
 }
 #artist-grid tr td:first-child {
     width: 15px;
 }
 #artist-grid tr td a {
     display: block;
-}
-#artist-grid tr td a:Hover {
-    text-decoration: none;
 }
 #playlist_table td i {
     float: right;
@@ -74,4 +61,12 @@ h6.movie-title, h6.show-title, h6.album-title {
 #nowplaying #player-progressbar,
 #playlist tr td {
     cursor: pointer;
+}
+.modal-movieinfo {
+    margin-left: 230px;
+}
+.modal-youtube {
+    border: 0;
+    height: 375px;
+    width: 670px;
 }
