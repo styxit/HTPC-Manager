@@ -770,16 +770,19 @@ function errorHandler() {
 }
 
 function reloadTab() {
+    options = {'filter': searchString}
+
     if ($('#movies').is(':visible')) {
-        loadMovies({'filter': searchString});
+        loadMovies(options);
     } else if ($('#shows').is(':visible')) {
-        loadShows({'filter': searchString});
+        loadShows(options);
     } else if ($('#episodes').is(':visible')) {
-        loadEpisodes({'tvshowid': currentShow, 'filter': searchString});
+        options = $.extend(options, {'tvshowid': currentShow});
+        loadEpisodes(options);
     } else if ($('#artists').is(':visible')) {
-        loadArtists({'filter': searchString});
+        loadArtists(options);
     } else if ($('#albums').is(':visible')) {
-        loadAlbums({'filter': searchString});
+        loadAlbums(options);
     } else if ($('#pvr').is(':visible')) {
         loadChannels();
     }

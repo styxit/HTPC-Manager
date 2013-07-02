@@ -5,8 +5,15 @@ $(document).ready(function () {
         var action = btn.attr('data-target');
         var data = btn.parents('form:first').serialize();
         $.post(action, data, function(data) {
-            btn.button('reset')
-            xbmc_server_test(btn, data!=null);
+            btn.button('reset');
+            if (data['Network.MacAddress'] && data['Network.MacAddress'] != 'Busy') {
+                $('#xbmc_server_mac:visible').val(data['Network.MacAddress']);
+            }
+            if (data!=null == 1) {
+                btn.addClass('btn-success').append(' ').append($('<i>').addClass('icon-white icon-ok'));
+            } else {
+                btn.addClass('btn-danger').append(' ').append($('<i>').addClass('icon-white icon-exclamation-sign'));
+            }
         });
     });
     $('input, radio, select, button').bind('change keydown', function(e) {
@@ -48,6 +55,7 @@ $(document).ready(function () {
             $('#xbmc_server_port').val(data.port);
             $('#xbmc_server_username').val(data.username);
             $('#xbmc_server_password').val(data.password);
+            $('#xbmc_server_mac').val(data.mac);
             $("button:reset:visible").html('Delete').addClass('btn-danger').click(function(e) {
                 e.preventDefault();
                 var id = $('#xbmc_server_id').val()
@@ -65,22 +73,12 @@ $(document).ready(function () {
 });
 
 function xbmc_update_servers(id) {
-    if ($("#xbmc_server_id").is(":visible") ) {
-        $.get(WEBDIR + 'xbmc/Servers', function(data) {
-            if (data==null) return;
-            var servers = $('#xbmc_server_id').empty().append($('<option>').text('New').val(0));
-            $.each(data.servers, function(i, item) {
-                servers.append($('<option>').text(item.name).val(item.id));
-            });
-            servers.val(id).trigger('change');
-        }, 'json');
-    }
-}
-
-function xbmc_server_test(btn, status) {
-    if (status == 1) {
-        btn.addClass('btn-success').append(' ').append($('<i>').addClass('icon-white icon-ok'));
-    } else {
-        btn.addClass('btn-danger').append(' ').append($('<i>').addClass('icon-white icon-exclamation-sign'));
-    }
+    $.get(WEBDIR + 'xbmc/Servers', function(data) {
+        if (data==null) return;
+        var servers = $('#xbmc_server_id').empty().append($('<option>').text('New').val(0));
+        $.each(data.servers, function(i, item) {
+            servers.append($('<option>').text(item.name).val(item.id));
+        });
+        servers.val(id).trigger('change');
+    }, 'json');
 }

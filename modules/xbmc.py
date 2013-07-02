@@ -28,7 +28,6 @@ class Xbmc:
         """ Add module to list of modules on load and set required settings """
         self.logger = logging.getLogger('modules.xbmc')
 
-        # xbmc.XBMC.GetInfoLabels(labels=["Network.MacAddress"])
         XbmcServers.createTable(ifNotExists=True)
         htpc.MODULES.append({
             'name': 'XBMC',
@@ -114,6 +113,7 @@ class Xbmc:
                 url = xbmc_server_username + ':' + xbmc_server_password + '@' + url
             xbmc = Server('http://' + url + '/jsonrpc')
             self.logger.debug("Trying to contact xbmc via " + url)
+            return xbmc.XBMC.GetInfoLabels(labels=["Network.MacAddress"])
             return xbmc.JSONRPC.Ping()
         except (ProtocolError, InvalidURL) as e:
             self.logger.error("Unable to contact XBMC via " + url)
@@ -130,7 +130,8 @@ class Xbmc:
                 'host': server.host,
                 'port': server.port,
                 'username': server.username,
-                'password': server.password
+                'password': server.password,
+                'mac': server.mac
             }
         except SQLObjectNotFound:
             return None
@@ -138,7 +139,7 @@ class Xbmc:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def server(self, xbmc_server_id, xbmc_server_name, xbmc_server_host, xbmc_server_port,
-            xbmc_server_username=None, xbmc_server_password=None):
+            xbmc_server_username=None, xbmc_server_password=None, xbmc_server_mac=None):
         """ Create a server if id=0, else update a server """
         if xbmc_server_id == "0":
             self.logger.debug("Creating XBMC-Server in database")
@@ -147,7 +148,8 @@ class Xbmc:
                         host=xbmc_server_host,
                         port=int(xbmc_server_port),
                         username=xbmc_server_username,
-                        password=xbmc_server_password)
+                        password=xbmc_server_password,
+                        mac=xbmc_server_mac)
                 return True
             except ValueError:
                 self.logger.error("Unable to create XBMC-Server in database")
@@ -161,6 +163,7 @@ class Xbmc:
                 server.port = int(xbmc_server_port)
                 server.username = xbmc_server_username
                 server.password = xbmc_server_password
+                server.mac = xbmc_server_mac
                 return True
             except SQLObjectNotFound, e:
                 self.logger.error("Unable to update XBMC-Server " + server.name + " in database")
@@ -498,9 +501,21 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def Wake(self, mac='00:01:2e:47:49:76'):
+    def Wake(self, mac=''):
         """ Send WakeOnLan package """
         self.logger.info("Waking up XBMC-System")
+        try:
+            server = XbmcServers.selectBy(id=self.current).getOne()
+            mac = server.mac
+            self.logger.info("WOL: Selecting current server.")
+        except SQLObjectNotFound:
+            server = XbmcServers.select(limit=1).getOne()
+            mac = server.mac
+            self.logger.info("WOL: Selecting first server.")
+        except SQLObjectNotFound:
+            self.logger.info("WOL: Cannot select server.")
+            return
+
         try:
             addr_byte = mac.split(':')
             hw_addr = struct.pack('BBBBBB',
@@ -514,10 +529,11 @@ class Xbmc:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             s.sendto(msg, ("255.255.255.255", 9))
-            return 'Packet send to ' + mac
+            self.logger.error("WOL package sent to " + mac)
+            return "WakeOnLan package sent"
         except:
             self.logger.error("Unable to send WOL packet")
-            return 'Failed to send WOL packet'
+            return
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
