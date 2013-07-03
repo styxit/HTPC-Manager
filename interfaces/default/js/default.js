@@ -59,8 +59,8 @@ $(document).ready(function () {
     });
     $('#btn-restart').click(function (e) {
         e.preventDefault();
-        if (confirm('Restart?')) {
-            notify('Restart','Restart command sent...','success')
+        if (confirm('Restart HTPC Manager?')) {
+            notify('Restarting HTPC Manager','Restart command sent...','success')
             $.get(WEBDIR + 'restart', function() {
                 // On restart
             }, 'json');
@@ -68,8 +68,8 @@ $(document).ready(function () {
     });
     $('#btn-shutdown').click(function (e) {
         e.preventDefault();
-        if (confirm('Shutdown?')) {
-            notify('Shutdown','Shutdown command sent.','success')
+        if (confirm('Shutdown HTPC Manager?')) {
+            notify('Shuttingdown HTPC Manager','Shutdown command sent.','success')
             $.get(WEBDIR + 'shutdown', function() {
                 // On shutdown confirmed
             }, 'json');
