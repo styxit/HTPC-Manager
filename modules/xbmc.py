@@ -215,7 +215,7 @@ class Xbmc:
             xbmc = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
             properties = ['title', 'year', 'plot', 'thumbnail', 'file', 'fanart', 'studio', 'trailer',
-                    'imdbnumber', 'genre', 'rating', 'streamdetails', 'playcount']
+                    'imdbnumber', 'genre', 'rating', 'playcount']
             limits = {'start': int(start), 'end': int(end)}
             filter = {'field': 'title', 'operator': 'contains', 'value': filter}
             if hidewatched == "1":
@@ -358,23 +358,24 @@ class Xbmc:
         self.logger.debug("Fetching currently playing information")
         try:
             xbmc = Server(self.url('/jsonrpc', True))
-            player = xbmc.Player.GetActivePlayers()
-            application = xbmc.Application.GetProperties(properties=['muted', 'volume', 'version'])
+            player = xbmc.Player.GetActivePlayers()[0]
+            playerid = player['playerid']
 
-            if player[0][u'type'] == 'video':
-                properties = ['speed', 'position', 'totaltime', 'time', 'percentage', 'subtitleenabled', 'currentsubtitle', 'subtitles',
-                              'currentaudiostream', 'audiostreams']
-                playerInfo = xbmc.Player.GetProperties(playerid=player[0][u'playerid'], properties=properties)
-                itemInfo = xbmc.Player.GetItem(playerid=player[0][u'playerid'], properties=['thumbnail', 'showtitle', 'year', 'episode', 'season', 'fanart'])
-                return {'playerInfo': playerInfo, 'itemInfo': itemInfo, 'app': application}
+            if player['type'] == 'video':
+                playerprop = ['speed', 'position', 'time', 'totaltime',
+                              'percentage', 'subtitleenabled', 'currentsubtitle',
+                              'subtitles', 'currentaudiostream', 'audiostreams']
+                itemprop = ['thumbnail', 'showtitle', 'season', 'episode', 'year', 'fanart']
 
-            elif player[0][u'type'] == 'audio':
-                properties = ['speed', 'position', 'totaltime', 'time', 'percentage',
-                              'currentaudiostream', 'audiostreams']
-                playerInfo = xbmc.Player.GetProperties(playerid=player[0][u'playerid'], properties=properties)
-                itemInfo = xbmc.Player.GetItem(playerid=player[0][u'playerid'], properties=['title', 'artist', 'album', 'thumbnail', 'showtitle', 'year', 'episode', 'season', 'fanart'])
+            elif player['type'] == 'audio':
+                playerprop = ['speed', 'position', 'time', 'totaltime', 'percentage']
+                itemprop = ['thumbnail', 'title', 'artist', 'album', 'year', 'fanart']
 
-                return {'playerInfo': playerInfo, 'itemInfo': itemInfo, 'app': application}
+            app = xbmc.Application.GetProperties(properties=['muted', 'volume'])
+            player = xbmc.Player.GetProperties(playerid=playerid, properties=playerprop)
+            item = xbmc.Player.GetItem(playerid=playerid, properties=itemprop)
+
+            return {'playerInfo': player, 'itemInfo': item, 'app': app}
         except:
             self.logger.debug("Unable to fetch currently playing information!")
             return
@@ -446,12 +447,10 @@ class Xbmc:
         self.logger.debug("Changing subtitles to " + subtitle)
         try:
             xbmc = Server(self.url('/jsonrpc', True))
-            player = xbmc.Player.GetActivePlayers()
-            playerid = player[0][u'playerid']
+            playerid = xbmc.Player.GetActivePlayers()[0][u'playerid']
             try:
                 subtitle = int(subtitle)
-                xbmc.Player.SetSubtitle(playerid=playerid, subtitle=subtitle)
-                xbmc.Player.SetSubtitle(playerid=playerid, subtitle='on')
+                xbmc.Player.SetSubtitle(playerid=playerid, subtitle=subtitle, enable=True)
             except ValueError:
                 self.logger.error("Unable to set subtitle to specified value " + subtitle)
                 self.logger.info("Disabling subtitles")
@@ -552,7 +551,8 @@ class Xbmc:
         self.logger.debug("Fetching recently added movies")
         try:
             xbmc = Server(self.url('/jsonrpc', True))
-            properties = ['title', 'year', 'runtime', 'plot', 'thumbnail', 'file', 'fanart', 'trailer', 'imdbnumber', 'studio', 'genre', 'rating']
+            properties = ['title', 'year', 'runtime', 'plot', 'thumbnail', 'file',
+                          'fanart', 'trailer', 'imdbnumber', 'studio', 'genre', 'rating']
             limits = {'start': 0, 'end': int(limit)}
             return xbmc.VideoLibrary.GetRecentlyAddedMovies(properties=properties, limits=limits)
         except:
@@ -566,7 +566,8 @@ class Xbmc:
         self.logger.debug("Fetching recently added TV Shows")
         try:
             xbmc = Server(self.url('/jsonrpc', True))
-            properties = ['showtitle', 'season', 'episode', 'title', 'runtime', 'thumbnail', 'plot', 'fanart', 'file']
+            properties = ['showtitle', 'season', 'episode', 'title', 'runtime',
+                          'thumbnail', 'plot', 'fanart', 'file']
             limits = {'start': 0, 'end': int(limit)}
             return xbmc.VideoLibrary.GetRecentlyAddedEpisodes(properties=properties, limits=limits)
         except:
@@ -580,8 +581,9 @@ class Xbmc:
         self.logger.debug("Fetching recently added Music")
         try:
             xbmc = Server(self.url('/jsonrpc', True))
+            properties = ['artist', 'albumlabel', 'year', 'description', 'thumbnail']
             limits = {'start': 0, 'end': int(limit)}
-            return xbmc.AudioLibrary.GetRecentlyAddedAlbums(properties=['artist', 'albumlabel', 'year', 'description', 'thumbnail'], limits=limits)
+            return xbmc.AudioLibrary.GetRecentlyAddedAlbums(properties=properties, limits=limits)
         except:
             self.logger.error("Unable to fetch recently added Music!")
             return

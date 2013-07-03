@@ -1,7 +1,7 @@
 var searchString = '';
 var hideWatched = 0;
 $(document).ready(function() {
-    //loadNowPlaying();
+    loadNowPlaying();
     hideWatched = $('#hidewatched').hasClass('active')?1:0;
 
     // Load data on tab display
@@ -538,7 +538,7 @@ function loadChannels(){
                     e.preventDefault();
                     playItem(channel.channelid, 'channel');
                 });
- 
+
                 var src = 'holder.js/75x75/text:'+channel.label;
                 if (channel.thumbnail) {
                     src = WEBDIR + 'xbmc/GetThumb?w=75&h=75&thumb='+encodeURIComponent(channel.thumbnail);
@@ -670,7 +670,7 @@ function loadNowPlaying() {
 
             var select = $('#audio').html('')
             select.parent().hide();
-            if (data.playerInfo.audiostreams > 1) {
+            if (data.playerInfo.audiostreams && data.playerInfo.audiostreams > 1) {
                 var current = data.playerInfo.currentaudiostream.index;
                 $.each(data.playerInfo.audiostreams, function (i, item) {
                     var option = $('<option>').html(item.name).val(item.index);
@@ -738,7 +738,7 @@ function loadPlaylist(type){
                 } else {
                     var label = item.label + ' (' + item.year + ')';
                     if (item.episode != -1) {
-                        label = item.showtitle + ': ' + 
+                        label = item.showtitle + ': ' +
                                 item.season + 'x' + item.episode + '. ' +
                                 item.label
                     }

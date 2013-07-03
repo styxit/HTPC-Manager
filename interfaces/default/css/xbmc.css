@@ -23,13 +23,25 @@ a.thumbnail:Hover,
     height: 90px;
     width: 500px;
 }
+#album-grid .thumbnail,
+#album-grid .thumbnail img {
+    position: relative;
+    height: 150px;
+    width: 150px;
+}
+#pvr-grid .thumbnail,
+#pvr-grid .thumbnail img {
+    position: relative;
+    height: 75px;
+    width: 75px;
+}
 #movie-grid i,
 #show-grid i,
 #episode-grid i {
     position: absolute;
     bottom: 5px;
     right: 5px;
-    width: 16px; 
+    width: 16px;
     height: 16px;
 }
 h6.movie-title,
@@ -62,10 +74,17 @@ h6.episode-title {
 #playlist tr td {
     cursor: pointer;
 }
-.modal-movieinfo {
+.modal {
+    width: 700px;
+}
+.modal .movie-poster {
+    height: 300px;
+    width: 200px;
+}
+.modal .modal-movieinfo {
     margin-left: 230px;
 }
-.modal-youtube {
+.modal .modal-youtube {
     border: 0;
     height: 375px;
     width: 670px;
