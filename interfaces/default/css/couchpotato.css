@@ -39,3 +39,9 @@
     height: 150px;
     width: 100px;
 }
+h6.movie-title {
+    color: #555555;
+    text-align: center;
+    margin: 0;
+    padding-top: 4px;
+}
