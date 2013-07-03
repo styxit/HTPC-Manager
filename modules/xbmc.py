@@ -126,6 +126,7 @@ class Xbmc:
         try:
             server = XbmcServers.selectBy(id=id).getOne()
             return {
+                'id': server.id,
                 'name': server.name,
                 'host': server.host,
                 'port': server.port,

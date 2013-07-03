@@ -27,29 +27,28 @@ $(document).ready(function () {
         $(this).find("input:checkbox:not(:checked)").each(function(e){
             data+='&'+$(this).attr('name')+'=0';
         });
+        console.log(data)
         $.post(action, data, function(data) {
             msg = data ? 'Save successful' : 'Save failed';
             notify('Settings', msg, 'info');
-        }).success(function() {
-            xbmc_update_servers(0);
+            if ($('#xbmc_server_id').is(":visible")) xbmc_update_servers($('#xbmc_server_id').val());
         });
     });
     $('input.enable-module').change(function() {
-        var clickItem = $(this);
-        var disabled = !clickItem.is(':checked');
-        var moduleItems = clickItem.parents('fieldset:first').find('input, radio, select');
-        moduleItems.attr('readonly', disabled);
-        moduleItems.attr('disabled', disabled);
-        clickItem.attr('disabled', false);
-        clickItem.attr('readonly', false);
+        var disabled = !$(this).is(':checked');
+        $(this).parents('fieldset:first').find('input, radio, select').not(this)
+            .attr('readonly', disabled)
+            .attr('disabled', disabled);
     });
+    $('input.enable-module').trigger('change')
     $('#xbmc_server_id').change(function() {
         var item = $(this);
         $.get(WEBDIR + 'xbmc/getserver?id='+item.val(), function(data) {
             if (data==null) {
-                $("button:reset:visible").html('Clear').removeClass('btn-danger').unbind().trigger('click');
+                $("button:reset:visible").html('Clear').removeClass('btn-danger').unbind();
                 return;
             }
+            $('#xbmc_server_id').val(data.id);
             $('#xbmc_server_name').val(data.name);
             $('#xbmc_server_host').val(data.host);
             $('#xbmc_server_port').val(data.port);
@@ -63,7 +62,6 @@ $(document).ready(function () {
                 if (!confirm('Delete ' + name)) return;
                 $.get(WEBDIR + 'xbmc/delserver?id='+id, function(data) {
                     notify('Settings', 'Server deleted', 'info');
-                }).success(function() {
                     xbmc_update_servers(id);
                 });
             });
@@ -77,8 +75,9 @@ function xbmc_update_servers(id) {
         if (data==null) return;
         var servers = $('#xbmc_server_id').empty().append($('<option>').text('New').val(0));
         $.each(data.servers, function(i, item) {
-            servers.append($('<option>').text(item.name).val(item.id));
+            var option = $('<option>').text(item.name).val(item.id);
+            if (id == item.id) option.attr('selected', 'selected');
+            servers.append(option);
         });
-        servers.val(id).trigger('change');
     }, 'json');
 }
