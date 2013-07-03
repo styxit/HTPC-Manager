@@ -73,21 +73,21 @@
             </div>
         </div>
         <ul class="nav nav-tabs">
-            <li><a href="#movies" data-toggle="tab">Movies</a></li>
-            <li><a href="#shows" data-toggle="tab">TV Shows</a></li>
+            <li><a href="#movies" data-toggle="tab"><i class="icon-film"></i> Movies</a></li>
+            <li><a href="#shows" data-toggle="tab"><i class="icon-facetime-video"></i> TV Shows</a></li>
             <li class="hide"><a href="#episodes" data-toggle="tab">Episodes</a></li>
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Music
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-music"></i> Music
                 <i class="caret"></i></a>
                 <ul class="dropdown-menu">
-                    <li><a href="#artists" data-toggle="tab">Artists</a></li>
-                    <li><a href="#albums" data-toggle="tab">Album</a></li>
+                    <li><a href="#artists" data-toggle="tab"><i class="icon-group"></i> Artists</a></li>
+                    <li><a href="#albums" data-toggle="tab"><i class="icon-th"></i> Albums</a></li>
                 </ul>
             </li>
             %if settings.get('xbmc_enable_pvr', 0):
             <li><a href="#pvr" data-toggle="tab">PVR</a></li>
             %endif
-            <li class="hide"><a href="#playlist" data-toggle="tab">Playlist</a></li>
+            <li class="hide"><a href="#playlist" data-toggle="tab"><i class="icon-align-justify"></i> Playlist</a></li>
         </ul>
         <div class="tab-content">
             <div id="movies" class="tab-pane">
