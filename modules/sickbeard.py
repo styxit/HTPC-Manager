@@ -17,8 +17,9 @@ class Sickbeard:
                 {'type': 'text', 'label': 'Menu name', 'name': 'sickbeard_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'sickbeard_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'sickbeard_port'},
+                {'type': 'text', 'label': 'Basepath', 'name': 'sickbeard_basepath'},
                 {'type': 'text', 'label': 'API key', 'name': 'sickbeard_apikey'},
-                {'type': 'text', 'label': 'Basepath (starts with a slash)', 'name': 'sickbeard_basepath'}
+                {'type': 'bool', 'label': 'Use SSL', 'name': 'sickbeard_ssl'}
         ]})
 
     @cherrypy.expose()
@@ -36,7 +37,9 @@ class Sickbeard:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def ping(self, sickbeard_host, sickbeard_port, sickbeard_apikey, sickbeard_basepath, **kwargs):
+    def ping(self, sickbeard_host, sickbeard_port, sickbeard_apikey, sickbeard_basepath, sickbeard_ssl, **kwargs):
+        ssl = 's' if sickbeard_ssl else ''
+        
         self.logger.debug("Testing connectivity")
         try:
             if(sickbeard_basepath == ""):
@@ -44,7 +47,7 @@ class Sickbeard:
             if not (sickbeard_basepath.endswith('/')):
               sickbeard_basepath += "/"
 
-            url = 'http://' + sickbeard_host + ':' + sickbeard_port + sickbeard_basepath + 'api/' + sickbeard_apikey + '/?cmd='
+            url = 'http' + ssl + '://' + sickbeard_host + ':' + sickbeard_port + sickbeard_basepath + 'api/' + sickbeard_apikey + '/?cmd='
             self.logger.debug("Trying to contact sickbeard via " + url)
             response = loads(urlopen(url + 'sb.ping', timeout=10).read())
             if response.get('result') == "success":
@@ -127,13 +130,14 @@ class Sickbeard:
             host = settings.get('sickbeard_host', '')
             port = str(settings.get('sickbeard_port', ''))
             apikey = settings.get('sickbeard_apikey', '')
+            ssl = 's' if settings.get('sickbeard_ssl', 0) else ''
             sickbeard_basepath = settings.get('sickbeard_basepath', '/')
 
             if(sickbeard_basepath == ""):
                 sickbeard_basepath = "/"
             if not (sickbeard_basepath.endswith('/')):
               sickbeard_basepath += "/"
-            url = 'http://' + host + ':' + str(port) + sickbeard_basepath + 'api/' + apikey + '/?cmd=' + cmd
+            url = 'http' + ssl + '://' + host + ':' + str(port) + sickbeard_basepath + 'api/' + apikey + '/?cmd=' + cmd
             
             self.logger.debug("Fetching information from: " + url)
 
