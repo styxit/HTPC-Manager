@@ -150,6 +150,10 @@ def main():
     # Load settings from database
     from htpc.settings import Settings
     settings = Settings()
+    
+    # Check for SSL
+    htpc.SSLCERT = settings.get('app_ssl_cert')
+    htpc.SSLKEY = settings.get('app_ssl_key')
 
     htpc.WEBDIR = settings.get('app_webdir', '/')
     if args.webdir:
@@ -174,8 +178,8 @@ def main():
     htpc.PORT = int(settings.get('app_port', 8085))
     if args.port:
         htpc.PORT = args.port
-
     logger.info("Starting on " + htpc.HOST + ":" +  str(htpc.PORT))
+    
     htpc.USERNAME = settings.get('app_username')
     htpc.PASSWORD = settings.get('app_password')
 

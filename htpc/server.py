@@ -22,6 +22,14 @@ def start():
             'environment': 'production'
         })
 
+    # Enable SSL
+    if htpc.SSLCERT and htpc.SSLKEY:
+        cherrypy.config.update({
+            'server.ssl_module': 'builtin',
+            'server.ssl_certificate': htpc.SSLCERT,
+            'server.ssl_private_key': htpc.SSLKEY
+        })
+
     # Daemonize cherrypy if specified
     if htpc.DAEMON:
         Daemonizer(cherrypy.engine).subscribe()
@@ -88,7 +96,6 @@ def start():
             'tools.auth_digest.get_ha1': get_ha1,
             'tools.auth_digest.key': 'a565c27146791cfb'
         })
-
 
 
     # When in INFO-mode, cherrypy will print out a ton of access messages
