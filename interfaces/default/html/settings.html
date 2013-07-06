@@ -21,7 +21,9 @@
                 {'type':'text', 'label':'Port *', 'name':'app_port', 'value':settings.get('app_port', 8085)},
                 {'type':'text', 'label':'Webdir *', 'name':'app_webdir', 'value':settings.get('app_webdir', '/')},
                 {'type':'text', 'label':'Username *', 'name':'app_username', 'value':settings.get('app_username')},
-                {'type':'password', 'label':'Password *', 'name':'app_password', 'value':settings.get('app_password')}
+                {'type':'password', 'label':'Password *', 'name':'app_password', 'value':settings.get('app_password')},
+                {'type':'text', 'label':'SSL Cert', 'name':'app_ssl_cert', 'value':settings.get('app_ssl_cert')},
+                {'type':'text', 'label':'SSL Key', 'name':'app_ssl_key', 'value':settings.get('app_ssl_key')}
             ])}
             % for m in htpc.MODULES:
                 % if m.get('test'):

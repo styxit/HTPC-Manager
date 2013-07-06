@@ -118,11 +118,11 @@ class Sabnzbd:
             host = settings.get('sabnzbd_host', '')
             port = str(settings.get('sabnzbd_port', ''))
             apikey = settings.get('sabnzbd_apikey', '')
-            ssl = 's' if settings.get('sabnzbd_ssl', 0) else ''
-
             sabnzbd_basepath = settings.get('sabnzbd_basepath', '/sabnzbd/')
+            ssl = 's' if settings.get('sabnzbd_ssl', 0) else ''
+                        
             if(sabnzbd_basepath == ""):
-              sabnzbd_basepath = "/sabnzbd/"
+                sabnzbd_basepath = "/sabnzbd/"
             if not(sabnzbd_basepath.endswith('/')):
                 sabnzbd_basepath += "/"
 

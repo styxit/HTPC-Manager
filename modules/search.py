@@ -16,7 +16,8 @@ class Search:
             'fields': [
                 {'type':'bool', 'label':'Enable', 'name':'nzbsearch_enable'},
                 {'type':'text', 'label':'Host', 'name':'newznab_host'},
-                {'type':'text', 'label':'Apikey', 'name':'newznab_apikey'}
+                {'type':'text', 'label':'Apikey', 'name':'newznab_apikey'},
+                {'type': 'bool', 'label': 'Use SSL', 'name': 'newznab_ssl'}
         ]})
 
     @cherrypy.expose()
@@ -36,12 +37,10 @@ class Search:
     def thumb(self, url, h=None, w=None, o=100):
         if url.startswith('rageid'):
             settings = htpc.settings.Settings()
-            host = settings.get('newznab_host', '')
+            host = settings.get('newznab_host', '').replace('http://', '').replace('https://', '')
+            ssl = 's' if settings.get('newznab_ssl', 0) else ''
 
-            if 'http://' in host:
-                url = host + '/covers/tv/' + url[6:] + '.jpg'
-            else:
-                url = 'http://' + host + '/covers/tv/' + url[6:] + '.jpg'
+            url = 'http' + ssl + '://' + host + '/covers/tv/' + url[6:] + '.jpg'
 
         return get_image(url, h, w, o)
 
@@ -65,13 +64,11 @@ class Search:
     def fetch(self, cmd):
         try:
             settings = htpc.settings.Settings()
-            host = settings.get('newznab_host', '')
+            host = settings.get('newznab_host', '').replace('http://', '').replace('https://', '')
+            ssl = 's' if settings.get('newznab_ssl', 0) else ''
             apikey = settings.get('newznab_apikey', '')
 
-            if 'http://' in host:
-                url = host + '/api?o=json&apikey=' + apikey + '&t=' + cmd
-            else:
-                url = 'http://' + host + '/api?o=json&apikey=' + apikey + '&t=' + cmd
+            url = 'http' + ssl + '://' + host + '/api?o=json&apikey=' + apikey + '&t=' + cmd
 
             self.logger.debug("Fetching information from: " + url)
             return loads(urlopen(url, timeout=10).read())
