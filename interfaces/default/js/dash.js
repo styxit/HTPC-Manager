@@ -3,8 +3,8 @@ $(document).ready(function () {
     loadRecentTVshows();
     loadRecentAlbums();
     loadDownloadHistory();
-    loadWantedMovies(5);
-    loadNextAired({limit: 5});
+    loadWantedMovies();
+    loadNextAired();
 });
 
 function loadRecentMovies () {
@@ -16,7 +16,7 @@ function loadRecentMovies () {
             if (data == null) return;
             $('#movie-carousel').show();
             $.each(data.movies, function (i, movie) {
-                var itemDiv = $('<div>').addClass('item');
+                var itemDiv = $('<div>').addClass('item carousel-item');
 
                 if (i == 0) itemDiv.addClass('active');
 
@@ -47,7 +47,7 @@ function loadRecentTVshows () {
             if (data == null) return;
             $('#tvshow-carousel').show();
             $.each(data.episodes, function (i, episode) {
-                var itemDiv = $('<div>').addClass('item ');
+                var itemDiv = $('<div>').addClass('item carousel-item');
 
                 if (i == 0) itemDiv.addClass('active');
 
@@ -79,31 +79,26 @@ function loadRecentAlbums () {
             if (data == null) return;
             $('#albums-content').parent().show();
             $.each(data.albums, function (i, album) {
+                var imageSrc = WEBDIR + 'js/libs/holder.js/45x45/text:No cover';
                 if (album.thumbnail != '') {
-                  imageSrc = WEBDIR + 'xbmc/GetThumb?h=45&w=45&thumb='+encodeURIComponent(album.thumbnail);
-                } else {
-                  imageSrc = WEBDIR + 'js/libs/holder.js/45x45/text:No cover';
+                    imageSrc = WEBDIR + 'xbmc/GetThumb?h=45&w=45&thumb='+encodeURIComponent(album.thumbnail);
                 }
 
                 // Frodo fix artist is now a list. Use the first.
                 if($.isArray(album.artist)) album.artist = album.artist[0]
-                year = '';
-                if (album.year != '0') {
-                    year = ' (' + album.year + ')';
-                }
 
-                var row = $('<div>').addClass('media').append(
-                    $('<div>').addClass('pull-left albumart').append(
-                        $('<img>').addClass('media-object').attr('src', imageSrc)
-                    ),
+                var year = '';
+                if (album.year != '0') year = ' (' + album.year + ')';
+
+                $('#albums-content').append($('<li>').addClass('media').append(
+                    $('<img>').addClass('media-object pull-left img-rounded').attr('src', imageSrc),
                     $('<div>').addClass('media-body').append(
                         $('<h5>').addClass('media-heading').html(album.label + year),
-                        album.artist
+                        $('<p>').text(album.artist)
                     )
                 ).click(function(e) {
-                    location.href = 'xbmc/#music';
-                });
-                $('#albums-content').append(row);
+                    location.href = 'xbmc/#albums';
+                }));
             });
 
             Holder.run();
@@ -134,9 +129,9 @@ function loadDownloadHistory() {
     });
 }
 
-function loadWantedMovies(limit) {
+function loadWantedMovies() {
     $.ajax({
-        url: WEBDIR + 'couchpotato/GetMovieList?limit='+limit,
+        url: WEBDIR + 'couchpotato/GetMovieList?limit=5',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -158,21 +153,13 @@ function loadWantedMovies(limit) {
 }
 
 function loadNextAired(options) {
-    var defaults = {
-       limit : 0
-    };
-    $.extend(defaults, options);
-
     $.ajax({
         url: WEBDIR + 'sickbeard/GetNextAired',
         type: 'get',
         dataType: 'json',
         success: function (result) {
-            if (result == null) return false;
-
-            if (result.data.soon.legth == 0) {
-                var row = $('<tr>')
-                row.append($('<td>').html('No future episodes found'));
+            if (result == null || result.data.soon.legth == 0) {
+                var row = $('<tr>').append($('<td>').html('No future episodes found'));
                 $('#nextaired_table_body').append(row);
                 return false;
             }
@@ -182,22 +169,15 @@ function loadNextAired(options) {
             var nextaired = todayaired.concat(soonaired);
 
             $.each(nextaired, function (i, tvshow) {
-                if (defaults.limit != 0 && i == defaults.limit) {
-                    return false;
-                }
-                var row = $('<tr>');
+                if (i > 5) return false;
                 var name = $('<a>').attr('href', WEBDIR + 'sickbeard/view/' + tvshow.tvdbid).html(tvshow.show_name);
-
-                row.append(
-                  $('<td>').append(name),
-                  $('<td>').html(tvshow.ep_name),
-                  $('<td>').html(tvshow.airdate)
+                var row = $('<tr>').append(
+                    $('<td>').append(name),
+                    $('<td>').html(tvshow.ep_name),
+                    $('<td>').html(tvshow.airdate)
                 );
-
                 $('#nextaired_table_body').append(row);
             });
-
-            $('#nextaired_table_body').parent().trigger('update');
         }
     });
 }
