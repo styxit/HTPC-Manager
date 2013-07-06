@@ -4,18 +4,34 @@
 .alignright {
     text-align: right !important;
 }
-
+.carousel-item {
+    height: 200px;
+    background-position: center 20%;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.carousel-caption h4 {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    cursor: pointer;
+}
 .carousel-caption p {
     font-size: smaller;
     height: 150px;
+    text-overflow: ellipsis;
     overflow: hidden;
+    cursor: pointer;
 }
-
 .movie-poster {
     height: 300px;
     width: 200px;
 }
-.dashboard .albumart {
+.media {
+    margin: 0;
+    cursor: pointer;
+}
+.dashboard .media-object {
     height: 45px;
     width: 45px;
 }
@@ -23,22 +39,10 @@
     table-layout: fixed;
 }
 .dashboard .span4 td{
-    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
+    overflow: hidden;
 }
 .dashboard .span4 #downloads_table_body td:last-child {
     width: 14px;
-}
-
-.carousel-caption,
-div.media {
-    cursor: pointer;
-}
-
-#tvshow-carousel .item,
-#movie-carousel .item {
-  height: 200px;
-  background-position: center 20%;
-  background-size: cover;
-  background-repeat: no-repeat; 
 }
