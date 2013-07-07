@@ -8,8 +8,6 @@ start function to start the server.
 import os
 import sys
 import htpc
-import logging
-
 
 def parse_arguments():
     """ Get variables from commandline """
@@ -32,7 +30,7 @@ def parse_arguments():
     parser.add_argument('--webdir', default=None,
                         help='Use a custom webdir')
     parser.add_argument('--loglevel', default='ERROR',
-                        help='Set a loglevel. Allowed values: DEBUG, INFO, WARNING, ERROR, CRITICAL')
+                        help='Set a loglevel. Allowed values: debug, info, warning, error, critical')
     return parser.parse_args()
 
 
@@ -80,52 +78,24 @@ def main():
     if not os.access(htpc.DATADIR, os.W_OK):
         sys.exit("No write access to userdata folder")
 
-    #Initialize the logger
-    logger = logging.getLogger()
-    logch = logging.StreamHandler()
-    logfh = logging.FileHandler(os.path.join(htpc.DATADIR, 'htpcmanager.log'))
-
-    logformatter = logging.Formatter('%(asctime)s :: %(name)s :: %(levelname)s :: %(message)s')
-    logfh.setFormatter(logformatter)
-    logch.setFormatter(logformatter)
-
-    # Set a custom loglevel if supplied via the command line
-    if args.loglevel == 'DEBUG':
-        htpc.LOGLEVEL = logging.DEBUG
-    elif args.loglevel == 'INFO':
-        htpc.LOGLEVEL = logging.INFO
-    elif args.loglevel == 'WARNING':
-        htpc.LOGLEVEL = logging.WARNING
-    elif args.loglevel == 'ERROR':
-        htpc.LOGLEVEL = logging.ERROR
-    elif args.loglevel == 'CRITICAL':
-        htpc.LOGLEVEL = logging.CRITICAL
-
-    logger.setLevel(htpc.LOGLEVEL)
-    logch.setLevel(htpc.LOGLEVEL)
-    logfh.setLevel(htpc.LOGLEVEL)
-
-    logger.addHandler(logfh)
-    logger.addHandler(logch)
-
-    logger.critical("Welcome to HTPC-Manager!")
-    logger.critical("Loglevel set to " + args.loglevel)
-
-    from sqlobject import connectionForURI, sqlhub
     from mako.lookup import TemplateLookup
+
+    # Enable debug mode if needed
+    htpc.DEBUG = args.debug
+
+    # Set loglevel
+    htpc.LOGLEVEL = args.loglevel.lower()
+    from htpc.log import Log
 
     # Set default database and overwrite if supplied through commandline
     htpc.DB = os.path.join(htpc.DATADIR, 'database.db')
     if args.db:
         htpc.DB = args.db
-        logger.info("Connecting to database " + htpc.DB)
-    # Initiate database connection
-    sqlhub.processConnection = connectionForURI('sqlite:' + htpc.DB)
 
     # Load settings from database
     from htpc.settings import Settings
     settings = Settings()
-    
+
     # Check for SSL
     htpc.SSLCERT = settings.get('app_ssl_cert')
     htpc.SSLKEY = settings.get('app_ssl_key')
@@ -133,7 +103,6 @@ def main():
     htpc.WEBDIR = settings.get('app_webdir', '/')
     if args.webdir:
         htpc.WEBDIR = args.webdir
-        logger.info("Using context root " + htpc.WEBDIR)
     if not(htpc.WEBDIR.endswith('/')):
         htpc.WEBDIR += '/'
 
@@ -153,30 +122,17 @@ def main():
     htpc.PORT = int(settings.get('app_port', 8085))
     if args.port:
         htpc.PORT = args.port
-    logger.info("Starting on " + htpc.HOST + ":" +  str(htpc.PORT))
-    
+
     htpc.USERNAME = settings.get('app_username')
     htpc.PASSWORD = settings.get('app_password')
 
-    htpc.DAEMON = False
-    if args.daemon and sys.platform != 'win32':
-        logger.info("Setting up daemon-mode")
-        htpc.DAEMON = True
+    # Select wether to run as daemon
+    htpc.DAEMON = args.daemon
 
-    if args.daemon and sys.platform == 'win32':
-        logger.error("You are using Windows - I cannot setup daemon mode. Please use the pythonw executable instead.")
-        logger.error("More information at http://docs.python.org/2/using/windows.html.")
+    # Set Application PID
+    htpc.PID = args.pid
 
-    htpc.PID = False
-    if args.pid:
-        htpc.PID = args.pid
-
-    htpc.DEBUG = False
-    if args.debug:
-        logger.info("Enabling DEBUG-Messages")
-        logger.setLevel(logging.DEBUG)
-        htpc.DEBUG = True
-
+    # Start the server
     from htpc.server import start
     start()
 
