@@ -9,6 +9,7 @@ import os
 import sys
 import htpc
 
+
 def parse_arguments():
     """ Get variables from commandline """
     import argparse
