@@ -29,7 +29,7 @@ def parse_arguments():
                         help='Print debug text')
     parser.add_argument('--webdir', default=None,
                         help='Use a custom webdir')
-    parser.add_argument('--loglevel', default='ERROR',
+    parser.add_argument('--loglevel', default='error',
                         help='Set a loglevel. Allowed values: debug, info, warning, error, critical')
     return parser.parse_args()
 
