@@ -10,7 +10,6 @@ import sys
 import htpc
 import logging
 
-logger = None
 
 def parse_arguments():
     """ Get variables from commandline """
@@ -32,7 +31,7 @@ def parse_arguments():
                         help='Print debug text')
     parser.add_argument('--webdir', default=None,
                         help='Use a custom webdir')
-    parser.add_argument('--loglevel', default=None,
+    parser.add_argument('--loglevel', default='ERROR',
                         help='Set a loglevel. Allowed values: DEBUG, INFO, WARNING, ERROR, CRITICAL')
     return parser.parse_args()
 
@@ -82,7 +81,6 @@ def main():
         sys.exit("No write access to userdata folder")
 
     #Initialize the logger
-    global logger
     logger = logging.getLogger()
     logch = logging.StreamHandler()
     logfh = logging.FileHandler(os.path.join(htpc.DATADIR, 'htpcmanager.log'))
@@ -91,52 +89,27 @@ def main():
     logfh.setFormatter(logformatter)
     logch.setFormatter(logformatter)
 
-    loginfo = 'ERROR'
     # Set a custom loglevel if supplied via the command line
-    if args.loglevel:
-        loglevels = ['DEBUG','INFO','WARNING','ERROR','CRITICAL']
-        if args.loglevel in loglevels:
-            if args.loglevel == 'DEBUG':
-                logger.setLevel(logging.DEBUG)
-                logch.setLevel(logging.DEBUG)
-                logfh.setLevel(logging.DEBUG)
-                loginfo = 'DEBUG'
-            elif args.loglevel == 'INFO':
-                logger.setLevel(logging.INFO)
-                logch.setLevel(logging.INFO)
-                logfh.setLevel(logging.INFO)
-                loginfo = 'INFO'
-            elif args.loglevel == 'WARNING':
-                logger.setLevel(logging.WARNING)
-                logch.setLevel(logging.WARNING)
-                logfh.setLevel(logging.WARNING)
-                loginfo = 'WARNING'
-            elif args.loglevel == 'ERROR':
-                logger.setLevel(logging.ERROR)
-                logch.setLevel(logging.ERROR)
-                logfh.setLevel(logging.ERROR)
-                loginfo = 'ERROR'
-            elif args.loglevel == 'CRITICAL':
-                logger.setLevel(logging.CRITICAL)
-                logch.setLevel(logging.CRITICAL)
-                logfh.setLevel(logging.CRITICAL)
-                loginfo = 'CRITICAL'
-        else:
-            logger.setLevel(logging.ERROR)
-            logch.setLevel(logging.ERROR)
-            logfh.setLevel(logging.ERROR)
-    else:
-        logger.setLevel(logging.ERROR)
-        logch.setLevel(logging.ERROR)
-        logfh.setLevel(logging.ERROR)
+    if args.loglevel == 'DEBUG':
+        htpc.LOGLEVEL = logging.DEBUG
+    elif args.loglevel == 'INFO':
+        htpc.LOGLEVEL = logging.INFO
+    elif args.loglevel == 'WARNING':
+        htpc.LOGLEVEL = logging.WARNING
+    elif args.loglevel == 'ERROR':
+        htpc.LOGLEVEL = logging.ERROR
+    elif args.loglevel == 'CRITICAL':
+        htpc.LOGLEVEL = logging.CRITICAL
+
+    logger.setLevel(htpc.LOGLEVEL)
+    logch.setLevel(htpc.LOGLEVEL)
+    logfh.setLevel(htpc.LOGLEVEL)
 
     logger.addHandler(logfh)
     logger.addHandler(logch)
 
-    logger.critical("------------------------")
     logger.critical("Welcome to HTPC-Manager!")
-    logger.critical("------------------------")
-    logger.critical("Loglevel set to " + loginfo)
+    logger.critical("Loglevel set to " + args.loglevel)
 
     from sqlobject import connectionForURI, sqlhub
     from mako.lookup import TemplateLookup
