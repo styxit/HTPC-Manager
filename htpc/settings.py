@@ -3,7 +3,7 @@ import os
 import cherrypy
 import htpc
 import logging
-from sqlobject import SQLObject, SQLObjectNotFound
+from sqlobject import connectionForURI, sqlhub, SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol
 
 
@@ -18,8 +18,10 @@ class Settings:
 
     def __init__(self):
         """ Create table on load if table doesnt exist """
-        Setting.createTable(ifNotExists=True)
         self.logger = logging.getLogger('htpc.settings')
+        self.logger.debug('Connecting to database: ' + htpc.DB)
+        sqlhub.processConnection = connectionForURI('sqlite:' + htpc.DB)
+        Setting.createTable(ifNotExists=True)
 
     @cherrypy.expose()
     def index(self, **kwargs):
