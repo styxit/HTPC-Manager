@@ -89,8 +89,6 @@ def start():
             'tools.auth_digest.key': 'a565c27146791cfb'
         })
 
-
-
     # When in INFO-mode, cherrypy will print out a ton of access messages
     # Need a way to find out why it isn't logging in the level which is set for it
     if not htpc.DEBUG:

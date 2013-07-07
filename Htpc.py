@@ -43,6 +43,8 @@ def load_modules():
     htpc.ROOT = Root()
     from htpc.settings import Settings
     htpc.ROOT.settings = Settings()
+    from htpc.log import Log
+    htpc.ROOT.log = Log()
     from htpc.updater import Updater
     htpc.ROOT.update = Updater()
     from modules.xbmc import Xbmc
