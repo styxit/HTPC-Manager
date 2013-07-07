@@ -7,6 +7,7 @@ import sys
 import cherrypy
 import htpc
 import logging
+from threading import Thread
 
 class Root:
     """ Root class """
@@ -37,7 +38,6 @@ class Root:
     def restart(self):
         """ Shutdown script and rerun with the same variables """
         self.logger.info("Restarting htpc-manager.")
-        from threading import Thread
         Thread(target=self.do_restart).start()
         return "Restart in progress."
 
