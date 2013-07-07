@@ -25,9 +25,9 @@ $(document).ready(function () {
         e.preventDefault();
         var link = $(this);
         if (confirm(link.attr('title') + '?')) {
-          $.get(link.attr('href'), function(data){
-            notify(link.attr('title'), data, 'warning');
-          }, 'json');
+            $.get(link.attr('href'), function(data){
+                notify(link.attr('title'), data, 'info');
+            }, 'json');
         }
     });
     $('a.confirm').click(function (e) {
