@@ -1,5 +1,6 @@
 """ Initiate the HTTP server according to settings """
 import os
+import sys
 import cherrypy
 import htpc
 import logging
@@ -13,7 +14,8 @@ def start():
     # Set server ip, port and root
     cherrypy.config.update({
         'server.socket_host': htpc.HOST,
-        'server.socket_port': htpc.PORT
+        'server.socket_port': htpc.PORT,
+        'log.screen': False
     })
 
     # Set server environment to production unless when debugging
@@ -32,7 +34,11 @@ def start():
 
     # Daemonize cherrypy if specified
     if htpc.DAEMON:
-        Daemonizer(cherrypy.engine).subscribe()
+        if sys.platform != 'win32':
+            logger.error("You are using Windows - I cannot setup daemon mode. Please use the pythonw executable instead.")
+            logger.error("More information at http://docs.python.org/2/using/windows.html.")
+        else:
+            Daemonizer(cherrypy.engine).subscribe()
 
     # Create PID if specified
     if htpc.PID:
@@ -83,11 +89,11 @@ def start():
             'tools.expires.secs' : 60*60*6,
             'tools.staticfile.on': True,
             'tools.staticfile.filename': favicon
-        }
+        },
     }
     # Require username and password if they are set
     if htpc.USERNAME and htpc.PASSWORD:
-        logger.debug("Enabling username/password access")
+        logger.info("Enabling username/password access")
         userpassdict = {htpc.USERNAME: htpc.PASSWORD}
         get_ha1 = cherrypy.lib.auth_digest.get_ha1_dict_plain(userpassdict)
         app_config['/'].update({
@@ -96,20 +102,6 @@ def start():
             'tools.auth_digest.get_ha1': get_ha1,
             'tools.auth_digest.key': 'a565c27146791cfb'
         })
-
-
-    # When in INFO-mode, cherrypy will print out a ton of access messages
-    # Need a way to find out why it isn't logging in the level which is set for it
-    if not htpc.DEBUG:
-        logging.getLogger('cherrypy.error').setLevel(logging.ERROR)
-        logger = logging.getLogger('cherrypy.access')
-        logger.setLevel(logging.ERROR)
-        cherrypy.log.access_log = logger
-    else:
-        logging.getLogger('cherrypy.error').setLevel(logging.DEBUG)
-        logger = logging.getLogger('cherrypy.access')
-        logger.setLevel(logging.DEBUG)
-        cherrypy.log.access_log = logger
 
     # Start the CherryPy server (remove trailing slash from webdir)
     logger.info("Starting up webserver")

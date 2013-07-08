@@ -1,0 +1,48 @@
+<%inherit file="base.html"/><%
+settings = self.attr.settings
+%><div class="container">
+    <div class="content">
+        <h1 class="page-header page-title">
+            <div class="btn-toolbar pull-right">
+                <div class="btn-group">
+                    <select id="logsize">
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                        <option value="500">500</option>
+                        <option value="1000">1000</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <select id="loglevel">
+                        <option value="1">Critical</option>
+                        <option value="2">Error</option>
+                        <option value="3">Warning</option>
+                        <option value="4">Info</option>
+                        <option value="5">Debug</option>
+                    </select>
+                </div>
+                <div class="btn-group">
+                    <a href="#" id="refreshlog" class="ajax-link btn">
+                        <i class="icon-refresh"></i>
+                    </a>
+                </div>
+                <div class="btn-group">
+                    <a href="deletelog" id="deletelog" class="ajax-confirm btn" title="Clear log">
+                        <i class="icon-trash"></i>
+                    </a>
+                </div>
+            </div>
+            Log
+        </h1>
+        <table id="log-grid" class="table table-striped table-sortable">
+            <thead>
+                <th>Date</th>
+                <th>Module</th>
+                <th>Level</th>
+                <th>Message</th>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
