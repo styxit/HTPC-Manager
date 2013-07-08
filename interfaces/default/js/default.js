@@ -21,15 +21,17 @@ $(document).ready(function () {
             notify(link.text(), data, 'success');
         }, 'json');
     });
-
     $('a.ajax-confirm').click(function (e) {
         e.preventDefault();
         var link = $(this);
         if (confirm(link.attr('title') + '?')) {
-          $.get(link.attr('href'), function(data){
-            notify(link.attr('title'), data, 'warning');
-          }, 'json');
+            $.get(link.attr('href'), function(data){
+                notify(link.attr('title'), data, 'info');
+            }, 'json');
         }
+    });
+    $('a.confirm').click(function (e) {
+        return(confirm($(this).attr('title') + '?'));
     });
 
     $('#btn-check-update').click(function (e) {
@@ -56,24 +58,6 @@ $(document).ready(function () {
                 }
             }
         }, 'json');
-    });
-    $('#btn-restart').click(function (e) {
-        e.preventDefault();
-        if (confirm('Restart HTPC Manager?')) {
-            notify('Restarting HTPC Manager','Restart command sent...','success')
-            $.get(WEBDIR + 'restart', function() {
-                // On restart
-            }, 'json');
-        }
-    });
-    $('#btn-shutdown').click(function (e) {
-        e.preventDefault();
-        if (confirm('Shutdown HTPC Manager?')) {
-            notify('Shuttingdown HTPC Manager','Shutdown command sent.','success')
-            $.get(WEBDIR + 'shutdown', function() {
-                // On shutdown confirmed
-            }, 'json');
-        }
     });
 
     $('#modal_dialog').on('hidden', function () {
