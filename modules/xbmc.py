@@ -327,18 +327,52 @@ class Xbmc:
 
         if type == 'movie':
             return xbmc.Player.Open(item={'movieid': int(item)})
-        if type == 'episode':
+        elif type == 'episode':
             return xbmc.Player.Open(item={'episodeid': int(item)})
-        if type == 'artist':
-            return xbmc.Player.Open(item={'artistid': int(item)})
-        if type == 'album':
-            return xbmc.Player.Open(item={'albumid': int(item)})
-        if type == 'song':
-            return xbmc.Player.Open(item={'songid': int(item)})
-        if type == 'channel':
+        elif type == 'channel':
             return xbmc.Player.Open(item={'channelid': int(item)})
+        elif type == 'artist':
+            return xbmc.Player.Open(item={'artistid': int(item)})
+        elif type == 'album':
+            return xbmc.Player.Open(item={'albumid': int(item)})
+        elif type == 'song':
+            return xbmc.Player.Open(item={'songid': int(item)})
+        else:
+            return xbmc.Player.Open(item={'file': item})
 
-        return xbmc.Player.Open(item={'file': item})
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def QueueItem(self, item=None, type=None):
+        """ Play a file in XBMC """
+        xbmc = Server(self.url('/jsonrpc', True))
+        self.logger.debug("Enqueueing a file from the type " + type)
+
+        if type == 'movie':
+            return xbmc.Playlist.Add(playlistid=1, item={'movieid': int(item)})
+        elif type == 'episode':
+            return xbmc.Playlist.Add(playlistid=1, item={'episodeid': int(item)})
+        elif type == 'channel':
+            return xbmc.Playlist.Add(playlistid=1, item={'channelid': int(item)})
+        elif type == 'artist':
+            return xbmc.Playlist.Add(playlistid=0, item={'artistid': int(item)})
+        elif type == 'album':
+            return xbmc.Playlist.Add(playlistid=0, item={'albumid': int(item)})
+        elif type == 'song':
+            return xbmc.Playlist.Add(playlistid=0, item={'songid': int(item)})
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def PlaylistMove(self, position1, position2, playlistid=0):
+        """ Swap files in playlist """
+        playlistid = int(playlistid)
+        position1 = int(position1)
+        position2 = int(position2)
+        i = 1 if position1 < position2 else -1
+        xbmc = Server(self.url('/jsonrpc', True))
+        while(position1 != position2):
+            xbmc.Playlist.Swap(playlistid=playlistid, position1=position1, position2=position1+i)
+            position1 += i
+        return "Moved from " + str(position1) + " to " + str(position2)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()

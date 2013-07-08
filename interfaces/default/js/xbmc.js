@@ -1,8 +1,29 @@
 var searchString = '';
 var hideWatched = 0;
+var playerLoader = null
+var position1 = null
 $(document).ready(function() {
-    loadNowPlaying();
+    playerLoader = setInterval('loadNowPlaying()', 1000);
     hideWatched = $('#hidewatched').hasClass('active')?1:0;
+
+    // Make the playlist sortable
+    $('#playlist-table tbody').sortable({
+        handle: ".handle",
+        containment: "parent",
+        start: function(event, ui) {
+            clearInterval(playerLoader);
+            position1 = ui.item.index()
+        },
+        stop: function(event, ui) {
+            $.get(WEBDIR + 'xbmc/PlaylistMove',{
+                position1: position1,
+                position2: ui.item.index()
+            }, function (data) {
+                nowPlayingId = null
+                playerLoader = setInterval('loadNowPlaying()', 1000)
+            });
+        }
+    });
 
     // Load data on tab display
     $('a[data-toggle="tab"]').on('shown', reloadTab);
@@ -437,7 +458,7 @@ function loadArtists(options) {
 var albumLoad = {
     last: 0,
     request: null,
-    limit: 20,
+    limit: 50,
     options: null
 }
 lastArtist = null;
@@ -488,22 +509,37 @@ function loadAlbums(options) {
 
             if (data.albums != undefined) {
                 $.each(data.albums, function (i, album) {
-                    var albumItem = $('<li>').attr('title', album.artist + ' - ' + album.title);
-
-                    var albumAnchor = $('<a>').attr('href', '#').addClass('thumbnail').click(function(e) {
-                        e.preventDefault();
-                        playItem(album.albumid, 'album');
-                        $('a[href=#playlist]').tab('show');
+                    var albumItem = $('<li>').hover(function() {
+                        $(this).children('div').slideToggle()
                     });
 
                     var src = 'holder.js/150x150/text:No artwork';
                     if (album.thumbnail != '') {
                         src = WEBDIR + 'xbmc/GetThumb?w=150&h=150&thumb='+encodeURIComponent(album.thumbnail);
                     }
-                    albumAnchor.append($('<img>').attr('src', src));
+                    albumItem.append($('<img>').attr('src', src).addClass('thumbnail'));
 
-                    albumItem.append(albumAnchor);
-                    albumItem.append($('<h6>').addClass('album-title').html(shortenText(album.label, 18)));
+                    var albumCaption = $('<div>').addClass('album-caption hide').append(
+                        $('<h6>').html(album.title),
+                        $('<p>').html(album.artist),
+                        $('<a>').attr('href', '#').text('Play').click(function(e) {
+                            e.preventDefault();
+                            playItem(album.albumid, 'album');
+                            $('a[href=#playlist]').tab('show');
+                        }),
+                        $('<a>').attr('href', '#').text('Queue').click(function(e) {
+                            e.preventDefault();
+                            queueItem(album.albumid, 'album');
+                            notify('Added', 'Album has been added to the playlist.', 'info');
+                        }),
+                        $('<a>').attr('href', '#').text('Songs').click(function(e) {
+                            e.preventDefault();
+                            notify('Not implementet', 'Work in progress.', 'error');
+                        })
+                    )
+
+                    albumItem.append(albumCaption);
+                    //albumItem.append($('<h6>').addClass('album-title').html(shortenText(album.label, 18)));
 
                     elem.append(albumItem);
                 });
@@ -567,9 +603,6 @@ function loadNowPlaying() {
         url: WEBDIR + 'xbmc/NowPlaying',
         type: 'get',
         dataType: 'json',
-        complete: function() {
-            setTimeout('loadNowPlaying()', 1000);
-        },
         success: function(data) {
             if (data == null) {
                 $('#nowplaying').hide();
@@ -698,8 +731,10 @@ function loadNowPlaying() {
             $('[data-player-control]').attr('disabled', false);
 
             //update playlist
-            nowPlayingId = data.itemInfo.item.id;
-            loadPlaylist(data.itemInfo.item.type=='song'?'audio':'video');
+            if (nowPlayingId != data.itemInfo.item.id) {
+                loadPlaylist(data.itemInfo.item.type=='song'?'audio':'video');
+                nowPlayingId = data.itemInfo.item.id;
+            }
         }
     });
 }
@@ -720,8 +755,8 @@ function loadPlaylist(type){
 
             $.each(data.items, function(i, item){
                 var listItem = $('<tr>').attr('title',item.title).click(function(e) {
-                    e.preventDefault();
-                    playlistJump(i);
+                    //e.preventDefault();
+                    //playlistJump(i);
                 });
 
                 if (item.id == nowPlayingId) {
@@ -733,7 +768,8 @@ function loadPlaylist(type){
                         $('<td>').html(shortenText(item.title,90)),
                         $('<td>').html(item.artist[0]),
                         $('<td>').html(item.album),
-                        $('<td>').html(parseSec(item.duration))
+                        $('<td>').html(parseSec(item.duration)),
+                        $('<td>').append($('<i>').addClass('handle icon-align-justify'))
                     );
                 } else {
                     var label = item.label + ' (' + item.year + ')';
@@ -756,6 +792,11 @@ function loadPlaylist(type){
 function playItem(item, type) {
     type = typeof type !== 'undefined' ? '&type='+type : '';
     $.get(WEBDIR + 'xbmc/PlayItem?item='+item+type);
+}
+
+function queueItem(item, type) {
+    type = typeof type !== 'undefined' ? '&type='+type : '';
+    $.get(WEBDIR + 'xbmc/QueueItem?item='+item+type);
 }
 
 function playlistJump(position) {

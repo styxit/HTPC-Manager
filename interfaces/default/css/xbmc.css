@@ -20,9 +20,12 @@ a.thumbnail:Hover,
     height: 90px;
     width: 500px;
 }
-#album-grid .thumbnail,
-#album-grid .thumbnail img {
+#album-grid li,
+#artist-grid li {
     position: relative;
+}
+#album-grid img.thumbnail,
+#artist-grid img.thumbnail {
     height: 150px;
     width: 150px;
 }
@@ -40,6 +43,24 @@ a.thumbnail:Hover,
     right: 5px;
     width: 16px;
     height: 16px;
+}
+.album-caption {
+    position: absolute;
+    background: rgba(0,0,0,0.75);
+    padding: 5px;
+    bottom: 5px;
+    left: 5px;
+    width: 140px;
+    height: 140px;
+}
+.album-caption h6,
+.album-caption p {
+    color: #fff;
+    margin: 0;
+}
+.album-caption a {
+    display: inline-block !important;
+    margin: 8px 8px 0 0;
 }
 h6.movie-title,
 h6.show-title,
@@ -70,6 +91,9 @@ h6.episode-title {
 #nowplaying #player-progressbar,
 #playlist tr td {
     cursor: pointer;
+}
+#playlist-table tr td:last-child {
+    width: 15px;
 }
 .modal {
     width: 700px;
