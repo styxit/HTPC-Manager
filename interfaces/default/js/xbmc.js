@@ -6,25 +6,6 @@ $(document).ready(function() {
     playerLoader = setInterval('loadNowPlaying()', 1000);
     hideWatched = $('#hidewatched').hasClass('active')?1:0;
 
-    // Make the playlist sortable
-    $('#playlist-table tbody').sortable({
-        handle: ".handle",
-        containment: "parent",
-        start: function(event, ui) {
-            clearInterval(playerLoader);
-            position1 = ui.item.index()
-        },
-        stop: function(event, ui) {
-            $.get(WEBDIR + 'xbmc/PlaylistMove',{
-                position1: position1,
-                position2: ui.item.index()
-            }, function (data) {
-                nowPlayingId = null
-                playerLoader = setInterval('loadNowPlaying()', 1000)
-            });
-        }
-    });
-
     // Load data on tab display
     $('a[data-toggle="tab"]').on('shown', reloadTab);
     toggleTab();
@@ -96,6 +77,25 @@ $(document).ready(function() {
         });
     });
 
+    // Make the playlist sortable
+    $('#playlist-table tbody').sortable({
+        handle: ".handle",
+        containment: "parent",
+        start: function(event, ui) {
+            clearInterval(playerLoader);
+            position1 = ui.item.index()
+        },
+        stop: function(event, ui) {
+            $.get(WEBDIR + 'xbmc/PlaylistMove',{
+                position1: position1,
+                position2: ui.item.index()
+            }, function (data) {
+                nowPlayingId = null
+                playerLoader = setInterval('loadNowPlaying()', 1000)
+            });
+        }
+    });
+
     // Filter on searchfield changes
     $("#search").keyup(function (e) {
         if ($(this).val() == searchString) return;
@@ -150,7 +150,7 @@ function loadMovies(options) {
                 $.each(data.movies, function (i, movie) {
                     var movieItem = $('<li>').attr('title', movie.title);
 
-                    var movieAnchor = $('<a>').attr('href', '#').addClass('thumbnail').click(function(e) {
+                    var movieAnchor = $('<a>').attr('href', '#').click(function(e) {
                         e.preventDefault();
                         loadMovie(movie);
                     });
@@ -159,14 +159,15 @@ function loadMovies(options) {
                     if (movie.thumbnail != '') {
                         src = WEBDIR + 'xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(movie.thumbnail);
                     }
-                    movieAnchor.append($('<img>').attr('src', src));
+                    movieAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (movie.playcount >= 1) {
-                        movieAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok'));
+                        movieAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched'));
                     }
 
+                    movieAnchor.append($('<h6>').addClass('title').html(shortenText(movie.title, 12)));
+
                     movieItem.append(movieAnchor);
-                    movieItem.append($('<h6>').addClass('movie-title').html(shortenText(movie.title, 12)));
 
                     $('#movie-grid').append(movieItem);
                 });
@@ -287,7 +288,7 @@ function loadShows(options) {
                 $.each(data.tvshows, function (i, show) {
                     var showItem = $('<li>').attr('title', show.title);
 
-                    var showAnchor = $('<a>').attr('href', '#').addClass('thumbnail').click(function(e) {
+                    var showAnchor = $('<a>').attr('href', '#').click(function(e) {
                         e.preventDefault();
                         loadEpisodes({'tvshowid':show.tvshowid})
                     });
@@ -296,14 +297,15 @@ function loadShows(options) {
                     if (show.thumbnail != '') {
                         src = WEBDIR + 'xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(show.thumbnail);
                     }
-                    showAnchor.append($('<img>').attr('src', src));
+                    showAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (show.playcount >= 1) {
-                        showAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok'));
+                        showAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched'));
                     }
 
+                    showAnchor.append($('<h6>').addClass('title').html(shortenText(show.title, 11)));
+
                     showItem.append(showAnchor);
-                    showItem.append($('<h6>').addClass('show-title').html(shortenText(show.title, 11)));
 
                     $('#show-grid').append(showItem);
                 });
@@ -365,7 +367,7 @@ function loadEpisodes(options) {
                 $.each(data.episodes, function (i, episode) {
                     var episodeItem = $('<li>').attr('title', episode.plot);
 
-                    var episodeAnchor = $('<a>').attr('href', '#').addClass('thumbnail').click(function(e) {
+                    var episodeAnchor = $('<a>').attr('href', '#').click(function(e) {
                         e.preventDefault();
                         playItem(episode.episodeid, 'episode');
                     });
@@ -374,14 +376,16 @@ function loadEpisodes(options) {
                     if (episode.thumbnail != '') {
                         src = WEBDIR + 'xbmc/GetThumb?w=150&h=85&thumb='+encodeURIComponent(episode.thumbnail);
                     }
-                    episodeAnchor.append($('<img>').attr('src', src));
+                    episodeAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (episode.playcount >= 1) {
-                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok'));
+                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched'));
                     }
 
+                    episodeAnchor.append($('<h6>').addClass('title').html(shortenText(episode.label, 18)));
+
                     episodeItem.append(episodeAnchor);
-                    episodeItem.append($('<h6>').addClass('episode-title').html(shortenText(episode.label, 18)));
+
                     $('#episode-grid').append(episodeItem);
                 });
             }
@@ -435,15 +439,23 @@ function loadArtists(options) {
             if (data.artists != undefined) {
                 $.each(data.artists, function (i, artist) {
                     $('#artist-grid').append($('<tr>').append(
-                        $('<td>').append($('<a>').attr('href','#').attr('title', 'Play all').html('<i class="icon-play-circle">').click(function(e) {
-                            e.preventDefault();
-                            playItem(artist.artistid, 'artist');
-                            $('a[href=#playlist]').tab('show');
-                        })),
-                        $('<td>').append($('<a>').attr('href','#').html(artist.label).click(function(e) {
-                            e.preventDefault(e);
-                            $(this).parent().append(loadAlbums({'artistid' : artist.artistid}));
-                        }))
+                        $('<td>').append(
+                            $('<a>').attr('href','#').attr('title', 'Play all').html('<i class="icon-play">').click(function(e) {
+                                e.preventDefault();
+                                playItem(artist.artistid, 'artist');
+                                $('a[href=#playlist]').tab('show');
+                            }),
+                            $('<a>').attr('href','#').attr('title', 'Enqueue all').html('<i class="icon-plus">').click(function(e) {
+                                e.preventDefault();
+                                queueItem(artist.artistid, 'artist');
+                            })
+                        ),
+                        $('<td>').append(
+                            $('<a>').attr('href','#').addClass('artist-link').html(artist.label).click(function(e) {
+                                e.preventDefault(e);
+                                $(this).parent().append(loadAlbums({'artistid' : artist.artistid}));
+                            })
+                        )
                     ));
                 });
             }
@@ -510,7 +522,7 @@ function loadAlbums(options) {
             if (data.albums != undefined) {
                 $.each(data.albums, function (i, album) {
                     var albumItem = $('<li>').hover(function() {
-                        $(this).children('div').slideToggle()
+                        $(this).children('div').fadeToggle()
                     });
 
                     var src = 'holder.js/150x150/text:No artwork';
@@ -519,27 +531,27 @@ function loadAlbums(options) {
                     }
                     albumItem.append($('<img>').attr('src', src).addClass('thumbnail'));
 
-                    var albumCaption = $('<div>').addClass('album-caption hide').append(
+                    var albumCaption = $('<div>').addClass('grid-caption hide').append(
                         $('<h6>').html(album.title),
-                        $('<p>').html(album.artist),
-                        $('<a>').attr('href', '#').text('Play').click(function(e) {
-                            e.preventDefault();
-                            playItem(album.albumid, 'album');
-                            $('a[href=#playlist]').tab('show');
-                        }),
-                        $('<a>').attr('href', '#').text('Queue').click(function(e) {
-                            e.preventDefault();
-                            queueItem(album.albumid, 'album');
-                            notify('Added', 'Album has been added to the playlist.', 'info');
-                        }),
-                        $('<a>').attr('href', '#').text('Songs').click(function(e) {
-                            e.preventDefault();
-                            notify('Not implementet', 'Work in progress.', 'error');
-                        })
+                        $('<h6>').html(album.artist).addClass('artist'),
+                        $('<div>').addClass('grid-control').append(
+                            $('<a>').attr('href', '#').text('Play').click(function(e) {
+                                e.preventDefault();
+                                playItem(album.albumid, 'album');
+                                $('a[href=#playlist]').tab('show');
+                            }),
+                            $('<a>').attr('href', '#').text('Queue').click(function(e) {
+                                e.preventDefault();
+                                queueItem(album.albumid, 'album');
+                                notify('Added', 'Album has been added to the playlist.', 'info');
+                            }),
+                            $('<a>').attr('href', '#').text('Songs').click(function(e) {
+                                e.preventDefault();
+                                notify('Not implementet', 'Work in progress.', 'error');
+                            })
+                        )
                     )
-
                     albumItem.append(albumCaption);
-                    //albumItem.append($('<h6>').addClass('album-title').html(shortenText(album.label, 18)));
 
                     elem.append(albumItem);
                 });
@@ -570,7 +582,7 @@ function loadChannels(){
             $.each(data.channels, function (i, channel) {
                 var item = $('<li>').attr('title', channel.label);
 
-                var link = $('<a>').attr('href', '#').addClass('thumbnail').click(function(e) {
+                var link = $('<a>').attr('href', '#').click(function(e) {
                     e.preventDefault();
                     playItem(channel.channelid, 'channel');
                 });
@@ -579,10 +591,11 @@ function loadChannels(){
                 if (channel.thumbnail) {
                     src = WEBDIR + 'xbmc/GetThumb?w=75&h=75&thumb='+encodeURIComponent(channel.thumbnail);
                 }
-                link.append($('<img>').attr('src', src).addClass('channellogo'));
+                link.append($('<img>').attr('src', src).addClass('thumbnail'));
+
+                link.append($('<h6>').addClass('title').html(shortenText(channel.label, 21)));
 
                 item.append(link);
-                item.append($('<h6>').html(shortenText(channel.label, 21)));
 
                 list.append(item);
             });
@@ -629,7 +642,7 @@ function loadNowPlaying() {
                             thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(nowPlayingThumb));
                             thumbnail.attr('width', '100').attr('height', '150');
                             break;
-                        case'song':
+                        case 'song':
                             thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=180&h=180&thumb='+encodeURIComponent(nowPlayingThumb));
                             thumbnail.attr('width', '180').attr('height', '180');
                             break;
@@ -755,8 +768,8 @@ function loadPlaylist(type){
 
             $.each(data.items, function(i, item){
                 var listItem = $('<tr>').attr('title',item.title).click(function(e) {
-                    //e.preventDefault();
-                    //playlistJump(i);
+                    e.preventDefault();
+                    playlistJump(i);
                 });
 
                 if (item.id == nowPlayingId) {
@@ -765,7 +778,13 @@ function loadPlaylist(type){
 
                 if (item.type == 'song') {
                     listItem.append(
-                        $('<td>').html(shortenText(item.title,90)),
+                        $('<td>').html(shortenText(item.title,90)).prepend(
+                            $('<i>').addClass('remove icon-remove').click(function(e) {
+                                e.stopPropagation();
+                                removeItem(i);
+                                nowPlaying = null;
+                            })
+                        ),
                         $('<td>').html(item.artist[0]),
                         $('<td>').html(item.album),
                         $('<td>').html(parseSec(item.duration)),
@@ -797,6 +816,13 @@ function playItem(item, type) {
 function queueItem(item, type) {
     type = typeof type !== 'undefined' ? '&type='+type : '';
     $.get(WEBDIR + 'xbmc/QueueItem?item='+item+type);
+    nowPlayingId = null;
+}
+
+function removeItem(item) {
+    $.get(WEBDIR + 'xbmc/RemoveItem?item='+item);
+    console.log(WEBDIR + 'xbmc/RemoveItem?item='+item)
+    nowPlayingId = null;
 }
 
 function playlistJump(position) {
