@@ -34,7 +34,7 @@ def start():
 
     # Daemonize cherrypy if specified
     if htpc.DAEMON:
-        if sys.platform != 'win32':
+        if sys.platform == 'win32':
             logger.error("You are using Windows - I cannot setup daemon mode. Please use the pythonw executable instead.")
             logger.error("More information at http://docs.python.org/2/using/windows.html.")
         else:
