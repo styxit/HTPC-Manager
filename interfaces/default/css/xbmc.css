@@ -1,99 +1,82 @@
-a.thumbnail:Hover,
-#artist-grid a:Hover {
+a:Hover {
     text-decoration: none;
 }
-#movie-grid img,
-#movie-grid .thumbnail,
-#show-grid img,
-#show-grid .thumbnail {
+.thumbnails li {
     position: relative;
+}
+#movie-grid img.thumbnail,
+#show-grid img.thumbnail {
     height: 150px;
     width: 100px;
 }
-#episode-grid .thumbnail,
-#episode-grid .thumbnail img {
+#episode-grid img.thumbnail {
     position: relative;
     height: 85px;
     width: 150px;
-}
-#show-grid.banners img {
-    height: 90px;
-    width: 500px;
-}
-#album-grid li,
-#artist-grid li {
-    position: relative;
 }
 #album-grid img.thumbnail,
 #artist-grid img.thumbnail {
     height: 150px;
     width: 150px;
 }
-#pvr-grid .thumbnail,
-#pvr-grid .thumbnail img {
-    position: relative;
+#pvr-grid img.thumbnail {
     height: 75px;
     width: 75px;
 }
-#movie-grid i,
-#show-grid i,
-#episode-grid i {
+.watched {
     position: absolute;
-    bottom: 5px;
+    top: 138px;
     right: 5px;
     width: 16px;
     height: 16px;
 }
-.album-caption {
+.grid-caption {
     position: absolute;
-    background: rgba(0,0,0,0.75);
-    padding: 5px;
     bottom: 5px;
     left: 5px;
-    width: 140px;
-    height: 140px;
+    background: rgba(0,0,0,0.75);
+    padding: 10px;
+    width: 130px;
+    height: 130px;
 }
-.album-caption h6,
-.album-caption p {
+.grid-caption h6 {
     color: #fff;
+    font-family: inherit;
     margin: 0;
 }
-.album-caption a {
-    display: inline-block !important;
-    margin: 8px 8px 0 0;
+.grid-caption h6.artist {
+    font-weight: normal;
 }
-h6.movie-title,
-h6.show-title,
-h6.album-title,
-h6.episode-title {
+.grid-control {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+}
+.grid-caption a {
+    margin: 0 10px 0 0;
+}
+h6.title {
     color: #555555;
     text-align: center;
     margin: 0;
     padding-top: 4px;
 }
-.artist-albums .albumart {
-    height: 150px;
-    width: 150px;
-}
 #artist-grid tr td:first-child {
-    width: 15px;
+    width: 35px;
 }
-#artist-grid tr td a {
+#artist-grid a.artist-link {
     display: block;
 }
-#playlist_table td i {
-    float: right;
-    display: none;
-}
-#playlist_table td:hover i {
-    display: block;
+#artist-grid i,
+#playlist-table i {
+    margin: 0 5px 0 0;
 }
 #nowplaying #player-progressbar,
 #playlist tr td {
     cursor: pointer;
 }
 #playlist-table tr td:last-child {
-    width: 15px;
+    width: 35px;
 }
 .modal {
     width: 700px;

@@ -342,8 +342,8 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def QueueItem(self, item=None, type=None):
-        """ Play a file in XBMC """
+    def QueueItem(self, item, type):
+        """ Queue a file in XBMC """
         xbmc = Server(self.url('/jsonrpc', True))
         self.logger.debug("Enqueueing a file from the type " + type)
 
@@ -359,6 +359,14 @@ class Xbmc:
             return xbmc.Playlist.Add(playlistid=0, item={'albumid': int(item)})
         elif type == 'song':
             return xbmc.Playlist.Add(playlistid=0, item={'songid': int(item)})
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def RemoveItem(self, item, playlistid=0):
+        """ Remove a file from the playlist """
+        xbmc = Server(self.url('/jsonrpc', True))
+        self.logger.debug("Removing a file from the playlist")
+        return xbmc.Playlist.Remove(playlistid=playlistid, position=int(item))
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
