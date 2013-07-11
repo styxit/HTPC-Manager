@@ -283,7 +283,7 @@ class Xbmc:
         try:
             xbmc = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
-            properties=['artist', 'title', 'year', 'description', 'thumbnail']
+            properties=['title', 'artist', 'year', 'thumbnail']
             limits = {'start': int(start), 'end': int(end)}
             if artistid is not None:
                 filter = {'artistid': int(artistid)}
@@ -294,6 +294,30 @@ class Xbmc:
                          ]}
             return xbmc.AudioLibrary.GetAlbums(properties=properties, limits=limits, sort=sort, filter=filter)
         except ValueError:
+            return
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetSongs(self, start=0, end=0, sortmethod='title', sortorder='ascending', albumid=None, artistid=None, filter=''):
+        """ Get a list of all songs """
+        self.logger.debug("Fetching all artists in the music database")
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
+            properties=['artist', 'artistid', 'album', 'albumid', 'duration', 'year', 'thumbnail']
+            limits = {'start': int(start), 'end': int(end)}
+            if albumid:
+                filter = {'albumid': int(albumid)}
+            elif artistid:
+                filter = {'artistid': int(artistid)}
+            else:
+                filter = {'or': [
+                             {'field': 'album', 'operator': 'contains', 'value': filter},
+                             {'field': 'artist', 'operator': 'contains', 'value': filter}
+                         ]}
+            return xbmc.AudioLibrary.GetSongs(properties=properties, limits=limits, sort=sort, filter=filter)
+        except ValueError:
+            logger.error("Unable to fetch artists!")
             return
 
     @cherrypy.expose()
