@@ -104,7 +104,12 @@ $(document).ready(function() {
     });
 
     // Load more titles on scroll
-    $(window).scroll(reloadTab);
+    $(window).scroll(function() {
+        if($(window).scrollTop() + $(window).height() >= $(document).height() - 10) {
+            reloadTab();
+        }
+
+    });
 });
 
 var movieLoad = {
@@ -327,7 +332,6 @@ var episodeLoad = {
 var currentShow = null;
 function loadEpisodes(options) {
     currentShow = options.tvshowid;
-    $('a[href=#episodes]').tab('show');
     var optionstr = JSON.stringify(options) + hideWatched;
     if (episodeLoad.options != optionstr) {
         episodeLoad.last = 0;
@@ -352,10 +356,8 @@ function loadEpisodes(options) {
         data: sendData,
         dataType: 'json',
         success: function (data) {
-            if (data==null || data.limits.total==0) {
-                $('a[href=#shows]').tab('show');
-                return;
-            }
+            if (data==null || data.limits.total==0) return;
+            $('a[href=#episodes]').tab('show');
 
             if (data.limits.end == data.limits.total) {
                 episodeLoad.last = -1;
@@ -547,7 +549,8 @@ function loadAlbums(options) {
                             }),
                             $('<a>').attr('href', '#').text('Songs').click(function(e) {
                                 e.preventDefault();
-                                notify('Not implementet', 'Work in progress.', 'error');
+                                songsLoad.last = 0;
+                                loadSongs({'albumid': album.albumid});
                             })
                         )
                     )
@@ -564,6 +567,80 @@ function loadAlbums(options) {
         }
     });
     return elem;
+}
+
+var songsLoad = {
+    last: 0,
+    request: null,
+    limit: 50,
+    options: null
+}
+function loadSongs(options) {
+    var active = (songsLoad.request!=null && songsLoad.request.readyState!=4);
+    if (active || songsLoad.last == -1) return;
+
+    var optionstr = JSON.stringify(options);
+    if (songsLoad.options != optionstr) {
+        songsLoad.last = 0;
+        $('#songs-grid tbody').empty();
+    }
+    songsLoad.options = optionstr;
+
+    var sendData = {
+        start: songsLoad.last,
+        end: (songsLoad.last + songsLoad.limit)
+    }
+    $.extend(sendData, options);
+
+    $('.spinner').show();
+    songsLoad.request = $.ajax({
+        url: WEBDIR + 'xbmc/GetSongs',
+        type: 'get',
+        data: sendData,
+        dataType: 'json',
+        success: function (data) {
+            if (data==null || data.limits.total==0) return;
+            $('a[href=#songs]').tab('show');
+
+            if (data.limits.end == data.limits.total) {
+                songsLoad.last = -1;
+            } else {
+                songsLoad.last += songsLoad.limit;
+            }
+            if (data.songs != undefined) {
+                $.each(data.songs, function (i, song) {
+                    var row = $('<tr>');
+                    row.append(
+                        $('<td>').append(
+                            $('<a>').attr('href','#').text(song.label).click(function(e) {
+                                e.preventDefault();
+                                playItem(song.songid, 'song')
+                            })
+                        ),
+                        $('<td>').append(
+                            $('<a>').attr('href','#').text(song.artist).click(function(e) {
+                                e.preventDefault();
+                                songsLoad.last = 0;
+                                loadSongs({'artistid': song.artistid[0]})
+                            })
+                        ),
+                        $('<td>').append(
+                            $('<a>').attr('href','#').text(song.album).click(function(e) {
+                                e.preventDefault();
+                                songsLoad.last = 0;
+                                loadSongs({'albumid': song.albumid})
+                            })
+                        ),
+                        $('<td>').append(parseSec(song.duration))
+                    )
+                    $('#songs-grid tbody').append(row);
+                });
+            }
+        },
+        complete: function() {
+            $('.spinner').hide();
+        }
+    });
 }
 
 var channelsLoaded = false;
@@ -850,6 +927,8 @@ function reloadTab() {
         loadArtists(options);
     } else if ($('#albums').is(':visible')) {
         loadAlbums(options);
+    } else if ($('#songs').is(':visible')) {
+        loadSongs(options);
     } else if ($('#pvr').is(':visible')) {
         loadChannels();
     }
