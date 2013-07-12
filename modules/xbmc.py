@@ -277,7 +277,7 @@ class Xbmc:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetAlbums(self, start=0, end=0, sortmethod='label', sortorder='ascending', filter='', artistid=None):
+    def GetAlbums(self, start=0, end=0, sortmethod='label', sortorder='ascending', artistid=None, filter=''):
         """ Get a list of all albums for artist """
         self.logger.debug("Loading all albums for ARTISTID " + str(artistid))
         try:
@@ -285,20 +285,18 @@ class Xbmc:
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
             properties=['title', 'artist', 'year', 'thumbnail']
             limits = {'start': int(start), 'end': int(end)}
-            if artistid is not None:
+            if artistid:
                 filter = {'artistid': int(artistid)}
             else:
-                filter = {'or': [
-                             {'field': 'album', 'operator': 'contains', 'value': filter},
-                             {'field': 'artist', 'operator': 'contains', 'value': filter}
-                         ]}
+                filter = {'or': [{'field': 'album', 'operator': 'contains', 'value': filter},
+                                 {'field': 'artist', 'operator': 'contains', 'value': filter}]}
             return xbmc.AudioLibrary.GetAlbums(properties=properties, limits=limits, sort=sort, filter=filter)
         except ValueError:
             return
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetSongs(self, start=0, end=0, sortmethod='title', sortorder='ascending', albumid=None, artistid=None, filter=''):
+    def GetSongs(self, start=0, end=0, sortmethod='title', sortorder='ascending', albumid=None, artistid=None, filter='', *args, **kwargs):
         """ Get a list of all songs """
         self.logger.debug("Fetching all artists in the music database")
         try:
@@ -306,15 +304,15 @@ class Xbmc:
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
             properties=['artist', 'artistid', 'album', 'albumid', 'duration', 'year', 'thumbnail']
             limits = {'start': int(start), 'end': int(end)}
-            if albumid:
+            if albumid and filter == '':
                 filter = {'albumid': int(albumid)}
-            elif artistid:
+            elif artistid and filter == '':
                 filter = {'artistid': int(artistid)}
             else:
-                filter = {'or': [
-                             {'field': 'album', 'operator': 'contains', 'value': filter},
-                             {'field': 'artist', 'operator': 'contains', 'value': filter}
-                         ]}
+                filter = {'or': [{'field': 'album', 'operator': 'contains', 'value': filter},
+                                 {'field': 'artist', 'operator': 'contains', 'value': filter},
+                                 {'field': 'title', 'operator': 'contains', 'value': filter}]}
+
             return xbmc.AudioLibrary.GetSongs(properties=properties, limits=limits, sort=sort, filter=filter)
         except ValueError:
             logger.error("Unable to fetch artists!")
