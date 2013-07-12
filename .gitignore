@@ -5,7 +5,5 @@ ehthumbs.db
 Icon?
 Thumbs.db
 
-htpc_manager.log
-
 # Ignore folder with jekyll compiled content for gh-pages #
 _site/
