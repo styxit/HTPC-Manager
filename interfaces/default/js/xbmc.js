@@ -576,15 +576,15 @@ var songsLoad = {
     options: null
 }
 function loadSongs(options) {
-    var active = (songsLoad.request!=null && songsLoad.request.readyState!=4);
-    if (active || songsLoad.last == -1) return;
-
     var optionstr = JSON.stringify(options);
     if (songsLoad.options != optionstr) {
         songsLoad.last = 0;
         $('#songs-grid tbody').empty();
     }
     songsLoad.options = optionstr;
+
+    var active = (songsLoad.request!=null && songsLoad.request.readyState!=4);
+    if (active || songsLoad.last == -1) return;
 
     var sendData = {
         start: songsLoad.last,
