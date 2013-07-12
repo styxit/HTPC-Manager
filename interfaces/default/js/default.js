@@ -13,7 +13,9 @@ $(document).ready(function () {
         location.hash = $(e.target).attr('href');;
         $(window).scrollTop(yScroll);
     });
-
+    $('form.disabled').submit(function(e) {
+        e.preventDefault()
+    })
     $('a.ajax-link').click(function (e) {
         e.preventDefault();
         var link = $(this);
