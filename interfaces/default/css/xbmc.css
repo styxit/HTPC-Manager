@@ -52,8 +52,8 @@ a:Hover {
     bottom: 10px;
     left: 10px;
 }
-.grid-caption a {
-    margin: 0 10px 0 0;
+.grid-control a:first-child {
+    margin-right: 35px;
 }
 h6.title {
     color: #555555;
