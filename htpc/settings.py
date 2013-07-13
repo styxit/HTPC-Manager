@@ -46,12 +46,11 @@ class Settings:
 
     def set(self, key, val):
         """ Save a setting to the database """
+        self.logger.debug("Saving settings to the database.")
         try:
             setting = Setting.selectBy(key=key).getOne()
             setting.val = val
-            self.logger.debug("Saving settings to the database.")
         except SQLObjectNotFound:
-            self.logger.error("Unable to save settings to the database.")
             Setting(key=key, val=val)
 
     def get_templates(self):

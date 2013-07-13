@@ -49,7 +49,7 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
             # Serve the resized file
             image = resized
         else:
-            logger.error("Can't resize when PIL is missing on system!")
+            #logger.error("Can't resize when PIL is missing on system!")
             if (opacity < 100):
                 image = os.path.join(htpc.RUNDIR,'interfaces/default/img/fff_20.png')
 
