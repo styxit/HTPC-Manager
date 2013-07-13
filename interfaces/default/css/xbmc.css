@@ -75,6 +75,12 @@ h6.title {
 #playlist tr td {
     cursor: pointer;
 }
+#nowplaying {
+    background-size: 100%;
+    background-position: 50% 20%;
+    background-repeat: no-repeat;
+    margin-bottom: 10px;
+}
 #playlist-table tr td:last-child {
     width: 35px;
 }

@@ -49,7 +49,7 @@ class Xbmc:
         htpc.MODULES.append({
             'name': 'XBMC Servers',
             'id': 'xbmc_update_server',
-            'action': htpc.WEBDIR + 'xbmc/server',
+            'action': htpc.WEBDIR + 'xbmc/setserver',
             'test': htpc.WEBDIR + 'xbmc/ping',
             'fields': [
                 {'type':'select',
@@ -80,16 +80,13 @@ class Xbmc:
         try:
             server = htpc.settings.get('xbmc_current_server', 0)
             self.current = XbmcServers.selectBy(id=server).getOne()
-            self.xbmc = Server(self.url('/jsonrpc', True))
             self.logger.debug("Using XBMC server: " + self.current.name)
         except SQLObjectNotFound:
             self.current = XbmcServers.select(limit=1).getOne()
-            self.xbmc = Server(self.url('/jsonrpc', True))
             self.logger.debug("No active XBMC. Setting first one.")
         except SQLObjectNotFound:
-            self.logger.debug("No XBMC-Server found in database.")
             self.current = None
-            self.xbmc = None
+            self.logger.debug("No XBMC-Server found in database.")
 
     @cherrypy.expose()
     def index(self):
@@ -107,10 +104,6 @@ class Xbmc:
             xbmc_server_username='', xbmc_server_password='', **kwargs):
         """ Tests settings, returns MAC address on success and null on fail """
         self.logger.debug("Testing XBMC connectivity")
-
-        if not xbmc_server_host or not xbmc_server_port:
-            self.logger.error("Please specifiy hostname and port for XBMC.")
-            return
         try:
             url = xbmc_server_host + ':' + xbmc_server_port
             if xbmc_server_username and xbmc_server_password:
@@ -195,7 +188,6 @@ class Xbmc:
             self.current = None
             self.logger.error("Unable to find any XBMC-Servers. Please check your settings")
             return "No valid servers"
-        self.xbmc = Server(self.url('/jsonrpc', True))
         return "success"
 
     @cherrypy.expose()
@@ -214,6 +206,7 @@ class Xbmc:
         """ Get a list of all movies """
         self.logger.debug("Fetching Movies")
         try:
+            xbmc = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
             properties = ['title', 'year', 'plot', 'thumbnail', 'file', 'fanart', 'studio', 'trailer',
                     'imdbnumber', 'genre', 'rating', 'playcount']
@@ -221,7 +214,7 @@ class Xbmc:
             filter = {'field': 'title', 'operator': 'contains', 'value': filter}
             if hidewatched == "1":
                 filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
-            return self.xbmc.VideoLibrary.GetMovies(sort=sort, properties=properties, limits=limits, filter=filter)
+            return xbmc.VideoLibrary.GetMovies(sort=sort, properties=properties, limits=limits, filter=filter)
         except:
             self.logger.error("Unable to fetch movies!")
             return
@@ -232,13 +225,14 @@ class Xbmc:
         """ Get a list of all the TV Shows """
         self.logger.debug("Fetching TV Shows")
         try:
+            xbmc = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
             properties = ['title', 'year', 'plot', 'thumbnail', 'playcount']
             limits = {'start': int(start), 'end': int(end)}
             filter = {'field': 'title', 'operator': 'contains', 'value': filter}
             if hidewatched == "1":
                 filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
-            shows = self.xbmc.VideoLibrary.GetTVShows(sort=sort,properties=properties, limits=limits, filter=filter)
+            shows = xbmc.VideoLibrary.GetTVShows(sort=sort,properties=properties, limits=limits, filter=filter)
             return shows
         except:
             self.logger.error("Unable to fetch TV Shows")
@@ -249,14 +243,18 @@ class Xbmc:
     def GetEpisodes(self, start=0, end=0, sortmethod='episode', sortorder='ascending', tvshowid=None, hidewatched=False, filter=''):
         """ Get information about a single TV Show """
         self.logger.debug("Loading information for TVID" + str(tvshowid))
-        sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
-        properties = ['episode', 'season', 'thumbnail', 'plot', 'file', 'playcount']
-        limits = {'start': int(start), 'end': int(end)}
-        filter = {'field': 'title', 'operator': 'contains', 'value': filter}
-        if hidewatched == "1":
-            filter = {"and": [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
-        episodes = self.xbmc.VideoLibrary.GetEpisodes(sort=sort, tvshowid=int(tvshowid), properties=properties, limits=limits, filter=filter)
-        return episodes
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
+            properties = ['episode', 'season', 'thumbnail', 'plot', 'file', 'playcount']
+            limits = {'start': int(start), 'end': int(end)}
+            filter = {'field': 'title', 'operator': 'contains', 'value': filter}
+            if hidewatched == "1":
+                filter = {"and": [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
+            episodes = xbmc.VideoLibrary.GetEpisodes(sort=sort, tvshowid=int(tvshowid), properties=properties, limits=limits, filter=filter)
+            return episodes
+        except:
+            return
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -264,11 +262,12 @@ class Xbmc:
         """ Get a list of all artists """
         self.logger.debug("Fetching all artists in the music database")
         try:
+            xbmc = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
             properties = ['thumbnail', 'fanart']
             limits = {'start': int(start), 'end': int(end)}
             filter = {'field': 'artist', 'operator': 'contains', 'value': filter}
-            return self.xbmc.AudioLibrary.GetArtists(properties=properties, limits=limits, sort=sort, filter=filter)
+            return xbmc.AudioLibrary.GetArtists(properties=properties, limits=limits, sort=sort, filter=filter)
         except ValueError:
             logger.error("Unable to fetch artists!")
             return
@@ -279,6 +278,7 @@ class Xbmc:
         """ Get a list of all albums for artist """
         self.logger.debug("Loading all albums for ARTISTID " + str(artistid))
         try:
+            xbmc = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
             properties=['title', 'artist', 'year', 'thumbnail']
             limits = {'start': int(start), 'end': int(end)}
@@ -287,7 +287,7 @@ class Xbmc:
             else:
                 filter = {'or': [{'field': 'album', 'operator': 'contains', 'value': filter},
                                  {'field': 'artist', 'operator': 'contains', 'value': filter}]}
-            return self.xbmc.AudioLibrary.GetAlbums(properties=properties, limits=limits, sort=sort, filter=filter)
+            return xbmc.AudioLibrary.GetAlbums(properties=properties, limits=limits, sort=sort, filter=filter)
         except ValueError:
             return
 
@@ -297,6 +297,7 @@ class Xbmc:
         """ Get a list of all songs """
         self.logger.debug("Fetching all artists in the music database")
         try:
+            xbmc = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
             properties=['artist', 'artistid', 'album', 'albumid', 'duration', 'year', 'thumbnail']
             limits = {'start': int(start), 'end': int(end)}
@@ -309,7 +310,7 @@ class Xbmc:
                                  {'field': 'artist', 'operator': 'contains', 'value': filter},
                                  {'field': 'title', 'operator': 'contains', 'value': filter}]}
 
-            return self.xbmc.AudioLibrary.GetSongs(properties=properties, limits=limits, sort=sort, filter=filter)
+            return xbmc.AudioLibrary.GetSongs(properties=properties, limits=limits, sort=sort, filter=filter)
         except:
             logger.error("Unable to fetch artists!")
             return
@@ -320,7 +321,8 @@ class Xbmc:
         """ Get PVR channel list from xbmc """
         self.logger.debug("Loading XBMC PVC channel list.")
         try:
-            return self.xbmc.PVR.GetChannelGroups(channeltype=type)
+            xbmc = Server(self.url('/jsonrpc', True))
+            return xbmc.PVR.GetChannelGroups(channeltype=type)
         except:
             return
 
@@ -330,7 +332,8 @@ class Xbmc:
         """ Get PVR channel list from xbmc """
         self.logger.debug("Loading XBMC PVC channel list.")
         try:
-            return self.xbmc.PVR.GetChannels(channelgroupid=int(group), properties=['thumbnail'])
+            xbmc = Server(self.url('/jsonrpc', True))
+            return xbmc.PVR.GetChannels(channelgroupid=int(group), properties=['thumbnail'])
         except:
             return
 
@@ -339,45 +342,48 @@ class Xbmc:
     def PlayItem(self, item=None, type=None):
         """ Play a file in XBMC """
         self.logger.debug("Playing '" + item + "' of the type " + type)
+        xbmc = Server(self.url('/jsonrpc', True))
         if type == 'movie':
-            return self.xbmc.Player.Open(item={'movieid': int(item)}, options={'resume': True})
+            return xbmc.Player.Open(item={'movieid': int(item)}, options={'resume': True})
         elif type == 'episode':
-            return self.xbmc.Player.Open(item={'episodeid': int(item)}, options={'resume': True})
+            return xbmc.Player.Open(item={'episodeid': int(item)}, options={'resume': True})
         elif type == 'channel':
-            return self.xbmc.Player.Open(item={'channelid': int(item)})
+            return xbmc.Player.Open(item={'channelid': int(item)})
         elif type == 'artist':
-            return self.xbmc.Player.Open(item={'artistid': int(item)})
+            return xbmc.Player.Open(item={'artistid': int(item)})
         elif type == 'album':
-            return self.xbmc.Player.Open(item={'albumid': int(item)})
+            return xbmc.Player.Open(item={'albumid': int(item)})
         elif type == 'song':
-            return self.xbmc.Player.Open(item={'songid': int(item)})
+            return xbmc.Player.Open(item={'songid': int(item)})
         else:
-            return self.xbmc.Player.Open(item={'file': item})
+            return xbmc.Player.Open(item={'file': item})
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def QueueItem(self, item, type):
         """ Queue a file in XBMC """
         self.logger.debug("Enqueueing '" + item + "' of the type " + type)
+        xbmc = Server(self.url('/jsonrpc', True))
         if type == 'movie':
-            return self.xbmc.Playlist.Add(playlistid=1, item={'movieid': int(item)})
+            return xbmc.Playlist.Add(playlistid=1, item={'movieid': int(item)})
         elif type == 'episode':
-            return self.xbmc.Playlist.Add(playlistid=1, item={'episodeid': int(item)})
+            return xbmc.Playlist.Add(playlistid=1, item={'episodeid': int(item)})
         elif type == 'channel':
-            return self.xbmc.Playlist.Add(playlistid=1, item={'channelid': int(item)})
+            return xbmc.Playlist.Add(playlistid=1, item={'channelid': int(item)})
         elif type == 'artist':
-            return self.xbmc.Playlist.Add(playlistid=0, item={'artistid': int(item)})
+            return xbmc.Playlist.Add(playlistid=0, item={'artistid': int(item)})
         elif type == 'album':
-            return self.xbmc.Playlist.Add(playlistid=0, item={'albumid': int(item)})
+            return xbmc.Playlist.Add(playlistid=0, item={'albumid': int(item)})
         elif type == 'song':
-            return self.xbmc.Playlist.Add(playlistid=0, item={'songid': int(item)})
+            return xbmc.Playlist.Add(playlistid=0, item={'songid': int(item)})
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def RemoveItem(self, item, playlistid=0):
         """ Remove a file from the playlist """
         self.logger.debug("Removing '" + item + "' from the playlist")
-        return self.xbmc.Playlist.Remove(playlistid=playlistid, position=int(item))
+        xbmc = Server(self.url('/jsonrpc', True))
+        return xbmc.Playlist.Remove(playlistid=playlistid, position=int(item))
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -387,8 +393,9 @@ class Xbmc:
         position1 = int(position1)
         position2 = int(position2)
         i = 1 if position1 < position2 else -1
+        xbmc = Server(self.url('/jsonrpc', True))
         while(position1 != position2):
-            self.xbmc.Playlist.Swap(playlistid=playlistid, position1=position1, position2=position1+i)
+            xbmc.Playlist.Swap(playlistid=playlistid, position1=position1, position2=position1+i)
             position1 += i
         return "Moved from " + str(position1) + " to " + str(position2)
 
@@ -397,10 +404,11 @@ class Xbmc:
     def Playlist(self, type='audio'):
         """ Get a playlist from XBMC """
         self.logger.debug("Loading Playlist of type " + type)
+        xbmc = Server(self.url('/jsonrpc', True))
         if type == 'video':
-            return self.xbmc.Playlist.GetItems(playlistid=1, properties=['year', 'showtitle', 'season', 'episode', 'runtime'])
+            return xbmc.Playlist.GetItems(playlistid=1, properties=['year', 'showtitle', 'season', 'episode', 'runtime'])
 
-        return self.xbmc.Playlist.GetItems(playlistid=0, properties=['artist', 'title', 'album', 'duration'])
+        return xbmc.Playlist.GetItems(playlistid=0, properties=['artist', 'title', 'album', 'duration'])
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -408,7 +416,8 @@ class Xbmc:
         """ Get information about current playing item """
         self.logger.debug("Fetching currently playing information")
         try:
-            player = self.xbmc.Player.GetActivePlayers()[0]
+            xbmc = Server(self.url('/jsonrpc', True))
+            player = xbmc.Player.GetActivePlayers()[0]
             playerid = player['playerid']
 
             if player['type'] == 'video':
@@ -421,9 +430,9 @@ class Xbmc:
                 playerprop = ['speed', 'position', 'time', 'totaltime', 'percentage']
                 itemprop = ['thumbnail', 'title', 'artist', 'album', 'year', 'fanart']
 
-            app = self.xbmc.Application.GetProperties(properties=['muted', 'volume'])
-            player = self.xbmc.Player.GetProperties(playerid=playerid, properties=playerprop)
-            item = self.xbmc.Player.GetItem(playerid=playerid, properties=itemprop)
+            app = xbmc.Application.GetProperties(properties=['muted', 'volume'])
+            player = xbmc.Player.GetProperties(playerid=playerid, properties=playerprop)
+            item = xbmc.Player.GetItem(playerid=playerid, properties=itemprop)
 
             return {'playerInfo': player, 'itemInfo': item, 'app': app}
         except:
@@ -436,16 +445,17 @@ class Xbmc:
         """ Various commands to control XBMC Player """
         self.logger.debug("Sending control to XBMC: " + action)
         try:
+            xbmc = Server(self.url('/jsonrpc', True))
             if action == 'seek':
-                player = self.xbmc.Player.GetActivePlayers()[0]
-                return self.xbmc.Player.Seek(playerid=player[u'playerid'], value=float(value))
+                player = xbmc.Player.GetActivePlayers()[0]
+                return xbmc.Player.Seek(playerid=player[u'playerid'], value=float(value))
             elif action == 'jump':
-                player = self.xbmc.Player.GetActivePlayers()[0]
-                return self.xbmc.Player.GoTo(playerid=player[u'playerid'], to=int(value))
+                player = xbmc.Player.GetActivePlayers()[0]
+                return xbmc.Player.GoTo(playerid=player[u'playerid'], to=int(value))
             elif action == 'party':
-                return self.xbmc.Player.Open(item={'partymode': 'audio'})
+                return xbmc.Player.Open(item={'partymode': 'audio'})
             else:
-                return self.xbmc.Input.ExecuteAction(action=action)
+                return xbmc.Input.ExecuteAction(action=action)
         except:
             self.logger.error("Unable to control XBMC with action: " + action)
             return 'error'
@@ -456,7 +466,8 @@ class Xbmc:
     def SendText(self, text):
         """ Send text to XBMC """
         self.logger.debug("Sending text to XBMC: " + text)
-        return self.xbmc.Input.SendText(text=text)
+        xbmc = Server(self.url('/jsonrpc', True))
+        return xbmc.Input.SendText(text=text)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -464,15 +475,16 @@ class Xbmc:
         """ Change the subtitles """
         self.logger.debug("Changing subtitles to " + subtitle)
         try:
-            playerid = self.xbmc.Player.GetActivePlayers()[0][u'playerid']
+            xbmc = Server(self.url('/jsonrpc', True))
+            playerid = xbmc.Player.GetActivePlayers()[0][u'playerid']
             try:
                 subtitle = int(subtitle)
-                self.xbmc.Player.SetSubtitle(playerid=playerid, subtitle=subtitle, enable=True)
+                xbmc.Player.SetSubtitle(playerid=playerid, subtitle=subtitle, enable=True)
+                return "success"
             except ValueError:
-                self.logger.error("Unable to set subtitle to specified value " + subtitle)
-                self.xbmc.Player.SetSubtitle(playerid=playerid, subtitle='off')
-            return
-        except:
+                xbmc.Player.SetSubtitle(playerid=playerid, subtitle='off')
+                return "Disabling subtitles."
+        except ValueError:
             self.logger.error("Unable to set subtitle to specified value " + subtitle)
             return
 
@@ -482,13 +494,9 @@ class Xbmc:
         """ Change the audio stream  """
         self.logger.debug("Chaning audio stream to " + audio)
         try:
-            playerid = self.xbmc.Player.GetActivePlayers()[0][u'playerid']
-            try:
-                self.xbmc.Player.SetAudioStream(playerid=playerid, stream=int(audio))
-            except ValueError:
-                self.logger.error("Unable to change audio stream to specified value " + audio)
-                pass
-            return
+            xbmc = Server(self.url('/jsonrpc', True))
+            playerid = xbmc.Player.GetActivePlayers()[0][u'playerid']
+            return xbmc.Player.SetAudioStream(playerid=playerid, stream=int(audio))
         except:
             self.logger.error("Unable to change audio stream to specified value " + audio)
             return
@@ -497,17 +505,18 @@ class Xbmc:
     @cherrypy.tools.json_out()
     def System(self, action=''):
         """ Various system commands """
+        xbmc = Server(self.url('/jsonrpc', True))
         if action == 'Shutdown':
             self.logger.info("Shutting down XBMC")
-            self.xbmc.System.Shutdown()
+            xbmc.System.Shutdown()
             return 'Shutting down XBMC.'
         elif action == 'Suspend':
             self.logger.info("Suspending XBMC")
-            self.xbmc.System.Suspend()
+            xbmc.System.Suspend()
             return 'Suspending XBMC.'
         elif action == 'Reboot':
             self.logger.info("Rebooting XBMC")
-            self.xbmc.System.Reboot()
+            xbmc.System.Reboot()
             return 'Rebooting XBMC.'
 
     @cherrypy.expose()
@@ -528,7 +537,7 @@ class Xbmc:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             s.sendto(msg, ("255.255.255.255", 9))
-            self.logger.error("WOL package sent to " + self.current.mac)
+            self.logger.info("WOL package sent to " + self.current.mac)
             return "WOL package sent"
         except:
             self.logger.error("Unable to send WOL packet")
@@ -539,8 +548,9 @@ class Xbmc:
     def Notify(self, text):
         """ Create popup in XBMC """
         self.logger.debug("Sending notification to XBMC: " + text)
+        xbmc = Server(self.url('/jsonrpc', True))
         image='https://raw.github.com/styxit/HTPC-Manager/master/interfaces/default/img/xbmc-logo.png'
-        return self.xbmc.GUI.ShowNotification(title='HTPC manager', message=text, image=image)
+        return xbmc.GUI.ShowNotification(title='HTPC manager', message=text, image=image)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -589,16 +599,17 @@ class Xbmc:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def Library(self, do='scan', lib='video'):
+        xbmc = Server(self.url('/jsonrpc', True))
         if lib == 'video':
             if do == 'clean':
-                return self.xbmc.VideoLibrary.Clean()
+                return xbmc.VideoLibrary.Clean()
             else:
-                return self.xbmc.VideoLibrary.Scan()
+                return xbmc.VideoLibrary.Scan()
         else:
             if do == 'clean':
-                return self.xbmc.AudioLibrary.Clean()
+                return xbmc.AudioLibrary.Clean()
             else:
-                return self.xbmc.AudioLibrary.Scan()
+                return xbmc.AudioLibrary.Scan()
 
     def url(self, path='', auth=False):
         """ Generate a URL for the RPC based on XBMC settings """

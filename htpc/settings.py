@@ -67,7 +67,6 @@ class Settings:
         path = os.path.join(htpc.TEMPLATE, "css/themes/")
         themes = []
         dirs = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
-        print dirs
         for theme in dirs:
             current = bool(theme == self.get('app_theme', 'default'))
             themes.append({'name': theme, 'value': theme, 'selected': current})

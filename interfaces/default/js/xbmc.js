@@ -46,6 +46,10 @@ $(document).ready(function() {
         var action = $(this).attr('data-player-control');
         $.get(WEBDIR + 'xbmc/ControlPlayer?action='+action);
     });
+    $('#nowplaying #player-progressbar').click(function(e) {
+        pos = ((e.pageX-this.offsetLeft)/$(this).width()*100).toFixed(2);
+        $.get(WEBDIR + 'xbmc/ControlPlayer?action=seek&value='+pos);
+    });
 
     // Toggle wether to show already seen episodes
     $('#hidewatched').click(function(e) {
@@ -671,28 +675,21 @@ function loadChannels(){
         success: function(data){
             $('.spinner').hide();
             if (data == null) return errorHandler();
-
             $.each(data.channels, function (i, channel) {
                 var item = $('<li>').attr('title', channel.label);
-
                 var link = $('<a>').attr('href', '#').click(function(e) {
                     e.preventDefault();
                     playItem(channel.channelid, 'channel');
                 });
-
                 var src = 'holder.js/75x75/text:'+channel.label;
                 if (channel.thumbnail) {
                     src = WEBDIR + 'xbmc/GetThumb?w=75&h=75&thumb='+encodeURIComponent(channel.thumbnail);
                 }
                 link.append($('<img>').attr('src', src).addClass('thumbnail'));
-
                 link.append($('<h6>').addClass('title').html(shortenText(channel.label, 21)));
-
                 item.append(link);
-
                 list.append(item);
             });
-
             channelsLoaded = true;
             Holder.run();
         },
@@ -703,7 +700,6 @@ function loadChannels(){
 }
 
 var nowPlayingId = null
-var nowPlayingThumb = 'empty-image';
 function loadNowPlaying() {
     $.ajax({
         url: WEBDIR + 'xbmc/NowPlaying',
@@ -716,8 +712,8 @@ function loadNowPlaying() {
                 return;
             }
             $('#nowplaying').show();
-            if (nowPlayingThumb != data.itemInfo.item.thumbnail) {
-                nowPlayingThumb = data.itemInfo.item.thumbnail;
+            if (nowPlayingId != data.itemInfo.item.id) {
+                var nowPlayingThumb = data.itemInfo.item.thumbnail;
 
                 var thumbnail = $('#nowplaying .thumb img');
                 thumbnail.attr('alt', data.itemInfo.item.label);
@@ -746,12 +742,7 @@ function loadNowPlaying() {
                 }
                 if (data.itemInfo.item.fanart) {
                     var nowPlayingBackground = WEBDIR + 'xbmc/GetThumb?w=1150&h=640&o=10&thumb='+encodeURIComponent(data.itemInfo.item.fanart);
-                    $('#nowplaying').css({
-                        'background' : 'url('+nowPlayingBackground+') no-repeat',
-                        'background-size' : '100%;',
-                        'background-position' : '50% 20%',
-                        'margin-bottom' : '10px'
-                    });
+                    $('#nowplaying').css({'background-image':'url('+nowPlayingBackground+')'});
                 }
             }
 
@@ -799,17 +790,12 @@ function loadNowPlaying() {
             itemTitel.html(playingTitle);
             itemSubtitel.html(playingSubtitle);
 
-            $('#nowplaying #player-progressbar').click(function(e) {
-                pos = ((e.pageX-this.offsetLeft)/$(this).width()*100).toFixed(2);
-                $.get(WEBDIR + 'xbmc/ControlPlayer?action=seek&value='+pos);
-            });
-
             var progressBar = $('#nowplaying #player-progressbar').find('.bar');
             progressBar.css('width', data.playerInfo.percentage + '%');
 
             var select = $('#audio').html('')
             select.parent().hide();
-            if (data.playerInfo.audiostreams && data.playerInfo.audiostreams > 1) {
+            if (data.playerInfo.audiostreams && data.playerInfo.audiostreams.length > 1) {
                 var current = data.playerInfo.currentaudiostream.index;
                 $.each(data.playerInfo.audiostreams, function (i, item) {
                     var option = $('<option>').html(item.name).val(item.index);
