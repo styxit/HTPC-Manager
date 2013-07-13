@@ -192,67 +192,57 @@ function loadMovies(options) {
 }
 
 function loadMovie(movie) {
-    var modalMoviePoster = $('<img>').attr('src', WEBDIR + 'xbmc/GetThumb?w=200&h=300&thumb='+encodeURIComponent(movie.thumbnail));
-    modalMoviePoster.addClass('movie-poster')
-
-    var modalMovieAnchor = $('<div>').addClass('thumbnail pull-left');
-    modalMovieAnchor.append(modalMoviePoster);
-
-    var modalMovieInfo = $('<div>').addClass('modal-movieinfo');
-    if(movie.streamdetails && movie.streamdetails.video[0]) {
+    var poster = WEBDIR + 'xbmc/GetThumb?w=200&h=300&thumb='+encodeURIComponent(movie.thumbnail)
+    var info = $('<div>').addClass('modal-movieinfo');
+    if (movie.streamdetails && movie.streamdetails.video[0]) {
         var runtime = parseSec(movie.streamdetails.video[0].duration);
-        modalMovieInfo.append($('<p>').html('<b>Runtime:</b> ' + runtime));
+        info.append($('<p>').html('<b>Runtime:</b> ' + runtime));
     }
-    modalMovieInfo.append($('<p>').html('<b>Plot:</b> ' + movie.plot));
-    if(movie.genre) {
+    info.append($('<p>').html('<b>Plot:</b> ' + movie.plot));
+    if (movie.genre) {
         var genre = movie.genre.join(', ');
-        modalMovieInfo.append($('<p>').html('<b>Genre:</b> ' + genre));
+        info.append($('<p>').html('<b>Genre:</b> ' + genre));
     }
-    if(movie.studio[0]) {
+    if (movie.studio) {
         var studio = movie.studio.join(', ');
-        modalMovieInfo.append($('<p>').html('<b>Studio:</b> ' + studio));
+        info.append($('<p>').html('<b>Studio:</b> ' + studio));
     }
-    if(movie.rating) {
-        var rating = $('<span>').raty({
+    if (movie.rating) {
+        info.append($('<span>').raty({
             readOnly: true,
-            path: WEBDIR+'img',
+            path: WEBDIR + 'img',
             score: (movie.rating / 2),
-        })
-        modalMovieInfo.append(rating);
+        }));
     }
-
-    modalBody = $('<div>');
-    modalBody.append(modalMovieAnchor);
-    modalBody.append(modalMovieInfo);
-
-    var modalButtons = {
+    var buttons = {
         'Play' : function() {
             playItem(movie.movieid, 'movie');
             hideModal();
         }
     }
     if (movie.imdbnumber) {
-        $.extend(modalButtons,{
+        $.extend(buttons,{
             'IMDb' : function() {
                 window.open('http://www.imdb.com/title/'+movie.imdbnumber,'IMDb')
             }
         });
     }
     if (movie.trailer) {
-        $.extend(modalButtons,{
+        $.extend(buttons,{
             'Trailer' : function() {
-                trailerid = movie.trailer.substr(movie.trailer.length-11);
-                var youtube = $('<iframe>').attr('src','http://www.youtube.com/embed/'+trailerid+'?rel=0&autoplay=1');
-                youtube.addClass('modal-youtube');
-                $('#modal_dialog').find('.modal-body').html(youtube);
+                var trailerid = movie.trailer.substr(movie.trailer.length-11);
+                var src = 'http://www.youtube.com/embed/'+trailerid+'?rel=0&autoplay=1'
+                var youtube = $('<iframe>').attr('src',src).addClass('modal-youtube');
+                $('#modal_dialog .modal-body').html(youtube);
             }
         });
     }
-
-    showModal(movie.title + ' ('+movie.year+')',  modalBody, modalButtons);
+    showModal(movie.title + ' ('+movie.year+')', $('<div>').append(
+        $('<img>').attr('src', poster).addClass('thumbnail movie-poster pull-left'),
+        info
+    ), buttons);
     $('.modal-fanart').css({
-        'background' : '#ffffff url(' + WEBDIR + 'xbmc/GetThumb?w=675&h=400&o=10&thumb='+encodeURIComponent(movie.fanart)+') top center no-repeat',
-        'background-size' : '100%'
+        'background-image' : 'url('+WEBDIR+'xbmc/GetThumb?w=675&h=400&o=10&thumb='+encodeURIComponent(movie.fanart)+')'
     });
 }
 
@@ -363,7 +353,6 @@ function loadEpisodes(options) {
         dataType: 'json',
         success: function (data) {
             if (data==null || data.limits.total==0) return;
-            $('a[href=#episodes]').tab('show');
 
             if (data.limits.end == data.limits.total) {
                 episodeLoad.last = -1;
@@ -401,6 +390,7 @@ function loadEpisodes(options) {
         },
         complete: function() {
             $('.spinner').hide();
+            $('a[href=#episodes]').tab('show');
         }
     });
     $('#episode-grid').slideDown()
@@ -711,63 +701,56 @@ function loadNowPlaying() {
                 $('a[href=#playlist]').parent().hide();
                 return;
             }
-            $('#nowplaying').show();
             if (nowPlayingId != data.itemInfo.item.id) {
-                var nowPlayingThumb = data.itemInfo.item.thumbnail;
-
-                var thumbnail = $('#nowplaying .thumb img');
-                thumbnail.attr('alt', data.itemInfo.item.label);
-                thumbnail.removeAttr('style width height');
+                var nowPlayingThumb = encodeURIComponent(data.itemInfo.item.thumbnail);
+                var thumbnail = $('#nowplaying .thumb img').attr('alt', data.itemInfo.item.label);
                 if (nowPlayingThumb == '') {
                     thumbnail.attr('src', 'holder.js/140x140/text:No+artwork');
                     thumbnail.attr('width', '140').attr('height', '140');
                 } else {
                     switch(data.itemInfo.item.type) {
                         case 'episode':
-                            thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=150&h=75&thumb='+encodeURIComponent(nowPlayingThumb));
+                            thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=150&h=75&thumb='+nowPlayingThumb);
                             thumbnail.attr('width', '150').attr('height', '75');
                             break;
                         case 'movie':
-                            thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(nowPlayingThumb));
+                            thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=100&h=150&thumb='+nowPlayingThumb);
                             thumbnail.attr('width', '100').attr('height', '150');
                             break;
                         case 'song':
-                            thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=180&h=180&thumb='+encodeURIComponent(nowPlayingThumb));
+                            thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=180&h=180&thumb='+nowPlayingThumb);
                             thumbnail.attr('width', '180').attr('height', '180');
                             break;
                         default:
-                            thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=140&h=140&thumb='+encodeURIComponent(nowPlayingThumb));
+                            thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=140&h=140&thumb='+nowPlayingThumb);
                             thumbnail.attr('width', '140').attr('height', '140');
                     }
                 }
                 if (data.itemInfo.item.fanart) {
-                    var nowPlayingBackground = WEBDIR + 'xbmc/GetThumb?w=1150&h=640&o=10&thumb='+encodeURIComponent(data.itemInfo.item.fanart);
-                    $('#nowplaying').css({'background-image':'url('+nowPlayingBackground+')'});
+                    var background = encodeURIComponent(data.itemInfo.item.fanart)
+                    background = WEBDIR + 'xbmc/GetThumb?w=1150&h=640&o=10&thumb='+background;
+                    $('#nowplaying').css({'background-image':'url('+background+')'});
                 }
             }
 
-            var playPauseButton = $('[data-player-control=playpause]');
-            var playPauseIcon = playPauseButton.find('i');
-            playPauseIcon.removeClass();
             if (data.playerInfo.speed == 1) {
-                playPauseIcon.addClass('icon-pause');
+                $('#nowplaying i.icon-play').removeClass().addClass('icon-pause')
             } else {
-                playPauseIcon.addClass('icon-play');
+                $('#nowplaying i.icon-pause').removeClass().addClass('icon-play')
             }
-
-            var setMuteButton = $('[data-player-control=mute]')
-            var setMuteIcon = setMuteButton.find('i');
-            setMuteIcon.removeClass();
             if (data.app.muted) {
-                setMuteIcon.addClass('icon-volume-off');
+                $('#nowplaying i.icon-volume-up').removeClass().addClass('icon-volume-off')
             } else {
-                setMuteIcon.addClass('icon-volume-up');
+                $('#nowplaying i.icon-volume-off').removeClass().addClass('icon-volume-up')
             }
 
-            var playingTime = pad(data.playerInfo.time.hours, 2) + ':' + pad(data.playerInfo.time.minutes, 2) + ':' + pad(data.playerInfo.time.seconds, 2);
-            var totalTime = pad(data.playerInfo.totaltime.hours, 2) + ':' + pad(data.playerInfo.totaltime.minutes, 2) + ':' + pad(data.playerInfo.totaltime.seconds, 2);
-            var itemTime = $('#nowplaying #player-item-time');
-            itemTime.html(playingTime + ' / ' + totalTime);
+            var playingTime = pad(data.playerInfo.time.hours, 2) + ':' +
+                              pad(data.playerInfo.time.minutes, 2) + ':' +
+                              pad(data.playerInfo.time.seconds, 2);
+            var totalTime = pad(data.playerInfo.totaltime.hours, 2) + ':' +
+                            pad(data.playerInfo.totaltime.minutes, 2) + ':' +
+                            pad(data.playerInfo.totaltime.seconds, 2);
+            var itemTime = $('#nowplaying #player-item-time').html(playingTime + ' / ' + totalTime);
 
             var itemTitel = $('#nowplaying #player-item-title')
             var itemSubtitel = $('#nowplaying #player-item-subtitle')
@@ -775,7 +758,9 @@ function loadNowPlaying() {
             var playingSubtitle = '';
             if (data.itemInfo.item.type == 'episode') {
                 playingTitle = data.itemInfo.item.label;
-                playingSubtitle = data.itemInfo.item.showtitle + ' ' + data.itemInfo.item.season + 'x' + data.itemInfo.item.episode;
+                playingSubtitle = data.itemInfo.item.showtitle + ' ' +
+                                  data.itemInfo.item.season + 'x' +
+                                  data.itemInfo.item.episode;
             }
             else if (data.itemInfo.item.type == 'movie') {
                 playingTitle = data.itemInfo.item.label;
@@ -790,7 +775,7 @@ function loadNowPlaying() {
             itemTitel.html(playingTitle);
             itemSubtitel.html(playingSubtitle);
 
-            var progressBar = $('#nowplaying #player-progressbar').find('.bar');
+            var progressBar = $('#nowplaying #player-progressbar .bar');
             progressBar.css('width', data.playerInfo.percentage + '%');
 
             var select = $('#audio').html('')
@@ -822,11 +807,11 @@ function loadNowPlaying() {
 
             $('[data-player-control]').attr('disabled', false);
 
-            //update playlist
             if (nowPlayingId != data.itemInfo.item.id) {
                 loadPlaylist(data.itemInfo.item.type=='song'?'audio':'video');
                 nowPlayingId = data.itemInfo.item.id;
             }
+            $('#nowplaying').slideDown();
         }
     });
 }
