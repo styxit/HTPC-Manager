@@ -16,8 +16,8 @@ $(document).ready(function() {
     // Catch keyboard event and send to XBMC
     $(document).keydown(function(e) {
         if (!$('input').is(":focus")) {
-            arrow = {8: 'Back', 27: 'Back', 13: 'Select', 37: 'Left', 38: 'Up', 39: 'Right', 40: 'Down',
-                     88: 'Stop', 32: 'PlayPause'};
+            arrow = {8: 'back', 27: 'back', 13: 'select', 37: 'left', 38: 'up', 39: 'right', 40: 'down',
+                     88: 'stop', 32: 'playpause', 67: 'contextmenu', 73: 'info', 77: 'mute'};
             command = arrow[e.which];
             if (command) {
                 $.get(WEBDIR + 'xbmc/ControlPlayer?action='+command);
@@ -28,15 +28,15 @@ $(document).ready(function() {
 
     // Load serverlist and send command on change.
     var servers = $('#servers').change(function() {
-         $.get(WEBDIR + 'xbmc/Servers?server='+$(this).val(), function(data) {
+         $.get(WEBDIR + 'xbmc/changeserver?id='+$(this).val(), function(data) {
             notify('XBMC','Server change '+data,'info');
          });
     });
-    $.get(WEBDIR + 'xbmc/Servers', function(data) {
+    $.get(WEBDIR + 'xbmc/getserver', function(data) {
         if (data==null) return;
         $.each(data.servers, function(i, item) {
             server = $('<option>').text(item.name).val(item.id);
-            if (item.id == data.current) server.attr('selected','selected');
+            if (item.name == data.current) server.attr('selected','selected');
             servers.append(server);
         });
     }, 'json');
@@ -474,20 +474,20 @@ var albumLoad = {
     last: 0,
     request: null,
     limit: 50,
-    options: null
+    options: null,
+    artist: null
 }
-lastArtist = null;
 function loadAlbums(options) {
     var elem = $('#album-grid');
     if (options && options.artistid!=undefined) {
         $('.artist-albums:visible').slideUp(300, function() {
             $(this).remove();
         });
-        if (options.artistid == lastArtist) {
-            lastArtist = null;
+        if (options.artistid == loadAlbums.artist) {
+            loadAlbums.artist = null;
             return;
         }
-        lastArtist = options.artistid;
+        loadAlbums.artist = options.artistid;
         var elem = $('<ul>').addClass('artist-albums thumbnails').hide()
     }
 
@@ -559,7 +559,6 @@ function loadAlbums(options) {
                         )
                     )
                     albumItem.append(albumCaption);
-
                     elem.append(albumItem);
                 });
             }
@@ -606,8 +605,6 @@ function loadSongs(options) {
         filter: (options && options.search ? '' : songsLoad.filter)
     }
     $.extend(sendData, songsLoad.options)
-
-    console.log(sendData)
 
     $('.spinner').show();
     songsLoad.request = $.ajax({
@@ -758,7 +755,7 @@ function loadNowPlaying() {
                 }
             }
 
-            var playPauseButton = $('[data-player-control=PlayPause]');
+            var playPauseButton = $('[data-player-control=playpause]');
             var playPauseIcon = playPauseButton.find('i');
             playPauseIcon.removeClass();
             if (data.playerInfo.speed == 1) {
@@ -767,7 +764,7 @@ function loadNowPlaying() {
                 playPauseIcon.addClass('icon-play');
             }
 
-            var setMuteButton = $('[data-player-control=SetMute]')
+            var setMuteButton = $('[data-player-control=mute]')
             var setMuteIcon = setMuteButton.find('i');
             setMuteIcon.removeClass();
             if (data.app.muted) {
@@ -804,7 +801,7 @@ function loadNowPlaying() {
 
             $('#nowplaying #player-progressbar').click(function(e) {
                 pos = ((e.pageX-this.offsetLeft)/$(this).width()*100).toFixed(2);
-                $.get(WEBDIR + 'xbmc/ControlPlayer?action=Seek&percent='+pos);
+                $.get(WEBDIR + 'xbmc/ControlPlayer?action=seek&value='+pos);
             });
 
             var progressBar = $('#nowplaying #player-progressbar').find('.bar');
@@ -917,12 +914,11 @@ function queueItem(item, type) {
 
 function removeItem(item) {
     $.get(WEBDIR + 'xbmc/RemoveItem?item='+item);
-    console.log(WEBDIR + 'xbmc/RemoveItem?item='+item)
     nowPlayingId = null;
 }
 
 function playlistJump(position) {
-    $.get(WEBDIR + 'xbmc/ControlPlayer/JumpItem/'+position);
+    $.get(WEBDIR + 'xbmc/ControlPlayer/jump/'+position);
 }
 
 function errorHandler() {
