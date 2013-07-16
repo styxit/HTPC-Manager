@@ -114,12 +114,11 @@ class Sabnzbd:
 
     def fetch(self, path):
         try:
-            settings = htpc.settings.Settings()
-            host = settings.get('sabnzbd_host', '')
-            port = str(settings.get('sabnzbd_port', ''))
-            apikey = settings.get('sabnzbd_apikey', '')
-            sabnzbd_basepath = settings.get('sabnzbd_basepath', '/sabnzbd/')
-            ssl = 's' if settings.get('sabnzbd_ssl', 0) else ''
+            host = htpc.settings.get('sabnzbd_host', '')
+            port = str(htpc.settings.get('sabnzbd_port', ''))
+            apikey = htpc.settings.get('sabnzbd_apikey', '')
+            sabnzbd_basepath = htpc.settings.get('sabnzbd_basepath', '/sabnzbd/')
+            ssl = 's' if htpc.settings.get('sabnzbd_ssl', 0) else ''
                         
             if(sabnzbd_basepath == ""):
                 sabnzbd_basepath = "/sabnzbd/"
@@ -130,5 +129,5 @@ class Sabnzbd:
             self.logger.debug("Fetching information from: " + url)
             return loads(urlopen(url, timeout=10).read())
         except:
-            self.logger.error("Cannot contact sabnzbd via " + url)
+            self.logger.error("Cannot contact sabnzbd")
             return

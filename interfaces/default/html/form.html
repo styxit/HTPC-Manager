@@ -3,7 +3,7 @@
     {'name':'Clear', 'type':'reset'}
 ])"><%
 import htpc
-settings =  htpc.settings.Settings()
+settings =  htpc.settings
 %><form${' action="'+action+'"' if action else ''} method="${method}" id="${id}"${' class="'+classes+'"' if classes else ''}>
     <fieldset>
         % if legend:

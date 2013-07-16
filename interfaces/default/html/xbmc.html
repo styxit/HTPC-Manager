@@ -20,10 +20,11 @@
                         %else:
                         <li><a href="#" id="hidewatched"><i class="icon-eye-open"></i> Hide Watched</a></li>
                         %endif
-                        <li><a href="Scan?lib=video" class="ajax-link"><i class="icon-search"></i> Update Video Library</a></li>
-                        <li><a href="Clean?lib=video" class="ajax-link"><i class="icon-trash"></i> Clean Video Library</a></li>
-                        <li><a href="Scan?lib=audio" class="ajax-link"><i class="icon-search"></i> Update Music Library</a></li>
-                        <li><a href="Clean?lib=audio" class="ajax-link"><i class="icon-trash"></i> Clean Music Library</a></li>
+                        <li><a href="ControlPlayer?action=party" class="ajax-link"><i class="icon-glass"></i> Party Mode</a></li>
+                        <li><a href="Library/scan/video" class="ajax-link"><i class="icon-search"></i> Update Video Library</a></li>
+                        <li><a href="Library/clean/video" class="ajax-link"><i class="icon-trash"></i> Clean Video Library</a></li>
+                        <li><a href="Library/scan/audio" class="ajax-link"><i class="icon-search"></i> Update Music Library</a></li>
+                        <li><a href="Library/clean/audio" class="ajax-link"><i class="icon-trash"></i> Clean Music Library</a></li>
                     </ul>
                 </div>
                 <div class="btn-group">
@@ -54,11 +55,15 @@
                     </div>
                     <div class="btn-toolbar">
                         <div class="btn-group">
-                            <button class="btn btn-small" data-player-control="PlayPrev"><i class="icon-fast-backward"></i></button>
-                            <button class="btn btn-small" data-player-control="Stop"><i class="icon-stop"></i></button>
-                            <button class="btn btn-small" data-player-control="PlayPause"><i class="icon-pause"></i></button>
-                            <button class="btn btn-small" data-player-control="PlayNext"><i class="icon-fast-forward"></i></button>
-                            <button class="btn btn-small" data-player-control="SetMute"><i class="icon-volume-off"></i></button>
+                            <button class="btn btn-small" data-player-control="skipprevious"><i class="icon-fast-backward"></i></button>
+                            <button class="btn btn-small" data-player-control="stepback"><i class="icon-backward"></i></button>
+                            <button class="btn btn-small" data-player-control="stop"><i class="icon-stop"></i></button>
+                            <button class="btn btn-small" data-player-control="play"><i class="icon-pause"></i></button>
+                            <button class="btn btn-small" data-player-control="stepforward"><i class="icon-forward"></i></button>
+                            <button class="btn btn-small" data-player-control="skipnext"><i class="icon-fast-forward"></i></button>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-small" data-player-control="mute"><i class="icon-volume-off"></i></button>
                         </div>
                         <div class="input-prepend pull-right">
                             <span class="add-on"><i class="icon-text-width"></i></span>
@@ -73,21 +78,22 @@
             </div>
         </div>
         <ul class="nav nav-tabs">
-            <li><a href="#movies" data-toggle="tab"><i class="icon-film"></i> Movies</a></li>
-            <li><a href="#shows" data-toggle="tab"><i class="icon-facetime-video"></i> TV Shows</a></li>
+            <li><a href="#movies" data-toggle="tab">Movies</a></li>
+            <li><a href="#shows" data-toggle="tab">TV Shows</a></li>
             <li class="hide"><a href="#episodes" data-toggle="tab">Episodes</a></li>
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-music"></i> Music
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Music
                 <i class="caret"></i></a>
                 <ul class="dropdown-menu">
-                    <li><a href="#artists" data-toggle="tab"><i class="icon-group"></i> Artists</a></li>
-                    <li><a href="#albums" data-toggle="tab"><i class="icon-th"></i> Albums</a></li>
+                    <li><a href="#artists" data-toggle="tab">Artists</a></li>
+                    <li><a href="#albums" data-toggle="tab">Albums</a></li>
+                    <li><a href="#songs" data-toggle="tab">Songs</a></li>
                 </ul>
             </li>
             %if settings.get('xbmc_enable_pvr', 0):
             <li><a href="#pvr" data-toggle="tab">PVR</a></li>
             %endif
-            <li class="hide"><a href="#playlist" data-toggle="tab"><i class="icon-align-justify"></i> Playlist</a></li>
+            <li class="hide"><a href="#playlist" data-toggle="tab">Playlist</a></li>
         </ul>
         <div class="tab-content">
             <div id="movies" class="tab-pane">
@@ -105,14 +111,31 @@
             <div id="albums" class="tab-pane">
                 <ul id="album-grid" class="artist-albums thumbnails"></ul>
             </div>
+            <div id="songs" class="tab-pane">
+                <table id="songs-grid" class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Artist</th>
+                            <th>Album</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
             <div id="playlist" class="tab-pane">
-                <table id ="playlist-table" class="playlist table table-striped table-hover">
-                    <tr>
-                        <th>Title</th>
-                        <th>Artist</th>
-                        <th>Album</th>
-                        <th>Duration</th>
-                    </tr>
+                <table id="playlist-table" class="table table-striped table-hover playlist">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Artist</th>
+                            <th>Album</th>
+                            <th>Duration</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
                 </table>
             </div>
             <div id="pvr" class="tab-pane">

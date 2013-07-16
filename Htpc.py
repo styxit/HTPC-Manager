@@ -95,13 +95,13 @@ def main():
 
     # Load settings from database
     from htpc.settings import Settings
-    settings = Settings()
+    htpc.settings = Settings()
 
     # Check for SSL
-    htpc.SSLCERT = settings.get('app_ssl_cert')
-    htpc.SSLKEY = settings.get('app_ssl_key')
+    htpc.SSLCERT = htpc.settings.get('app_ssl_cert')
+    htpc.SSLKEY = htpc.settings.get('app_ssl_key')
 
-    htpc.WEBDIR = settings.get('app_webdir', '/')
+    htpc.WEBDIR = htpc.settings.get('app_webdir', '/')
     if args.webdir:
         htpc.WEBDIR = args.webdir
     if not(htpc.WEBDIR.endswith('/')):
@@ -111,21 +111,21 @@ def main():
     load_modules()
 
     htpc.TEMPLATE = os.path.join(htpc.RUNDIR, 'interfaces/',
-                                 settings.get('app_template', 'default'))
+                                 htpc.settings.get('app_template', 'default'))
     htpc.LOOKUP = TemplateLookup(directories=[os.path.join(htpc.TEMPLATE,'html/')])
 
     # Overwrite host setting if supplied through commandline
-    htpc.HOST = settings.get('app_host', '0.0.0.0')
+    htpc.HOST = htpc.settings.get('app_host', '0.0.0.0')
     if args.host:
         htpc.HOST = args.host
 
     # Overwrite port setting if supplied through commandline
-    htpc.PORT = int(settings.get('app_port', 8085))
+    htpc.PORT = int(htpc.settings.get('app_port', 8085))
     if args.port:
         htpc.PORT = args.port
 
-    htpc.USERNAME = settings.get('app_username')
-    htpc.PASSWORD = settings.get('app_password')
+    htpc.USERNAME = htpc.settings.get('app_username')
+    htpc.PASSWORD = htpc.settings.get('app_password')
 
     # Select wether to run as daemon
     htpc.DAEMON = args.daemon
