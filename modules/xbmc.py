@@ -149,7 +149,8 @@ class Xbmc:
                         password=xbmc_server_password,
                         mac=xbmc_server_mac)
                 return True
-            except ValueError:
+            except Exception, e:
+                self.logger.debug("Exception: " + str(e))
                 self.logger.error("Unable to create XBMC-Server in database")
                 return False
         else:
@@ -215,7 +216,8 @@ class Xbmc:
             if hidewatched == "1":
                 filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
             return xbmc.VideoLibrary.GetMovies(sort=sort, properties=properties, limits=limits, filter=filter)
-        except:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to fetch movies!")
             return
 
@@ -234,7 +236,8 @@ class Xbmc:
                 filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
             shows = xbmc.VideoLibrary.GetTVShows(sort=sort,properties=properties, limits=limits, filter=filter)
             return shows
-        except:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to fetch TV Shows")
             return
 
@@ -268,8 +271,9 @@ class Xbmc:
             limits = {'start': int(start), 'end': int(end)}
             filter = {'field': 'artist', 'operator': 'contains', 'value': filter}
             return xbmc.AudioLibrary.GetArtists(properties=properties, limits=limits, sort=sort, filter=filter)
-        except ValueError:
-            logger.error("Unable to fetch artists!")
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
+            self.logger.error("Unable to fetch artists!")
             return
 
     @cherrypy.expose()
@@ -288,7 +292,9 @@ class Xbmc:
                 filter = {'or': [{'field': 'album', 'operator': 'contains', 'value': filter},
                                  {'field': 'artist', 'operator': 'contains', 'value': filter}]}
             return xbmc.AudioLibrary.GetAlbums(properties=properties, limits=limits, sort=sort, filter=filter)
-        except ValueError:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
+            self.logger.error("Unable to fetch albums!")
             return
 
     @cherrypy.expose()
@@ -311,8 +317,9 @@ class Xbmc:
                                  {'field': 'title', 'operator': 'contains', 'value': filter}]}
 
             return xbmc.AudioLibrary.GetSongs(properties=properties, limits=limits, sort=sort, filter=filter)
-        except:
-            logger.error("Unable to fetch artists!")
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
+            self.logger.error("Unable to fetch artists!")
             return
 
     @cherrypy.expose()
@@ -323,7 +330,9 @@ class Xbmc:
         try:
             xbmc = Server(self.url('/jsonrpc', True))
             return xbmc.PVR.GetChannelGroups(channeltype=type)
-        except:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
+            self.logger.error("Unable to fetch channelgroups!")
             return
 
     @cherrypy.expose()
@@ -334,7 +343,9 @@ class Xbmc:
         try:
             xbmc = Server(self.url('/jsonrpc', True))
             return xbmc.PVR.GetChannels(channelgroupid=int(group), properties=['thumbnail'])
-        except:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
+            self.logger.error("Unable to fetch channels!")
             return
 
     @cherrypy.expose()
@@ -435,7 +446,8 @@ class Xbmc:
             item = xbmc.Player.GetItem(playerid=playerid, properties=itemprop)
 
             return {'playerInfo': player, 'itemInfo': item, 'app': app}
-        except:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
             self.logger.debug("Unable to fetch currently playing information!")
             return
 
@@ -456,7 +468,8 @@ class Xbmc:
                 return xbmc.Player.Open(item={'partymode': 'audio'})
             else:
                 return xbmc.Input.ExecuteAction(action=action)
-        except:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to control XBMC with action: " + action)
             return 'error'
 
@@ -484,7 +497,8 @@ class Xbmc:
             except ValueError:
                 xbmc.Player.SetSubtitle(playerid=playerid, subtitle='off')
                 return "Disabling subtitles."
-        except ValueError:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to set subtitle to specified value " + subtitle)
             return
 
@@ -497,7 +511,8 @@ class Xbmc:
             xbmc = Server(self.url('/jsonrpc', True))
             playerid = xbmc.Player.GetActivePlayers()[0][u'playerid']
             return xbmc.Player.SetAudioStream(playerid=playerid, stream=int(audio))
-        except:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to change audio stream to specified value " + audio)
             return
 
@@ -539,7 +554,8 @@ class Xbmc:
             s.sendto(msg, ("255.255.255.255", 9))
             self.logger.info("WOL package sent to " + self.current.mac)
             return "WOL package sent"
-        except:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to send WOL packet")
             return "Unable to send WOL packet"
 
@@ -563,7 +579,8 @@ class Xbmc:
                           'fanart', 'trailer', 'imdbnumber', 'studio', 'genre', 'rating']
             limits = {'start': 0, 'end': int(limit)}
             return xbmc.VideoLibrary.GetRecentlyAddedMovies(properties=properties, limits=limits)
-        except ValueError:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to fetch recently added movies!")
             return
 
@@ -578,7 +595,8 @@ class Xbmc:
                           'thumbnail', 'plot', 'fanart', 'file']
             limits = {'start': 0, 'end': int(limit)}
             return xbmc.VideoLibrary.GetRecentlyAddedEpisodes(properties=properties, limits=limits)
-        except ValueError:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to fetch recently added TV Shows")
             return
 
@@ -592,7 +610,8 @@ class Xbmc:
             properties = ['artist', 'albumlabel', 'year', 'description', 'thumbnail']
             limits = {'start': 0, 'end': int(limit)}
             return xbmc.AudioLibrary.GetRecentlyAddedAlbums(properties=properties, limits=limits)
-        except ValueError:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to fetch recently added Music!")
             return
 
