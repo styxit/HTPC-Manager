@@ -446,6 +446,9 @@ class Xbmc:
             item = xbmc.Player.GetItem(playerid=playerid, properties=itemprop)
 
             return {'playerInfo': player, 'itemInfo': item, 'app': app}
+        except IndexError:
+            # Nothing currently playing. No reason to spam log.
+            return
         except Exception, e:
             self.logger.debug("Exception: " + str(e))
             self.logger.debug("Unable to fetch currently playing information!")
