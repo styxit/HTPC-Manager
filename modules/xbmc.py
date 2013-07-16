@@ -473,7 +473,6 @@ class Xbmc:
             self.logger.error("Unable to control XBMC with action: " + action)
             return 'error'
 
-
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def SendText(self, text):
