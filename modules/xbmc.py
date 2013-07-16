@@ -447,11 +447,11 @@ class Xbmc:
 
             return {'playerInfo': player, 'itemInfo': item, 'app': app}
         except IndexError:
-            # Nothing currently playing. No reason to spam log.
+            self.logger.debug("Nothing current playing.")
             return
         except Exception, e:
             self.logger.debug("Exception: " + str(e))
-            self.logger.debug("Unable to fetch currently playing information!")
+            self.logger.error("Unable to fetch currently playing information!")
             return
 
     @cherrypy.expose()
