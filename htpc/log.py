@@ -32,6 +32,7 @@ class Log:
 
         self.logch.setLevel(loglevel)
         self.logfh.setLevel(loglevel)
+        htpc.LOGGER.setLevel(loglevel)
 
         # Disable cherrypy access log
         logging.getLogger('cherrypy.access').propagate = False
