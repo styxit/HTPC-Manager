@@ -27,6 +27,11 @@ class Root:
         return "An error occured"
 
     @cherrypy.expose()
+    def ping(self, *args, **kwargs):
+        """ Return 1 """
+        return 1
+
+    @cherrypy.expose()
     def shutdown(self):
         """ Shutdown CherryPy and exit script """
         self.logger.info("Shutting down htpc-manager.")

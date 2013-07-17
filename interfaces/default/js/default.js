@@ -158,6 +158,7 @@ function showModal(title, content, buttons) {
 }
 
 function hideModal() {
+<<<<<<< HEAD
     $('#modal_dialog').modal('hide')
 }
 
@@ -170,5 +171,16 @@ function checkUpdate() {
         }
     }).error(function() {
         setTimeout(checkUpdate, 1000);
+=======
+    $('#modal_dialog').find('.modal-body').empty();
+    $('#modal_dialog').modal('hide')
+}
+
+function ping() {
+    $.getJSON(WEBDIR + 'update/', function () {
+        location.reload()
+    }).error(function() {
+      setTimeout('ping', 1000);
+>>>>>>> Ping on success
     })
 }
