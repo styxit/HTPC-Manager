@@ -39,7 +39,7 @@ $(document).ready(function () {
     $('#btn-check-update').click(function (e) {
         e.preventDefault();
         notify('Update','Checking for update.','info');
-        $.get(WEBDIR + 'update/', function (data) {
+        $.getJSON(WEBDIR + 'update/', function (data) {
             if (data == 0) {
                 notify('Update', 'Already running latest version.', 'success');
             } else if (data == null || !$.isNumeric(data[0]) || data[0] < 0) {
@@ -55,11 +55,11 @@ $(document).ready(function () {
                             notify('Update', 'An error occured while updating!', 'error')
                         }
                     }, 'json').always(function() {
-                        setTimeout(function() {location.reload()}, 5000)
+                        ping()
                     });
                 }
             }
-        }, 'json');
+        });
     });
 
     $('#modal_dialog').on('hidden', function () {
@@ -157,7 +157,15 @@ function showModal(title, content, buttons) {
     });
 }
 
-function hideModal(){
+function hideModal() {
     $('#modal_dialog').find('.modal-body').empty();
     $('#modal_dialog').modal('hide')
+}
+
+function ping() {
+    $.getJSON(WEBDIR + 'update/', function () {
+        location.reload()
+    }).error(function() {
+      setTimeout('ping', 1000);
+    })
 }
