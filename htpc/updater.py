@@ -21,10 +21,11 @@ class Updater:
     def __init__(self):
         """ Set GitHub constants on load """
         self.UPDATING = 0
-        self.user = htpc.settings.get('git_user', 'mbw2001')
-        self.repo = htpc.settings.get('git_repo', 'htpc-manager')
-        self.branch = htpc.settings.get('git_branch', 'Updater')
-        self.git = htpc.settings.get('git_path', 'git')
+        settings = htpc.settings.Settings()
+        self.user = settings.get('git_user', 'mbw2001')
+        self.repo = settings.get('git_repo', 'htpc-manager')
+        self.branch = settings.get('git_branch', 'Updater')
+        self.git = settings.get('git_path', 'git')
         self.logger = logging.getLogger('htpc.updater')
 
     @cherrypy.expose()
