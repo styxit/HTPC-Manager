@@ -162,9 +162,7 @@ function hideModal() {
 }
 
 function checkUpdate() {
-    console.log('checking update status')
     $.getJSON(WEBDIR + 'update/status', function (data) {
-        console.log(data)
         if (data != 0) {
             setTimeout(checkUpdate, 1000);
         } else {
