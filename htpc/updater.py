@@ -15,7 +15,7 @@ import htpc
 import logging
 
 
-class Updater: 
+class Updater:
     """ Main class """
     def __init__(self):
         """ Set GitHub constants on load """
@@ -39,27 +39,35 @@ class Updater:
 
     def current(self):
         """ Get hash of current Git commit """
+        self.logger.debug('Getting current version.')
         output = self.git_exec('rev-parse HEAD')
+        self.logger.debug('Current version: ' + output)
         if re.match('^[a-z0-9]+$', output):
             return output
 
     def latest(self):
         """ Get hash of latest git commit """
+        self.logger.debug('Getting latest version.')
         try:
             url = 'https://api.github.com/repos/%s/%s/commits/%s' % (
                     self.user, self.repo, self.branch)
             result = loads(urllib2.urlopen(url).read())
-            return result['sha'].strip()
+            latest = result['sha'].strip()
+            self.logger.debug('Latest version: ' + latest)
+            return latest
         except:
             return None
 
     def behind_by(self, current, latest):
         """ Check how many commits between current and latest """
+        self.logger.debug('Checking how far behind latest')
         try:
             url = 'https://api.github.com/repos/%s/%s/compare/%s...%s' % (
                     self.user, self.repo, current, latest)
             result = loads(urllib2.urlopen(url).read())
-            return int(result['total_commits'])
+            behind = int(result['total_commits'])
+            self.logger.debug('Behind: ' + behind)
+            return behind
         except Exception, e:
             self.logger.error(str(e))
             return -1
@@ -74,8 +82,6 @@ class Updater:
             return 0
         else:
             behind = self.behind_by(current, latest)
-            if behind == -1:
-                return behind
             self.logger.info("Currently " + str(behind) + " commits behind.")
             return (behind, 'https://github.com/%s/%s/compare/%s...%s' % (
                       self.user, self.repo, current, latest))

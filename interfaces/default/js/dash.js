@@ -8,6 +8,7 @@ $(document).ready(function () {
 });
 
 function loadRecentMovies () {
+    if (!$('#movie-carousel').length) return
     $.ajax({
         url: WEBDIR + 'xbmc/GetRecentMovies',
         type: 'get',
@@ -39,6 +40,7 @@ function loadRecentMovies () {
 }
 
 function loadRecentTVshows () {
+    if (!$('#tvshow-carousel').length) return
     $.ajax({
         url: WEBDIR + 'xbmc/GetRecentShows',
         type: 'get',
@@ -71,6 +73,7 @@ function loadRecentTVshows () {
 }
 
 function loadRecentAlbums () {
+    if (!$('#albums-content').length) return
     $.ajax({
         url: WEBDIR + 'xbmc/GetRecentAlbums/4',
         type: 'get',
@@ -107,6 +110,7 @@ function loadRecentAlbums () {
 }
 
 function loadDownloadHistory() {
+    if (!$('#downloads_table_body').length) return
     $.ajax({
         url: WEBDIR + 'sabnzbd/GetHistory?limit=5',
         type: 'get',
@@ -130,6 +134,7 @@ function loadDownloadHistory() {
 }
 
 function loadWantedMovies() {
+    if (!$('#wantedmovies_table_body').length) return
     $.ajax({
         url: WEBDIR + 'couchpotato/GetMovieList?limit=5',
         type: 'get',
@@ -153,6 +158,7 @@ function loadWantedMovies() {
 }
 
 function loadNextAired(options) {
+    if (!$('#nextaired_table_body').length) return
     $.ajax({
         url: WEBDIR + 'sickbeard/GetNextAired',
         type: 'get',
