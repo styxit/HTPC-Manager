@@ -19,9 +19,9 @@ class Updater:
     """ Main class """
     def __init__(self):
         """ Set GitHub constants on load """
-        self.user = 'styxit'
+        self.user = 'mbw2001'
         self.repo = 'htpc-manager'
-        self.branch = 'master'
+        self.branch = 'Updater'
         self.logger = logging.getLogger('htpc.updater')
 
     @cherrypy.expose()
