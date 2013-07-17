@@ -48,13 +48,13 @@ $(document).ready(function () {
             } else {
                 if (confirm('Your are '+data[0]+' versions behind. Update to latest version?')) {
                     showModal('Installing update', '<div class="progress progress-striped active"><div class="bar" style="width:100%"></div></div>','');
-                    $.postJSON(WEBDIR + 'update/', function (data) {
+                    $.post(WEBDIR + 'update/', function (data) {
                         if (data == 1) {
                             notify('Update', 'New version installed!', 'success');
                         } else {
                             notify('Update', 'An error occured while updating!', 'error')
                         }
-                    }).always(function() {
+                    }, 'json').always(function() {
                         location.reload()
                     });
                 }
