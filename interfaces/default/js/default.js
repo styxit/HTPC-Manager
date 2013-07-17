@@ -39,24 +39,25 @@ $(document).ready(function () {
     $('#btn-check-update').click(function (e) {
         e.preventDefault();
         notify('Update','Checking for update.','info');
-        $.get(WEBDIR + 'update/', function (update) {
-            if (update.behind == 0) {
-                notify('Update','Already running latest version.','success');
-            } else if (update.behind < 0) {
-                notify('Update','In app updating not supported. Git-command not found, or you are ahead of the master branch.','error');
+        $.get(WEBDIR + 'update/', function (data) {
+            if (data == 0) {
+                notify('Update', 'Already running latest version.', 'success');
+            } else if (data == null || !$.isNumeric(data[0]) || data[0] < 0) {
+                console.log(data)
+                notify('Update', 'Failed. Check errorlog.', 'error');
             } else {
-                if (confirm('Your are '+update.behind+' versions behind. Update to latest version?')) {
-                    showModal('Installing update', '<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>','');
+                if (confirm('Your are '+data[0]+' versions behind. Update to latest version?')) {
+                    showModal('Installing update', '<div class="progress progress-striped active"><div class="bar" style="width:100%"></div></div>','');
                     $.post(WEBDIR + 'update/', function (data) {
                         hideModal();
-                        if (data.completed) {
-                            notify('New version installed!','success');
+                        if (data == 1) {
+                            notify('Update', 'New version installed!', 'success');
                         } else {
-                            notify('An error occured while updating','error')
+                            notify('Update', 'An error occured while updating!', 'error')
                         }
                     }, 'json');
                 } else {
-                    notify('Update cancelled!','info');
+                    notify('Update', 'Update cancelled!', 'info');
                 }
             }
         }, 'json');
