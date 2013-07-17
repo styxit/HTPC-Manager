@@ -64,7 +64,7 @@ class Updater:
                     self.user, self.repo, current, latest)
             result = loads(urllib2.urlopen(url).read())
             behind = int(result['total_commits'])
-            self.logger.debug('Behind: ' + behind)
+            self.logger.debug('Behind: ' + str(behind))
             return behind
         except Exception, e:
             self.logger.error(str(e))
