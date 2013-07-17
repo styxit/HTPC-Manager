@@ -2,7 +2,7 @@ html, body {
     background: #eee url('../../../img/bodybg.jpg');
 }
 .content {
-    background: #fff;
+    background: #fff fixed no-repeat;
     margin: -20px;
     padding: 20px;
     -webkit-border-radius: 0 0 10px 10px;

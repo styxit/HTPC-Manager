@@ -27,7 +27,6 @@ $(document).ready(function () {
         $(this).find("input:checkbox:not(:checked)").each(function(e){
             data+='&'+$(this).attr('name')+'=0';
         });
-        console.log(data)
         $.post(action, data, function(data) {
             msg = data ? 'Save successful' : 'Save failed';
             notify('Settings', msg, 'info');
@@ -71,7 +70,7 @@ $(document).ready(function () {
 });
 
 function xbmc_update_servers(id) {
-    $.get(WEBDIR + 'xbmc/Servers', function(data) {
+    $.get(WEBDIR + 'xbmc/getserver', function(data) {
         if (data==null) return;
         var servers = $('#xbmc_server_id').empty().append($('<option>').text('New').val(0));
         $.each(data.servers, function(i, item) {

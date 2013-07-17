@@ -101,15 +101,14 @@ class Couchpotato:
 
     def fetch(self, path):
         try:
-            settings = htpc.settings.Settings()
-            host = settings.get('couchpotato_host', '')
-            port = str(settings.get('couchpotato_port', ''))
-            apikey = settings.get('couchpotato_apikey', '')
-            couchpotato_basepath = settings.get('couchpotato_basepath', '/')
-            ssl = 's' if settings.get('couchpotato_ssl', 0) else ''
+            host = htpc.settings.get('couchpotato_host', '')
+            port = str(htpc.settings.get('couchpotato_port', ''))
+            apikey = htpc.settings.get('couchpotato_apikey', '')
+            couchpotato_basepath = htpc.settings.get('couchpotato_basepath', '/')
+            ssl = 's' if htpc.settings.get('couchpotato_ssl', 0) else ''
 
             if(couchpotato_basepath == ""):
-              couchpotato_basepath = "/"
+                couchpotato_basepath = "/"
             if not(couchpotato_basepath.endswith('/')):
                 couchpotato_basepath += "/"
 
@@ -118,5 +117,5 @@ class Couchpotato:
             self.logger.debug("Fetching information from: " + url)
             return loads(urlopen(url, timeout=10).read())
         except:
-            self.logger.error("Unable to fetch information from " + url)
+            self.logger.error("Unable to fetch information")
             return

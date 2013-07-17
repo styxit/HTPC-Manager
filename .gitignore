@@ -1,11 +1,11 @@
 userdata/
 .DS_Store*
 *.pyc
+.project
+.pydevproject
 ehthumbs.db
 Icon?
 Thumbs.db
-
-htpc_manager.log
 
 # Ignore folder with jekyll compiled content for gh-pages #
 _site/

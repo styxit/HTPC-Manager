@@ -126,17 +126,16 @@ class Sickbeard:
 
     def fetch(self, cmd, img=False, timeout = 10):
         try:
-            settings = htpc.settings.Settings()
-            host = settings.get('sickbeard_host', '')
-            port = str(settings.get('sickbeard_port', ''))
-            apikey = settings.get('sickbeard_apikey', '')
-            ssl = 's' if settings.get('sickbeard_ssl', 0) else ''
-            sickbeard_basepath = settings.get('sickbeard_basepath', '/')
+            host = htpc.settings.get('sickbeard_host', '')
+            port = str(htpc.settings.get('sickbeard_port', ''))
+            apikey = htpc.settings.get('sickbeard_apikey', '')
+            ssl = 's' if htpc.settings.get('sickbeard_ssl', 0) else ''
+            sickbeard_basepath = htpc.settings.get('sickbeard_basepath', '/')
 
             if(sickbeard_basepath == ""):
                 sickbeard_basepath = "/"
             if not (sickbeard_basepath.endswith('/')):
-              sickbeard_basepath += "/"
+                sickbeard_basepath += "/"
             url = 'http' + ssl + '://' + host + ':' + str(port) + sickbeard_basepath + 'api/' + apikey + '/?cmd=' + cmd
             
             self.logger.debug("Fetching information from: " + url)
@@ -146,5 +145,5 @@ class Sickbeard:
 
             return loads(urlopen(url, timeout=timeout).read())
         except:
-            self.logger.error("Unable to fetch information from: " + url)
+            self.logger.error("Unable to fetch information")
             return
