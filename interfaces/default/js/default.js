@@ -54,7 +54,7 @@ $(document).ready(function () {
                             notify('Update', 'An error occured while updating!', 'error')
                         }
                     }, 'json').always(function() {
-                        checkUpdate();
+                        setTimeout('checkUpdate', 1000);
                     });
                 }
             }
@@ -176,11 +176,19 @@ function checkUpdate() {
     $('#modal_dialog').modal('hide')
 }
 
-function ping() {
-    $.getJSON(WEBDIR + 'update/', function () {
-        location.reload()
+function checkUpdate() {
+    $.getJSON(WEBDIR + 'update/status', function (data) {
+        if (data != '0') {
+            setTimeout('checkUpdate', 1000);
+        } else {
+            location.reload()
+        }
     }).error(function() {
+<<<<<<< HEAD
       setTimeout('ping', 1000);
 >>>>>>> Ping on success
+=======
+        setTimeout('checkUpdate', 1000);
+>>>>>>> Monitor update
     })
 }

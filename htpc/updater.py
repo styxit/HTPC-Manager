@@ -4,10 +4,7 @@ Original code by Mikie (https://github.com/Mikie-Ghost/)
 """
 import os
 import sys
-<<<<<<< HEAD
 from threading import Thread
-=======
->>>>>>> Correct shutdown and restart on update
 import urllib2
 import shutil
 import platform
