@@ -166,11 +166,11 @@ function checkUpdate() {
     $.getJSON(WEBDIR + 'update/status', function (data) {
         console.log(data)
         if (data != 0) {
-            setTimeout('checkUpdate', 1000);
+            setTimeout(checkUpdate, 1000);
         } else {
             location.reload()
         }
     }).error(function() {
-        setTimeout('checkUpdate', 1000);
+        setTimeout(checkUpdate, 1000);
     })
 }
