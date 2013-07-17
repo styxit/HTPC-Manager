@@ -82,11 +82,12 @@ class Xbmc:
             self.current = XbmcServers.selectBy(id=server).getOne()
             self.logger.debug("Using XBMC server: " + self.current.name)
         except SQLObjectNotFound:
-            self.current = XbmcServers.select(limit=1).getOne()
-            self.logger.debug("No active XBMC. Setting first one.")
-        except SQLObjectNotFound:
-            self.current = None
-            self.logger.debug("No XBMC-Server found in database.")
+            try:
+                self.current = XbmcServers.select(limit=1).getOne()
+                self.logger.debug("No active XBMC. Setting first one.")
+            except SQLObjectNotFound:
+                self.current = None
+                self.logger.debug("No XBMC-Server found in database.")
 
     @cherrypy.expose()
     def index(self):
