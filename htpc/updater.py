@@ -4,8 +4,8 @@ Original code by Mikie (https://github.com/Mikie-Ghost/)
 """
 import os
 import sys
+from threading import Thread
 import urllib2
-import tarfile
 import shutil
 import platform
 import subprocess
@@ -20,6 +20,7 @@ class Updater:
     """ Main class """
     def __init__(self):
         """ Set GitHub constants on load """
+        htpc.UPDATING = 0
         self.user = 'mbw2001'
         self.repo = 'htpc-manager'
         self.branch = 'Updater'
@@ -31,9 +32,15 @@ class Updater:
     def index(self):
         """ Handle server requests. Update on POST. Get status on GET. """
         if cherrypy.request.method.upper() == 'POST':
-            return self.git_update()
+            Thread(target=self.git_update).start()
+            return 1
         else:
             return self.check_update()
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def status(self):
+        return htpc.UPDATING
 
     def current(self):
         """ Get hash of current Git commit """
@@ -87,28 +94,15 @@ class Updater:
     def git_update(self):
         """ Do update through git """
         self.logger.info("Attempting update through Git.")
-
-        arguments = sys.argv[:]
-        arguments.insert(0, sys.executable)
-        if sys.platform == 'win32':
-            arguments = ['"%s"' % arg for arg in arguments]
-        os.chdir(os.getcwd())
-        self.logger.info("Stopping.")
+        htpc.UPDATING = 1
         cherrypy.engine.exit()
-
         output = self.git_exec('pull origin %s' % self.branch)
-
-        self.logger.info("Starting up again,")
-        os.execv(sys.executable, arguments)
-
         if not output:
             self.logger.error("Unable to update through git. Make sure that Git is located in your path and can be accessed by this application.")
-            return False
         elif 'Aborting.' in output:
             self.logger.error("Update aborted.")
-            return False
-
-        return True
+        cherrypy.engine.start()
+        htpc.UPDATING = 0
 
     def git_exec(self, args):
         """ Tool for running git program on system """
