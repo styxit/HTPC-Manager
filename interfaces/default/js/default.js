@@ -54,7 +54,7 @@ $(document).ready(function () {
                             notify('Update', 'An error occured while updating!', 'error')
                         }
                     }, 'json').always(function() {
-                        setTimeout('checkUpdate', 1000);
+                        checkUpdate();
                     });
                 }
             }
@@ -158,25 +158,11 @@ function showModal(title, content, buttons) {
 }
 
 function hideModal() {
-<<<<<<< HEAD
     $('#modal_dialog').modal('hide')
 }
 
 function checkUpdate() {
-    $.getJSON(WEBDIR + 'update/status', function (data) {
-        if (data != 0) {
-            setTimeout(checkUpdate, 1000);
-        } else {
-            location.reload()
-        }
-    }).error(function() {
-        setTimeout(checkUpdate, 1000);
-=======
-    $('#modal_dialog').find('.modal-body').empty();
-    $('#modal_dialog').modal('hide')
-}
-
-function checkUpdate() {
+    console.log('checking update status')
     $.getJSON(WEBDIR + 'update/status', function (data) {
         console.log(data)
         if (data != 0) {
@@ -185,11 +171,6 @@ function checkUpdate() {
             location.reload()
         }
     }).error(function() {
-<<<<<<< HEAD
-      setTimeout('ping', 1000);
->>>>>>> Ping on success
-=======
         setTimeout('checkUpdate', 1000);
->>>>>>> Monitor update
     })
 }
