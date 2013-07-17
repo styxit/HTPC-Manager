@@ -53,7 +53,7 @@ $(document).ready(function () {
                             notify('Update', 'An error occured while updating!', 'error')
                         }
                     }, 'json').always(function() {
-                        setTimeout(function() {location.reload()}, 3000)
+                        setTimeout(function() {location.reload()}, 5000)
                     });
                 }
             }
