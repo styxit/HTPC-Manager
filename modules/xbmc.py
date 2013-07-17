@@ -77,17 +77,8 @@ class Xbmc:
                  'label':'Mac addr.',
                  'name':'xbmc_server_mac'}
         ]})
-        try:
-            server = htpc.settings.get('xbmc_current_server', 0)
-            self.current = XbmcServers.selectBy(id=server).getOne()
-            self.logger.debug("Using XBMC server: " + self.current.name)
-        except SQLObjectNotFound:
-            try:
-                self.current = XbmcServers.select(limit=1).getOne()
-                self.logger.debug("No active XBMC. Setting first one.")
-            except SQLObjectNotFound:
-                self.current = None
-                self.logger.debug("No XBMC-Server found in database.")
+        server = htpc.settings.get('xbmc_current_server', 0)
+        self.changeserver(server)
 
     @cherrypy.expose()
     def index(self):
@@ -112,7 +103,8 @@ class Xbmc:
             xbmc = Server('http://' + url + '/jsonrpc')
             self.logger.debug("Trying to contact xbmc via " + url)
             return xbmc.XBMC.GetInfoLabels(labels=["Network.MacAddress"])
-        except (ProtocolError, InvalidURL) as e:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to contact XBMC via " + url)
             return
 
@@ -133,7 +125,11 @@ class Xbmc:
             servers.append({'id': s.id, 'name': s.name})
         if len(servers) < 1:
             return
-        return {'current': self.current.name, 'servers': servers}
+        try:
+            current = self.current.name
+        except AttributeError:
+            current = None
+        return {'current': current, 'servers': servers}
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -143,17 +139,18 @@ class Xbmc:
         if xbmc_server_id == "0":
             self.logger.debug("Creating XBMC-Server in database")
             try:
-                XbmcServers(name=xbmc_server_name,
+                id = XbmcServers(name=xbmc_server_name,
                         host=xbmc_server_host,
                         port=int(xbmc_server_port),
                         username=xbmc_server_username,
                         password=xbmc_server_password,
                         mac=xbmc_server_mac)
-                return True
+                self.setcurrent(id)
+                return 1
             except Exception, e:
                 self.logger.debug("Exception: " + str(e))
                 self.logger.error("Unable to create XBMC-Server in database")
-                return False
+                return 0
         else:
             self.logger.debug("Updating XBMC-Server " + xbmc_server_name + " in database")
             try:
@@ -164,33 +161,36 @@ class Xbmc:
                 server.username = xbmc_server_username
                 server.password = xbmc_server_password
                 server.mac = xbmc_server_mac
-                return True
+                return 1
             except SQLObjectNotFound, e:
                 self.logger.error("Unable to update XBMC-Server " + server.name + " in database")
-                return False
+                return 0
 
     @cherrypy.expose()
     def delserver(self, id):
         """ Delete a server """
         self.logger.debug("Deleting server " + str(id))
         XbmcServers.delete(id)
+        self.changeserver()
         return
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def changeserver(self, id):
+    def changeserver(self, id=0):
         try:
             self.current = XbmcServers.selectBy(id=id).getOne()
             htpc.settings.set('xbmc_current_server', id)
             self.logger.info("Selecting XBMC server: " + id)
+            return "success"
         except SQLObjectNotFound:
-            self.current = XbmcServers.select(limit=1).getOne()
-            self.logger.error("Invalid server. Selecting first Available.")
-        except SQLObjectNotFound:
-            self.current = None
-            self.logger.error("Unable to find any XBMC-Servers. Please check your settings")
-            return "No valid servers"
-        return "success"
+            try:
+                self.current = XbmcServers.select(limit=1).getOne()
+                self.logger.error("Invalid server. Selecting first Available.")
+                return "success"
+            except SQLObjectNotFound:
+                self.current = None
+                self.logger.error("Unable to find any XBMC-Servers. Please check your settings")
+                return "No valid servers"
 
     @cherrypy.expose()
     def GetThumb(self, thumb=None, h=None, w=None, o=100):
