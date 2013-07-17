@@ -19,7 +19,7 @@ import htpc
 import logging
 
 
-class Updater:
+class Updater: 
     """ Main class """
     def __init__(self):
         """ Set GitHub constants on load """
