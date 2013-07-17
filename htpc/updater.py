@@ -15,7 +15,7 @@ import htpc
 import logging
 
 
-class Updater: 
+class Updater:
     """ Main class """
     def __init__(self):
         """ Set GitHub constants on load """
@@ -88,7 +88,7 @@ class Updater:
         if not output:
             self.logger.error("Unable to update through git. Make sure that Git is located in your path and can be accessed by this application.")
             return False
-        elif line.endswith('Aborting.'):
+        elif 'Aborting.' in output:
             self.logger.error("Update aborted.")
             return False
 
