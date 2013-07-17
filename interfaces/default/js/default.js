@@ -162,7 +162,8 @@ function hideModal() {
 
 function checkUpdate() {
     $.getJSON(WEBDIR + 'update/status', function (data) {
-        if (data != '0') {
+        console.log(data)
+        if (data != 0) {
             setTimeout('checkUpdate', 1000);
         } else {
             location.reload()
