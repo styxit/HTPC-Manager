@@ -45,15 +45,14 @@ $(document).ready(function () {
                 notify('Update', 'Failed. Check errorlog.', 'error');
             } else {
                 if (confirm('Your are '+data[0]+' versions behind. Update to latest version?')) {
-                    showModal('Installing update', '<div class="progress progress-striped active"><div class="bar" style="width:100%"></div></div>','');
                     $.post(WEBDIR + 'update/', function (data) {
                         if (data == 1) {
-                            notify('Update', 'Update in progress!', 'info');
+                            showModal('Installing update', '<div class="progress progress-striped active"><div class="bar" style="width:100%"></div></div>','');
                         } else {
                             notify('Update', 'An error occured while updating!', 'error')
                         }
                     }, 'json').always(function() {
-                        setTimeout('checkUpdate', 1000);
+                        checkUpdate();
                     });
                 }
             }
@@ -61,6 +60,7 @@ $(document).ready(function () {
     });
 
     $('#modal_dialog').on('hidden', function () {
+        $('#modal_dialog .modal-body').empty();
         $('#modal_dialog .trans').removeClass('trans');
         $('#modal_dialog .modal-fanart').css('background', '#ffffff');
     })
@@ -156,11 +156,11 @@ function showModal(title, content, buttons) {
 }
 
 function hideModal() {
-    $('#modal_dialog').find('.modal-body').empty();
     $('#modal_dialog').modal('hide')
 }
 
 function checkUpdate() {
+    console.log('checking update status')
     $.getJSON(WEBDIR + 'update/status', function (data) {
         console.log(data)
         if (data != 0) {
