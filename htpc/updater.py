@@ -3,6 +3,7 @@ Update HTPC-Manager from Github. Either through git command or tarball.
 Original code by Mikie (https://github.com/Mikie-Ghost/)
 """
 import os
+import sys
 import urllib2
 import tarfile
 import shutil
@@ -30,10 +31,7 @@ class Updater:
     def index(self):
         """ Handle server requests. Update on POST. Get status on GET. """
         if cherrypy.request.method.upper() == 'POST':
-            cherrypy.engine.exit()
-            status = self.git_update()
-            cherrypy.server.start()
-            return status
+            return self.git_update()
         else:
             return self.check_update()
 
@@ -89,7 +87,19 @@ class Updater:
     def git_update(self):
         """ Do update through git """
         self.logger.info("Attempting update through Git.")
+
+        arguments = sys.argv[:]
+        arguments.insert(0, sys.executable)
+        if sys.platform == 'win32':
+            arguments = ['"%s"' % arg for arg in arguments]
+        os.chdir(os.getcwd())
+        self.logger.info("Stopping.")
+        cherrypy.engine.exit()
+
         output = self.git_exec('pull origin %s' % self.branch)
+
+        self.logger.info("Starting up again,")
+        os.execv(sys.executable, arguments)
 
         if not output:
             self.logger.error("Unable to update through git. Make sure that Git is located in your path and can be accessed by this application.")
