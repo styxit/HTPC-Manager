@@ -3,6 +3,7 @@ userdata/
 *.pyc
 .project
 .pydevproject
+.settings/
 ehthumbs.db
 Icon?
 Thumbs.db
