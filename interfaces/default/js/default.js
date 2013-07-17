@@ -50,12 +50,12 @@ $(document).ready(function () {
                     showModal('Installing update', '<div class="progress progress-striped active"><div class="bar" style="width:100%"></div></div>','');
                     $.post(WEBDIR + 'update/', function (data) {
                         if (data == 1) {
-                            notify('Update', 'New version installed!', 'success');
+                            notify('Update', 'Update in progress!', 'info');
                         } else {
                             notify('Update', 'An error occured while updating!', 'error')
                         }
                     }, 'json').always(function() {
-                        ping()
+                        setTimeout('checkUpdate', 1000);
                     });
                 }
             }
@@ -162,10 +162,14 @@ function hideModal() {
     $('#modal_dialog').modal('hide')
 }
 
-function ping() {
-    $.getJSON(WEBDIR + 'update/', function () {
-        location.reload()
+function checkUpdate() {
+    $.getJSON(WEBDIR + 'update/status', function (data) {
+        if (data != '0') {
+            setTimeout('checkUpdate', 1000);
+        } else {
+            location.reload()
+        }
     }).error(function() {
-      setTimeout('ping', 1000);
+        setTimeout('checkUpdate', 1000);
     })
 }
