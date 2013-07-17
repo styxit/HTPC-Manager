@@ -59,7 +59,7 @@ class Updater:
             url = 'https://api.github.com/repos/%s/%s/compare/%s...%s' % (
                     self.user, self.repo, current, latest)
             result = loads(urllib2.urlopen(url).read())
-            return int(result['behind_by'])
+            return int(result['total_commits'])
         except Exception, e:
             self.logger.error(str(e))
             return -1
