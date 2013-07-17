@@ -20,17 +20,20 @@ class Updater:
     """ Main class """
     def __init__(self):
         """ Set GitHub constants on load """
-        htpc.UPDATING = 0
-        self.user = 'mbw2001'
-        self.repo = 'htpc-manager'
-        self.branch = 'Updater'
-        self.git = 'git'
+        self.UPDATING = 0
+        self.user = htpc.settings.get('git_user', 'mbw2001')
+        self.repo = htpc.settings.get('git_repo', 'htpc-manager')
+        self.branch = htpc.settings.get('git_branch', 'Updater')
+        self.git = htpc.settings.get('git_path', 'git')
         self.logger = logging.getLogger('htpc.updater')
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def index(self):
         """ Handle server requests. Update on POST. Get status on GET. """
+        if self.git == '':
+            self.logger.warning('Git not configured. Automatic update disabled.')
+            return -1 
         if cherrypy.request.method.upper() == 'POST':
             Thread(target=self.git_update).start()
             return 1
@@ -40,7 +43,7 @@ class Updater:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def status(self):
-        return htpc.UPDATING
+        return self.UPDATING
 
     def current(self):
         """ Get hash of current Git commit """
@@ -94,7 +97,7 @@ class Updater:
     def git_update(self):
         """ Do update through git """
         self.logger.info("Attempting update through Git.")
-        htpc.UPDATING = 1
+        self.UPDATING = 1
         cherrypy.engine.exit()
         output = self.git_exec('pull origin %s' % self.branch)
         if not output:
@@ -102,7 +105,7 @@ class Updater:
         elif 'Aborting.' in output:
             self.logger.error("Update aborted.")
         cherrypy.engine.start()
-        htpc.UPDATING = 0
+        self.UPDATING = 0
 
     def git_exec(self, args):
         """ Tool for running git program on system """
