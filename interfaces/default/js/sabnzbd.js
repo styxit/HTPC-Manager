@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    $(window).trigger('hashchange')
     $('#nzb_pause_button').click(function () {
         var clickItem = $(this);
         clickItem.button('loading');

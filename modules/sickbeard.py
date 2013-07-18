@@ -39,13 +39,10 @@ class Sickbeard:
     @cherrypy.tools.json_out()
     def ping(self, sickbeard_host, sickbeard_port, sickbeard_apikey, sickbeard_basepath, sickbeard_ssl, **kwargs):
         ssl = 's' if sickbeard_ssl else ''
-        
         self.logger.debug("Testing connectivity")
         try:
-            if(sickbeard_basepath == ""):
-                sickbeard_basepath = "/"
             if not (sickbeard_basepath.endswith('/')):
-              sickbeard_basepath += "/"
+                sickbeard_basepath += "/"
 
             url = 'http' + ssl + '://' + sickbeard_host + ':' + sickbeard_port + sickbeard_basepath + 'api/' + sickbeard_apikey + '/?cmd='
             self.logger.debug("Trying to contact sickbeard via " + url)
@@ -132,12 +129,10 @@ class Sickbeard:
             ssl = 's' if htpc.settings.get('sickbeard_ssl', 0) else ''
             sickbeard_basepath = htpc.settings.get('sickbeard_basepath', '/')
 
-            if(sickbeard_basepath == ""):
-                sickbeard_basepath = "/"
             if not (sickbeard_basepath.endswith('/')):
                 sickbeard_basepath += "/"
             url = 'http' + ssl + '://' + host + ':' + str(port) + sickbeard_basepath + 'api/' + apikey + '/?cmd=' + cmd
-            
+
             self.logger.debug("Fetching information from: " + url)
 
             if (img == True):

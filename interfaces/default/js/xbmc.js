@@ -11,7 +11,7 @@ $(document).ready(function() {
         $('#search').val('')
         searchString = ''
     }).on('shown', reloadTab);
-    toggleTab();
+    $(window).trigger('hashchange')
 
     // Catch keyboard event and send to XBMC
     $(document).keydown(function(e) {
