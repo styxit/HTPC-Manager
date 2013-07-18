@@ -3,6 +3,7 @@ var artist_id = {}
 var album_id = {}
 
 $(document).ready(function () {
+    $(window).trigger('hashchange')
     $('#players').change(function() {
         currentPlayer = $(this).val();
         $.cookie('squeezebox', currentPlayer);

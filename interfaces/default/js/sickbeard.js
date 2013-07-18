@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    $(window).trigger('hashchange')
     loadShows();
     loadNextAired();
     loadSickbeardHistory(25);

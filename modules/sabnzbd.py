@@ -33,7 +33,7 @@ class Sabnzbd:
         ssl = 's' if sabnzbd_ssl else ''
 
         if(sabnzbd_basepath == ""):
-          sabnzbd_basepath = "/sabnzbd/"
+            sabnzbd_basepath = "/sabnzbd/"
         if not(sabnzbd_basepath.endswith('/')):
             sabnzbd_basepath += "/"
 
