@@ -7,7 +7,13 @@ $(document).ready(function () {
     $('.carousel').carousel();
     $(".table-sortable").tablesorter();
     $('.tabs').tab();
-    $(window).on('hashchange', toggleTab);
+    $(window).on('hashchange', function() {
+        if (location.hash) {
+            $('a[href='+location.hash+']').tab('show');
+        } else {
+            $('a[data-toggle="tab"]:first').tab('show')
+        }
+    });
     $('a[data-toggle="tab"]').on('click', function(e) {
         var yScroll = $(window).scrollTop();
         location.hash = $(e.target).attr('href');;
@@ -67,14 +73,6 @@ $(document).ready(function () {
         $('#modal_dialog .modal-fanart').css('background', '#ffffff');
     })
 });
-
-function toggleTab() {
-    if (location.hash) {
-        $('a[href='+location.hash+']').tab('show');
-    } else {
-        $('a[data-toggle="tab"]:first').tab('show')
-    }
-}
 
 function makeIcon(iconClass, title) {
     var icon = $('<i>');

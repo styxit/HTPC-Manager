@@ -29,14 +29,11 @@ class Couchpotato:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def ping(self, couchpotato_host, couchpotato_port, couchpotato_apikey, couchpotato_basepath, couchpotato_ssl, **kwargs):
-
         self.logger.debug("Testing connectivity to couchpotato")
-        if(couchpotato_basepath == ""):
-            couchpotato_basepath = "/"
         if not(couchpotato_basepath.endswith('/')):
             couchpotato_basepath += "/"
 
-        ssl = 's' if sabnzbd_ssl else ''
+        ssl = 's' if couchpotato_ssl else ''
         url = 'http' + ssl + '://' + couchpotato_host + ':' + couchpotato_port + couchpotato_basepath + 'api/' + couchpotato_apikey
         try:
             return loads(urlopen(url + '/app.available/', timeout=10).read())
@@ -107,8 +104,6 @@ class Couchpotato:
             couchpotato_basepath = htpc.settings.get('couchpotato_basepath', '/')
             ssl = 's' if htpc.settings.get('couchpotato_ssl', 0) else ''
 
-            if(couchpotato_basepath == ""):
-                couchpotato_basepath = "/"
             if not(couchpotato_basepath.endswith('/')):
                 couchpotato_basepath += "/"
 
