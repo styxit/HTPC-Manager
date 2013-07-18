@@ -2,12 +2,8 @@
 Update HTPC-Manager from Github. Either through git command or tarball.
 Original code by Mikie (https://github.com/Mikie-Ghost/)
 """
-import os
-import sys
 from threading import Thread
 import urllib2
-import shutil
-import platform
 import subprocess
 import re
 from json import loads
@@ -21,11 +17,10 @@ class Updater:
     def __init__(self):
         """ Set GitHub constants on load """
         self.UPDATING = 0
-        settings = htpc.settings.Settings()
-        self.user = settings.get('git_user', 'mbw2001')
-        self.repo = settings.get('git_repo', 'htpc-manager')
-        self.branch = settings.get('git_branch', 'Updater')
-        self.git = settings.get('git_path', 'git')
+        self.user = htpc.settings.get('git_user', 'mbw2001')
+        self.repo = htpc.settings.get('git_repo', 'htpc-manager')
+        self.branch = htpc.settings.get('git_branch', 'Updater')
+        self.git = htpc.settings.get('git_path', 'git')
         self.logger = logging.getLogger('htpc.updater')
 
     @cherrypy.expose()
