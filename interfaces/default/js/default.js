@@ -13,7 +13,7 @@ $(document).ready(function () {
         } else {
             $('a[data-toggle="tab"]:first').tab('show')
         }
-    });
+    })
     $('a[data-toggle="tab"]').on('click', function(e) {
         var yScroll = $(window).scrollTop()
         location.hash = $(e.target).attr('href')
