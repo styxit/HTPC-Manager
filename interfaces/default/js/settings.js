@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    $(window).trigger('hashchange')
     $('.btn-test').click(function(e) {
         e.preventDefault();
         var btn = $(this).button('loading');
@@ -33,9 +34,11 @@ $(document).ready(function () {
         $.post(action, data, function(data) {
             msg = data ? 'Save successful' : 'Save failed';
             notify('Settings', msg, 'info');
-            if ($('#xbmc_server_id').is(":visible")) xbmc_update_servers(0);
+            if ($('#xbmc_server_id').is(":visible")) {
+                xbmc_update_servers(0);
+                this.reset();
+            }
         });
-        this.reset();
     });
     $('input.enable-module').change(function() {
         var disabled = !$(this).is(':checked');

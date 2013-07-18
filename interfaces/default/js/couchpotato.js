@@ -1,6 +1,6 @@
 var profiles;
-
 $(document).ready(function() {
+    $(window).trigger('hashchange')
     getNotificationList();
     getMovieList();
     getHistory();
@@ -8,9 +8,6 @@ $(document).ready(function() {
         e.preventDefault();
         var search = $('#search_movie_name').val();
         if (search) searchMovie(search);
-    });
-    $('#searchform button').click(function(e) {
-        e.stopPropagation();
     });
     $('#search_movie_name').popover({
         placement: 'bottom',
@@ -183,24 +180,21 @@ function searchMovie(q) {
         success: function (result) {
             $('.spinner').hide();
             $.each(result.movies, function(i, item) {
-                var row = $('<li>').click(function(e) {
-                    e.stopPropagation();
-                    selectProfile(item)
-                });
-
-                var movieThumb = $('<div>').addClass('thumbnail');
-                movieThumb.append($('<img>').attr('src', item.images.poster[0]));
-                row.append(movieThumb);
-
-                var movieInfo = $('<div>').addClass('movie-info');
-                movieInfo.append($('<h3>').text(item.original_title + ' ('+item.year+')'));
-                movieInfo.append($('<p>').html(shortenText(item.plot, 200)));
-                row.append(movieInfo);
-
-                $('#search-movie-list').append(row);
-            });
+                $('#search-movie-list').append(
+                    $('<li>').click(function(e) {
+                        e.stopPropagation();
+                        selectProfile(item)
+                    }).append(
+                        $('<img>').attr('src', item.images.poster[0]).addClass('thumbnail'),
+                        $('<div>').addClass('movie-info').append(
+                            $('<h3>').text(item.original_title + ' ('+item.year+')'),
+                            $('<p>').html(shortenText(item.plot, 200))
+                        )
+                    )
+                )
+            })
         }
-    });
+    })
 }
 
 function selectProfile(movie) {
