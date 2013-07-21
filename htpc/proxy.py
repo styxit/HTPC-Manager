@@ -55,7 +55,8 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
 
     # Load file from disk
     imagetype = imghdr.what(image)
-    return serve_file(path=image, content_type='image/' + imagetype)
+    if imagetype is not None:
+        return serve_file(path=image, content_type='image/' + imagetype)
 
 
 def download_image(url, dest, auth=None):
