@@ -5,6 +5,7 @@ from urllib2 import urlopen
 from json import loads
 import logging
 
+
 class Sabnzbd:
     def __init__(self):
         self.logger = logging.getLogger('modules.sabnzbd')
@@ -119,7 +120,7 @@ class Sabnzbd:
             apikey = htpc.settings.get('sabnzbd_apikey', '')
             sabnzbd_basepath = htpc.settings.get('sabnzbd_basepath', '/sabnzbd/')
             ssl = 's' if htpc.settings.get('sabnzbd_ssl', 0) else ''
-                        
+
             if(sabnzbd_basepath == ""):
                 sabnzbd_basepath = "/sabnzbd/"
             if not(sabnzbd_basepath.endswith('/')):

@@ -6,7 +6,7 @@ $(document).ready(function() {
     getHistory()
     $('#searchform').submit(function(e) {
         e.preventDefault()
-        var search = $('#search_movie_name').val()
+        var search = $('#moviename').val()
         if (search) searchMovie(search)
     })
     $.get(WEBDIR + 'couchpotato/GetProfiles', function(data) {
@@ -50,7 +50,7 @@ function showMovie(movie) {
         var year = movie.year
     }
     var src = 'holder.js/154x231/text:No artwork'
-    if (info.images.poster) {
+    if (info.images.poster && info.images.poster[0]) {
         src = WEBDIR + 'couchpotato/GetImage?w=154&h=231&url=' + info.images.poster[0]
     }
     var modalImg = $('<img>').attr('src', src).addClass('thumbnail pull-left')
@@ -66,25 +66,29 @@ function showMovie(movie) {
     if (info.genres) {
         modalInfo.append($('<p>').html('<b>Genre:</b> ' + info.genres))
     }
+
     if (info.rating && info.rating.imdb) {
-        var rating = $('<div>').raty({
-            readOnly: true,
-            path: WEBDIR+'img',
-            score: (info.rating.imdb[0] / 2),
-        })
-        modalInfo.append(rating)
+        modalInfo.append(
+            $('<div>').raty({
+                readOnly: true,
+                path: WEBDIR+'img',
+                score: (info.rating.imdb[0] / 2),
+            })
+        )
     }
 
     profiles.unbind()
-    var title = info.original_title
+    var title = info.original_title + ' ('+year+')'
     if (movie.library) {
         profiles.change(function() {
             editMovie(movie.id, $(this).val())
         }).val(movie.profile_id)
         var modalButtons = {
             'Delete' : function() {
-                deleteMovie(movie.id, title)
-                hideModal()
+                if (confirm('Do you want to delete: ' + title)) {
+                    deleteMovie(movie.id, title)
+                    hideModal()
+                }
             },
             'Refresh' : function() {
                 refreshMovie(movie.id, title)
@@ -109,6 +113,7 @@ function showMovie(movie) {
     modalInfo.append(profiles)
     var modalBody = $('<div>').append(modalImg, modalInfo)
     showModal(title + ' ('+year+')',  modalBody, modalButtons)
+    Holder.run()
 }
 function addMovie(movieid, profile, title) {
     $.getJSON(WEBDIR + 'couchpotato/AddMovie', {
@@ -116,6 +121,7 @@ function addMovie(movieid, profile, title) {
         profile: profile,
         title: encodeURIComponent(title)
     }, function (result) {
+        if (result == null || result.success != true) return
         notify('CouchPotato', title + ' successfully added!', 'info')
         setTimeout(function() {
             getMovieList()
@@ -158,7 +164,7 @@ function refreshMovie(id, name) {
 function searchMovie(q) {
     var grid = $('#result-grid').empty()
     $('a[href=#result]').tab('show')
-    $('#searchspinner').show()
+    $('.spinner').show()
     $.getJSON(WEBDIR + 'couchpotato/SearchMovie', {
         q: encodeURIComponent(q)
     }, function (result) {

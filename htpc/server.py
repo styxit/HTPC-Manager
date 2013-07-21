@@ -6,6 +6,7 @@ import htpc
 import logging
 from cherrypy.process.plugins import Daemonizer, PIDFile
 
+
 def start():
     """ Main function for starting HTTP server """
     logger = logging.getLogger('htpc.server')
@@ -55,38 +56,38 @@ def start():
             'tools.gzip.on': True
         },
         '/js': {
-            'tools.caching.on' : True,
-            'tools.caching.force' : True,
-            'tools.caching.delay' : 0,
-            'tools.expires.on' : True,
-            'tools.expires.secs' : 60*60*6,
+            'tools.caching.on': True,
+            'tools.caching.force': True,
+            'tools.caching.delay': 0,
+            'tools.expires.on': True,
+            'tools.expires.secs': 60 * 60 * 6,
             'tools.staticdir.on': True,
             'tools.staticdir.dir': 'js'
         },
         '/css': {
-            'tools.caching.on' : True,
-            'tools.caching.force' : True,
-            'tools.caching.delay' : 0,
-            'tools.expires.on' : True,
-            'tools.expires.secs' : 60*60*6,
+            'tools.caching.on': True,
+            'tools.caching.force': True,
+            'tools.caching.delay': 0,
+            'tools.expires.on': True,
+            'tools.expires.secs': 60 * 60 * 6,
             'tools.staticdir.on': True,
             'tools.staticdir.dir': 'css'
         },
         '/img': {
-            'tools.caching.on' : True,
-            'tools.caching.force' : True,
-            'tools.caching.delay' : 0,
-            'tools.expires.on' : True,
-            'tools.expires.secs' : 60*60*6,
+            'tools.caching.on': True,
+            'tools.caching.force': True,
+            'tools.caching.delay': 0,
+            'tools.expires.on': True,
+            'tools.expires.secs': 60 * 60 * 6,
             'tools.staticdir.on': True,
             'tools.staticdir.dir': 'img'
         },
         '/favicon.ico': {
-            'tools.caching.on' : True,
-            'tools.caching.force' : True,
-            'tools.caching.delay' : 0,
-            'tools.expires.on' : True,
-            'tools.expires.secs' : 60*60*6,
+            'tools.caching.on': True,
+            'tools.caching.force': True,
+            'tools.caching.delay': 0,
+            'tools.expires.on': True,
+            'tools.expires.secs': 60 * 60 * 6,
             'tools.staticfile.on': True,
             'tools.staticfile.filename': favicon
         },

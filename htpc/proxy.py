@@ -8,10 +8,10 @@ from cherrypy.lib.static import serve_file
 from urllib2 import Request, urlopen
 try:
     import Image
-    import ImageEnhance
     PIL = True
 except ImportError:
     PIL = False
+
 
 def get_image(url, height=None, width=None, opacity=100, auth=None):
     """ Load image form cache if possible, else download. Resize if needed """
@@ -51,7 +51,7 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
         else:
             logger.error("Can't resize when PIL is missing on system!")
             if (opacity < 100):
-                image = os.path.join(htpc.RUNDIR,'interfaces/default/img/fff_20.png')
+                image = os.path.join(htpc.RUNDIR, 'interfaces/default/img/fff_20.png')
 
     # Load file from disk
     imagetype = imghdr.what(image)
@@ -72,8 +72,9 @@ def download_image(url, dest, auth=None):
 
         with open(dest, "wb") as local_file:
             local_file.write(urlopen(request).read())
-    except Exception, e:
+    except Exception:
         pass
+
 
 def resize_image(img, height, width, opacity, dest):
     """ Resize image, set opacity and save to disk """
@@ -88,7 +89,7 @@ def resize_image(img, height, width, opacity, dest):
         enhance = opacity / 100
         # Create white overlay image
         overlay = Image.new('RGB', size, '#FFFFFF')
-        #apply overlay to resized image
+        # apply overlay to resized image
         im = Image.blend(overlay, im, enhance)
 
     if imagetype == 'jpeg':

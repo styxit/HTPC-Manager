@@ -105,7 +105,7 @@ class Updater:
     def git_exec(self, args):
         """ Tool for running git program on system """
         try:
-            proc = subprocess.Popen(self.git + " " +args, stdout=subprocess.PIPE,
+            proc = subprocess.Popen(self.git + " " + args, stdout=subprocess.PIPE,
                    stderr=subprocess.STDOUT, shell=True, cwd=htpc.RUNDIR)
             output, err = proc.communicate()
         except OSError, e:
