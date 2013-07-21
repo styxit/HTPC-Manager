@@ -15,7 +15,16 @@ import logging
 class Updater:
     """ Main class """
     def __init__(self):
-        """ Set GitHub constants on load """
+        """ Set GitHub settings on load """
+        htpc.MODULES.append({
+            'name': 'Updater',
+            'id': 'updater',
+            'fields': [
+                {'type': 'text', 'label': 'Git path', 'name': 'git_path'},
+                {'type': 'text', 'label': 'Git User', 'name': 'git_user'},
+                {'type': 'text', 'label': 'Git Repository', 'name': 'git_repo'},
+                {'type': 'text', 'label': 'Git Branch', 'name': 'git_branch'}
+        ]})
         self.UPDATING = 0
         self.user = htpc.settings.get('git_user', 'styxit')
         self.repo = htpc.settings.get('git_repo', 'htpc-manager')
