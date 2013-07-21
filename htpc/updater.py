@@ -17,9 +17,9 @@ class Updater:
     def __init__(self):
         """ Set GitHub constants on load """
         self.UPDATING = 0
-        self.user = htpc.settings.get('git_user', 'mbw2001')
+        self.user = htpc.settings.get('git_user', 'styxit')
         self.repo = htpc.settings.get('git_repo', 'htpc-manager')
-        self.branch = htpc.settings.get('git_branch', 'Updater')
+        self.branch = htpc.settings.get('git_branch', 'master')
         self.git = htpc.settings.get('git_path', 'git')
         self.logger = logging.getLogger('htpc.updater')
 
