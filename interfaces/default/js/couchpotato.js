@@ -184,7 +184,7 @@ function searchMovie(q) {
             link.append($('<h6>').addClass('movie-title').html(title))
             grid.append($('<li>').attr('id', movie.id).append(link))
         })
-        Holder.run();
+        Holder.run()
     })
 }
 function getNotificationList() {
