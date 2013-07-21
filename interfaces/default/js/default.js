@@ -40,11 +40,9 @@ $(document).ready(function () {
         e.preventDefault()
         notify('Update','Checking for update.','info')
         $.getJSON(WEBDIR + 'update/', function (data) {
-            if (data == null || !$.isNumeric(data[0]) || data[0] < 0) {
-                notify('Update', 'Failed. Check errorlog.', 'error')
-            } else if (data[0] == 0) {
+            if (data == 0) {
                 notify('Update', 'Already running latest version.', 'success')
-            } else {
+            } else if ($.isNumeric(data[0] && data[0] > 0)) {
                 if (confirm('Your are '+data[0]+' versions behind. Update to latest version?')) {
                     $.post(WEBDIR + 'update/', function (data) {
                         if (data == 1) {
@@ -56,6 +54,8 @@ $(document).ready(function () {
                         checkUpdate()
                     })
                 }
+            } else {
+                notify('Update', 'Failed. Check errorlog.', 'error')
             }
         })
     })
