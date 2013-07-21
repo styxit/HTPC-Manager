@@ -80,11 +80,9 @@ function makeIcon(iconClass, title) {
         .css('cursor', 'pointer')
         .tooltip({placement: 'right'})
 }
-
 function shortenText(string, length) {
     return string.substr(0,length)+(string.length>length?'&hellip;':'')
 }
-
 function pad(str, max) {
   return str.toString().length < max ? pad("0"+str, max) : str
 }
