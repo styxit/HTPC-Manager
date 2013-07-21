@@ -31,24 +31,29 @@
     margin: 10px;
     float: left;
 }
-#wanted-grid img,
-#wanted-grid .thumbnail {
+#wanted-grid img.thumbnail,
+#result-grid img.thumbnail {
     position: relative;
     height: 150px;
     width: 100px;
 }
-h6.movie-title {
+#wanted-grid h6.movie-title,
+#result-grid h6.movie-title {
     color: #555555;
     text-align: center;
     margin: 0;
     padding-top: 4px;
 }
+#wanted-grid a:Hover,
+#result-grid a:Hover {
+    text-decoration: none;
+}
 .modal {
     width: 650px;
 }
-.modal-fanart {
-    background: #fff top center no-repeat;
-    background-size: 100%;
+.modal img.thumbnail {
+    height: 231px;
+    width: 154px;
 }
 .modal .modal-movieinfo {
     margin-left: 180px;
