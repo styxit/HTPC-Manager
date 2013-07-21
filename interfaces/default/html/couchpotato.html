@@ -10,12 +10,13 @@
             <button type="submit" class="btn btn-success" id="search_movie_button"><i class="icon-search icon-white"></i> Search movie</button>
         </form>
         <ul class="nav nav-tabs">
-            <li class="active"><a href="#wanted" data-toggle="tab">Wanted</a></li>
+            <li><a href="#wanted" data-toggle="tab">Wanted</a></li>
             <li><a href="#history" data-toggle="tab">History</a></li>
+            <li class="hidden"><a href="#result" data-toggle="tab">Search</a></li>
         </ul>
         <div class="tab-content">
-            <div id="wanted" class="tab-pane active">
-                <ul id="wanted-grid" class="thumbnails filter"></ul>
+            <div id="wanted" class="tab-pane">
+                <ul id="wanted-grid" class="thumbnails"></ul>
             </div>
             <div id="history" class="tab-pane">
                 <table class="table table-striped table-sortable">
@@ -27,6 +28,9 @@
                     </thead>
                     <tbody id="history-grid"></tbody>
                 </table>
+            </div>
+            <div id="result" class="tab-pane">
+                <ul id="result-grid" class="thumbnails"></ul>
             </div>
         </div>
         <div class="spinner"></div>
