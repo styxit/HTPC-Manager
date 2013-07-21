@@ -4,14 +4,13 @@ import htpc
 import base64
 import socket
 import struct
-from urllib2 import quote, unquote
+from urllib2 import quote
 from jsonrpclib import Server
-from xmlrpclib import ProtocolError
-from httplib import InvalidURL
 from sqlobject import SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol, IntCol
 from htpc.proxy import get_image
 import logging
+
 
 class XbmcServers(SQLObject):
     """ SQLObject class for xbmc_servers table """
@@ -215,7 +214,7 @@ class Xbmc:
             limits = {'start': int(start), 'end': int(end)}
             filter = {'field': 'title', 'operator': 'contains', 'value': filter}
             if hidewatched == "1":
-                filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
+                filter = {"and": [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
             return xbmc.VideoLibrary.GetMovies(sort=sort, properties=properties, limits=limits, filter=filter)
         except Exception, e:
             self.logger.debug("Exception: " + str(e))
@@ -234,8 +233,8 @@ class Xbmc:
             limits = {'start': int(start), 'end': int(end)}
             filter = {'field': 'title', 'operator': 'contains', 'value': filter}
             if hidewatched == "1":
-                filter = {"and" : [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
-            shows = xbmc.VideoLibrary.GetTVShows(sort=sort,properties=properties, limits=limits, filter=filter)
+                filter = {"and": [filter, {'field': 'playcount', 'operator': 'is', 'value': '0'}]}
+            shows = xbmc.VideoLibrary.GetTVShows(sort=sort, properties=properties, limits=limits, filter=filter)
             return shows
         except Exception, e:
             self.logger.debug("Exception: " + str(e))
@@ -285,7 +284,7 @@ class Xbmc:
         try:
             xbmc = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
-            properties=['title', 'artist', 'year', 'thumbnail']
+            properties = ['title', 'artist', 'year', 'thumbnail']
             limits = {'start': int(start), 'end': int(end)}
             if artistid:
                 filter = {'artistid': int(artistid)}
@@ -306,7 +305,7 @@ class Xbmc:
         try:
             xbmc = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
-            properties=['artist', 'artistid', 'album', 'albumid', 'duration', 'year', 'thumbnail']
+            properties = ['artist', 'artistid', 'album', 'albumid', 'duration', 'year', 'thumbnail']
             limits = {'start': int(start), 'end': int(end)}
             if albumid and filter == '':
                 filter = {'albumid': int(albumid)}
@@ -407,7 +406,7 @@ class Xbmc:
         i = 1 if position1 < position2 else -1
         xbmc = Server(self.url('/jsonrpc', True))
         while(position1 != position2):
-            xbmc.Playlist.Swap(playlistid=playlistid, position1=position1, position2=position1+i)
+            xbmc.Playlist.Swap(playlistid=playlistid, position1=position1, position2=position1 + i)
             position1 += i
         return "Moved from " + str(position1) + " to " + str(position2)
 
@@ -568,7 +567,7 @@ class Xbmc:
         """ Create popup in XBMC """
         self.logger.debug("Sending notification to XBMC: " + text)
         xbmc = Server(self.url('/jsonrpc', True))
-        image='https://raw.github.com/styxit/HTPC-Manager/master/interfaces/default/img/xbmc-logo.png'
+        image = 'https://raw.github.com/styxit/HTPC-Manager/master/interfaces/default/img/xbmc-logo.png'
         return xbmc.GUI.ShowNotification(title='HTPC manager', message=text, image=image)
 
     @cherrypy.expose()

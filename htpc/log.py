@@ -6,6 +6,7 @@ import cherrypy
 import htpc
 import logging
 
+
 class Log:
     """ Root class """
     def __init__(self):

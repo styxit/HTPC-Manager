@@ -5,6 +5,7 @@ from json import loads
 from urllib2 import urlopen
 import logging
 
+
 class Couchpotato:
     def __init__(self):
         self.logger = logging.getLogger('modules.couchpotato')
@@ -25,6 +26,18 @@ class Couchpotato:
     @cherrypy.expose()
     def index(self):
         return htpc.LOOKUP.get_template('couchpotato.html').render(scriptname='couchpotato')
+
+    @cherrypy.expose()
+    def webinterface(self):
+        """ Generate page from template """
+        ssl = 's' if htpc.settings.get('couchpotato_ssl', 0) else ''
+        host = htpc.settings.get('couchpotato_host', '')
+        port = str(htpc.settings.get('couchpotato_port', ''))
+        basepath = htpc.settings.get('couchpotato_basepath', '/')
+        if not(basepath.endswith('/')):
+                basepath += "/"
+        url = 'http' + ssl + '://' + host + ':' + port + basepath
+        raise cherrypy.HTTPRedirect(url)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -101,16 +114,17 @@ class Couchpotato:
             host = htpc.settings.get('couchpotato_host', '')
             port = str(htpc.settings.get('couchpotato_port', ''))
             apikey = htpc.settings.get('couchpotato_apikey', '')
-            couchpotato_basepath = htpc.settings.get('couchpotato_basepath', '/')
+            basepath = htpc.settings.get('couchpotato_basepath', '/')
             ssl = 's' if htpc.settings.get('couchpotato_ssl', 0) else ''
 
-            if not(couchpotato_basepath.endswith('/')):
-                couchpotato_basepath += "/"
+            if not(basepath.endswith('/')):
+                basepath += "/"
 
-            url = 'http' + ssl + '://' + host + ':' + port + couchpotato_basepath + 'api/' + apikey + '/' + path
+            url = 'http' + ssl + '://' + host + ':' + port + basepath + 'api/' + apikey + '/' + path
 
             self.logger.debug("Fetching information from: " + url)
             return loads(urlopen(url, timeout=10).read())
-        except:
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to fetch information")
             return

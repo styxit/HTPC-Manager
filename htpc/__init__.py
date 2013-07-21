@@ -15,3 +15,5 @@ PORT = None
 USERNAME = None
 PASSWORD = None
 UPDATE = None
+SSL_CERT = None
+SSL_KEY = None

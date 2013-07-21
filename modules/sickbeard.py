@@ -5,6 +5,7 @@ from urllib2 import urlopen
 from json import loads
 import logging
 
+
 class Sickbeard:
     def __init__(self):
         self.logger = logging.getLogger('modules.sickbeard')
@@ -29,9 +30,9 @@ class Sickbeard:
     @cherrypy.expose()
     def view(self, tvdbid):
         if not (tvdbid.isdigit()):
-          raise cherrypy.HTTPError("500 Error", "Invalid show ID.")
-          self.logger.error("Invalid show ID was supplied: " + str(tvdbid))
-          return False
+            raise cherrypy.HTTPError("500 Error", "Invalid show ID.")
+            self.logger.error("Invalid show ID was supplied: " + str(tvdbid))
+            return False
 
         return htpc.LOOKUP.get_template('sickbeard_view.html').render(scriptname='sickbeard_view', tvdbid=tvdbid)
 
@@ -121,7 +122,7 @@ class Sickbeard:
         except:
             return
 
-    def fetch(self, cmd, img=False, timeout = 10):
+    def fetch(self, cmd, img=False, timeout=10):
         try:
             host = htpc.settings.get('sickbeard_host', '')
             port = str(htpc.settings.get('sickbeard_port', ''))
@@ -136,7 +137,7 @@ class Sickbeard:
             self.logger.debug("Fetching information from: " + url)
 
             if (img == True):
-              return urlopen(url, timeout=timeout).read()
+                return urlopen(url, timeout=timeout).read()
 
             return loads(urlopen(url, timeout=timeout).read())
         except:
