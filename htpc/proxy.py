@@ -17,6 +17,7 @@ except ImportError:
         PIL = False
 
 
+
 def get_image(url, height=None, width=None, opacity=100, auth=None):
     """ Load image form cache if possible, else download. Resize if needed """
     opacity = float(opacity)

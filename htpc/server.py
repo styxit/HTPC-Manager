@@ -8,6 +8,7 @@ from cherrypy.process.plugins import Daemonizer, PIDFile
 from cherrypy.lib.auth_digest import get_ha1_dict_plain
 
 
+
 def start():
     """ Main function for starting HTTP server """
     logger = logging.getLogger('htpc.server')
