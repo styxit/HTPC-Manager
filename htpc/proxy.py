@@ -10,7 +10,11 @@ try:
     import Image
     PIL = True
 except ImportError:
-    PIL = False
+    try:
+        from PIL import Image
+        PIL = True
+    except ImportError:
+        PIL = False
 
 
 def get_image(url, height=None, width=None, opacity=100, auth=None):
