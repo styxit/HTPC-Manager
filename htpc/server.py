@@ -5,6 +5,7 @@ import cherrypy
 import htpc
 import logging
 from cherrypy.process.plugins import Daemonizer, PIDFile
+from cherrypy.lib.auth_digest import get_ha1_dict_plain
 
 
 def start():
@@ -96,7 +97,7 @@ def start():
     if htpc.USERNAME and htpc.PASSWORD:
         logger.info("Enabling username/password access")
         userpassdict = {htpc.USERNAME: htpc.PASSWORD}
-        get_ha1 = cherrypy.lib.auth_digest.get_ha1_dict_plain(userpassdict)
+        get_ha1 = get_ha1_dict_plain(userpassdict)
         app_config['/'].update({
             'tools.auth_digest.on': True,
             'tools.auth_digest.realm': "HTPC Manager",
