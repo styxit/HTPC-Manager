@@ -8,7 +8,7 @@ $(document).ready(function() {
         e.preventDefault();
         var search = $('#search_movie_name').val();
         if (search) searchMovie(search);
-    });
+    })
     $.get(WEBDIR + 'couchpotato/GetProfiles', function(data) {
         if (data == null) return
         $.each(data.list, function(i, item) {
