@@ -86,7 +86,6 @@ def main():
 
     # Set loglevel
     htpc.LOGLEVEL = args.loglevel.lower()
-    from htpc.log import Log
 
     # Set default database and overwrite if supplied through commandline
     htpc.DB = os.path.join(htpc.DATADIR, 'database.db')
@@ -112,7 +111,7 @@ def main():
 
     htpc.TEMPLATE = os.path.join(htpc.RUNDIR, 'interfaces/',
                                  htpc.settings.get('app_template', 'default'))
-    htpc.LOOKUP = TemplateLookup(directories=[os.path.join(htpc.TEMPLATE,'html/')])
+    htpc.LOOKUP = TemplateLookup(directories=[os.path.join(htpc.TEMPLATE, 'html/')])
 
     # Overwrite host setting if supplied through commandline
     htpc.HOST = htpc.settings.get('app_host', '0.0.0.0')

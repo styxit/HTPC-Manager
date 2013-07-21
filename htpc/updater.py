@@ -29,7 +29,7 @@ class Updater:
         """ Handle server requests. Update on POST. Get status on GET. """
         if self.git == '':
             self.logger.warning('Git not configured. Automatic update disabled.')
-            return -1 
+            return -1
         if cherrypy.request.method.upper() == 'POST':
             Thread(target=self.git_update).start()
             return 1
@@ -106,7 +106,7 @@ class Updater:
     def git_exec(self, args):
         """ Tool for running git program on system """
         try:
-            proc = subprocess.Popen(self.git + " " +args, stdout=subprocess.PIPE,
+            proc = subprocess.Popen(self.git + " " + args, stdout=subprocess.PIPE,
                    stderr=subprocess.STDOUT, shell=True, cwd=htpc.RUNDIR)
             output, err = proc.communicate()
         except OSError, e:

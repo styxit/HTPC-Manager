@@ -1,36 +1,3 @@
-#search-movie-list {
-    margin: 0;
-    padding: 0;
-    max-height: 600px;
-    overflow-y: auto;
-}
-#search-movie-list li {
-    margin: 15px 0;
-    padding: 0;
-    list-style: none;
-    cursor: pointer;
-    clear: both;
-    overflow: auto;
-}
-#search-movie-list li:hover {
-    background: #eee;
-}
-#search-movie-list img {
-    height: 100px;
-    width: 75px;
-}
-#search-movie-list h3 {
-    margin: 0;
-    padding: 0;
-    font-size: 1.5em;
-}
-#search-movie-list .movie-info {
-    margin: 0 0 0 95px;
-}
-#search-movie-list .thumbnail {
-    margin: 10px;
-    float: left;
-}
 #wanted-grid img.thumbnail,
 #result-grid img.thumbnail {
     position: relative;
