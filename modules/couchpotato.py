@@ -92,9 +92,9 @@ class Couchpotato:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def AddMovie(self, profile_id='', identifier='', title=''):
+    def AddMovie(self, movieid, profile, title):
         self.logger.debug("Adding movie")
-        return self.fetch('movie.add/?profile_id=' + profile_id + '&identifier=' + identifier + '&title=' + title)
+        return self.fetch('movie.add/?profile_id=' + profile + '&identifier=' + movieid + '&title=' + title)
 
     def fetch(self, path):
         try:
