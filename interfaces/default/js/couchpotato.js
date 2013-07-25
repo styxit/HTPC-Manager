@@ -33,6 +33,9 @@ function getMovieList() {
             })
             var src = WEBDIR + 'couchpotato/GetImage?w=100&h=150&url=' + movie.library.info.images.poster[0]
             link.append($('<img>').attr('src', src).addClass('thumbnail'))
+            if (movie.releases.length > 0) {
+                link.append($('<i>').attr('title', 'Download').addClass('icon-white icon-download releases'));
+            }
             var title = shortenText(movie.library.info.original_title, 12)
             link.append($('<h6>').addClass('movie-title').html(title))
             wanted.append($('<li>').attr('id', movie.id).append(link))
@@ -111,6 +114,45 @@ function showMovie(movie) {
         })
     }
     modalInfo.append(profiles)
+
+    if (movie.releases.length > 0) {
+        var releaseTable = $('<table>').addClass('table table-striped table-hover')
+        $.each(movie.releases, function(i, item){
+            releaseTable.append(
+                $('<tr>').append(
+                    $('<td>').append(
+                        $('<a>').attr('href', '#').append(
+                            $('<i>').attr('title', 'Download').addClass('icon-download')
+                        ).click(function(e) {
+                            e.preventDefault()
+                            hideModal()
+                            $.getJSON('DownloadRelease/?id='+item.id)
+                        }),
+                        $('<a>').attr('href','DownloadRelease?id='+item.info.id).append(
+                            $('<i>').attr('title', 'Ignore').addClass('icon-remove-sign')
+                        ).click(function(e) {
+                            e.preventDefault()
+                            $(this).closest('tr').toggleClass('ignore')
+                            $.getJSON('IgnoreRelease/?id='+item.id)
+                        })
+                    ),
+                    $('<td>').append(
+                        $('<a>').attr('href', '#').text(item.info.name).click(function(e) {
+                            e.preventDefault()
+                            window.open(item.info.detail_url)
+                        })
+                    ),
+                    $('<td>').html(bytesToSize(item.info.size*1000000))
+                ).toggleClass('ignore', item.status_id == 3)
+            )
+        })
+        $.extend(modalButtons,{
+            'Releases' : function() {
+                $('.modal-body').html(releaseTable)
+            }
+        })
+    }
+
     var modalBody = $('<div>').append(modalImg, modalInfo)
     showModal(title + ' ('+year+')',  modalBody, modalButtons)
     Holder.run()

@@ -1,6 +1,8 @@
+.thumbnails li {
+    position: relative;
+}
 #wanted-grid img.thumbnail,
 #result-grid img.thumbnail {
-    position: relative;
     height: 150px;
     width: 100px;
 }
@@ -14,6 +16,19 @@
 #wanted-grid a:Hover,
 #result-grid a:Hover {
     text-decoration: none;
+}
+.releases {
+    position: absolute;
+    top: 138px;
+    right: 5px;
+    width: 16px;
+    height: 16px;
+}
+.modal-body td i {
+    margin-right: 5px;
+}
+.modal-body .ignore {
+    text-decoration: line-through;
 }
 .modal {
     width: 650px;

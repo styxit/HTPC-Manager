@@ -75,15 +75,15 @@ class Couchpotato:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def DeleteMovie(self, id=''):
-        self.logger.debug("Deleting movie")
-        return self.fetch('movie.delete/?id=' + id)
+    def SearchMovie(self, q=''):
+        self.logger.debug("Searching for movie")
+        return self.fetch('movie.search/?q=' + q)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def RefreshMovie(self, id):
-        self.logger.debug("Refreshing movie")
-        return self.fetch('movie.refresh/?id=' + id)
+    def AddMovie(self, movieid, profile, title):
+        self.logger.debug("Adding movie")
+        return self.fetch('movie.add/?profile_id=' + profile + '&identifier=' + movieid + '&title=' + title)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -93,21 +93,33 @@ class Couchpotato:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def SearchMovie(self, q=''):
-        self.logger.debug("Searching for movie")
-        return self.fetch('movie.search/?q=' + q)
+    def RefreshMovie(self, id):
+        self.logger.debug("Refreshing movie")
+        return self.fetch('movie.refresh/?id=' + id)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def DeleteMovie(self, id=''):
+        self.logger.debug("Deleting movie")
+        return self.fetch('movie.delete/?id=' + id)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def DownloadRelease(self, id=''):
+        self.logger.debug("Downloading movie")
+        return self.fetch('release.download/?id=' + id)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def IgnoreRelease(self, id=''):
+        self.logger.debug("Downloading movie")
+        return self.fetch('release.ignore/?id=' + id)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetProfiles(self):
         self.logger.debug("Fetching available profiles")
         return self.fetch('profile.list/')
-
-    @cherrypy.expose()
-    @cherrypy.tools.json_out()
-    def AddMovie(self, movieid, profile, title):
-        self.logger.debug("Adding movie")
-        return self.fetch('movie.add/?profile_id=' + profile + '&identifier=' + movieid + '&title=' + title)
 
     def fetch(self, path):
         try:
