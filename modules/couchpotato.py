@@ -63,7 +63,7 @@ class Couchpotato:
     @cherrypy.tools.json_out()
     def GetMovieList(self, limit=''):
         self.logger.debug("Fetching Movies")
-        return self.fetch('movie.list/?status=active&limit_offset=' + limit)
+        return self.fetch('movie.list/?limit_offset=' + limit)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -87,9 +87,9 @@ class Couchpotato:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def EditMovie(self, id, profile):
+    def EditMovie(self, id, profile, title):
         self.logger.debug("Editing movie")
-        return self.fetch('movie.edit/?id=' + id + '&profile_id=' + profile)
+        return self.fetch('movie.edit/?id=' + id + '&profile_id=' + profile + '&default_title=' + title)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()

@@ -3,7 +3,7 @@ $(document).ready(function() {
     $(window).trigger('hashchange')
     getMovieList()
     getHistory()
-    setInterval('getNotificationList()', 2000)
+    setInterval('getNotificationList()', 10000)
     $('#searchform').submit(function(e) {
         e.preventDefault()
         var search = $('#moviename').val()
@@ -80,12 +80,27 @@ function showMovie(movie) {
         )
     }
 
+    var titles = $('<select>').attr('id', 'titles')
+    if (movie.library && movie.library.titles) {
+        $.each(movie.library.titles, function(i, item) {
+            console.log(item.default)
+            titles.append($('<option>').text(item.title).val(item.title).prop('selected', item.default))
+        })
+    } else {
+        $.each(info.titles, function(i, item) {
+            titles.append($('<option>').text(item).val(item))
+        })
+    }
+
     profiles.unbind()
     var title = info.original_title + ' ('+year+')'
     if (movie.library) {
         profiles.change(function() {
-            editMovie(movie.id, $(this).val())
+            editMovie(movie.id, profiles.val(), titles.val())
         }).val(movie.profile_id)
+        titles.change(function() {
+            editMovie(movie.id, profiles.val(), titles.val())
+        })
         var modalButtons = {
             'Delete' : function() {
                 if (confirm('Do you want to delete: ' + title)) {
@@ -101,7 +116,7 @@ function showMovie(movie) {
     } else {
         var modalButtons = {
             'Add' : function() {
-                addMovie(movie.imdb, profiles.val(), title)
+                addMovie(movie.imdb, profiles.val(), titles.val())
                 hideModal()
             }
         }
@@ -113,9 +128,9 @@ function showMovie(movie) {
             }
         })
     }
-    modalInfo.append(profiles)
+    modalInfo.append(titles, profiles)
 
-    if (movie.releases.length > 0) {
+    if (movie.releases && movie.releases.length > 0) {
         var releaseTable = $('<table>').addClass('table table-striped table-hover')
         $.each(movie.releases, function(i, item){
             releaseTable.append(
@@ -153,29 +168,38 @@ function showMovie(movie) {
         })
     }
 
+    if (info.images.backdrop.length > 0) {
+        var backdrop = WEBDIR + 'couchpotato/GetImage?w=675&h=400&o=10&url=' + encodeURIComponent(info.images.backdrop)
+        $('.modal-fanart').css({
+            'background-image' : 'url('+backdrop+')'
+        })
+    }
+
     var modalBody = $('<div>').append(modalImg, modalInfo)
     showModal(title, modalBody, modalButtons)
     Holder.run()
 }
 function addMovie(movieid, profile, title) {
-    $.getJSON(WEBDIR + 'couchpotato/AddMovie', {
+    var data = {
         movieid: movieid,
         profile: profile,
         title: encodeURIComponent(title)
-    }, function (result) {
+    }
+    console.log(data)
+    $.getJSON(WEBDIR + 'couchpotato/AddMovie', data, function (result) {
         console.log(result)
         if (result == null || result.success != true) return
-        notify('CouchPotato', title + ' successfully added!', 'info')
         setTimeout(function() {
             getMovieList()
             $('a[href=#wanted]').tab('show')
-        }, 500)
+        }, 1000)
     })
 }
-function editMovie(id, profile) {
+function editMovie(id, profile, title) {
     $.getJSON(WEBDIR + 'couchpotato/EditMovie', {
         id: id,
-        profile: profile
+        profile: profile,
+        title: encodeURIComponent(title)
     }, function (result) {
         if (result.success) {
             notify('CouchPotato', 'Profile changed', 'info')
@@ -189,7 +213,6 @@ function deleteMovie(id, name) {
     $.getJSON(WEBDIR + 'couchpotato/DeleteMovie', {id: id}, function (result) {
         if (result.success) {
             $('#' + id).fadeOut()
-            notify('CouchPotato', name + ' successfully deleted!', 'info')
         } else {
             notify('CouchPotato', 'An error occured.', 'error')
         }

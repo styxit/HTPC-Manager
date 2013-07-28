@@ -24,14 +24,18 @@
     width: 16px;
     height: 16px;
 }
+.modal {
+    width: 650px;
+}
+.modal-fanart {
+    background: #fff top center no-repeat;
+    background-size: 100%;
+}
 .modal-body td i {
     margin-right: 5px;
 }
 .modal-body .ignore {
     text-decoration: line-through;
-}
-.modal {
-    width: 650px;
 }
 .modal img.thumbnail {
     height: 231px;
