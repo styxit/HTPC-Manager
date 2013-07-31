@@ -180,7 +180,7 @@ a:hover {
   margin-bottom: 0;
   padding-top: 20px;
   padding-bottom: 20px;
-  background:  url("../img/header-bg.jpg") center center no-repeat;
+  background: url("../img/header-bg.jpg") center center no-repeat rgb(18, 59, 89);
   filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(src='imgrainbowblur.png', sizingMethod='scale'); /* IE7 */
   -ms-filter: "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='img/rainbowblur.png', sizingMethod='scale')"; /* IE8+ */
     -webkit-background-size: cover;
@@ -254,7 +254,7 @@ footer {
   margin-bottom: 0;
   color: #F2F2F2;
   border-top: 10px solid #000;
-  background: #1A1A1A url("../img/footer.jpg") center center;
+  background: rgb(12, 42, 66) url("../img/footer.jpg") center center;
 }
 footer > div.container-fluid {
   padding: 30px;
