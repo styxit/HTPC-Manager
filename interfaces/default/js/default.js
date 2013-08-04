@@ -42,8 +42,8 @@ $(document).ready(function () {
         $.getJSON(WEBDIR + 'update/', function (data) {
             if (data == 0) {
                 notify('Update', 'Already running latest version.', 'success')
-            } else if ($.isNumeric(data[0] && data[0] > 0)) {
-                if (confirm('Your are '+data[0]+' versions behind. Update to latest version?')) {
+            } else if ($.isNumeric(data) && data > 0) {
+                if (confirm('Your are '+data+' versions behind. Update to latest version?')) {
                     $.post(WEBDIR + 'update/', function (data) {
                         if (data == 1) {
                             showModal('Installing update', '<div class="progress progress-striped active"><div class="bar" style="width:100%"></div></div>','')

@@ -29,7 +29,7 @@ class Updater:
         """ Handle server requests. Update on POST. Get status on GET. """
         if self.git == '':
             self.logger.warning('Git not configured. Automatic update disabled.')
-            return -1 
+            return -1
         if cherrypy.request.method.upper() == 'POST':
             Thread(target=self.git_update).start()
             return 1
@@ -87,8 +87,7 @@ class Updater:
         else:
             behind = self.behind_by(current, latest)
             self.logger.info("Currently " + str(behind) + " commits behind.")
-            return (behind, 'https://github.com/%s/%s/compare/%s...%s' % (
-                      self.user, self.repo, current, latest))
+            return behind
 
     def git_update(self):
         """ Do update through git """
