@@ -5,6 +5,7 @@ from urllib2 import urlopen
 from json import loads
 import logging
 
+
 class Sickbeard:
     def __init__(self):
         self.logger = logging.getLogger('modules.sickbeard')
@@ -29,9 +30,9 @@ class Sickbeard:
     @cherrypy.expose()
     def view(self, tvdbid):
         if not (tvdbid.isdigit()):
-          raise cherrypy.HTTPError("500 Error", "Invalid show ID.")
-          self.logger.error("Invalid show ID was supplied: " + str(tvdbid))
-          return False
+            raise cherrypy.HTTPError("500 Error", "Invalid show ID.")
+            self.logger.error("Invalid show ID was supplied: " + str(tvdbid))
+            return False
 
         return htpc.LOOKUP.get_template('sickbeard_view.html').render(scriptname='sickbeard_view', tvdbid=tvdbid)
 
@@ -39,13 +40,10 @@ class Sickbeard:
     @cherrypy.tools.json_out()
     def ping(self, sickbeard_host, sickbeard_port, sickbeard_apikey, sickbeard_basepath, sickbeard_ssl, **kwargs):
         ssl = 's' if sickbeard_ssl else ''
-        
         self.logger.debug("Testing connectivity")
         try:
-            if(sickbeard_basepath == ""):
-                sickbeard_basepath = "/"
             if not (sickbeard_basepath.endswith('/')):
-              sickbeard_basepath += "/"
+                sickbeard_basepath += "/"
 
             url = 'http' + ssl + '://' + sickbeard_host + ':' + sickbeard_port + sickbeard_basepath + 'api/' + sickbeard_apikey + '/?cmd='
             self.logger.debug("Trying to contact sickbeard via " + url)
@@ -124,7 +122,7 @@ class Sickbeard:
         except:
             return
 
-    def fetch(self, cmd, img=False, timeout = 10):
+    def fetch(self, cmd, img=False, timeout=10):
         try:
             host = htpc.settings.get('sickbeard_host', '')
             port = str(htpc.settings.get('sickbeard_port', ''))
@@ -132,16 +130,14 @@ class Sickbeard:
             ssl = 's' if htpc.settings.get('sickbeard_ssl', 0) else ''
             sickbeard_basepath = htpc.settings.get('sickbeard_basepath', '/')
 
-            if(sickbeard_basepath == ""):
-                sickbeard_basepath = "/"
             if not (sickbeard_basepath.endswith('/')):
                 sickbeard_basepath += "/"
             url = 'http' + ssl + '://' + host + ':' + str(port) + sickbeard_basepath + 'api/' + apikey + '/?cmd=' + cmd
-            
+
             self.logger.debug("Fetching information from: " + url)
 
             if (img == True):
-              return urlopen(url, timeout=timeout).read()
+                return urlopen(url, timeout=timeout).read()
 
             return loads(urlopen(url, timeout=timeout).read())
         except:

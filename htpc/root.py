@@ -9,6 +9,7 @@ import htpc
 import logging
 from threading import Thread
 
+
 class Root:
     """ Root class """
     def __init__(self):
