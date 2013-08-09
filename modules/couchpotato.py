@@ -35,7 +35,7 @@ class Couchpotato:
         port = str(htpc.settings.get('couchpotato_port', ''))
         basepath = htpc.settings.get('couchpotato_basepath', '/')
         if not(basepath.endswith('/')):
-                basepath += "/"
+            basepath += "/"
         url = 'http' + ssl + '://' + host + ':' + port + basepath
         raise cherrypy.HTTPRedirect(url)
 
@@ -63,7 +63,7 @@ class Couchpotato:
     @cherrypy.tools.json_out()
     def GetMovieList(self, limit=''):
         self.logger.debug("Fetching Movies")
-        return self.fetch('movie.list/?limit_offset=' + limit)
+        return self.fetch('movie.list/?status=active&limit_offset=' + limit)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()

@@ -34,7 +34,7 @@ function getMovieList() {
             var src = WEBDIR + 'couchpotato/GetImage?w=100&h=150&url=' + movie.library.info.images.poster[0]
             link.append($('<img>').attr('src', src).addClass('thumbnail'))
             if (movie.releases.length > 0) {
-                link.append($('<i>').attr('title', 'Download').addClass('icon-white icon-download releases'));
+                link.append($('<i>').attr('title', 'Download').addClass('icon-white icon-download status'));
             }
             var title = shortenText(movie.library.info.original_title, 12)
             link.append($('<h6>').addClass('movie-title').html(title))
@@ -83,7 +83,6 @@ function showMovie(movie) {
     var titles = $('<select>').attr('id', 'titles')
     if (movie.library && movie.library.titles) {
         $.each(movie.library.titles, function(i, item) {
-            console.log(item.default)
             titles.append($('<option>').text(item.title).val(item.title).prop('selected', item.default))
         })
     } else {
@@ -133,6 +132,7 @@ function showMovie(movie) {
     if (movie.releases && movie.releases.length > 0) {
         var releaseTable = $('<table>').addClass('table table-striped table-hover')
         $.each(movie.releases, function(i, item){
+            if (item.info.id === undefined) return
             releaseTable.append(
                 $('<tr>').append(
                     $('<td>').append(
@@ -185,9 +185,7 @@ function addMovie(movieid, profile, title) {
         profile: profile,
         title: encodeURIComponent(title)
     }
-    console.log(data)
     $.getJSON(WEBDIR + 'couchpotato/AddMovie', data, function (result) {
-        console.log(result)
         if (result == null || result.success != true) return
         setTimeout(function() {
             getMovieList()
