@@ -7,7 +7,14 @@ $(document).ready(function () {
     $('.carousel').carousel()
     $(".table-sortable").tablesorter()
     $('.tabs').tab()
-    $(window).on('hashchange', toggleTab)
+    $(window).on('hashchange', function() {
+        if (location.hash) {
+            $('a[href='+location.hash+']').tab('show');
+        } else {
+            $('a[data-toggle="tab"]:first').tab('show')
+        }
+    })
+
     $('a[data-toggle="tab"]').on('click', function(e) {
         var yScroll = $(window).scrollTop()
         location.hash = $(e.target).attr('href')
@@ -67,14 +74,6 @@ $(document).ready(function () {
     })
 })
 
-function toggleTab() {
-    if (location.hash) {
-        $('a[href='+location.hash+']').tab('show')
-    } else {
-        $('a[data-toggle="tab"]:first').tab('show')
-    }
-}
-
 function makeIcon(iconClass, title) {
     return $('<i>')
         .addClass(iconClass)
@@ -82,11 +81,9 @@ function makeIcon(iconClass, title) {
         .css('cursor', 'pointer')
         .tooltip({placement: 'right'})
 }
-
 function shortenText(string, length) {
     return string.substr(0,length)+(string.length>length?'&hellip;':'')
 }
-
 function pad(str, max) {
   return str.toString().length < max ? pad("0"+str, max) : str
 }

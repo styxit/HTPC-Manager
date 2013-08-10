@@ -1,47 +1,49 @@
-#search-movie-list {
-    margin: 0;
-    padding: 0;
-    max-height: 600px;
-    overflow-y: auto;
-}
-#search-movie-list li {
-    margin: 15px 0;
-    padding: 0;
-    list-style: none;
-    cursor: pointer;
-    clear: both;
-    overflow: auto;
-}
-#search-movie-list li:hover {
-    background: #eee;
-}
-#search-movie-list img {
-    height: 100px;
-    width: 75px;
-}
-#search-movie-list h3 {
-    margin: 0;
-    padding: 0;
-    font-size: 1.5em;
-}
-#search-movie-list .movie-info {
-    margin: 0 0 0 95px;
-}
-#search-movie-list .thumbnail {
-    margin: 10px;
-    float: left;
-    height: 100px;
-    width: 75px;
-}
-#wanted-grid img,
-#wanted-grid .thumbnail {
+.thumbnails li {
     position: relative;
+}
+#wanted-grid img.thumbnail,
+#result-grid img.thumbnail {
     height: 150px;
     width: 100px;
 }
-h6.movie-title {
+#wanted-grid h6.movie-title,
+#result-grid h6.movie-title {
     color: #555555;
     text-align: center;
     margin: 0;
     padding-top: 4px;
+}
+#wanted-grid a:Hover,
+#result-grid a:Hover {
+    text-decoration: none;
+}
+.status {
+    position: absolute;
+    top: 138px;
+    right: 5px;
+    width: 16px;
+    height: 16px;
+}
+.modal {
+    width: 650px;
+}
+.modal-fanart {
+    background: #fff top center no-repeat;
+    background-size: 100%;
+}
+.modal-body td i {
+    margin-right: 5px;
+}
+.modal-body .ignore {
+    text-decoration: line-through;
+}
+.modal img.thumbnail {
+    height: 231px;
+    width: 154px;
+}
+.modal .modal-movieinfo {
+    margin-left: 180px;
+}
+.modal .modal-movieinfo select {
+    margin-top: 10px;
 }

@@ -5,6 +5,8 @@ import cherrypy
 import htpc
 import logging
 from cherrypy.process.plugins import Daemonizer, PIDFile
+from cherrypy.lib.auth_digest import get_ha1_dict_plain
+
 
 def start():
     """ Main function for starting HTTP server """
@@ -55,38 +57,38 @@ def start():
             'tools.gzip.on': True
         },
         '/js': {
-            'tools.caching.on' : True,
-            'tools.caching.force' : True,
-            'tools.caching.delay' : 0,
-            'tools.expires.on' : True,
-            'tools.expires.secs' : 60*60*6,
+            'tools.caching.on': True,
+            'tools.caching.force': True,
+            'tools.caching.delay': 0,
+            'tools.expires.on': True,
+            'tools.expires.secs': 60 * 60 * 6,
             'tools.staticdir.on': True,
             'tools.staticdir.dir': 'js'
         },
         '/css': {
-            'tools.caching.on' : True,
-            'tools.caching.force' : True,
-            'tools.caching.delay' : 0,
-            'tools.expires.on' : True,
-            'tools.expires.secs' : 60*60*6,
+            'tools.caching.on': True,
+            'tools.caching.force': True,
+            'tools.caching.delay': 0,
+            'tools.expires.on': True,
+            'tools.expires.secs': 60 * 60 * 6,
             'tools.staticdir.on': True,
             'tools.staticdir.dir': 'css'
         },
         '/img': {
-            'tools.caching.on' : True,
-            'tools.caching.force' : True,
-            'tools.caching.delay' : 0,
-            'tools.expires.on' : True,
-            'tools.expires.secs' : 60*60*6,
+            'tools.caching.on': True,
+            'tools.caching.force': True,
+            'tools.caching.delay': 0,
+            'tools.expires.on': True,
+            'tools.expires.secs': 60 * 60 * 6,
             'tools.staticdir.on': True,
             'tools.staticdir.dir': 'img'
         },
         '/favicon.ico': {
-            'tools.caching.on' : True,
-            'tools.caching.force' : True,
-            'tools.caching.delay' : 0,
-            'tools.expires.on' : True,
-            'tools.expires.secs' : 60*60*6,
+            'tools.caching.on': True,
+            'tools.caching.force': True,
+            'tools.caching.delay': 0,
+            'tools.expires.on': True,
+            'tools.expires.secs': 60 * 60 * 6,
             'tools.staticfile.on': True,
             'tools.staticfile.filename': favicon
         },
@@ -95,7 +97,7 @@ def start():
     if htpc.USERNAME and htpc.PASSWORD:
         logger.info("Enabling username/password access")
         userpassdict = {htpc.USERNAME: htpc.PASSWORD}
-        get_ha1 = cherrypy.lib.auth_digest.get_ha1_dict_plain(userpassdict)
+        get_ha1 = get_ha1_dict_plain(userpassdict)
         app_config['/'].update({
             'tools.auth_digest.on': True,
             'tools.auth_digest.realm': "HTPC Manager",

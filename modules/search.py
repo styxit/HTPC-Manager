@@ -1,11 +1,10 @@
 import cherrypy
 import htpc
 from htpc.proxy import get_image
-from urllib import urlencode
 from urllib2 import urlopen, quote
-from re import findall
 from json import loads
 import logging
+
 
 class Search:
     def __init__(self):
