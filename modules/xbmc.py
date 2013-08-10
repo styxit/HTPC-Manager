@@ -188,7 +188,7 @@ class Xbmc:
                 return "success"
             except SQLObjectNotFound:
                 self.current = None
-                self.logger.error("Unable to find any XBMC-Servers. Please check your settings")
+                self.logger.warning("No configured XBMC-Servers.")
                 return "No valid servers"
 
     @cherrypy.expose()
