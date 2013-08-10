@@ -38,17 +38,18 @@ class Sickbeard:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def ping(self, sickbeard_host, sickbeard_port, sickbeard_apikey, sickbeard_basepath, sickbeard_ssl, **kwargs):
+    def ping(self, sickbeard_host, sickbeard_port, sickbeard_apikey, sickbeard_basepath, sickbeard_ssl = False, **kwargs):
         ssl = 's' if sickbeard_ssl else ''
         self.logger.debug("Testing connectivity")
         try:
             if not (sickbeard_basepath.endswith('/')):
                 sickbeard_basepath += "/"
 
-            url = 'http' + ssl + '://' + sickbeard_host + ':' + sickbeard_port + sickbeard_basepath + 'api/' + sickbeard_apikey + '/?cmd='
+            url = 'http' + ssl + '://' + sickbeard_host + ':' + sickbeard_port + sickbeard_basepath + 'api/' + sickbeard_apikey + '/?cmd=sb.ping'
             self.logger.debug("Trying to contact sickbeard via " + url)
-            response = loads(urlopen(url + 'sb.ping', timeout=10).read())
+            response = loads(urlopen(url, timeout=10).read())
             if response.get('result') == "success":
+                self.logger.debug("Sicbeard connectivity test success")
                 return response
         except:
             self.logger.error("Unable to contact sickbeard via " + url)
