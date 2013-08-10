@@ -107,4 +107,8 @@ def start():
 
     # Start the CherryPy server (remove trailing slash from webdir)
     logger.info("Starting up webserver")
+    print '******************************************************'
+    print 'Starting HTPC Manager on port ' + str(htpc.PORT) + '.'
+    print 'Start your browser and go to http://localhost:' + str(htpc.PORT)
+    print '******************************************************'
     cherrypy.quickstart(htpc.ROOT, htpc.WEBDIR[:-1], config=app_config)
