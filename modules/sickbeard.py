@@ -47,7 +47,7 @@ class Sickbeard:
             if not (sickbeard_basepath.endswith('/')):
               sickbeard_basepath += "/"
 
-            url = 'http' + ssl + '://' + sickbeard_host + ':' + sickbeard_port + sickbeard_basepath + 'api/' + sickbeard_apikey + '/?cmd='
+            url = 'http' + ssl + '://' + sickbeard_host + ':' + sickbeard_port + sickbeard_basepath + 'api/' + sickbeard_apikey
             self.logger.debug("Trying to contact sickbeard via " + url)
             response = loads(urlopen(url + 'sb.ping', timeout=10).read())
             if response.get('result') == "success":
