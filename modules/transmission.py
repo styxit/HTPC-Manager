@@ -58,6 +58,15 @@ class Transmission:
             return False
         return self.fetch('torrent-stop', {'ids': torrentId})
 
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def remove(self, torrentId):
+        try:
+            torrentId = int(torrentId)
+        except ValueError:
+            return False
+        return self.fetch('torrent-remove', {'ids': torrentId})
+
     # Wrapper to access the Transmission Api
     # If the first call fails, there probably is no valid Session ID so we try it again
     def fetch(self, method, arguments=''):

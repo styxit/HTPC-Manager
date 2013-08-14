@@ -51,8 +51,20 @@ function getTorrents(){
           // Round to 2 decimals
           ratio = Math.round(torrent.uploadRatio*100) / 100;
 
-          // Action button
+          // Button group
+          buttons = $('<div>').addClass('btn-group');
+
+          // Action button (pause or resume)
           actionButton = generateTorrentActionButton(torrent);
+          buttons.append(actionButton);
+
+          // Remove button
+          removeButton = $('<a>').
+            addClass('btn btn-mini').
+            html('<i class="icon-remove"></i>').
+            attr('href', WEBDIR + 'transmission/remove/' + torrent.id).
+            attr('title', 'Remove torrent');
+          buttons.append(removeButton);
 
           tr.append(
             $('<td>').html(torrent.name
@@ -63,7 +75,7 @@ function getTorrents(){
             $('<td>').text(getReadableTime(torrent.eta)),
             $('<td>').text(torrentStatus(torrent.status)),
             $('<td>').addClass('span3').html(progress),
-            $('<td>').addClass('torrent-action').append(actionButton)
+            $('<td>').addClass('torrent-action').append(buttons)
           );
           $('#torrent-queue').append(tr);
         });
