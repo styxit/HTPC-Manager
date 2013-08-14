@@ -5,7 +5,6 @@
       <h1 class="page-header page-title">
           <a href="http://${settings.get('transmission_host')}:${settings.get('transmission_port')}" target="_blank">${settings.get('transmission_name', 'Transmission')}</a>
           <small>
-            <strong>Speed:</strong>
             <i class="icon-arrow-up"></i> <span id="queue_upload"></span>
             <i class="icon-arrow-down"></i> <span id="queue_download"></span>
           </small>
@@ -14,18 +13,18 @@
       <table class="table table-striped table-condensed">
         <thead>
           <tr>
-            <th>Id</th>
-            <th>File</th>
-            <th>Ratio</th>
-            <th>ETA</th>
-            <th>Status</th>
-            <th>Progress</th>
+            <th class="span5">File</th>
+            <th class="span1">Ratio</th>
+            <th class="span1">ETA</th>
+            <th class="span1">Status</th>
+            <th class="span3">Progress</th>
+            <th class="span1"></th>
           </tr>
         </thead>
         <tbody id="torrent-queue">
         </tbody>
       </table>
 
-      <div class="spinner"></div>
+      <i class="icon-spinner icon-spin spinner"></i>
     </div>
 </div>

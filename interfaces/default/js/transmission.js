@@ -6,6 +6,26 @@ $(document).ready(function(){
      getTorrents();
      getStatus();
   }, 4000);
+
+  // Torrent button ajax load
+  $(document.body).off('click', '#torrent-queue .torrent-action a');
+  $(document.body).on('click', '#torrent-queue .torrent-action a', function(event) {
+    event.preventDefault();
+
+    // set spinner inside button
+    $(this).html('<i class="icon-spinner icon-spin"></i>');
+
+    // do ajax request
+    $.ajax({
+      url: $(this).attr('href'),
+      success: function(response) {
+        // Refresh torrent list after successfull request with a tiny delay
+        if (response.result == 'success') {
+          window.setTimeout(getTorrents, 500);
+        }
+      }
+    });
+  });
 });
 
 function getTorrents(){
@@ -31,16 +51,19 @@ function getTorrents(){
           // Round to 2 decimals
           ratio = Math.round(torrent.uploadRatio*100) / 100;
 
+          // Action button
+          actionButton = generateTorrentActionButton(torrent);
+
           tr.append(
-            $('<td>').text(torrent.id),
             $('<td>').html(torrent.name
-              +'<br><small><i class="icon-arrow-up"></i> ' + getReadableFileSizeString(torrent.rateUpload)
-              +'/s <i class="icon-arrow-down"></i> ' + getReadableFileSizeString(torrent.rateDownload) + '/s</small>'
+              +'<br><small><i class="icon-long-arrow-up"></i> ' + getReadableFileSizeString(torrent.rateUpload)
+              +'/s <i class="icon-long-arrow-down"></i> ' + getReadableFileSizeString(torrent.rateDownload) + '/s</small>'
             ),
             $('<td>').text(ratio),
             $('<td>').text(getReadableTime(torrent.eta)),
             $('<td>').text(torrentStatus(torrent.status)),
-            $('<td>').addClass('span3').html(progress)
+            $('<td>').addClass('span3').html(progress),
+            $('<td>').addClass('torrent-action').append(actionButton)
           );
           $('#torrent-queue').append(tr);
         });
@@ -48,6 +71,22 @@ function getTorrents(){
       }
     }
   });
+}
+
+function generateTorrentActionButton(torrent) {
+  button = $('<a>').addClass('btn btn-mini');
+  // Resume button if torrent is paused
+  if (torrent.status == 0) {
+    button.html('<i class="icon-play"></i>');
+    button.attr('href', WEBDIR + 'transmission/start/' + torrent.id);
+    button.attr('title', 'Resume torrent');
+  } else { // Pause button
+    button.html('<i class="icon-pause"></i>');
+    button.attr('href', WEBDIR + 'transmission/stop/' + torrent.id);
+    button.attr('title', 'Pause torrent');
+  }
+
+  return button;
 }
 
 /**
@@ -94,12 +133,17 @@ function getReadableTime(timeInSeconds) {
   var minutes = parseInt( timeInSeconds / 60 ) % 60;
   var seconds = parseInt(timeInSeconds % 60);
 
+  // Add leading 0 and : to seconds
+  seconds = ':'+ (seconds  < 10 ? "0" + seconds : seconds);
+
   if (days < 1) {
     days = '';
   } else {
     days = days + 'd ';
+    // remove seconds if the eta is 1 day or more
+    seconds = '';
   }
-  return days + hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds  < 10 ? "0" + seconds : seconds);
+  return days + hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + seconds;
 };
 
 /**
