@@ -53,6 +53,8 @@ def load_modules():
     htpc.ROOT.couchpotato = Couchpotato()
     from modules.sickbeard import Sickbeard
     htpc.ROOT.sickbeard = Sickbeard()
+    from modules.transmission import Transmission
+    htpc.ROOT.transmission = Transmission()
     from modules.squeezebox import Squeezebox
     htpc.ROOT.squeezebox = Squeezebox()
     from modules.search import Search
