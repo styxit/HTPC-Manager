@@ -1,10 +1,8 @@
 $(document).ready(function(){
   $('.spinner').show();
   getTorrents();
-  getStatus();
   setInterval(function() {
      getTorrents();
-     getStatus();
   }, 4000);
 
   // Torrent button ajax load
@@ -34,12 +32,16 @@ function getTorrents(){
     'success': function(response){
       if (response.result == 200) {
         $('#torrents').html('');
+        var dl_speed_sum=up_speed_sum=0;
         $.each(response.torrents, function(index, torrent){
           tr = $('<tr>');
 
+          dl_speed_sum += torrent.dl_speed;
+          up_speed_sum += torrent.up_speed;
+
           var progressBar = $('<div>');
           progressBar.addClass('bar');
-          progressBar.css('width', (torrent.percentage_done*100) + '%');
+          progressBar.css('width', (torrent.percentage_done/10.) + '%');
 
           var  progress = $('<div>');
           progress.addClass('progress');
@@ -73,12 +75,14 @@ function getTorrents(){
             ),
             $('<td>').text(ratio),
             $('<td>').text(getReadableTime(torrent.eta)),
-            $('<td>').text(torrentStatus(torrent.status)),
+            $('<td>').text(getStatusInfo(torrent)),
             $('<td>').addClass('span3').html(progress),
             $('<td>').addClass('torrent-action').append(buttons)
           );
           $('#torrents').append(tr);
         });
+        $('#queue_download').text(getReadableFileSizeString(dl_speed_sum) + '/s');
+        $('#queue_upload').text(getReadableFileSizeString(up_speed_sum) + '/s');
         $('.spinner').hide();
       }
     }
@@ -88,7 +92,7 @@ function getTorrents(){
 function generateTorrentActionButton(torrent) {
   button = $('<a>').addClass('btn btn-mini');
   // Resume button if torrent is paused
-  if (torrent.status == 0) {
+  if (getStatusInfo(torrent).toLowerCase() == "paused") {
     button.html('<i class="icon-play"></i>');
     button.attr('href', WEBDIR + 'utorrent/start/' + torrent.id);
     button.attr('title', 'Resume torrent');
@@ -99,24 +103,6 @@ function generateTorrentActionButton(torrent) {
   }
 
   return button;
-}
-
-/**
- * Get General transmission stats
- */
-function getStatus(){
-  $.ajax({
-    'url': WEBDIR + 'utorrent/stats',
-    'success': function(response){
-      if (response.arguments && response.result == 'success') {
-        uploadSpeed = getReadableFileSizeString(response.arguments.uploadSpeed);
-        downloadSpeed = getReadableFileSizeString(response.arguments.downloadSpeed);
-
-       $('#queue_upload').text(uploadSpeed + '/s');
-       $('#queue_download').text(downloadSpeed + '/s');
-      }
-    }
-  });
 }
 
 /**
@@ -158,12 +144,33 @@ function getReadableTime(timeInSeconds) {
   return days + hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + seconds;
 };
 
-/**
- * Get textual representation of torrent status
- *
- * Since torrent status is retured as integer by the Transmission API the number must be mapped to a string
- */
-function torrentStatus(statusNr) {
-  states = ['Paused', 'unkown 1', 'unknown 2', 'Queued', 'Downloading', 'unknown 5', 'Seeding']
-  return states[statusNr]
+
+function getStatusInfo(torrent) {
+    var status = eval(torrent.status);
+    var status = [];
+    if (status.indexOf(32)){
+        return "Paused";
+    } else {
+        if (status.indexOf(1)) {
+            return (torrent.percentage_done == 1000) ? "Seeding" : "Downloading";
+        } else {
+            if (status.indexOf(8)) {
+                return "Checked";
+            } else {
+                if (status.indexOf(16)) {
+                    return "Error";
+                } else {
+                    if (status.indexOf(64)) {
+                        return "Queued";
+                    } else {
+                        if (torrent.percentage_done == 1000) {
+                            return "Finished";
+                        } else {
+                            return "Incomplete";
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

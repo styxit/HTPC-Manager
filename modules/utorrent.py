@@ -6,14 +6,13 @@ __author__ = 'quentingerome'
 import logging
 import htpc
 import cherrypy
+import collections
 from lxml import html
 
 logger = logging.getLogger('modules.transmission')
 
 
-class TorrentResult(object):
-    _torrent = None
-
+class TorrentResult(collections.Mapping):
     """
     HACHAGE (chaîne),
 	STATUS (ÉTAT)* (entier),
@@ -35,35 +34,96 @@ class TorrentResult(object):
 	ORDRE DE LA FILE D'ATTENTE TORRENT (entier),
 	RESTANT (entier, en octets)	],
 
+    STATUS (ÉTAT) est un bitfield représenté par des entiers, qui constitue la somme des différentes valeurs des états correspondants :
+
+    1 = Started (Démarré)
+    2 = Checking (Vérification)
+    4 = Start after check (Démarrer après vérification)
+    8 = Checked (Vérifié)
+    16 = Error (Erreur)
+    32 = Paused (Suspendu)
+    64 = Queued (Mis en file d'attente)
+    128 = Loaded (Chargé)
+
     """
 
-
-    _keys = {
-        'name' : 2,
-        'id' : 0,
-        'status': 1,
-        'size' : 3,
-        'percentage_done' : 4,
-        'dl' : 5,
-        'up' : 6,
-        'dl_speed' : 8,
-        'up_speed' : 9,
-        'eta' : 10,
-        'ratio' : 7,
+    _conversions = {
+        'status' :
+            {
+                1 : 'Started',
+                2 : 'Checking',
+                4 : 'Started&Checked',
+                8 : 'Checked',
+                16: 'Error',
+                32 : 'Paused',
+                64 : 'Queued',
+                128 : 'Loaded'
+            },
+        'fields' :
+            {
+                'name' : 2,
+                'id' : 0,
+                'status': 1,
+                'size' : 3,
+                'percentage_done' : 4,
+                'dl' : 5,
+                'up' : 6,
+                'dl_speed' : 8,
+                'up_speed' : 9,
+                'eta' : 10,
+                'ratio' : 7,
+            },
     }
 
-    def __init__(self, torrent):
-        super(TorrentResult, self).__init__()
-        self._torrent = torrent
+    def _get_state(self, value):
+        """
+        Returns a list of all states of the torrent
+        :param value: int
+        :return: str
+        """
 
-    def get(self, key):
-        try:
-            return self._torrent[self._keys[key]]
-        except KeyError:
-            raise AttributeError
+        states = []
+        for ps in sorted(self._conversions['status'].keys(), reverse=True):
+            if not value:
+                break
+            if ps <= value:
+                states.append(ps)
+                value -= ps
+        return states
 
     def to_dict(self):
-        return {k: self._torrent[index] for k, index in self._keys.items()}
+        """
+        Returns the object in dict (maybe useless, need to check)
+        :rtype: dict
+        """
+        return {k: v for k, v in self.items()}
+
+    def __transform_key__(self, key):
+        """
+        Returns the correct key according to the key passed. Each key match a single index of the values list
+        :param key:
+        :type: str
+        :rtype: int
+        """
+        return self._conversions['fields'][key]
+
+    def __init__(self, values):
+        self.store = values
+
+    def __getitem__(self, item):
+        right_item = self.store[self.__transform_key__(item)]
+        if item == 'status':
+            return self._get_state(right_item)
+        return right_item
+
+    def __len__(self):
+        return len(self.store)
+
+    def __iter__(self):
+        return iter(self._conversions['fields'])
+
+    def __str__(self):
+        return str(self.to_dict())
 
 
 class UTorrent:
@@ -88,6 +148,27 @@ class UTorrent:
     def index(self):
         return htpc.LOOKUP.get_template('utorrent.html').render(scriptname='utorrent')
 
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def torrents(self):
+        req = self.fetch('?list=1')
+        torrents = req.json()['torrents']
+        return {'torrents':[TorrentResult(tor).to_dict() for tor in torrents], 'result':req.status_code}
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def start(self, torrent_id):
+        return self.do_action('start', torrent_id).json()
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def stop(self, torrent_id):
+        return self.do_action('stop', torrent_id).json()
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def remove(self, torrent_id):
+        return self.do_action('remove', torrent_id).json()
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -102,6 +183,11 @@ class UTorrent:
             logger.debug("Exception: " + str(e))
             logger.error("Unable to contact uTorrent via " + self._get_url(utorrent_host, utorrent_port))
             return
+
+    def do_action(self, action, torrent_id):
+        if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove'):
+            raise AttributeError
+        return self.fetch('?action=%s&hash=%s' % (action, torrent_id))
 
     def _get_url(self, host=None, port=None):
         u_host = host or htpc.settings.get('utorrent_host')
@@ -123,13 +209,6 @@ class UTorrent:
 
         response = requests.get(self._get_url(host, port)+args+token_str, auth=(username, pwd), cookies=self._cookies)
         return response
-
-    @cherrypy.expose()
-    @cherrypy.tools.json_out()
-    def torrents(self):
-        req = self.fetch('?list=1')
-        torrents = req.json()['torrents']
-        return {'torrents':[TorrentResult(tor).to_dict() for tor in torrents], 'result':req.status_code}
 
     def fetch(self, args):
         password = htpc.settings.get('utorrent_password', '')
