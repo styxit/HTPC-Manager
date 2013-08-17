@@ -184,7 +184,10 @@ class UTorrent:
         try:
             res = self._fetch(utorrent_host, utorrent_port, utorrent_username, utorrent_password, '?list=1')
             logger.debug("Trying to contact uTorrent via " + self._get_url(utorrent_host, utorrent_port))
-            return res.status_code == 200
+            if res.status_code == 200:
+                return True
+            else:
+                return
         except Exception, e:
             logger.debug("Exception: " + str(e))
             logger.error("Unable to contact uTorrent via " + self._get_url(utorrent_host, utorrent_port))
