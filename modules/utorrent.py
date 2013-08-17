@@ -164,17 +164,26 @@ class UTorrent:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def start(self, torrent_id):
-        return self.do_action('start', torrent_id).json()
+        return self.do_action('start', hash=torrent_id).json()
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def stop(self, torrent_id):
-        return self.do_action('stop', torrent_id).json()
+        return self.do_action('stop', hash=torrent_id).json()
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def remove(self, torrent_id):
-        return self.do_action('remove', torrent_id).json()
+        return self.do_action('remove', hash=torrent_id).json()
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def add_url(self, url):
+        try:
+            res = self.do_action('add-url', s=url)
+            return {'result' : res.status_code}
+        except ConnectionError, e:
+            logger.exception(e)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -193,11 +202,19 @@ class UTorrent:
             logger.error("Unable to contact uTorrent via " + self._get_url(utorrent_host, utorrent_port))
             return
 
-    def do_action(self, action, torrent_id):
-        if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove'):
+    def do_action(self, action, hash=None, **kwargs):
+        """
+        :param action:
+        :param hash:
+        :param kwargs:
+        :rtype: requests.Response
+        :return:
+        """
+        if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove', 'add-url'):
             raise AttributeError
         try:
-            return self.fetch('?action=%s&hash=%s' % (action, torrent_id))
+            params_str = ''.join(["&%s=%s"%(k,v) for k,v in kwargs.items()])
+            return self.fetch('?action=%s%s&hash=%s' % (action, params_str, hash))
         except ConnectionError:
             return {'result': 500}
 
@@ -213,6 +230,16 @@ class UTorrent:
         self._cookies = token_page.cookies
 
     def _fetch(self, host, port, username, pwd, args):
+        """
+
+        :param host:
+        :param port:
+        :param username:
+        :param pwd:
+        :param args:
+        :rtype: requests.Response
+        :return:
+        """
         if not self._cookies or not self._token:
             self.auth(host, port, username, pwd)
         if not args:
@@ -223,6 +250,12 @@ class UTorrent:
         return response
 
     def fetch(self, args):
+        """
+
+        :param args:
+        :rtype: requests.Response
+        :return:
+        """
         password = htpc.settings.get('utorrent_password', '')
         username = htpc.settings.get('utorrent_username', '')
         host = htpc.settings.get('utorrent_host')

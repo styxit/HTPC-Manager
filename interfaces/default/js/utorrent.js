@@ -1,22 +1,28 @@
-$(document).ready(function(){
+$(document).ready(function () {
     $('.spinner').show();
     getTorrents();
-    setInterval(function() {
+    setAddTorrentModal();
+    setInterval(function () {
         getTorrents();
     }, 4000);
 
+    $('#addurlform').submit(function (e) {
+        e.preventDefault()
+        var url = $('#torrenturl').val()
+        if (url) addUrl(url)
+    })
+
     // Torrent button ajax load
     $(document.body).off('click', '#torrents .torrent-action a');
-    $(document.body).on('click', '#torrents .torrent-action a', function(event) {
+    $(document.body).on('click', '#torrents .torrent-action a', function (event) {
         event.preventDefault();
 
         // set spinner inside button
         $(this).html('<i class="icon-spinner icon-spin"></i>');
-
         // do ajax request
         $.ajax({
             url: $(this).attr('href'),
-            success: function(response) {
+            success: function (response) {
                 // Refresh torrent list after successfull request with a tiny delay
                 if (response.result == 'success') {
                     window.setTimeout(getTorrents, 500);
@@ -26,15 +32,63 @@ $(document).ready(function(){
     });
 });
 
-function getTorrents(){
+function setAddTorrentModal(){
+    $('#btnaddtorrent').click(function (e) {
+        e.preventDefault();
+
+        var modalButtons = {
+            'Add': function () {
+                $.ajax(
+                    {
+                        'url' : WEBDIR +'utorrent/add_url/?url=' + encodeURI($('#inputTorrentUrl').val()),
+                        'success' : function(response){
+                            if (response.result == 200)
+                            {
+                                notify('Info', 'Torrent added', 'success', 5);
+                            }
+                            else
+                            {
+                                notify('Error', 'Problem adding torrent', 'error', 5);
+                            }
+                            hideModal();
+                        }
+                    }
+                )
+            }
+        }
+        // Create the content
+
+        var content = '<form id="addTorrentForm"><input id="inputTorrentUrl" type="url" placeholder="Enter the URL" /></form>'
+        showModal("Add a torrent", content, modalButtons);
+    })
+}
+
+function addUrl(url) {
+    $.ajax(
+        {
+            'url': WEBDIR + 'utorrent/add_url/?url=' + encodeURI(url),
+            'success': function (response) {
+
+                if (response.result == 200) {
+                    notify('Success', '<strong>Success</strong> Torrent added !', 'success', 5);
+                }
+                else {
+                    notify('Error', '<strong>Error</strong> Could not add torrent (see logs)', 'error', 5);
+                }
+            }
+        }
+    )
+}
+
+function getTorrents() {
     $.ajax({
         'url': WEBDIR + 'utorrent/torrents',
-        'success': function(response){
+        'success': function (response) {
             $('#torrents').html('');
             $('#error_message').text("");
             if (response.result == 200) {
-                var dl_speed_sum=up_speed_sum=0;
-                $.each(response.torrents, function(index, torrent){
+                var dl_speed_sum = up_speed_sum = 0;
+                $.each(response.torrents, function (index, torrent) {
                     tr = $('<tr>');
 
                     dl_speed_sum += torrent.dl_speed;
@@ -42,9 +96,9 @@ function getTorrents(){
 
                     var progressBar = $('<div>');
                     progressBar.addClass('bar');
-                    progressBar.css('width', (torrent.percentage_done/10.) + '%');
+                    progressBar.css('width', (torrent.percentage_done / 10.) + '%');
 
-                    var  progress = $('<div>');
+                    var progress = $('<div>');
                     progress.addClass('progress');
                     if (torrent.percentage_done >= 1) {
                         progress.addClass('progress-success');
@@ -52,7 +106,7 @@ function getTorrents(){
                     progress.append(progressBar);
 
                     // Round to 2 decimals
-                    ratio = Math.round(torrent.ratio*100) / 100;
+                    ratio = Math.round(torrent.ratio * 100) / 100;
 
                     // Button group
                     buttons = $('<div>').addClass('btn-group');
@@ -71,8 +125,8 @@ function getTorrents(){
 
                     tr.append(
                         $('<td>').html(torrent.name
-                            +'<br><small><i class="icon-long-arrow-down"></i> ' + getReadableFileSizeString(torrent.up_speed)
-                            +'/s <i class="icon-long-arrow-up"></i> ' + getReadableFileSizeString(torrent.dl_speed) + '/s</small>'
+                            + '<br><small><i class="icon-long-arrow-down"></i> ' + getReadableFileSizeString(torrent.up_speed)
+                            + '/s <i class="icon-long-arrow-up"></i> ' + getReadableFileSizeString(torrent.dl_speed) + '/s</small>'
                         ),
                         $('<td>').text(ratio),
                         $('<td>').text(getReadableTime(torrent.eta)),
@@ -86,8 +140,7 @@ function getTorrents(){
                 $('#queue_upload').text(getReadableFileSizeString(up_speed_sum) + '/s');
                 $('.spinner').hide();
             }
-            else if (response.result == 500)
-            {
+            else if (response.result == 500) {
                 $('#error_message').text("Impossible to connect to uTorrent. Maybe the remote port changed ?");
                 $('.spinner').hide();
             }
@@ -99,21 +152,21 @@ function generateTorrentActionButton(torrent) {
     button = $('<a>').addClass('btn btn-mini');
     // Resume button if torrent is paused
     var status = getStatusInfo(torrent).toLowerCase();
-    var icon=cmd=title="";
+    var icon = cmd = title = "";
 
     if (status == "paused" || status == "finished" || status == "stopped") {
-        icon="icon-play";
+        icon = "icon-play";
         title = "Resume torrent";
         cmd = "start";
-    } else{ // Pause button
-        icon= "icon-pause";
+    } else { // Pause button
+        icon = "icon-pause";
         title = "Pause torrent";
         cmd = "stop";
     }
 
     // Set icon, command and title to button
-    button.html('<i class="'+ icon + '"></i>');
-    button.attr('href', WEBDIR + 'utorrent/'+ cmd + '/' + torrent.id);
+    button.html('<i class="' + icon + '"></i>');
+    button.attr('href', WEBDIR + 'utorrent/' + cmd + '/' + torrent.id);
     button.attr('title', title);
     return button;
 }
@@ -139,13 +192,13 @@ function getReadableTime(timeInSeconds) {
         return '0:00:00';
     }
 
-    var days = parseInt( timeInSeconds / 86400 ) % 7;
-    var hours = parseInt( timeInSeconds / 3600 ) % 24;
-    var minutes = parseInt( timeInSeconds / 60 ) % 60;
+    var days = parseInt(timeInSeconds / 86400) % 7;
+    var hours = parseInt(timeInSeconds / 3600) % 24;
+    var minutes = parseInt(timeInSeconds / 60) % 60;
     var seconds = parseInt(timeInSeconds % 60);
 
     // Add leading 0 and : to seconds
-    seconds = ':'+ (seconds  < 10 ? "0" + seconds : seconds);
+    seconds = ':' + (seconds < 10 ? "0" + seconds : seconds);
 
     if (days < 1) {
         days = '';
@@ -160,7 +213,7 @@ function getReadableTime(timeInSeconds) {
 
 function getStatusInfo(torrent) {
     var status = eval(torrent.status);
-    if (status.indexOf(32) > 0){
+    if (status.indexOf(32) > 0) {
         return "Paused";
     } else {
         if (status.indexOf(1) > 0) {
