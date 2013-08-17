@@ -12,6 +12,9 @@ from lxml import html
 logger = logging.getLogger('modules.transmission')
 
 
+class ConnectionError(Exception):
+    pass
+
 class TorrentResult(collections.Mapping):
     """
     HACHAGE (chaîne),
@@ -151,7 +154,10 @@ class UTorrent:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def torrents(self):
-        req = self.fetch('?list=1')
+        try:
+            req = self.fetch('?list=1')
+        except ConnectionError:
+            return {'result' : 500}
         torrents = req.json()['torrents']
         return {'torrents':[TorrentResult(tor).to_dict() for tor in torrents], 'result':req.status_code}
 
@@ -187,7 +193,10 @@ class UTorrent:
     def do_action(self, action, torrent_id):
         if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove'):
             raise AttributeError
-        return self.fetch('?action=%s&hash=%s' % (action, torrent_id))
+        try:
+            return self.fetch('?action=%s&hash=%s' % (action, torrent_id))
+        except ConnectionError:
+            return {'result': 500}
 
     def _get_url(self, host=None, port=None):
         u_host = host or htpc.settings.get('utorrent_host')
@@ -217,5 +226,5 @@ class UTorrent:
         port = htpc.settings.get('utorrent_port')
         try:
             return self._fetch(host, port, username, password, args)
-        except Exception, e:
-            logger.exception(e)
+        except requests.ConnectionError:
+            raise ConnectionError
