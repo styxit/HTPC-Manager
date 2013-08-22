@@ -88,13 +88,13 @@ class Squeezebox:
         return self.jsonRequest("", ["playlists", "0"])
 
     def webhost(self, path=''):
-        settings = htpc.settings.Settings()
+        settings = htpc.settings
         host = settings.get('squeezebox_host', '')
         port = str(settings.get('squeezebox_port', ''))
         return 'http://' + host + ':' + str(port) + '/' + path
 
     def auth(self):
-        settings = htpc.settings.Settings()
+        settings = htpc.settings
         username = settings.get('squeezebox_username', '')
         password = settings.get('squeezebox_password', '')
         if username and password:

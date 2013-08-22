@@ -35,7 +35,7 @@ class Search:
     @cherrypy.expose()
     def thumb(self, url, h=None, w=None, o=100):
         if url.startswith('rageid'):
-            settings = htpc.settings.Settings()
+            settings = htpc.settings
             host = settings.get('newznab_host', '').replace('http://', '').replace('https://', '')
             ssl = 's' if settings.get('newznab_ssl', 0) else ''
 
@@ -62,7 +62,7 @@ class Search:
 
     def fetch(self, cmd):
         try:
-            settings = htpc.settings.Settings()
+            settings = htpc.settings
             host = settings.get('newznab_host', '').replace('http://', '').replace('https://', '')
             ssl = 's' if settings.get('newznab_ssl', 0) else ''
             apikey = settings.get('newznab_apikey', '')
