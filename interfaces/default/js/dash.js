@@ -22,7 +22,7 @@ function loadRecentMovies () {
             itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
                 location.href = 'xbmc/#movies'
             }).hover(function() {
-                var text = $(this).children('p').slideToggle()
+                var text = $(this).children('p').stop().slideToggle()
             }).append(
                 $('<h4>').html(movie.title + ' (' + movie.year + ')'),
                 $('<p>').html(
@@ -46,12 +46,12 @@ function loadRecentTVshows () {
             if (i == 0) itemDiv.addClass('active')
 
             var src = WEBDIR + "xbmc/GetThumb?h=240&w=430&thumb="+encodeURIComponent(episode.fanart)
-            itemDiv.attr('style', "background-image: url(" + src + ")")
+            itemDiv.attr('style', 'background-image: url("' + src + '")')
 
             itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
                 location.href = 'xbmc/#shows'
             }).hover(function() {
-                var text = $(this).children('p').slideToggle()
+                var text = $(this).children('p').stop().slideToggle()
             }).append(
                 $('<h4>').html(episode.showtitle + ': ' + episode.label),
                 $('<p>').html(
