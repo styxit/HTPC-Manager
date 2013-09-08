@@ -59,8 +59,10 @@ def load_modules():
     htpc.ROOT.squeezebox = Squeezebox()
     from modules.search import Search
     htpc.ROOT.search = Search()
+    """
     from modules.utorrent import UTorrent
     htpc.ROOT.utorrent = UTorrent()
+    """
 
 
 def main():
