@@ -1,3 +1,6 @@
+// Last time we checked, was there a problem connecting to transmission?
+var transmissionConnectionError = false;
+
 $(document).ready(function(){
   $('.spinner').show();
   getTorrents();
@@ -30,9 +33,9 @@ $(document).ready(function(){
 
 function getTorrents(){
   $.ajax({
-    'url': WEBDIR + 'transmission/queue',
-    'success': function(response){
-      if (response.arguments && response.result == 'success') {
+    url: WEBDIR + 'transmission/queue',
+    success: function(response){
+      if (response != null && response.arguments && response.result == 'success') {
         $('#torrent-queue').html('');
 
         // Empty queue
@@ -112,14 +115,20 @@ function generateTorrentActionButton(torrent) {
  */
 function getStatus(){
   $.ajax({
-    'url': WEBDIR + 'transmission/stats',
-    'success': function(response){
-      if (response.arguments && response.result == 'success') {
+    url: WEBDIR + 'transmission/stats',
+    success: function(response){
+      if (response != null && response.arguments && response.result == 'success') {
         uploadSpeed = getReadableFileSizeString(response.arguments.uploadSpeed);
         downloadSpeed = getReadableFileSizeString(response.arguments.downloadSpeed);
 
        $('#queue_upload').text(uploadSpeed + '/s');
        $('#queue_download').text(downloadSpeed + '/s');
+      }
+
+      // Transmission api not responding, show message if the last know state was OK
+      if (response == null && transmissionConnectionError == false) {
+        transmissionConnectionError = true;
+        notify('Error', 'Could not connect to Transmission', 'error');
       }
     }
   });
