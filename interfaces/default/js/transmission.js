@@ -34,6 +34,12 @@ function getTorrents(){
     'success': function(response){
       if (response.arguments && response.result == 'success') {
         $('#torrent-queue').html('');
+
+        // Empty queue
+        if (response.arguments.torrents.length == 0) {
+          $('#torrent-queue').html('<tr><td colspan="5">Queue is empty</td></tr>');
+        }
+
         $.each(response.arguments.torrents, function(index, torrent){
           tr = $('<tr>');
 
