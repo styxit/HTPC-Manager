@@ -63,6 +63,8 @@ def load_modules():
     from modules.utorrent import UTorrent
     htpc.ROOT.utorrent = UTorrent()
     """
+    from modules.qbittorrent import qbittorrent
+    htpc.ROOT.qbittorrent = qbittorrent()
 
 
 def main():
