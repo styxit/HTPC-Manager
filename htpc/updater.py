@@ -46,6 +46,11 @@ class Updater:
         self.logger.debug('Getting current version.')
         output = self.git_exec('rev-parse HEAD')
         self.logger.debug('Current version: ' + output)
+
+        if (output == '') :
+            self.logger.error('Got no response for current Git version.')
+            return False
+
         if re.match('^[a-z0-9]+$', output):
             return output
 
@@ -60,7 +65,7 @@ class Updater:
             self.logger.debug('Latest version: ' + latest)
             return latest
         except:
-            return None
+            return False
 
     def behind_by(self, current, latest):
         """ Check how many commits between current and latest """
@@ -81,6 +86,11 @@ class Updater:
         self.logger.info("Checking for updates.")
         current = self.current()
         latest = self.latest()
+
+        if (current == False or latest == False) :
+            self.logger.error("Failed to determine the current or latest version for HTPC Manager. Update Cancelled.")
+            return -1;
+
         if current == latest:
             self.logger.info("HTPC-Manager is Up-To-Date.")
             return 0
