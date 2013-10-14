@@ -68,7 +68,7 @@ def TorrentResult(values):
 			else:
 				yield key, _get_torrent_state(vals[idx])
 
-	return {k: v for k, v in get_result(values)}
+	return dict([(k, v) for k, v in get_result(values)])
 
 
 class ConnectionError(Exception):
