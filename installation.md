@@ -8,7 +8,7 @@ title: Installation
 Jump straight to:
 [Osx](#osx) - [Windows](#windows) - [Linux](#linux)
 
-Installing Htpc Manager can be really easy but might also cause some problems. The main requirement is you run Python. Python 2.7 is in most cases the way to go. The difficult part is installing the Python Image Library.
+Installing HTPC Manager can be really easy but might also cause some problems. The main requirement is you run Python. Python 2.7 is in most cases the way to go. The difficult part is installing the Python Image Library.
 
 ### Python Image Library
 The Python Image Library or PIL, is used to convert and resize images retrieved from the Xbmc Api. Installing PIL is, depending on your OS, not so easy. This guide should help you with it. If you do not use Xbmc or do not want the images, you can skip the installation of PIL and you only need Python.
@@ -17,7 +17,7 @@ The Python Image Library or PIL, is used to convert and resize images retrieved 
 [Osx](#osx) - [Windows](#windows) - [Linux](#linux)
 
 ## General usage
-From the commandline you can run Htpc Manager with a few options to configure it's behavior.
+From the commandline you can run HTPC Manager with a few options to configure it's behavior.
 
 #### Basic:
 {% highlight text %}
@@ -34,7 +34,7 @@ db        | Use a custom database              | none
 datadir   | Set the datarirectory              | none
 host      | Use a specific host/IP             | None/any
 pid       | Location to generate pid file      | false
-webdir    | Mount Htpc Manager on a custom url | /
+webdir    | Mount HTPC Manager on a custom url | /
 
 
 ##### Combine any of the options on the commandline
@@ -45,7 +45,7 @@ python Htpc.py --debug --port 8089
 
 ## OSX
 
-By default, Osx comes with Python 2.7 pre-installed. Great! No need to install Pyton manually! If you want, you can already [start using](#general_usage) Htpc Manager.
+By default, Osx comes with Python 2.7 pre-installed. Great! No need to install Pyton manually! If you want, you can already [start using](#general_usage) HTPC Manager.
 
 ### Python Image library
 The Python Image Library needs to be installed on your system to convert images provided by xbmc. To do this, the commandline tools from Xcode are needed to compile PIL.
@@ -83,7 +83,7 @@ To run ```python``` from anywhere on the commandline, instead of ```C:\Python27\
     3. At the end of the line add a semicolon (;) if it is not already there.
     4. After the ';' sign, add ```%PYTHONPATH%```
 
-Python is now installed and can be used from the commandline by typing ```python```. Take a look at the [usage](#general_usage) to get you started or continue to install PIL and benefit from all the Htpc Manager features.
+Python is now installed and can be used from the commandline by typing ```python```. Take a look at the [usage](#general_usage) to get you started or continue to install PIL and benefit from all the HTPC Manager features.
 
 
 ### Python Image library
@@ -98,8 +98,8 @@ Execute your downloaded PIL installer and follow the instructions to complete th
 If everything went well, the Python Image Library is now installed. All images retieved from Xbmc should now show up nicely.
 
 ## Linux
-Htpc Manager works great on Linux with Python. use Python 2.7 if possible. Download the latest zip, tar.gz or do a Git-clone.
-Cd into the directory where you extracted the htpc-manager folder and from there, launch Htpc Manager
+HTPC Manager works great on Linux with Python. use Python 2.7 if possible. Download the latest zip, tar.gz or do a Git-clone.
+Cd into the directory where you extracted the htpc-manager folder and from there, launch HTPC Manager
 ```python Htpc.py```
 
 ### Python Image library
@@ -135,11 +135,11 @@ If all went well, PIL has been installed. Check the install message to see jpeg 
 #Configuration
 
 ## Reverse proxy
-Htpc Manager supports the use of a reverse proxy. To use a reverse proxy Htpc Manager must run on a different webdir. By default Htpc Manager runs on it's ow port, in the root. If you want to use a reverse proxy you might want to set the webdir to /htpc. In the settings you can configure a custom webdir/basepath (restart required).
+HTPC Manager supports the use of a reverse proxy. To use a reverse proxy HTPC Manager must run on a different webdir. By default HTPC Manager runs on it's ow port, in the root. If you want to use a reverse proxy you might want to set the webdir to /htpc. In the settings you can configure a custom webdir/basepath (restart required).
 
 A second option is to set the webdir from the commandline with the "webdir" parameter. ```Htpc.py --webdir "/htpc"```
 
-From then on Htpc Manager runs on *localhost:8085/htpc*
+From then on HTPC Manager runs on *localhost:8085/htpc*
 
 If you use apache, this vhost config might help you get started. Remeber to activate mod_proxy for apache.
 
