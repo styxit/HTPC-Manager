@@ -116,6 +116,18 @@ class Sickbeard:
         return self.fetch('episode.search&tvdbid=' + tvdbid + '&season=' + season + '&episode=' + episode, False, 45)
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def ForceFullUpdate(self, tvdbid):
+        self.logger.debug("Force full update for tvdbid " + tvdbid)
+        return self.fetch("show.update&tvdbid=" + tvdbid)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def RescanFiles(self, tvdbid):
+        self.logger.debug("Rescan all local files for tvdbid " + tvdbid)
+        return self.fetch("show.refresh&tvdbid=" + tvdbid)
+
+    @cherrypy.expose()
     def SearchShow(self, query):
         try:
             url = 'http://www.thetvdb.com/api/GetSeries.php?seriesname=' + quote(query)
