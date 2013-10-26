@@ -187,7 +187,7 @@ function forceFullUpdate(tvdbid, name) {
     url: WEBDIR + 'sickbeard/ForceFullUpdate?tvdbid=' + tvdbid,
     type: 'get',
     dataType: 'json',
-    timeout: 40000,
+    timeout: 15000,
     success: function (data) {
       // If result is not 'succes' it must be a failure
       if (data.result != 'success') {
@@ -217,7 +217,7 @@ function rescanFiles(tvdbid, name) {
     url: WEBDIR + 'sickbeard/RescanFiles?tvdbid=' + tvdbid,
     type: 'get',
     dataType: 'json',
-    timeout: 40000,
+    timeout: 15000,
     success: function (data) {
       // If result is not 'succes' it must be a failure
       if (data.result != 'success') {
