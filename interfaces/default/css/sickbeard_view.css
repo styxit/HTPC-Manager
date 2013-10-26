@@ -42,12 +42,10 @@
   padding: 2px 5px;
 }
 
-
 .sickbeard_show .banner .show_details table,
 .sickbeard_show .banner .show_details strong {
   margin:10px;
 }
-
 
 @media all and  (max-width: 767px) {
   /*
