@@ -1,6 +1,6 @@
 .sickbeard_show .banner{
   position: relative;
-  border-radius: 6px 0px 0px 6px; 
+  border-radius: 6px 0px 0px 6px;
   background:  center left no-repeat ;
   -webkit-background-size: cover;
   -moz-background-size: cover;
@@ -20,8 +20,8 @@
   min-height: 10px;
   position: absolute;
   top: -15px;
-  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5); 
-  border-radius: 6px 6px 0px 0px; 
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+  border-radius: 6px 6px 0px 0px;
 }
 
 .sickbeard_show .banner .show_details #show_details_bottom{
@@ -30,13 +30,18 @@
   min-height: 10px;
   position: absolute;
   margin-left: 0px;
-  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5); 
-  border-radius: 0px 0px 6px 6px; 
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+  border-radius: 0px 0px 6px 6px;
+}
+
+.sickbeard_show .banner .show_details .show-options-menu {
+  margin: 0 10px;
 }
 
 .sickbeard_show .banner .show_details td{
   padding: 2px 5px;
 }
+
 
 .sickbeard_show .banner .show_details table,
 .sickbeard_show .banner .show_details strong {
@@ -54,9 +59,9 @@
   }
   /*
    * On small screens, Add rounded corners on all sides on banner and detail-box
-   */  
+   */
   .sickbeard_show .banner .show_details,
   .sickbeard_show .banner{
-    border-radius: 6px; 
+    border-radius: 6px;
   }
 }
