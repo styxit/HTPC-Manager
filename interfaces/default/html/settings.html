@@ -13,6 +13,7 @@
                 % endfor
                 <li><a href="#dashboard" data-toggle="tab">Dashboard</a></li>
                 <li><a href="#style" data-toggle="tab">Style</a></li>
+                <li><a href="#other" data-toggle="tab">Other apps</a></li>
             </ul>
 
             <div class="tab-content">
@@ -56,6 +57,37 @@
                 {'type':'bool', 'label':'Show SABnzbd', 'name':'dash_sabnzbd',
                  'checked':bool(settings.get('dash_sabnzbd', 0))}
             ])}
+
+            <form class="form-horizontal tab-pane" id="other" method="POST">
+
+                <fieldset>
+                    <legend>Other apps</legend>
+                    <blockquote>Are you using software that is not supported by Htpc Manager or want to have you selfmade dashboard url in the menu bar? Add them right here.</blockquote>
+                    <button class="btn btn-primary">Add</button>
+
+                    <input type="text" value="kjh" id="other_urls" name="other_urls.0.name">
+                    <input type="text" value="kjh" id="other_urls" name="other_urls.0.url">
+                    <input type="text" value="kjh" id="other_urls" name="other_urls.1.name">
+                    <input type="text" value="kjh" id="other_urls" name="other_urls.1.url">
+                    <table class="table table-striped">
+                        <tr>
+                            <td>BitTorrent</td>
+                            <td>http://www.bittorrent.com/webui</td>
+                            <td>delete</td>
+                        </tr>
+                    </table>
+                    <div class="control-group">
+                            <input type="text" value="kjh" id="other_urls" name="other_urls" class="hide">
+                    </div>
+
+                    <input type="text" value="{}" id="external_urls" name="external_urls">
+
+                    <div class="form-actions">
+                        <button class="btn btn-primary" type="submit">Save</button>
+                        <button class="btn " type="reset">Clear</button>
+                    </div>
+                </fieldset>
+            </form>
             </div>
         </div>
     </div>

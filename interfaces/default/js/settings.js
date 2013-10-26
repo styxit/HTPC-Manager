@@ -1,4 +1,15 @@
 $(document).ready(function () {
+    $('#other button').on('click', function(event){
+        event.preventDefault();
+        console.log('add');
+
+
+        values = $('#other').serialize();
+        console.log(values);
+        $('#other input#external_urls').val(values);
+    });
+
+
     $(window).trigger('hashchange')
     $('.btn-test').click(function(e) {
         e.preventDefault();
