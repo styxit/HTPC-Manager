@@ -199,7 +199,7 @@ function forceFullUpdate(tvdbid, name) {
       }
     },
     error: function (data) {
-      notify('Error', 'Unable to queue tv show for files rescan.', 'error', 1);
+      notify('Error', 'Unable to queue tv show for full update.', 'error', 1);
     },
     complete: function (data) {
       hideModal();
