@@ -1,4 +1,4 @@
-$.ajaxSetup({timeout: 3000})
+$.ajaxSetup({timeout: 30000})
 
 $(document).ready(function () {
     path = window.location.pathname.split('/')
