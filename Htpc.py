@@ -61,6 +61,8 @@ def load_modules():
     htpc.ROOT.search = Search()
     from modules.utorrent import UTorrent
     htpc.ROOT.utorrent = UTorrent()
+    from modules.nzbget import NZBGet
+    htpc.ROOT.nzbget = NZBGet()
 
 
 def main():
