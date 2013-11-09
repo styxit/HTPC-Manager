@@ -689,7 +689,7 @@ function loadChannels(){
     });
 }
 
-var nowPlayingId = null
+var nowPlayingId = false
 function loadNowPlaying() {
     $.ajax({
         url: WEBDIR + 'xbmc/NowPlaying',
@@ -705,8 +705,9 @@ function loadNowPlaying() {
                 var nowPlayingThumb = encodeURIComponent(data.itemInfo.item.thumbnail);
                 var thumbnail = $('#nowplaying .thumb img').attr('alt', data.itemInfo.item.label);
                 if (nowPlayingThumb == '') {
-                    thumbnail.attr('src', 'holder.js/140x140/text:No+artwork');
+                    thumbnail.attr('src', 'holder.js/140x140/text:No artwork');
                     thumbnail.attr('width', '140').attr('height', '140');
+                    Holder.run();
                 } else {
                     switch(data.itemInfo.item.type) {
                         case 'episode':
