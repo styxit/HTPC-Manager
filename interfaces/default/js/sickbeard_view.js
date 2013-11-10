@@ -24,6 +24,17 @@ function loadShowData(showid){
         $('.sickbeard_next_air').text(data.next_ep_airdate);
       }
 
+      var menu = $('.show-options-menu')
+      $('.rescan-files', menu).click(function(evt) {
+        evt.preventDefault();
+        rescanFiles(showid, data.show_name);
+      });
+
+      $('.full-update', menu).click(function(evt) {
+        evt.preventDefault();
+        forceFullUpdate(showid, data.show_name);
+      });
+
       renderSeasonTabs(showid, data.season_list);
     },
     error: function(){
@@ -164,6 +175,66 @@ function sickbeardStatusIcon(iconText, white){
     return icon;
   }
   return '';
+}
+
+function forceFullUpdate(tvdbid, name) {
+  var modalcontent = $('<div>');
+  modalcontent.append($('<p>').html('Queueing &quot;' + name +' &quot; for full TVDB information update..'));
+  modalcontent.append($('<div>').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'));
+  showModal('Queueing...', modalcontent, {});
+
+  $.ajax({
+    url: WEBDIR + 'sickbeard/ForceFullUpdate?tvdbid=' + tvdbid,
+    type: 'get',
+    dataType: 'json',
+    timeout: 15000,
+    success: function (data) {
+      // If result is not 'succes' it must be a failure
+      if (data.result != 'success') {
+        notify('Error', data.message, 'error');
+        return;
+      } else {
+        notify('OK', data.message, 'success');
+        return;
+      }
+    },
+    error: function (data) {
+      notify('Error', 'Unable to queue tv show for full update.', 'error', 1);
+    },
+    complete: function (data) {
+      hideModal();
+    }
+  });
+}
+
+function rescanFiles(tvdbid, name) {
+  var modalcontent = $('<div>');
+  modalcontent.append($('<p>').html('Queueing &quot;' + name +' &quot; for files rescan..'));
+  modalcontent.append($('<div>').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'));
+  showModal('Queueing...', modalcontent, {});
+
+  $.ajax({
+    url: WEBDIR + 'sickbeard/RescanFiles?tvdbid=' + tvdbid,
+    type: 'get',
+    dataType: 'json',
+    timeout: 15000,
+    success: function (data) {
+      // If result is not 'succes' it must be a failure
+      if (data.result != 'success') {
+        notify('Error', data.message, 'error');
+        return;
+      } else {
+        notify('OK', data.message, 'success');
+        return;
+      }
+    },
+    error: function (data) {
+      notify('Error', 'Unable to queue tv show for files rescan.', 'error', 1);
+    },
+    complete: function (data) {
+      hideModal();
+    }
+  });
 }
 
 function searchEpisode(tvdbid, season, episode, name) {

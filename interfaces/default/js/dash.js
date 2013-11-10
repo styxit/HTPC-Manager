@@ -3,10 +3,11 @@ $(document).ready(function () {
     loadRecentTVshows()
     loadRecentAlbums()
     loadDownloadHistory()
+    loadNZBGetDownloadHistory()
     loadWantedMovies()
     loadNextAired()
 })
-
+    
 function loadRecentMovies () {
     if (!$('#movie-carousel').length) return
     $.getJSON(WEBDIR + 'xbmc/GetRecentMovies',function (data) {
@@ -103,6 +104,23 @@ function loadDownloadHistory() {
             $('#downloads_table_body').append(
                 $('<tr>').append(
                     $('<td>').html(slot.name).attr('title', slot.name),
+                    $('<td>').html(status)
+                )
+            )
+        })
+    })
+}
+function loadNZBGetDownloadHistory() {
+    if (!$('#nzbgetdownloads_table_body').length) return
+    $.getJSON(WEBDIR + 'nzbget/GetHistory?limit=5', function (data) {
+        $.each(data.result, function (i, slot) {
+            var status = $('<i>').addClass('icon-ok')
+            if (slot.ParStatus == 'Failed') {
+                status.removeClass().addClass('icon-remove').attr('title', slot.fail_message)
+            }
+            $('#nzbgetdownloads_table_body').append(
+                $('<tr>').append(
+                    $('<td>').html(slot.Name).attr('title', slot.Name),
                     $('<td>').html(status)
                 )
             )
