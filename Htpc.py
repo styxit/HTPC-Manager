@@ -55,6 +55,8 @@ def load_modules():
     htpc.ROOT.sickbeard = Sickbeard()
     from modules.transmission import Transmission
     htpc.ROOT.transmission = Transmission()
+    from modules.deluge import Deluge
+    htpc.ROOT.deluge = Deluge()
     from modules.squeezebox import Squeezebox
     htpc.ROOT.squeezebox = Squeezebox()
     from modules.search import Search
