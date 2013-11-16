@@ -41,7 +41,7 @@ class Couchpotato:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def ping(self, couchpotato_host, couchpotato_port, couchpotato_apikey, couchpotato_basepath, couchpotato_ssl, **kwargs):
+    def ping(self, couchpotato_host, couchpotato_port, couchpotato_apikey, couchpotato_basepath, couchpotato_ssl = False, **kwargs):
         self.logger.debug("Testing connectivity to couchpotato")
         if not(couchpotato_basepath.endswith('/')):
             couchpotato_basepath += "/"
