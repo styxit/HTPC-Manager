@@ -18,7 +18,7 @@ $(document).ready(function(){
       success: function(response) {
         // Refresh torrent list after successfull request with a tiny delay
         if (response.result == 'success') {
-          window.setTimeout(getTorrents, 500);
+          window.setTimeout(refreshUi, 500);
         }
       }
     });
@@ -75,10 +75,16 @@ function getTorrents(){
         for(key in response.result){
           torrent = response.result[key]
           tr = $('<tr>');
-            
+          
+          var progress_precent = Math.round(torrent.progress*100) / 100;
+          
+          var progressText = $('<div>');
+          progressText.addClass('text-center');
+          progressText.text(progress_precent + '%');
+          
           var progressBar = $('<div>');
           progressBar.addClass('bar');
-          progressBar.css('width', (torrent.progress) + '%');
+          progressBar.css('width', (progress_precent) + '%');
           
           var  progress = $('<div>');
           progress.addClass('progress');
@@ -86,10 +92,12 @@ function getTorrents(){
             progress.addClass('progress-success');
           }
           progress.append(progressBar);
+          progress.append(progressText);
 
           // Round to 2 decimals
-          ratio = Math.round(torrent.ratio*100) / 100;
-
+          ratio = torrent.ratio == -1 ? '∞' : Math.round(torrent.ratio*100) / 100;
+          
+          eta = torrent.eta == '0:00:00' ?'∞' : torrent.eta;
           // Button group
           buttons = $('<div>').addClass('btn-group');
 
@@ -112,6 +120,7 @@ function getTorrents(){
               +'<br><small><i class="icon-long-arrow-down"></i> ' + getReadableFileSizeString(torrent.download_payload_rate)
               +'/s <i class="icon-long-arrow-up"></i> ' + getReadableFileSizeString(torrent.upload_payload_rate) + '/s</small>'
             ),
+            $('<td>').text(getReadableFileSizeString(torrent.total_size)),
             $('<td>').text(ratio),
             $('<td>').text(getReadableTime(torrent.eta)),
             $('<td>').text(torrent.state),
@@ -161,7 +170,7 @@ function setConnectToServer(servers){
                         if (response && !response.error)
                         {
                             notify('Info', 'Successfully logged in', 'success', 5);
-                            login();
+                            refreshUi();
                         }
                         else
                         {
@@ -204,6 +213,7 @@ function setRemoveTorrentModal(torrentId){
                         if (response)
                         {
                             notify('Info', 'Torrent removed', 'success', 5);
+                            refreshUi();
                         }
                         else
                         {

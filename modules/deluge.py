@@ -53,7 +53,7 @@ class Deluge:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def queue(self):
-        fields = ['progress','is_finished','ratio','name','download_payload_rate','upload_payload_rate','eta','state','hash']
+        fields = ['progress','is_finished','ratio','name','download_payload_rate','upload_payload_rate','eta','state','hash','total_size']
         return self.fetch('core.get_torrents_status', [[],fields])
 
     @cherrypy.expose()
