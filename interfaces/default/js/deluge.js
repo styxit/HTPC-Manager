@@ -76,15 +76,15 @@ function getTorrents(){
           torrent = response.result[key]
           tr = $('<tr>');
           
-          var progress_precent = Math.round(torrent.progress*100) / 100;
+          var progress_percent = Math.round(torrent.progress*100) / 100;
           
           var progressText = $('<div>');
           progressText.addClass('text-center');
-          progressText.text(progress_precent + '%');
+          progressText.text(progress_percent + '%');
           
           var progressBar = $('<div>');
           progressBar.addClass('bar');
-          progressBar.css('width', (progress_precent) + '%');
+          progressBar.css('width', (progress_percent) + '%');
           
           var  progress = $('<div>');
           progress.addClass('progress');
@@ -182,7 +182,7 @@ function setConnectToServer(servers){
             )
         },
     }
-    showModal('Remove Torrent', content,modalButtons);
+    showModal('Server Connection', content,modalButtons);
 }
 
 function setRemoveTorrentModal(torrentId){
