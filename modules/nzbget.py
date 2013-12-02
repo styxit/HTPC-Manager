@@ -81,7 +81,7 @@ class NZBGet:
             
             url = 'http' + ssl + '://' + host + ':' + port + nzbget_basepath + 'jsonrpc/' + path
             request = Request(url)
-            base64string = base64.encodestring(username + ':'password).replace('\n', '')
+            base64string = base64.encodestring(username + ':' + password).replace('\n', '')
             request.add_header("Authorization", "Basic %s" % base64string) 
             self.logger.debug("Fetching information from: " + url)
             return loads(urlopen(request, timeout=10).read())
