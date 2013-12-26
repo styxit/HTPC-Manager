@@ -13,6 +13,8 @@ $(document).ready(function() {
     }).on('shown', reloadTab);
     $(window).trigger('hashchange')
 
+    loadShowFromHash(location.hash);
+
     // Catch keyboard event and send to XBMC
     $(document).keydown(function(e) {
         if (!$('input').is(":focus")) {
@@ -289,8 +291,8 @@ function loadShows(options) {
                 $.each(data.tvshows, function (i, show) {
                     var showItem = $('<li>').attr('title', show.title);
 
-                    var showAnchor = $('<a>').attr('href', '#').click(function(e) {
-                        e.preventDefault();
+                    var showAnchor = $('<a>').attr('href', '#tvshow-' + show.tvshowid).click(function(e) {
+                        // e.preventDefault();
                         loadEpisodes({'tvshowid':show.tvshowid})
                     });
 
@@ -898,6 +900,19 @@ function errorHandler() {
     notify('Error','Error connecting to XBMC','error');
     moviesLoading = false;
     return false;
+}
+
+function substring(str, part) {
+    return str.substring(0, part.length) == part;
+}
+
+function loadShowFromHash(hash) {
+    options = {'filter': searchString}
+
+    if (substring(hash, '#tvshow-')) {
+        var tvShowId = hash.substring(8);
+        loadEpisodes({'tvshowid':tvShowId})
+    }
 }
 
 function reloadTab() {
