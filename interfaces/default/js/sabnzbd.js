@@ -226,6 +226,38 @@ function loadQueue(once) {
 
                 $('#active_table_body').append(row);
             });
+
+            // Set diskspace
+            freePercentDisk1 =  Math.ceil((data.diskspace1 / data.diskspacetotal1) * 100);
+            usedPercentDisk1 = 100 - freePercentDisk1;
+            $('#sabnzbd-stats #diskspace1 .bar').css('width', usedPercentDisk1+'%').text(data.diskspacetotal1 - data.diskspace1 + ' GB');
+
+            $('#sabnzbd-stats #diskspace1 .diskspace-total').text('Total: '+ data.diskspacetotal1 + ' GB');
+            $('#sabnzbd-stats #diskspace1 .diskspace-free').text('Free: '+ data.diskspace1 + ' GB');
+
+            // If less then 10% is free, show red bar
+            if (freePercentDisk1 < 10) {
+                $('#sabnzbd-stats #diskspace1 .progress').addClass('progress-danger');
+            }
+
+            // Only show disk 2 if it is not the same as disk1
+            if (data.diskspacetotal1 != data.diskspacetotal2 && data.diskspace1 != data.diskspace2) {
+                freePercentDisk2 =  Math.ceil((data.diskspace2 / data.diskspacetotal2) * 100);
+                usedPercentDisk2 = 100 - freePercentDisk2;
+                $('#sabnzbd-stats #diskspace2 .bar').css('width', usedPercentDisk2+'%').text(data.diskspacetotal2 - data.diskspace2 + ' GB');
+
+                $('#sabnzbd-stats #diskspace2 .diskspace-total').text('Total: '+ data.diskspacetotal2 + ' GB');
+                $('#sabnzbd-stats #diskspace2 .diskspace-free').text('Free: '+ data.diskspace2 + ' GB');
+
+                // If less then 10% is free, show red bar
+                if (freePercentDisk2 < 10) {
+                    $('#sabnzbd-stats #diskspace1 .progress').addClass('progress-danger');
+                }
+                $('#sabnzbd-stats #diskspace2').show();
+            } else {
+                $('#sabnzbd-stats #diskspace2').hide();
+            }
+
         }
     });
 }
