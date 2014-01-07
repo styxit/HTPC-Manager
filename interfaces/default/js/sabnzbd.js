@@ -230,7 +230,9 @@ function loadQueue(once) {
             // Set diskspace
             freePercentDisk1 =  Math.ceil((data.diskspace1 / data.diskspacetotal1) * 100);
             usedPercentDisk1 = 100 - freePercentDisk1;
-            $('#sabnzbd-stats #diskspace1 .bar').css('width', usedPercentDisk1+'%').text(data.diskspacetotal1 - data.diskspace1 + ' GB');
+            usedGbDisk1 = (data.diskspacetotal1 - data.diskspace1) * 100;
+            usedGbDisk1 = Math.round(usedGbDisk1) / 100;
+            $('#sabnzbd-stats #diskspace1 .bar').css('width', usedPercentDisk1+'%').text(usedGbDisk1 + ' GB');
 
             $('#sabnzbd-stats #diskspace1 .diskspace-total').text('Total: '+ data.diskspacetotal1 + ' GB');
             $('#sabnzbd-stats #diskspace1 .diskspace-free').text('Free: '+ data.diskspace1 + ' GB');
@@ -244,7 +246,9 @@ function loadQueue(once) {
             if (data.diskspacetotal1 != data.diskspacetotal2 && data.diskspace1 != data.diskspace2) {
                 freePercentDisk2 =  Math.ceil((data.diskspace2 / data.diskspacetotal2) * 100);
                 usedPercentDisk2 = 100 - freePercentDisk2;
-                $('#sabnzbd-stats #diskspace2 .bar').css('width', usedPercentDisk2+'%').text(data.diskspacetotal2 - data.diskspace2 + ' GB');
+                usedGbDisk2 = (data.diskspacetotal2 - data.diskspace2) * 100;
+                usedGbDisk2 = Math.round(usedGbDisk2) / 100;
+                $('#sabnzbd-stats #diskspace2 .bar').css('width', usedPercentDisk2+'%').text(usedGbDisk2 + ' GB');
 
                 $('#sabnzbd-stats #diskspace2 .diskspace-total').text('Total: '+ data.diskspacetotal2 + ' GB');
                 $('#sabnzbd-stats #diskspace2 .diskspace-free').text('Free: '+ data.diskspace2 + ' GB');
