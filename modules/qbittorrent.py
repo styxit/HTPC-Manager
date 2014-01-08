@@ -57,7 +57,7 @@ class qbittorrent:
             result = urllib2.urlopen(url + 'json/torrents/').read()
         
         except Exception as e:
-            self.logger.debug ("Couldn't get torrents :: %s" % e)
+            self.logger.error("Couldn't get torrents %s" % e)
         
         return result
     
@@ -89,7 +89,7 @@ class qbittorrent:
             rr = json.dumps(l)
         
         except Exception as e:
-            self.logger.debug("Couldn't get total download and uploads speed :: %s" % e)
+            self.logger.error("Couldn't get total download and uploads speed %s" % e)
             
         return rr
     
@@ -97,7 +97,7 @@ class qbittorrent:
     @cherrypy.expose
     def command(self, cmd=None, hash=None, name=None):
         try:
-            self.logger.debug("%sd %s" %(cmd, name))
+            self.logger.debug("%s %s" %(cmd, name))
             url = self.qbturl()
             url += 'command/%s/' % cmd
             data = {}
@@ -115,7 +115,7 @@ class qbittorrent:
             result = urllib2.urlopen(url, data).read()
         
         except Exception as e:
-            self.logger.debug("Failed at %s %s %s :: %s" % (cmd, name, hash ,e))
+            self.logger.error("Failed at %s %s %s %s" % (cmd, name, hash ,e))
     
     # Sets global upload and download speed
     @cherrypy.expose
@@ -140,4 +140,4 @@ class qbittorrent:
             result = urllib2.urlopen(url, data)
          
         except Exception as e:
-            self.logger.debug("Failed to set %s to %s :: %s"% (type, speed, e))
+            self.logger.error("Failed to set %s to %s %s"% (type, speed, e))
