@@ -8,4 +8,6 @@ A python based web application to manage the software on your Htpc. Htpc Manager
 
 ## See full installation instructions at [htpc.io](http://htpc.io/)
 
+Requires Python 2.7 or 2.6 with argeparse installed.
+
 Start with ```python Htpc.py```
