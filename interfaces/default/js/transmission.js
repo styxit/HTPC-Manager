@@ -29,6 +29,23 @@ $(document).ready(function(){
       }
     });
   });
+
+  /**
+   * Start or stop all torrents
+   */
+  $('#transmission-stop-all , #transmission-resume-all').click(function(){
+    action = $(this).data('action');
+    $.ajax({
+      url: WEBDIR + 'transmission/' + action,
+      success: function(response) {
+        // Refresh torrent list after successfull request with a tiny delay
+        if (response.result == 'success') {
+          window.setTimeout(getTorrents, 500);
+        }
+      }
+    });
+  });
+
 });
 
 function getTorrents(){
@@ -94,6 +111,9 @@ function getTorrents(){
   });
 }
 
+/**
+ * Generate a start or stop button based on the torrent status
+ */
 function generateTorrentActionButton(torrent) {
   button = $('<a>').addClass('btn btn-mini');
   // Resume button if torrent is paused
