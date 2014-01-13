@@ -43,6 +43,14 @@ $(document).ready(function () {
     }, 5000);
     loadHistory();
     loadWarnings();
+
+    // reload tab content on tab click
+    $('#tab-history').click(function() {
+        loadHistory();
+    })
+    $('#tab-warnings').click(function() {
+        loadWarnings();
+    })
 });
 
 function removeHistoryItem(id) {
@@ -75,10 +83,11 @@ function retryHistoryItem(id) {
 
 function loadHistory() {
     $.ajax({
-        url: WEBDIR + 'sabnzbd/GetHistory?limit=20',
+        url: WEBDIR + 'sabnzbd/GetHistory?limit=30',
         type: 'get',
         dataType: 'json',
         success: function (data) {
+            $('#history_table_body').empty();
             if (data.status == false) {
                 $('#notification_area').addClass('alert alert-error');
                 $('#notification_area').html('<strong>Error</strong> Could not connect to SABnzbd, go to <a href="' + WEBDIR + 'settings">settings</a>');
@@ -272,6 +281,7 @@ function loadWarnings() {
         type: 'get',
         dataType: 'json',
         success: function (data) {
+            $('#warning_table_body').empty();
             if (data.warnings == 0) {
                 var row = $('<tr>')
                 row.append($('<td>').html('No warnings'));
