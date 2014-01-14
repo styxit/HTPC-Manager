@@ -21,7 +21,7 @@ class NZBGet:
                 {'type': 'text', 'label': 'Port *', 'name': 'nzbget_port'},
                 {'type': 'text', 'label': 'Basepath', 'name': 'nzbget_basepath'},
                 {'type': 'text', 'label': 'User', 'name': 'nzbget_username'},
-                {'type': 'text', 'label': 'Password', 'name': 'nzbget_password'},
+                {'type': 'password', 'label': 'Password', 'name': 'nzbget_password'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'nzbget_ssl'}
         ]})
 
@@ -40,9 +40,14 @@ class NZBGet:
         if not(nzbget_basepath.endswith('/')):
             nzbget_basepath += "/"
 
-        url = 'http' + ssl + '://'+ nzbget_username + ':' + nzbget_password + '@' + nzbget_host + ':' + nzbget_port + nzbget_basepath + 'jsonrpc/'
+        url = 'http' + ssl + '://'+  nzbget_host + ':' + nzbget_port + nzbget_basepath + 'jsonrpc/version'
         try:
-            return loads(urlopen(url + 'version', timeout=10).read())
+            request = Request(url)
+            if(nzbget_username != ""):
+                base64string = base64.encodestring(nzbget_username + ':' + nzbget_password).replace('\n', '')
+                request.add_header("Authorization", "Basic %s" % base64string)
+            self.logger.debug("Fetching information from: " + url)
+            return loads(urlopen(request, timeout=10).read())
         except:
             self.logger.error("Unable to contact nzbget via " + url)
             return
@@ -64,7 +69,7 @@ class NZBGet:
     def GetStatus(self):
         self.logger.debug("Fetching queue")
         return self.fetch('listgroups')
-    
+
     def fetch(self, path):
         try:
             host = htpc.settings.get('nzbget_host', '')
@@ -78,11 +83,11 @@ class NZBGet:
                 nzbget_basepath = "/"
             if not(nzbget_basepath.endswith('/')):
                 nzbget_basepath += "/"
-            
+
             url = 'http' + ssl + '://' + host + ':' + port + nzbget_basepath + 'jsonrpc/' + path
             request = Request(url)
             base64string = base64.encodestring(username + ':' + password).replace('\n', '')
-            request.add_header("Authorization", "Basic %s" % base64string) 
+            request.add_header("Authorization", "Basic %s" % base64string)
             self.logger.debug("Fetching information from: " + url)
             return loads(urlopen(request, timeout=10).read())
         except:
