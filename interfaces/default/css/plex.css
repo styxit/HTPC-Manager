@@ -1,0 +1,105 @@
+a:Hover {
+    text-decoration: none;
+}
+.thumbnails li {
+    position: relative;
+}
+#movie-grid img.thumbnail,
+#show-grid img.thumbnail {
+    height: 150px;
+    width: 100px;
+}
+#episode-grid img.thumbnail {
+    position: relative;
+    height: 85px;
+    width: 150px;
+}
+#album-grid img.thumbnail,
+#artist-grid img.thumbnail {
+    height: 150px;
+    width: 150px;
+}
+#pvr-grid img.thumbnail {
+    height: 75px;
+    width: 75px;
+}
+.watched {
+    position: absolute;
+    top: 138px;
+    right: 5px;
+    width: 16px;
+    height: 16px;
+}
+.grid-caption {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    background: rgba(0,0,0,0.75);
+    padding: 10px;
+    width: 130px;
+    height: 130px;
+}
+.grid-caption h6 {
+    color: #fff;
+    font-family: inherit;
+    margin: 0;
+}
+.grid-caption h6.artist {
+    font-weight: normal;
+}
+.grid-control {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+}
+.grid-control a:first-child {
+    margin-right: 35px;
+}
+h6.title {
+    color: #555555;
+    text-align: center;
+    margin: 0;
+    padding-top: 4px;
+}
+#artist-grid tr td:first-child {
+    width: 35px;
+}
+#artist-grid a.artist-link {
+    display: block;
+}
+#artist-grid i,
+#playlist-table i {
+    margin: 0 5px 0 0;
+}
+#nowplaying #player-progressbar,
+#playlist tr td {
+    cursor: pointer;
+}
+#nowplaying {
+    background-size: 100%;
+    background-position: 50% 20%;
+    background-repeat: no-repeat;
+    margin-bottom: 10px;
+}
+#playlist-table tr td:last-child {
+    width: 35px;
+}
+.modal {
+    width: 700px;
+}
+.modal-fanart {
+    background: #fff top center no-repeat;
+    background-size: 100%;
+}
+.modal .movie-poster {
+    height: 300px;
+    width: 200px;
+}
+.modal .modal-movieinfo {
+    margin-left: 230px;
+}
+.modal .modal-youtube {
+    border: 0;
+    height: 375px;
+    width: 670px;
+}

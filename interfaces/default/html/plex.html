@@ -1,0 +1,72 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+<div class="container">
+    <div class="content">
+        <ul class="nav nav-tabs">
+            <li><a href="#movies" data-toggle="tab">Movies</a></li>
+            <li><a href="#shows" data-toggle="tab">TV Shows</a></li>
+            <li class="hide"><a href="#episodes" data-toggle="tab">Episodes</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Music
+                <i class="caret"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#artists" data-toggle="tab">Artists</a></li>
+                    <li><a href="#albums" data-toggle="tab">Albums</a></li>
+                    <li><a href="#songs" data-toggle="tab">Songs</a></li>
+                </ul>
+            </li>
+            %if settings.get('xbmc_enable_pvr', 0):
+            <li><a href="#pvr" data-toggle="tab">PVR</a></li>
+            %endif
+            <li class="hide"><a href="#playlist" data-toggle="tab">Playlist</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="movies" class="tab-pane">
+                <ul id="movie-grid" class="thumbnails"></ul>
+            </div>
+            <div id="shows" class="tab-pane">
+                <ul id="show-grid" class="thumbnails"></ul>
+            </div>
+            <div id="episodes" class="tab-pane">
+                <ul id="episode-grid" class="thumbnails"></ul>
+            </div>
+            <div id="artists" class="tab-pane">
+                <table id="artist-grid" class="table table-striped table-hover"></table>
+            </div>
+            <div id="albums" class="tab-pane">
+                <ul id="album-grid" class="artist-albums thumbnails"></ul>
+            </div>
+            <div id="songs" class="tab-pane">
+                <table id="songs-grid" class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Artist</th>
+                            <th>Album</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="playlist" class="tab-pane">
+                <table id="playlist-table" class="table table-striped table-hover playlist">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Artist</th>
+                            <th>Album</th>
+                            <th>Duration</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="pvr" class="tab-pane">
+                <ul id="pvr-grid" class="thumbnails"></ul>
+            </div>
+        </div>
+        <div class="spinner"></div>
+    </div>
+</div>
