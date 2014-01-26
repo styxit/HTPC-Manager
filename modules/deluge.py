@@ -29,7 +29,7 @@ class Deluge:
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'deluge_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'deluge_port'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'deluge_ssl'},
-                {'type': 'text', 'label': 'Base URL', 'name': 'deluge_url'},
+                {'type': 'text', 'label': 'Base path', 'name': 'deluge_basepath'},
                 {'type': 'password', 'label': 'Password', 'name': 'deluge_password'}
         ]})
 
@@ -113,10 +113,10 @@ class Deluge:
             
             host = htpc.settings.get('deluge_host', '')
             port = str(htpc.settings.get('deluge_port', ''))
-            deluge_url = str(htpc.settings.get('deluge_url', ''))
+            deluge_basepath = str(htpc.settings.get('deluge_basepath', ''))
             ssl = 's' if htpc.settings.get('deluge_ssl') else ''
 
-            url = 'http' + ssl + '://' +  host + ':' + str(port) + deluge_url + '/json'
+            url = 'http' + ssl + '://' +  host + ':' + str(port) + deluge_basepath + '/json'
             
             post_data = dumps(data)
             buf = StringIO( self.opener.open(url, post_data,1).read())
