@@ -29,7 +29,7 @@ class Deluge:
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'deluge_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'deluge_port'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'deluge_ssl'},
-                {'type': 'text', 'label': 'Base path', 'name': 'deluge_basepath'},
+                {'type': 'text', 'label': 'Basepath', 'name': 'deluge_basepath'},
                 {'type': 'password', 'label': 'Password', 'name': 'deluge_password'}
         ]})
 
