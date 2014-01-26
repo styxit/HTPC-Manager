@@ -110,8 +110,9 @@ function getTorrents(){
             addClass('btn btn-mini').
             html('<i class="icon-remove"></i>').
             attr('title', 'Remove torrent').
+            attr('data-torrent-id', torrent.hash).
             click(function(){
-                setRemoveTorrentModal(torrent.hash);
+                setRemoveTorrentModal($(this).attr('data-torrent-id'));
             });
           buttons.append(removeButton);
 
