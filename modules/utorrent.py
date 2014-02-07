@@ -30,8 +30,8 @@ fields = {
 	'percentage_done': 4,
 	'dl': 5,
 	'up': 6,
-	'dl_speed': 8,
-	'up_speed': 9,
+	'dl_speed': 9,
+	'up_speed': 8,
 	'eta': 10,
 	'ratio': 7,
 }
