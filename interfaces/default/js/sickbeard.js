@@ -273,7 +273,7 @@ function cancelAddShow() {
 
 function sickbeardStatusLabel(text){
   var statusOK = ['Continuing', 'Downloaded', 'HD'];
-  var statusInfo = ['Snatched', 'Unaired'];
+  var statusInfo = ['Snatched'];
   var statusError = ['Ended'];
   var statusWarning = ['Skipped'];
 
