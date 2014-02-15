@@ -130,7 +130,6 @@ function showModal(title, content, buttons) {
     $('#modal_dialog .modal-h3').html(title)
     $('#modal_dialog .modal-body').html(content)
     var footer = $('#modal_dialog .modal-footer').empty()
-    $.extend(buttons, {'Close': hideModal})
     $.each(buttons, function (name, action) {
         footer.append(
             $('<button>').html(name).addClass('btn btn-primary').click(function() {
@@ -138,6 +137,13 @@ function showModal(title, content, buttons) {
             })
         )
     })
+
+    footer.append(
+        $('<button>').html('Close').addClass('btn').click(function() {
+            $(hideModal)
+        })
+    )
+
     $('#modal_dialog').modal({show: true, backdrop: true})
 }
 function hideModal() {
