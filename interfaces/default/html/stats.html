@@ -1,0 +1,53 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+<div class="container">
+    <div class="content">
+      <h1 class="page-header page-title">
+          <a href="http://${settings.get('stats_enable')}" target="_blank">${settings.get('stats_name', 'Stats')}</a>
+          <small>
+	  <i class="icon-arrow-down"></i>
+	  <span id="stat-recv"></span>
+	  <i class="icon-arrow-up"></i>
+	  <span id="stat-sent"></span>
+	  
+          </small>
+      </h1>
+      <div class="row-fluid">
+		<div class="span4 l text-left"></div>
+                <div class="span4  c text-center"></div>
+                <div class="span4 r text-right"></div>
+      </div>
+    
+    
+        <!--<div class="row-fluid baseinfo"></div>-->
+            <div id="ss" class="row-fluid text-center">
+                <div class="span3 cpu text-center"></div>
+                <div class="span3 virmem text-center"></div>
+		<div class="span3 swpmem text-center"></div>
+                <div class="span3 nw text-center"></div>
+            </div>
+	    
+      <table class="table disktable table-striped table-hover">
+        <thead>
+          <tr>
+            <th>Disk</th>
+            <th class="span2">Free</th>
+            <th class="span2">Used</th>
+            <th class="span2">Total</th>
+            <th class="span3">Bar</th>
+            <th class="span1">%</th>
+          </tr>
+        </thead>
+        <tbody id="torrents-queue">
+        </tbody>
+      </table>
+      <span id="error_message">
+      <i class="icon-spinner icon-spin spinner"></i>
+      </span>
+	<!--<div class="row-fluid">
+	<div class="span4 text-left"><span class="localip text-left"></span</div>
+	<div class="span4"></div>
+	<div class="span4 externalip text-right"></div>
+	</div>-->
+    </div>
+</div>

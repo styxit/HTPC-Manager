@@ -1,0 +1,41 @@
+/*class="page-header page-title"*/
+
+h1.page-header.page-title {
+	margin: -20px -20px 5px;
+}
+.table.nwtable td{
+	padding:0px !important;
+	border-top: 0px none #ddd !important;
+	text-align: center;
+}
+
+.externalip {
+	//padding:0px !important;
+}
+
+.localip {
+	margin: 0px !important;
+	padding:0px !important;
+}
+
+.content {
+	margin: 0 0 0 0 !important;
+}
+
+.disktable {
+	margin: 0 0 0 0 !important;
+}
+
+.table.nwtable {
+	margin-bottom:0px !important;
+	overflow:auto;
+}
+
+td.tlip {
+	//font-size: 13px !important;
+}
+
+td.txip {
+	//font-size: 13px !important;
+}
+	*
