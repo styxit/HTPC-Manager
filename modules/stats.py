@@ -18,7 +18,7 @@ try:
     import psutil
 except:
     if platform.system() == 'Windows':
-        print 'Have you installed psutil correctly? Use the installer on pypi, make sure you get the right processorand architecture.'
+        print 'Have you installed psutil correctly? Use the installer on pypi, make sure you get the right processor and architecture. See http://psutil.googlecode.com/hg/INSTALL'
 
 class Stats:
     def __init__(self):
@@ -56,6 +56,42 @@ class Stats:
 
     @cherrypy.expose()
     def disk_usage(self):
+        rr = None
+        l = []
+        
+        try:
+            if os.name == 'nt':
+                # Need to be true, or else not network disks will show.
+                for disk in psutil.disk_partitions(all=True):
+                    
+                    if 'cdrom' in disk.opts or disk.fstype == '':
+                        #To stop windows errors if cdrom is empty
+                        continue
+                        
+                    usage = psutil.disk_usage(disk.mountpoint)
+                    dusage = usage._asdict()
+                    dusage['mountpoint'] = disk.mountpoint
+                    dusage['device'] = disk.device
+                    l.append(dusage)
+                    rr = json.dumps(l)
+                    
+            if os.name == 'posix':
+                
+                for disk in psutil.disk_partitions(all=False):
+                    usage = psutil.disk_usage(disk.device)
+                    dusage = usage._asdict()
+                    dusage['mountpoint'] = disk.mountpoint
+                    dusage['device'] = disk.device
+                    l.append(dusage)
+                    rr = json.dumps(l)
+                    
+        except Exception as e:
+            self.logger.error("Could not get disk info %s" % e)
+        
+        return rr
+ 
+    @cherrypy.expose()
+    def disk_usage2(self):
         rr = None
         l = []
         try:
