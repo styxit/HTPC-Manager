@@ -139,7 +139,7 @@ class Stats:
             
             return rr
         except Exception as e:
-            pass
+            self.logger.error("Error trying to pull cpu times: %s" % e)
     
     #Not in use as it returns threads aswell on windows
     @cherrypy.expose()
@@ -236,7 +236,7 @@ class Stats:
             return rr
             
         except Exception as e:
-            self.logger("Pulling system info %s" % e )
+            self.logger.error("Pulling system info %s" % e )
 
     #sys_info()
 
@@ -251,7 +251,7 @@ class Stats:
             return json.dumps(nw_psutil)
             
         except Exception as e:
-            self.logger("Pulling network info %s" % e)
+            self.logger.error("Pulling network info %s" % e)
             
 
     #print network_uage()
@@ -269,7 +269,7 @@ class Stats:
             return rr
             
         except Exception as e:
-            self.logger("Pulling physical memory %s" % e)
+            self.logger.error("Pulling physical memory %s" % e)
 
     @cherrypy.expose()
     def swap_memory(self):
@@ -285,14 +285,13 @@ class Stats:
             return rr
             
         except Exception as e:
-            self.logger("Pulling swap memory %s" % e)
+            self.logger.error("Pulling swap memory %s" % e)
     
     @cherrypy.expose()
     def return_settings(self):
         d = {}
         try:
             
-            d['real'] = htpc.settings.get('stats_use_bars')
             if str(htpc.settings.get('stats_use_bars')) == str('False'):
                 d['stats_use_bars'] = 'false'
             else:
@@ -301,7 +300,7 @@ class Stats:
             d['polling'] = htpc.settings.get('stats_polling')
         
         except Exception as e:
-            self.logger("Getting stats settings %s" % e)
+            self.logger.error("Getting stats settings %s" % e)
             
         return json.dumps(d)
 
