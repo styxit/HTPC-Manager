@@ -271,7 +271,6 @@ class Plex:
                 if 'thumb'in episode:
                     jepisode['thumbnail'] = episode["thumb"]
 
-                # "episode": 1, "season": 0, "episodeid": 1695, "label": "Sx01. Unaired Pilot", "file": "/Volumes/Content/Serier/30 Rock/Season 00/30.Rock.S00E01.Unaired Pilot.avi", "playcount": 0, "thumbnail": "image://http%3a%2f%2fthetvdb.com%2fbanners%2fepisodes%2f79488%2f338392.jpg/"}
                 episodes.append(jepisode)
                     
             limits = {'start': int(start), 'total': len(episodes), 'end': int(end)}
@@ -325,3 +324,48 @@ class Plex:
                 closg = s.find(r'"', unesc + 2)
                 s = s[:closg] + r'\"' + s[closg+1:]
         return result
+
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def NowPlaying(self):
+        """ Get information about current playing item """
+        self.logger.debug("Fetching currently playing information")
+        try:
+            plex_host = htpc.settings.get('plex_host', '')
+            plex_port = htpc.settings.get('plex_port', '32400')
+            playing_items = []
+
+            for video in self.JsonLoader(urlopen(Request('http://%s:%s/status/sessions' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+                jplaying_item = {}
+
+                if 'index' in video:
+                    jplaying_item['episode'] = int(video['index'])
+                if 'parentThumb' in video:
+                    jplaying_item['fanart'] = video['parentThumb']
+                jplaying_item['thumbnail'] =  video['thumb']
+                if 'parentIndex' in video:
+                    jplaying_item['season'] = int(video['parentIndex'])
+                jplaying_item['title'] = video['title']
+                jplaying_item['year'] = int(video['year'])
+                jplaying_item['id'] = int(video['ratingKey'])
+                jplaying_item['type'] = video['type']
+                if 'grandparentTitle' in video:
+                    jplaying_item['show'] = video['grandparentTitle']
+                jplaying_item['duration'] = int(video['duration'])
+                jplaying_item['viewOffset'] = int(video['viewOffset'])
+                #jplaying_item['state'] = video['state']
+
+                for children in video["_children"]:
+                    if children['_elementType'] == 'Player':
+                        jplaying_item['state'] = children['state']
+                playing_items.append(jplaying_item)
+                
+                    
+            print dumps({'playing_items': playing_items}) 
+            return dumps({'playing_items': playing_items})
+            
+        except Exception, e:
+            print ("Exception: " + str(e))
+            self.logger.error("Unable to fetch currently playing information!")
+            return

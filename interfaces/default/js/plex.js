@@ -23,6 +23,7 @@ $(document).ready(function() {
             reloadTab();
         }
     });
+    playerLoader = setInterval('loadNowPlaying()', 5000);
 
 });
 
@@ -285,6 +286,74 @@ function loadEpisodes(options) {
     $('#episode-grid').slideDown()
 }
 
+var nowPlayingId = false
+function loadNowPlaying() {
+    $.ajax({
+        url: WEBDIR + 'plex/NowPlaying',
+        type: 'get',
+        dataType: 'json',
+        success: function(data) {
+            data = JSON.parse(data);
+            if (data.playing_items.length == 0) {
+                $('#nowplaying').hide();
+                $('a[href=#playlist]').parent().hide();
+                return;
+            }
+            if (data.playing_items.length !== 0) {
+                $.each(data.playing_items, function (i, item) {
+                                var nowPlayingThumb = encodeURIComponent(item.thumbnail);
+                var thumbnail = $('#nowplaying .thumb img').attr('alt', item.label);
+                if (nowPlayingThumb == '') {
+                    thumbnail.attr('src', 'holder.js/140x140/text:No artwork');
+                    thumbnail.attr('width', '140').attr('height', '140');
+                    Holder.run();
+                } else {
+                    switch(item.type) {
+                        case 'episode':
+                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=150&h=75&thumb='+nowPlayingThumb);
+                            thumbnail.attr('width', '150').attr('height', '75');
+                            break;
+                        case 'movie':
+                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=100&h=150&thumb='+nowPlayingThumb);
+                            thumbnail.attr('width', '100').attr('height', '150');
+                            break;
+                        default:
+                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=140&h=140&thumb='+nowPlayingThumb);
+                            thumbnail.attr('width', '140').attr('height', '140');
+                    }
+                }
+                    //console.log(item)
+                    var itemTime = $('#nowplaying #player-item-time').html((item.viewOffset/1000).toString().toHHMMSS() + ' / ' + (item.duration/1000).toString().toHHMMSS());
+                    var itemTitel = $('#nowplaying #player-item-title')
+                    var itemSubtitel = $('#nowplaying #player-item-subtitle')
+                    var playingTitle = '';
+                    var playingSubtitle = '';
+            if (item.type == 'episode') {
+                playingTitle = item.show;
+                playingSubtitle = item.title + ' ' +
+                                  item.season + 'x' +
+                                  item.episode;
+            }
+            else if (item.type == 'movie') {
+                playingTitle = item.title;
+                playingSubtitle  = item.year;
+            } else {
+                playingTitle = item.title;
+            }
+            itemTitel.html(playingTitle);
+            itemSubtitel.html(playingSubtitle);
+            
+            var progressBar = $('#nowplaying #player-progressbar .bar');
+            progressBar.css('width', (item.viewOffset / item.duration)*100 + '%');
+        });
+                 $('#nowplaying').slideDown();
+    }
+}
+});
+}
+
+
+
 function reloadTab() {
     var options = {};
 
@@ -307,4 +376,18 @@ function errorHandler() {
     notify('Error','Error connecting to Plex','error');
     moviesLoading = false;
     return false;
+}
+
+
+String.prototype.toHHMMSS = function () {
+    var sec_num = parseInt(this, 10); // don't forget the second param
+    var hours   = Math.floor(sec_num / 3600);
+    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+    var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+    if (hours   < 10) {hours   = "0"+hours;}
+    if (minutes < 10) {minutes = "0"+minutes;}
+    if (seconds < 10) {seconds = "0"+seconds;}
+    var time    = hours+':'+minutes+':'+seconds;
+    return time;
 }
