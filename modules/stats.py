@@ -78,7 +78,7 @@ class Stats:
             if os.name == 'posix':
                 
                 for disk in psutil.disk_partitions(all=False):
-                    usage = psutil.disk_usage(disk.device)
+                    usage = psutil.disk_usage(disk.mountpoint)
                     dusage = usage._asdict()
                     dusage['mountpoint'] = disk.mountpoint
                     dusage['device'] = disk.device
