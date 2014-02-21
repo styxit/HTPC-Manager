@@ -9,15 +9,6 @@ h1.page-header.page-title {
 	text-align: center;
 }
 
-.externalip {
-	//padding:0px !important;
-}
-
-.localip {
-	margin: 0px !important;
-	padding:0px !important;
-}
-
 .content {
 	margin: 0 0 0 0 !important;
 }
@@ -28,7 +19,7 @@ h1.page-header.page-title {
 
 .table.nwtable {
 	margin-bottom:0px !important;
-	overflow:auto;
+	
 }
 
 td.tlip {
@@ -38,4 +29,8 @@ td.tlip {
 td.txip {
 	//font-size: 13px !important;
 }
-	*
+
+table.networktable {
+	table-layout: fixed;
+	word-wrap: break-word !important;
+}

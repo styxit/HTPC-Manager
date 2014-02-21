@@ -39,7 +39,7 @@ class Stats:
         return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats')
 
     @cherrypy.expose()
-    def uptime2(self):
+    def uptime(self):
         try:
             
             d = {}
@@ -59,62 +59,47 @@ class Stats:
         rr = None
         l = []
         
-        try:
-            if os.name == 'nt':
-                # Need to be true, or else not network disks will show.
-                for disk in psutil.disk_partitions(all=True):
-                    
-                    if 'cdrom' in disk.opts or disk.fstype == '':
-                        #To stop windows errors if cdrom is empty
-                        continue
-                        
-                    usage = psutil.disk_usage(disk.mountpoint)
-                    dusage = usage._asdict()
-                    dusage['mountpoint'] = disk.mountpoint
-                    dusage['device'] = disk.device
-                    l.append(dusage)
-                    rr = json.dumps(l)
-                    
-            if os.name == 'posix':
-                
-                for disk in psutil.disk_partitions(all=False):
-                    usage = psutil.disk_usage(disk.mountpoint)
-                    dusage = usage._asdict()
-                    dusage['mountpoint'] = disk.mountpoint
-                    dusage['device'] = disk.device
-                    l.append(dusage)
-                    rr = json.dumps(l)
-                    
-        except Exception as e:
-            self.logger.error("Could not get disk info %s" % e)
+        #Mount point that should be ignored, (Linux) Let me know if there is any missing
+        ignore_mntpoint = ['', '/dev/shm', '/lib/init/rw', '/sys/fs/cgroup', '/boot']
         
-        return rr
- 
-    @cherrypy.expose()
-    def disk_usage2(self):
-        rr = None
-        l = []
+        #File systems that should be ignored
+        ignore_fstypes = ['autofs', 'binfmt_misc', 'configfs', 'debugfs',
+                                'devfs', 'devpts', 'devtmpfs', 'hugetlbfs',
+                                'iso9660', 'linprocfs', 'mqueue', 'none',
+                                'proc', 'procfs', 'pstore', 'rootfs',
+                                'securityfs', 'sysfs', 'usbfs', '']
+        
+        #It must be one of this else exit loop and start
+        req_fstypes = ['ext', 'ext2', 'ext3', 'ext4', 'nfs', 'nfs4', 'fuseblk', 'cifs', 'msdos', 'NTFS', 'FAT', 'FAT32']
+    
         try:
+            
             for disk in psutil.disk_partitions(all=True):
-                if os.name == 'nt':
-                    if 'cdrom' in disk.opts or disk.fstype == '':
-                        pass
-                    else:
-                        usage = psutil.disk_usage(disk.mountpoint)
-                        dusage = usage._asdict()
-                        dusage['mountpoint'] = disk.mountpoint
-                        #jusage = json.dumps(dusage)
-                        l.append(dusage)
-  
-                        rr = json.dumps(l)
-                        
+                
+                # To stop windows barf on empy cdrom                            #File system that will be ignores            #Mountpoint that should be ignored, linux      #Only these will be processesed
+                if 'cdrom' in disk.opts or disk.fstype == '' or disk.fstype in ignore_fstypes or disk.mountpoint in ignore_mntpoint or disk.fstype not in req_fstypes:
+                    continue
+                    
+                usage = psutil.disk_usage(disk.mountpoint)
+                dusage = usage._asdict()
+                dusage['mountpoint'] = disk.mountpoint
+                dusage['device'] = disk.device
+                
+                #NTFS driver reports filesystem type as fuseblk on Linux 
+                if disk.fstype == 'fuseblk':
+                    dusage['fstype'] = 'NTFS'
+                else:
+                    dusage['fstype'] = disk.fstype
+                    
+                l.append(dusage)
+                rr = json.dumps(l)
+                
         except Exception as e:
             self.logger.error("Could not get disk info %s" % e)
-        
+            
+            
+  
         return rr
-
-
-    #disk_usage()
 
     @cherrypy.expose()
     def cpu_percent(self):
@@ -246,9 +231,9 @@ class Stats:
         
         try:
             nw_psutil = psutil.net_io_counters()
-            nw_psutil = nw_psutil._asdict()
+            dnw_psutil = nw_psutil._asdict()
             
-            return json.dumps(nw_psutil)
+            return json.dumps(dnw_psutil)
             
         except Exception as e:
             self.logger.error("Pulling network info %s" % e)
@@ -263,8 +248,8 @@ class Stats:
         
         try:
             mem = psutil.virtual_memory()
-            mem = mem._asdict()
-            rr = json.dumps(mem)
+            dmem = mem._asdict()
+            rr = json.dumps(dmem)
             
             return rr
             
@@ -279,8 +264,8 @@ class Stats:
         try:
             
             mem = psutil.swap_memory()
-            mem = mem._asdict()
-            rr = json.dumps(mem)
+            dmem = mem._asdict()
+            rr = json.dumps(dmem)
             
             return rr
             
@@ -297,6 +282,7 @@ class Stats:
             else:
                 d['stats_use_bars'] = 'true'
             
+            #Not in use atm
             d['polling'] = htpc.settings.get('stats_polling')
         
         except Exception as e:
