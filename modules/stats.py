@@ -30,12 +30,18 @@ class Stats:
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'stats_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'stats_name'},
-                {'type': 'bool', 'label': 'Bar', 'name': 'stats_use_bars'},
-                {'type': 'text', 'label': 'Polling', 'name': 'stats_polling'}
+                {'type': 'bool', 'label': 'Bar', 'name': 'stats_use_bars'}
+                #{'type': 'text', 'label': 'Polling', 'name': 'stats_polling'}
         ]})
 
     @cherrypy.expose()
     def index(self):
+        #Since many linux repos still have psutil version 0.5
+        if psutil.version_info >= (0, 7):
+            pass
+        else:
+            self.logger.error("Psutil is outdated, needs atleast version 0,7")
+            
         return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats')
 
     @cherrypy.expose()
@@ -100,7 +106,9 @@ class Stats:
             
   
         return rr
-
+    
+    
+    #Returns cpu usage
     @cherrypy.expose()
     def cpu_percent(self):
         jcpu = None
@@ -112,6 +120,7 @@ class Stats:
             return jcpu
         except Exception as e:
             self.logger.error("Error trying to pull cpu percent: %s" % e)
+
 
     # Not in use atm.
     @cherrypy.expose()
@@ -125,6 +134,7 @@ class Stats:
             return rr
         except Exception as e:
             self.logger.error("Error trying to pull cpu times: %s" % e)
+    
     
     #Not in use as it returns threads aswell on windows
     @cherrypy.expose()
@@ -140,8 +150,8 @@ class Stats:
         except Exception as e:
             self.logger.error("Error trying to pull cpu cores %s" % e)
 
-    #num_cpu()
 
+    #Fetches info about the user that is logged in.
     @cherrypy.expose()
     def get_user(self):
         l =[]
@@ -184,7 +194,6 @@ class Stats:
         except Exception as e:
             self.logger.error("Pulling  local ip %s" % e)
 
-    #get_local_ip()
     
     @cherrypy.expose()
     def get_external_ip(self):
@@ -193,7 +202,7 @@ class Stats:
         
         try:
             s = urllib2.urlopen('http://myexternalip.com/raw').read()
-            d['externalip'] = s
+            d['externalip'] = s.strip()
             rr = json.dumps(d)
             
             return rr
@@ -201,7 +210,6 @@ class Stats:
         except Exception as e:
             self.logger.error("Pulling external ip %s" % e)
 
-    #get_external_ip()
     
     @cherrypy.expose()
     def sys_info(self):
@@ -223,7 +231,6 @@ class Stats:
         except Exception as e:
             self.logger.error("Pulling system info %s" % e )
 
-    #sys_info()
 
     #get network usage
     @cherrypy.expose()
@@ -239,7 +246,6 @@ class Stats:
             self.logger.error("Pulling network info %s" % e)
             
 
-    #print network_uage()
     
     @cherrypy.expose()
     def virtual_memory(self):
@@ -255,6 +261,7 @@ class Stats:
             
         except Exception as e:
             self.logger.error("Pulling physical memory %s" % e)
+
 
     @cherrypy.expose()
     def swap_memory(self):
@@ -272,6 +279,7 @@ class Stats:
         except Exception as e:
             self.logger.error("Pulling swap memory %s" % e)
     
+    #Fetches settings in the db, is used for some styling, like bars or tables.
     @cherrypy.expose()
     def return_settings(self):
         d = {}
