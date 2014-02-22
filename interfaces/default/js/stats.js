@@ -190,22 +190,22 @@ function return_stats_settings() {
 $(document).ready(function () {
     $('.spinner').show();
     get_diskinfo();
+    network_usage_table();
+    return_stats_settings();
     uptime();
     get_user();
+    sys_info();
     get_external_ip();
     get_local_ip();
-    network_usage_table();
-    sys_info();
-    return_stats_settings();
 });
 
 setInterval(function () {
     get_diskinfo();
+    network_usage_table();
+    return_stats_settings();
     uptime();
     get_user();
+    sys_info();
     get_external_ip(); // dont want to spam a external service.
     get_local_ip();
-    network_usage_table();
-    sys_info();
-    return_stats_settings();
 }, 10000);
