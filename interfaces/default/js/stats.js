@@ -53,8 +53,8 @@ function get_diskinfo() {
 
                 row.append(
                 $('<td>').addClass('stats_disk_mountpoint').text(disk.mountpoint),
-                $('<td>').addClass('stats_disk_device').text(disk.device),
-                $('<td>').addClass('stats_disk_fstype').text(disk.fstype),
+                $('<td>').addClass('stats_disk_device hidden-phone').text(disk.device),
+                $('<td>').addClass('stats_disk_fstype hidden-phone').text(disk.fstype),
                 $('<td>').addClass('stats_disk_free').text(getReadableFileSizeStringHDD(disk.free)),
                 $('<td>').addClass('stats_disk_used').text(getReadableFileSizeStringHDD(disk.used)),
                 $('<td>').addClass('stats_disk_total').text(getReadableFileSizeStringHDD(disk.total)),
