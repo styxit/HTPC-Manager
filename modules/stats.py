@@ -30,8 +30,9 @@ class Stats:
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'stats_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'stats_name'},
-                {'type': 'bool', 'label': 'Bar', 'name': 'stats_use_bars'}
-                #{'type': 'text', 'label': 'Polling', 'name': 'stats_polling'}
+                {'type': 'bool', 'label': 'Bar', 'name': 'stats_use_bars'},
+                {'type': 'text', 'label': 'Ignore filesystem', 'name': 'stats_ignore_filesystem'},
+                {'type': 'text', 'label': 'Ignore Mountpoint', 'name': 'stats_ignore_mountpoint'}
         ]})
 
     @cherrypy.expose()
@@ -75,15 +76,22 @@ class Stats:
                                 'proc', 'procfs', 'pstore', 'rootfs',
                                 'securityfs', 'sysfs', 'usbfs', '']
         
-        #It must be one of this else exit loop and start
-        req_fstypes = ['ext', 'ext2', 'ext3', 'ext4', 'nfs', 'nfs4', 'fuseblk', 'cifs', 'msdos', 'NTFS', 'FAT', 'FAT32']
+        #Adds the mointpoints that the user wants to ignore to the list of ignored ignorepoints
+        user_ignore_mountpoint = htpc.settings.get('stats_ignore_mountpoint').split(',')
+        if len(user_ignore_mountpoint) >= 0:
+            ignore_mntpoint += user_ignore_mountpoint
+        
+        #Adds the filesystem that the user wants to ignore to the list of ignored filesystem
+        user_ignore_filesystem = htpc.settings.get('stats_ignore_filesystem').split(',')
+        if len(user_ignore_filesystem) >= 0:
+            ignore_fstypes += user_ignore_filesystem
     
         try:
             
             for disk in psutil.disk_partitions(all=True):
                 
-                # To stop windows barf on empy cdrom                            #File system that will be ignores            #Mountpoint that should be ignored, linux      #Only these will be processesed
-                if 'cdrom' in disk.opts or disk.fstype == '' or disk.fstype in ignore_fstypes or disk.mountpoint in ignore_mntpoint or disk.fstype not in req_fstypes:
+                # To stop windows barf on empy cdrom                            #File system that will be ignores            #Mountpoint that should be ignored, linux
+                if 'cdrom' in disk.opts or disk.fstype == '' or disk.fstype in ignore_fstypes or disk.mountpoint in ignore_mntpoint:
                     continue
                     
                 usage = psutil.disk_usage(disk.mountpoint)
@@ -291,7 +299,8 @@ class Stats:
                 d['stats_use_bars'] = 'true'
             
             #Not in use atm
-            d['polling'] = htpc.settings.get('stats_polling')
+            d['ignored_mountpoint'] = htpc.settings.get('stats_ignore_mountpoint')
+            d['ignored_filesystem'] = htpc.settings.get('stats_ignore_filesystem')
         
         except Exception as e:
             self.logger.error("Getting stats settings %s" % e)
