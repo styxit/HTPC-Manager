@@ -1,0 +1,70 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:          HTPC-Manager application instance
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts instance of HTPC-Manager
+# Description:       starts instance of HTPC-Manager
+### END INIT INFO
+
+# Source function library.
+. /etc/init.d/functions
+
+############### EDIT ME ##################
+# path to app
+APP_PATH=APPPATH_GOES_HERE
+# path to python bin
+DAEMON=PATH TO PYTHON
+# startup args
+DAEMON_OPTS="Htpc.py"
+OPTIONS=" --daemon --pid=${PID_FILE}"
+# script name
+NAME=htpc
+# app name
+DESC=HTPC-Manager
+# user
+RUN_AS=RUNAS_USER
+# PID & Lock - Change locations if needed
+PID_FILE=/var/run/htpcmanager.pid
+LOCK_FILE=/var/lock/subsys/${NAME}
+
+############### END EDIT ME ##################
+
+start() {
+        echo "Starting $DESC: "
+        daemon --user=${RUN_AS} --pidfile=${PID_FILE} python ${APP_PATH}/${DAEMON_OPTS} --daemon --pid=${PID_FILE}
+                RETVAL=$?
+                echo
+                [ $RETVAL -eq 0 ] && touch ${LOCK_FILE}
+                return $RETVAL
+}
+stop()  {
+        echo "Stopping $DESC: "
+        killproc -p ${PID_FILE} python
+                RETVAL=$?
+                echo
+                [ $RETVAL -eq 0 ] && rm -f ${LOCK_FILE}
+        return $RETVAL
+}
+
+# How we will call the options
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart|force-reload)
+        stop
+        start
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|force-reload}"
+        exit 2
+esac
+
+exit 0
