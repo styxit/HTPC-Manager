@@ -13,29 +13,37 @@
 # Source function library.
 . /etc/init.d/functions
 
+############### How to  ##################
+#Copy this file to your /etc/init.d/htpc or whatever you would like to name it.
+#Ensure file is executable "chmod +x htpc".
+#Edit the fields in the EDIT ME section below for your preferences.
+#Enable services at startup by "chkconfig htpc on" or "systemctl enable htpc"
+
 ############### EDIT ME ##################
+# PID & Lock.  Change if you would like your lock/pid elsewhere.
+PID_FILE=/var/run/htpcmanager.pid
+LOCK_FILE=/var/lock/subsys/${NAME}
 # path to app
 APP_PATH=APPPATH_GOES_HERE
-# path to python bin
-DAEMON=PATH TO PYTHON
+# path to python bin (must be changed to python, use which python to find path)
+DAEMON=PATH_TO_PYTHON
 # startup args
+# Script that will be ran, doesn't need to be changed
 DAEMON_OPTS="Htpc.py"
-OPTIONS=" --daemon --pid=${PID_FILE}"
-# script name
+# Options you wish to use, OK to change these items however PID is needed for stopping and restarting.  Leave the space at the beginning.
+OPTIONS=" --daemon --pid=$PID_FILE"
+# script name (doesn't need to be changed)
 NAME=htpc
 # app name
 DESC=HTPC-Manager
-# user
+# User you want to run service as
 RUN_AS=RUNAS_USER
-# PID & Lock - Change locations if needed
-PID_FILE=/var/run/htpcmanager.pid
-LOCK_FILE=/var/lock/subsys/${NAME}
-
 ############### END EDIT ME ##################
 
 start() {
         echo "Starting $DESC: "
-        daemon --user=${RUN_AS} --pidfile=${PID_FILE} python ${APP_PATH}/${DAEMON_OPTS} --daemon --pid=${PID_FILE}
+        touch ${PID_FILE}
+        daemon --user=${RUN_AS} --pidfile=${PID_FILE} python ${APP_PATH}/${DAEMON_OPTS}${OPTIONS}
                 RETVAL=$?
                 echo
                 [ $RETVAL -eq 0 ] && touch ${LOCK_FILE}
