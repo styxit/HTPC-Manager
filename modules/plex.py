@@ -5,6 +5,7 @@ from json import loads, dumps
 from urllib2 import Request, urlopen
 from htpc.proxy import get_image
 import logging
+import urllib
 
 
 class Plex:
@@ -131,8 +132,7 @@ class Plex:
         """ Parse thumb to get the url and send to htpc.proxy.get_image """
         #url = self.url('/images/DefaultVideo.png')
         if thumb:
-            url = "http://%s:%s%s.jpg" % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), thumb)
-            
+            url = "http://%s:%s/photo/:/transcode?format=jpg&height=%s&width=%s&url=%s" % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), h, w, urllib.quote_plus("http://%s:%s%s" % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), thumb)))
         else:
             url = "/images/DefaultVideo.png"
 
