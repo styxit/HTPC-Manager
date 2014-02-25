@@ -77,14 +77,22 @@ class Stats:
                                 'securityfs', 'sysfs', 'usbfs', '']
         
         #Adds the mointpoints that the user wants to ignore to the list of ignored ignorepoints
-        user_ignore_mountpoint = htpc.settings.get('stats_ignore_mountpoint').split(',')
-        if len(user_ignore_mountpoint) >= 0:
-            ignore_mntpoint += user_ignore_mountpoint
+        user_ignore_mountpoint = htpc.settings.get('stats_ignore_mountpoint')
+        
+        #If user_ignore_mountpoint is a empty string
+        if not user_ignore_mountpoint:
+            pass
+        else:
+            ignore_mntpoint += user_ignore_mountpoint.split()
         
         #Adds the filesystem that the user wants to ignore to the list of ignored filesystem
-        user_ignore_filesystem = htpc.settings.get('stats_ignore_filesystem').split(',')
-        if len(user_ignore_filesystem) >= 0:
-            ignore_fstypes += user_ignore_filesystem
+        user_ignore_filesystem = htpc.settings.get('stats_ignore_filesystem')
+        
+        #If user_ignore_filsystem is a empty string
+        if not user_ignore_filesystem:
+            pass
+        else:
+            ignore_fstypes += user_ignore_filesystem.split()
     
         try:
             
@@ -298,9 +306,8 @@ class Stats:
             else:
                 d['stats_use_bars'] = 'true'
             
-            #Not in use atm
-            d['ignored_mountpoint'] = htpc.settings.get('stats_ignore_mountpoint')
-            d['ignored_filesystem'] = htpc.settings.get('stats_ignore_filesystem')
+            d['stats_ignore_mountpoint'] = htpc.settings.get('stats_ignore_mountpoint')
+            d['stats_ignore_filesystem'] = htpc.settings.get('stats_ignore_filesystem')
         
         except Exception as e:
             self.logger.error("Getting stats settings %s" % e)
