@@ -47,84 +47,100 @@ class Plex:
     @cherrypy.tools.json_out()
     def GetRecentMovies(self, limit=5):
         """ Get a list of recently added movies """
+        self.logger.debug("Fetching recent Movies")
+
         try:
-            plex_host = htpc.settings.get('plex_host', '')
+            plex_host = htpc.settings.get('plex_host', 'localhost')
             plex_port = htpc.settings.get('plex_port', '32400')
-
-            videotree = etree.parse(
-                "http://%s:%s/library/sections/%s/recentlyAdded" %
-                (plex_host, plex_port, self.moviesSection)
-            )
-
             movies = []
-            for movie in videotree.xpath('//Video')[0:limit]:
-                title = movie.attrib['title']
-                thumbnail = movie.attrib['art']
-                
-                if(hasattr(movie, 'viewCount')):
-                    playcount = movie.attrib['viewCount']
-                else:
-                    playcount = 0
-                year = movie.attrib['year']
-                plot = movie.attrib['summary']
-                runtime = int(movie.attrib['duration']) / 1000
 
-                jmovie = {
-                    'title': title,
-                    'thumbnail': thumbnail,
-                    'playcount': playcount,
-                    'year': year,
-                    'plot': plot,
-                    'runtime': runtime}
+            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+                if section['type'] == "movie":
+                    for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all?type=1&sort=addedAt:desc&X-Plex-Container-Start=1&X-Plex-Container-Size=%s' % (plex_host, plex_port, section["key"], limit), headers={"Accept": "application/json"})).read())["_children"]:
+                        jmovie = {}
+                        genre = []
 
-                movies.append(jmovie)
+                        jmovie['title'] = movie["title"]
+                        if 'thumb'in movie:
+                           jmovie['thumbnail'] = movie["thumb"]
 
-            return json.dumps({'movies': movies})
+                        if 'year'in movie:
+                           jmovie['year'] = movie["year"]
+
+                        if 'summary'in movie:
+                           jmovie['plot'] = movie["summary"]
+
+                        if 'duration'in movie:
+                           jmovie['runtime'] = int(movie['duration']) / 60000
+
+                        if 'art'in movie:
+                           jmovie['fanart'] = movie["art"]
+
+                        if 'addedAt'in movie:
+                           jmovie['addedAt'] = movie["addedAt"]
+
+                        for attrib in movie['_children']:
+                            if attrib['_elementType'] == 'Genre':
+                                genre.append(attrib['tag'])
+                           
+
+                        jmovie['genre'] = [genre]
+
+                        movies.append(jmovie)
+
+            return {'movies': sorted(movies, key=lambda k: k['addedAt'], reverse=True)[:int(limit)]}
         except Exception, e:
             print ("Exception: " + str(e))
-            print ("Unable to fetch recently added movies!")
+            print ("Unable to fetch recent movies!")
             return
+
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetRecentShows(self, limit=5):
         """ Get a list of recently added movies """
         try:
-            plex_host = htpc.settings.get('plex_host', '10.0.1.5')
+            plex_host = htpc.settings.get('plex_host', 'localhost')
             plex_port = htpc.settings.get('plex_port', '32400')
-            videotree = etree.parse(
-                "http://%s:%s/library/sections/%s/recentlyAdded"
-                % (plex_host, plex_port, 2)
-            )
+            episodes = []
 
-            series = []
-            for movie in videotree.xpath('//Video')[0:limit]:
-                title = movie.attrib['title']
-                showTitle = movie.attrib['grandparentTitle']
-                thumbnail = 'http://10.0.1.5:32400' \
-                    + movie.attrib['grandparentThumb']
-                playcount = 1
-                if(hasattr(movie, 'year')):
-                    year = movie.attrib['year']
-                else:
-                    year = 0
-                plot = movie.attrib['summary']
-                runtime = int(movie.attrib['duration']) / 1000
+            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+                if section['type'] == "show":
+                    print 'http://%s:%s/library/sections/%s/all?type=4&sort=addedAt:desc&X-Plex-Container-Start=1&X-Plex-Container-Size=%s' % (plex_host, plex_port, section["key"], limit)
+                    for episode in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all?type=4&sort=addedAt:desc&X-Plex-Container-Start=1&X-Plex-Container-Size=%s' % (plex_host, plex_port, section["key"], limit), headers={"Accept": "application/json"})).read())["_children"]:
+                        jepisode = {}
+        
+                        jepisode['label'] = "%sx%s. %s" % (episode["parentIndex"], episode["index"], episode["title"])
+        
+                        if 'summary'in episode:
+                            jepisode['plot'] = episode["summary"]
+        
+                        if 'index'in episode:
+                            jepisode['episode'] = episode["index"]
+        
+                        if 'parentIndex'in episode:
+                            jepisode['season'] = episode["parentIndex"]
 
-                episode = {
-                    'title': title,
-                    'showTitle': showTitle,
-                    'thumbnail': thumbnail,
-                    'playcount': playcount,
-                    'year': year,
-                    'plot': plot,
-                    'runtime': runtime}
+                        if 'grandparentTitle'in episode:
+                            jepisode['showtitle'] = episode["grandparentTitle"]
 
-                series.append(episode)
-            return json.dumps({'episodes': series})
+                        if 'duration'in episode:
+                           jepisode['runtime'] = int(episode['duration']) / 60000
+        
+                        if 'thumb'in episode:
+                            jepisode['fanart'] = episode["thumb"]
+                            
+                        if 'addedAt'in episode:
+                           jepisode['addedAt'] = episode["addedAt"]
+        
+                        episodes.append(jepisode)
+                            
+
+
+            return {'episodes': sorted(episodes, key=lambda k: k['addedAt'], reverse=True)[:int(limit)]}
         except Exception, e:
             print ("Exception: " + str(e))
-            print ("Unable to fetch recently added movies!")
+            print ("Unable to fetch episodes movies!")
             return
 
     @cherrypy.expose()
@@ -258,6 +274,9 @@ class Plex:
 
                 if 'summary'in episode:
                     jepisode['plot'] = episode["summary"]
+
+                if 'grandparentTitle'in episode:
+                    jepisode['showtitle'] = episode["grandparentTitle"]
 
                 if 'index'in episode:
                     jepisode['episode'] = episode["index"]

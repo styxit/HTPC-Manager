@@ -5,7 +5,7 @@ settings = self.attr.settings
         <div class="row-fluid">
             %if settings.get('dash_rec_movies', 0):
             <div class="span4">
-                <h3><a href="xbmc/#movies">Latest Movies</a></h3>
+                <h3><a href="plex/#movies">Latest Movies</a></h3>
                 <div id="movie-carousel" class="carousel slide hide">
                     <div class="carousel-inner"></div>
                     <a class="carousel-control left" href="#movie-carousel" data-slide="prev">&lsaquo;</a>
@@ -15,7 +15,7 @@ settings = self.attr.settings
             %endif
             %if settings.get('dash_rec_tv', 0):
             <div class="span4">
-                <h3><a href="xbmc/#shows">Latest TV Shows</a></h3>
+                <h3><a href="plex/#shows">Latest TV Shows</a></h3>
                 <div id="tvshow-carousel" class="carousel slide hide">
                     <div class="carousel-inner"></div>
                     <a class="carousel-control left" href="#tvshow-carousel" data-slide="prev">&lsaquo;</a>
@@ -25,7 +25,7 @@ settings = self.attr.settings
             %endif
             %if settings.get('dash_rec_music', 0):
             <div class="span4">
-                <h3><a href="xbmc/#music">Latest Music</a></h3>
+                <h3><a href="plex/#music">Latest Music</a></h3>
                 <ul id="albums-content" class="media-list"></ul>
             </div>
             %endif

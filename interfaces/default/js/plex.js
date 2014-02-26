@@ -174,7 +174,7 @@ function loadShows(options) {
                 showLoad.last += showLoad.limit;
             }
 
-            if (data.tvShows !== undefined) {
+            if (data.tvShows != undefined) {
                 $.each(data.tvShows, function (i, show) {
                     var showItem = $('<li>').attr('title', show.title);
 
@@ -184,7 +184,7 @@ function loadShows(options) {
                     });
 
                     var src = 'holder.js/100x150/text:No artwork';
-                    if (show.thumbnail != '') {
+                    if (show.thumbnail != undefined) {
                         src = WEBDIR + 'plex/GetThumb?w=100&h=150&thumb='+encodeURIComponent(show.thumbnail);
                     }
                     showAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
