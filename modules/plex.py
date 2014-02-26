@@ -132,12 +132,12 @@ class Plex:
         """ Parse thumb to get the url and send to htpc.proxy.get_image """
         #url = self.url('/images/DefaultVideo.png')
         if thumb:
-            url = "http://%s:%s/photo/:/transcode?format=jpg&height=%s&width=%s&url=%s" % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), h, w, urllib.quote_plus("http://%s:%s%s" % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), thumb)))
+            url = "http://%s:%s/photo/:/transcode?height=%s&width=%s&url=%s" % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), h, w, urllib.quote_plus("http://%s:%s%s" % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), thumb)))
         else:
             url = "/images/DefaultVideo.png"
 
         self.logger.debug("Trying to fetch image via " + url)
-        return get_image(url, h, w, o, "")
+        return get_image(url, h=None, w=None, o, "")
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
