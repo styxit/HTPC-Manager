@@ -73,7 +73,7 @@ function loadMovies(options) {
                     });
 
                     var src = 'holder.js/100x150/text:No artwork';
-                    if (movie.thumbnail !== '') {
+                    if (movie.thumbnail != undefined) {
                         src = WEBDIR + 'plex/GetThumb?w=100&h=150&thumb='+encodeURIComponent(movie.thumbnail);
                     }
                     movieAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
