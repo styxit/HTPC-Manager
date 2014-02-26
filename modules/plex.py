@@ -137,7 +137,7 @@ class Plex:
             url = "/images/DefaultVideo.png"
 
         self.logger.debug("Trying to fetch image via " + url)
-        return get_image(url, h=None, w=None, o, "")
+        return get_image(url, o, "")
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
