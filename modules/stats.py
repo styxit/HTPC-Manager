@@ -13,20 +13,20 @@ import cherrypy
 import htpc
 import logging
 
+logger = logging.getLogger('modules.stats')
 
 try: 
     import psutil
-except:
-    if platform.system() == 'Windows':
-        print 'Have you installed psutil correctly? Use the installer on pypi, make sure you get the right processor and architecture. See http://psutil.googlecode.com/hg/INSTALL'
-
+    
+except ImportError:
+    logger.error("Could't import psutil. See http://psutil.googlecode.com/hg/INSTALL")
+    
 class Stats:
     def __init__(self):
         self.logger = logging.getLogger('modules.stats')
         htpc.MODULES.append({
             'name': 'Computer stats',
             'id': 'stats',
-            #'test': htpc.WEBDIR + 'stats/ping',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'stats_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'stats_name'},
@@ -119,8 +119,6 @@ class Stats:
         except Exception as e:
             self.logger.error("Could not get disk info %s" % e)
             
-            
-  
         return rr
     
     
@@ -152,7 +150,7 @@ class Stats:
             self.logger.error("Error trying to pull cpu times: %s" % e)
     
     
-    #Not in use as it returns threads aswell on windows
+    #Not in use as it returns threads aswell on windows, will added in psutil 2.0
     @cherrypy.expose()
     def num_cpu(self):
         try:

@@ -3,48 +3,41 @@
 <div class="container">
     <div class="content">
       <h1 class="page-header page-title">
-          <a href="http://${settings.get('stats_enable')}" target="_blank">${settings.get('stats_name', 'Stats')}</a>
+          <span>${settings.get('stats_name', 'Stats')}</span>
           <small>
-	  <i class="icon-arrow-down"></i>
-	  <span id="stat-recv"></span>
-	  <i class="icon-arrow-up"></i>
-	  <span id="stat-sent"></span>
-	  
+                <i class="icon-arrow-down"></i><span id="stat-recv"></span>
+                <i class="icon-arrow-up"></i><span id="stat-sent"></span>
           </small>
       </h1>
+      
       <div class="row-fluid">
 		<div class="span4 l text-left"></div>
-                <div class="span4  c text-center"></div>
-                <div class="span4 r text-right"></div>
+        <div class="span4  c text-center"></div>
+        <div class="span4 r text-right"></div>
       </div>
     
-    
-        
-            <div id="ss" class="row-fluid text-center">
-                <div class="span3 cpu text-center"></div>
-                <div class="span3 virmem text-center"></div>
-                <div class="span3 swpmem text-center"></div>
-                <div class="span3 nw text-center"></div>
-            </div>
+        <div id="ss" class="row-fluid text-center">
+            <div class="span3 cpu text-center"></div>
+            <div class="span3 virmem text-center"></div>
+            <div class="span3 swpmem text-center"></div>
+            <div class="span3 nw text-center"></div>
+        </div>
 	    
-      <table class="table disktable table-striped table-hover">
-        <thead>
-          <tr>
-            <th>Mount Point</th>
-            <th class="hidden-phone">Location</th>
-            <th class="hidden-phone">File System</th>
-            <th class="">Free</th>
-            <th class="">Used</th>
-            <th class="">Total</th>
-            <th id="pbar" class="span3">Bar</th>
-            <th class="">%</th>
-          </tr>
-        </thead>
-        <tbody id="disklist">
-        </tbody>
-      </table>
-      <span id="error_message">
-      <i class="icon-spinner icon-spin spinner"></i>
-      </span>
+        <table class="table disktable table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Mount Point</th>
+                    <th class="hidden-phone">Location</th>
+                    <th class="hidden-phone">File System</th>
+                    <th class="">Free</th>
+                    <th class="">Used</th>
+                    <th class="">Total</th>
+                    <th id="pbar" class="span3">Bar</th>
+                    <th class="">%</th>
+                </tr>
+            </thead>
+            <tbody id="disklist"></tbody>
+        </table>
+      <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
     </div>
 </div>

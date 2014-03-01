@@ -91,7 +91,6 @@ function get_local_ip() {
 // Not in use
 function network_usage() {
     $.getJSON(WEBDIR + "stats/network_usage", function (response) {
-	//alert(response);
 	$(".nw").append("<div>Recv: "+ getReadableFileSizeString(response.bytes_recv) +"</div>");
 	$(".nw").append("<div>Sent: "+ getReadableFileSizeString(response.bytes_sent) +"</div>");
 	$(".nw").append("<div>Error in: "+ response.errin +"</div>");
@@ -153,9 +152,6 @@ function swap_memory_table() {
 
 function cpu_percent_bar() {
     $.getJSON(WEBDIR + "stats/cpu_percent", function (cpu) {
-        if (cpu.idle <= 10) {
-            //$('.pcpu').addClass('progress-danger');
-        }
         $(".cpu").html("<div>CPU</div><div class=progress><div class=bar style=width:" + (cpu.user + cpu.system).toFixed(1) + "%><span class=sr-only>Used: "+ (cpu.user + cpu.system).toFixed(1) +"%</span></div><div class='bar bar-success' style=width:" + (100 - (cpu.user + cpu.system)).toFixed(1) + "%><span class=sr-only>Idle: "+ cpu.idle.toFixed(1) +"%</span></div></div><div class=progress><div class=bar style=width:" + cpu.user.toFixed(1) + "%><span class=sr-only>User: "+ cpu.user.toFixed(1) +"%</span></div><div class='bar bar-warning' style=width:" + cpu.system.toFixed(1) + "%><span class=sr-only>System: "+ cpu.system.toFixed(1) +"%</span></div><div class='bar bar-success' style=width:" + (100 - (cpu.user + cpu.system)).toFixed(1) + "%><span class=sr-only>Idle: " + cpu.idle.toFixed(1) +"%</span></div></div>");
     });
 }
