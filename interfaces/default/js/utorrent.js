@@ -125,8 +125,8 @@ function getTorrents() {
 
                     tr.append(
                         $('<td>').html(torrent.name
-                            + '<br><small><i class="icon-long-arrow-down"></i> ' + getReadableFileSizeString(torrent.up_speed)
-                            + '/s <i class="icon-long-arrow-up"></i> ' + getReadableFileSizeString(torrent.dl_speed) + '/s</small>'
+                            + '<br><small><i class="icon-long-arrow-down"></i> ' + getReadableFileSizeString(torrent.dl_speed)
+                            + '/s <i class="icon-long-arrow-up"></i> ' + getReadableFileSizeString(torrent.up_speed) + '/s</small>'
                         ),
                         $('<td>').text(ratio),
                         $('<td>').text(getReadableTime(torrent.eta)),

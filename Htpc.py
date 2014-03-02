@@ -30,7 +30,7 @@ def parse_arguments():
                         help='Print debug text')
     parser.add_argument('--webdir', default=None,
                         help='Use a custom webdir')
-    parser.add_argument('--loglevel', default='error',
+    parser.add_argument('--loglevel', default='info',
                         help='Set a loglevel. Allowed values: debug, info, warning, error, critical')
     return parser.parse_args()
 
@@ -55,16 +55,20 @@ def load_modules():
     htpc.ROOT.sickbeard = Sickbeard()
     from modules.transmission import Transmission
     htpc.ROOT.transmission = Transmission()
+    from modules.deluge import Deluge
+    htpc.ROOT.deluge = Deluge()
     from modules.squeezebox import Squeezebox
     htpc.ROOT.squeezebox = Squeezebox()
     from modules.search import Search
     htpc.ROOT.search = Search()
-    from modules.stats import Stats
-    htpc.ROOT.stats = Stats()
-    """
     from modules.utorrent import UTorrent
     htpc.ROOT.utorrent = UTorrent()
-    """
+    from modules.nzbget import NZBGet
+    htpc.ROOT.nzbget = NZBGet()
+    from modules.qbittorrent import qbittorrent
+    htpc.ROOT.qbittorrent = qbittorrent()
+    from modules.stats import Stats
+    htpc.ROOT.stats = Stats()
 
 
 def main():

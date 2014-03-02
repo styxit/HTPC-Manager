@@ -1,4 +1,4 @@
-$.ajaxSetup({timeout: 3000})
+$.ajaxSetup({timeout: 30000})
 
 $(document).ready(function () {
     path = window.location.pathname.split('/')
@@ -46,25 +46,31 @@ $(document).ready(function () {
     $('#btn-check-update').click(function (e) {
         e.preventDefault()
         notify('Update','Checking for update.','info')
-        $.getJSON(WEBDIR + 'update/', function (data) {
-            if (data == 0) {
-                notify('Update', 'Already running latest version.', 'success')
-            } else if ($.isNumeric(data) && data > 0) {
-                if (confirm('Your are '+data+' versions behind. Update to latest version?')) {
-                    $.post(WEBDIR + 'update/', function (data) {
-                        if (data == 1) {
-                            showModal('Installing update', '<div class="progress progress-striped active"><div class="bar" style="width:100%"></div></div>','')
-                        } else {
-                            notify('Update', 'An error occured while updating!', 'error')
-                        }
-                    }, 'json').always(function() {
-                        checkUpdate()
-                    })
+
+        $.ajax({
+            dataType: "json",
+            timeout: 10000,
+            url: WEBDIR + 'update/',
+            success: function(data) {
+                if ($.isNumeric(data.versionsBehind) && data.versionsBehind == 0) {
+                    notify('Update', 'Already running latest version.', 'success')
+                } else if (data.updateNeeded) {
+                    if (confirm('Your are '+data.versionsBehind+' versions behind. Update need. Update to latest version?')) {
+                        $.post(WEBDIR + 'update/', function (data) {
+                            if (data == 1) {
+                                showModal('Installing update', '<div class="progress progress-striped active"><div class="bar" style="width:100%"></div></div>','')
+                            } else {
+                                notify('Update', 'An error occured while updating!', 'error')
+                            }
+                        }, 'json').always(function() {
+                            checkUpdate()
+                        })
+                    }
+                } else {
+                    notify('Update', 'Failed. Check errorlog.', 'error')
                 }
-            } else {
-                notify('Update', 'Failed. Check errorlog.', 'error')
             }
-        })
+        });
     })
 
     $('#modal_dialog').on('hidden', function () {
@@ -124,7 +130,6 @@ function showModal(title, content, buttons) {
     $('#modal_dialog .modal-h3').html(title)
     $('#modal_dialog .modal-body').html(content)
     var footer = $('#modal_dialog .modal-footer').empty()
-    $.extend(buttons, {'Close': hideModal})
     $.each(buttons, function (name, action) {
         footer.append(
             $('<button>').html(name).addClass('btn btn-primary').click(function() {
@@ -132,6 +137,13 @@ function showModal(title, content, buttons) {
             })
         )
     })
+
+    footer.append(
+        $('<button>').html('Close').addClass('btn').click(function() {
+            $(hideModal)
+        })
+    )
+
     $('#modal_dialog').modal({show: true, backdrop: true})
 }
 function hideModal() {

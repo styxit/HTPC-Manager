@@ -5,9 +5,22 @@ __author__ = 'quentingerome'
 import logging
 import htpc
 import cherrypy
-from lxml import html
+from HTMLParser import HTMLParser
 
 logger = logging.getLogger('modules.transmission')
+
+
+class AuthTokenParser(HTMLParser):
+	token = None
+
+	def handle_data(self, data):
+		self._token = data
+
+	def token(self, html):
+		self._token = None
+		self.feed(html)
+		return self._token
+
 
 fields = {
 	'name': 2,
@@ -17,8 +30,8 @@ fields = {
 	'percentage_done': 4,
 	'dl': 5,
 	'up': 6,
-	'dl_speed': 8,
-	'up_speed': 9,
+	'dl_speed': 9,
+	'up_speed': 8,
 	'eta': 10,
 	'ratio': 7,
 }
@@ -68,7 +81,7 @@ def TorrentResult(values):
 			else:
 				yield key, _get_torrent_state(vals[idx])
 
-	return {k: v for k, v in get_result(values)}
+	return dict([(k, v) for k, v in get_result(values)])
 
 
 class ConnectionError(Exception):
@@ -172,7 +185,7 @@ class UTorrent:
 
 	def auth(self, host, port, username, pwd):
 		token_page = requests.get(self._get_url(host, port) + 'token.html', auth=(username, pwd))
-		self._token = html.document_fromstring(token_page.content).get_element_by_id('token').text
+		self._token = AuthTokenParser().token(token_page.content)
 		self._cookies = token_page.cookies
 
 	def _fetch(self, host, port, username, pwd, args):

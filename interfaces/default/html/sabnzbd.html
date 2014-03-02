@@ -19,8 +19,9 @@
         </form>
         <ul class="nav nav-tabs">
             <li class="active"><a href="#active" data-toggle="tab">Active</a></li>
-            <li><a href="#history" data-toggle="tab">History</a></li>
-            <li><a href="#warnings" data-toggle="tab">Warnings</a></li>
+            <li><a href="#history" data-toggle="tab" id="tab-history">History</a></li>
+            <li><a href="#warnings" data-toggle="tab" id="tab-warnings">Warnings</a></li>
+            <li><a href="#sabnzbd-stats" data-toggle="tab">Stats</a></li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="active">
@@ -59,6 +60,28 @@
                     </thead>
                     <tbody id="warning_table_body"></tbody>
                 </table>
+            </div>
+            <div id="sabnzbd-stats" class="tab-pane">
+                <legend>Diskspace</legend>
+                <div class="row-fluid">
+                    <div class="span6" id="diskspace1">
+                        <h6>Disk 1</h6>
+
+                        <div class="progress">
+                            <div class="bar" style="width: 0%;"></div>
+                        </div>
+                        <small class="diskspace-free">Freespace placeholder</small>
+                        <small class="pull-right diskspace-total">Total disk size placeholder</small>
+                    </div>
+                    <div class="span6"id="diskspace2">
+                        <h6>Disk 2</h6>
+                        <div class="progress">
+                            <div class="bar" style="width: 0%;">40 GB</div>
+                        </div>
+                        <small class="diskspace-free">Freespace placeholder</small>
+                        <small class="pull-right diskspace-total">Total disk size placeholder</small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

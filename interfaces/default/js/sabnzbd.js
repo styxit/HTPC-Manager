@@ -43,6 +43,14 @@ $(document).ready(function () {
     }, 5000);
     loadHistory();
     loadWarnings();
+
+    // reload tab content on tab click
+    $('#tab-history').click(function() {
+        loadHistory();
+    })
+    $('#tab-warnings').click(function() {
+        loadWarnings();
+    })
 });
 
 function removeHistoryItem(id) {
@@ -75,10 +83,11 @@ function retryHistoryItem(id) {
 
 function loadHistory() {
     $.ajax({
-        url: WEBDIR + 'sabnzbd/GetHistory?limit=20',
+        url: WEBDIR + 'sabnzbd/GetHistory?limit=30',
         type: 'get',
         dataType: 'json',
         success: function (data) {
+            $('#history_table_body').empty();
             if (data.status == false) {
                 $('#notification_area').addClass('alert alert-error');
                 $('#notification_area').html('<strong>Error</strong> Could not connect to SABnzbd, go to <a href="' + WEBDIR + 'settings">settings</a>');
@@ -226,6 +235,42 @@ function loadQueue(once) {
 
                 $('#active_table_body').append(row);
             });
+
+            // Set diskspace
+            freePercentDisk1 =  Math.ceil((data.diskspace1 / data.diskspacetotal1) * 100);
+            usedPercentDisk1 = 100 - freePercentDisk1;
+            usedGbDisk1 = (data.diskspacetotal1 - data.diskspace1) * 100;
+            usedGbDisk1 = Math.round(usedGbDisk1) / 100;
+            $('#sabnzbd-stats #diskspace1 .bar').css('width', usedPercentDisk1+'%').text(usedGbDisk1 + ' GB');
+
+            $('#sabnzbd-stats #diskspace1 .diskspace-total').text('Total: '+ data.diskspacetotal1 + ' GB');
+            $('#sabnzbd-stats #diskspace1 .diskspace-free').text('Free: '+ data.diskspace1 + ' GB');
+
+            // If less then 10% is free, show red bar
+            if (freePercentDisk1 < 10) {
+                $('#sabnzbd-stats #diskspace1 .progress').addClass('progress-danger');
+            }
+
+            // Only show disk 2 if it is not the same as disk1
+            if (data.diskspacetotal1 != data.diskspacetotal2 && data.diskspace1 != data.diskspace2) {
+                freePercentDisk2 =  Math.ceil((data.diskspace2 / data.diskspacetotal2) * 100);
+                usedPercentDisk2 = 100 - freePercentDisk2;
+                usedGbDisk2 = (data.diskspacetotal2 - data.diskspace2) * 100;
+                usedGbDisk2 = Math.round(usedGbDisk2) / 100;
+                $('#sabnzbd-stats #diskspace2 .bar').css('width', usedPercentDisk2+'%').text(usedGbDisk2 + ' GB');
+
+                $('#sabnzbd-stats #diskspace2 .diskspace-total').text('Total: '+ data.diskspacetotal2 + ' GB');
+                $('#sabnzbd-stats #diskspace2 .diskspace-free').text('Free: '+ data.diskspace2 + ' GB');
+
+                // If less then 10% is free, show red bar
+                if (freePercentDisk2 < 10) {
+                    $('#sabnzbd-stats #diskspace1 .progress').addClass('progress-danger');
+                }
+                $('#sabnzbd-stats #diskspace2').show();
+            } else {
+                $('#sabnzbd-stats #diskspace2').hide();
+            }
+
         }
     });
 }
@@ -236,6 +281,7 @@ function loadWarnings() {
         type: 'get',
         dataType: 'json',
         success: function (data) {
+            $('#warning_table_body').empty();
             if (data.warnings == 0) {
                 var row = $('<tr>')
                 row.append($('<td>').html('No warnings'));
