@@ -33,6 +33,6 @@ table.networktable {
 }
 /* First td should not have the smaller font */
 .nwtable tr td:first-child{
-	text-align: right;
+	text-align: center;
 	font-weight: inherit;
 }
