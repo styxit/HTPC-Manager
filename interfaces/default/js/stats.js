@@ -96,7 +96,7 @@ function get_diskinfo() {
 
 function uptime() {
     $.getJSON(WEBDIR + "stats/uptime", function (data) {
-	    $(".r").text("Uptime: "+ data.uptime);
+	    $("#uptime").text("Uptime: "+ data.uptime);
     });
 }
 
@@ -134,13 +134,13 @@ function network_usage_table() {
 
 function get_user() {
     $.getJSON(WEBDIR + "stats/get_user", function (response) {
-	$(".l").text(response.name +" logged in " + response.started + " ago")
+	$("#system_user").text(response.name +" logged in " + response.started + " ago")
     });
 }
 
 function sys_info() {
     $.getJSON(WEBDIR + "stats/sys_info", function (response) {
-        $(".c").html("<div>"+ response.system +' '+ response.release + ' ' + response.user + "</div>");
+        $("#system_info").html("<div>"+ response.system +' '+ response.release + ' ' + response.user + "</div>");
     });
 }
 
@@ -154,7 +154,7 @@ function virtual_memory_bar() {
 
 function virtual_memory_table() {
     $.getJSON(WEBDIR + "stats/virtual_memory", function (virtual) {
-	$(".virmem").html("<table class='table nwtable'><tr><td class=span4>Physical Memory:</td><td class=span4>" + virtual.percent + "%</td></tr><tr><td>Total:</td><td>" + getReadableFileSizeString(virtual.total) + "</td></tr><tr><td>Used:</td><td>" + getReadableFileSizeString((virtual.total - virtual.available)) + "</td></tr><tr><td>Free:</td><td>" + getReadableFileSizeString(virtual.available) + "</td></tr></tbody></table>");
+	$(".virmem").html("<table class='table nwtable'><tr><td>Physical Memory</td><td>" + virtual.percent + "%</td></tr><tr><td>Total</td><td>" + getReadableFileSizeString(virtual.total) + "</td></tr><tr><td>Used</td><td>" + getReadableFileSizeString((virtual.total - virtual.available)) + "</td></tr><tr><td>Free</td><td>" + getReadableFileSizeString(virtual.available) + "</td></tr></tbody></table>");
     });
 }
 
@@ -168,7 +168,7 @@ function swap_memory_bar() {
 
 function swap_memory_table() {
     $.getJSON(WEBDIR + "stats/swap_memory", function (swap) {
-        $(".swpmem").html("<table class='table nwtable'><tr><td class=span4>Swap Memory:</td><td class=span4>" +swap.percent +"%</td></tr><tr><td>Total:</td><td>"+getReadableFileSizeString(swap.total)+"</td></tr><tr><td>Used:</td><td>"+getReadableFileSizeString(swap.used)+"</td></tr><tr><td>Free:</td><td>"+getReadableFileSizeString(swap.free)+"</td></tr></tbody></table>");
+        $(".swpmem").html("<table class='table nwtable'><tr><td>Swap Memory</td><td>" +swap.percent +"%</td></tr><tr><td>Total</td><td>"+getReadableFileSizeString(swap.total)+"</td></tr><tr><td>Used</td><td>"+getReadableFileSizeString(swap.used)+"</td></tr><tr><td>Free</td><td>"+getReadableFileSizeString(swap.free)+"</td></tr></tbody></table>");
     });
 }
 
@@ -181,7 +181,7 @@ function cpu_percent_bar() {
 
 function cpu_percent_table() {
     $.getJSON(WEBDIR + "stats/cpu_percent", function (cpu) {
-        $(".cpu").html("<table class='table nwtable'><tr><td class=span4>CPU:</td><td class=span4>" + (100 - cpu.idle).toFixed(1) + "%</td></tr><tr><td>User:</td><td>" + cpu.user + "%</td></tr><tr><td>System:</td><td>" + cpu.system + "%</td></tr><tr><td>Idle:</td><td>" + cpu.idle + "%</td></tr></tbody></table>");
+        $(".cpu").html("<table class='table nwtable'><tr><td>CPU</td><td>" + (100 - cpu.idle).toFixed(1) + "%</td></tr><tr><td>User</td><td>" + cpu.user + "%</td></tr><tr><td>System</td><td>" + cpu.system + "%</td></tr><tr><td>Idle</td><td>" + cpu.idle + "%</td></tr></tbody></table>");
     });
 }
 

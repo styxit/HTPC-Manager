@@ -12,7 +12,7 @@ h1.page-header.page-title {
 }
 
 .table.nwtable {
-	margin-bottom:0px !important;	
+	margin-bottom:0px !important;
 }
 
 td.tlip {
@@ -26,4 +26,13 @@ td.txip {
 table.networktable {
 	table-layout: fixed;
 	word-wrap: break-word !important;
+}
+
+.nwtable tr td{
+	font-weight: 200;
+}
+/* First td should not have the smaller font */
+.nwtable tr td:first-child{
+	text-align: right;
+	font-weight: inherit;
 }
