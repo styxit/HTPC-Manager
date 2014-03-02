@@ -1,3 +1,31 @@
+// Document ready
+$(document).ready(function () {
+    if (importPsutil) {
+        $('.spinner').show();
+        get_diskinfo();
+        network_usage_table();
+        return_stats_settings();
+        uptime();
+        get_user();
+        sys_info();
+        get_external_ip();
+        get_local_ip();
+    }
+});
+
+if (importPsutil) {
+    // Set timeintercal to refresh stats
+    setInterval(function () {
+        get_diskinfo();
+        network_usage_table();
+        return_stats_settings();
+        uptime();
+        get_user();
+        sys_info();
+        get_external_ip(); // dont want to spam a external service.
+        get_local_ip();
+    }, 10000);
+}
 
 // For hdd. Converts bytes to filesize in kb,mb,gb
  function getReadableFileSizeStringHDD(fileSizeInBytes) {
@@ -50,7 +78,6 @@ function get_diskinfo() {
                     //progress2.addClass('progress-danger'); // need to check, does not work
                 }
 
-
                 row.append(
                 $('<td>').addClass('stats_disk_mountpoint').text(disk.mountpoint),
                 $('<td>').addClass('stats_disk_device hidden-phone').text(disk.device),
@@ -67,20 +94,17 @@ function get_diskinfo() {
     });
 }
 
-
 function uptime() {
     $.getJSON(WEBDIR + "stats/uptime", function (data) {
 	    $(".r").text("Uptime: "+ data.uptime);
     });
 }
 
-
 function get_external_ip() {
     $.getJSON(WEBDIR + "stats/get_external_ip", function (response) {
         $(".txip").text(response.externalip);
     });
 }
-
 
 function get_local_ip() {
     $.getJSON(WEBDIR + "stats/get_local_ip", function (response) {
@@ -134,7 +158,6 @@ function virtual_memory_table() {
     });
 }
 
-
 function swap_memory_bar() {
     $.getJSON(WEBDIR + "stats/swap_memory", function (swap) {
         //alert(response.total);
@@ -156,7 +179,6 @@ function cpu_percent_bar() {
     });
 }
 
-
 function cpu_percent_table() {
     $.getJSON(WEBDIR + "stats/cpu_percent", function (cpu) {
         $(".cpu").html("<table class='table nwtable'><tr><td class=span4>CPU:</td><td class=span4>" + (100 - cpu.idle).toFixed(1) + "%</td></tr><tr><td>User:</td><td>" + cpu.user + "%</td></tr><tr><td>System:</td><td>" + cpu.system + "%</td></tr><tr><td>Idle:</td><td>" + cpu.idle + "%</td></tr></tbody></table>");
@@ -177,35 +199,5 @@ function return_stats_settings() {
         } else {
             //pass
         }
-
     });
-}
-
-
-// Loads the moduleinfo
-$(document).ready(function () {
-    if (importPsutil) {
-        $('.spinner').show();
-        get_diskinfo();
-        network_usage_table();
-        return_stats_settings();
-        uptime();
-        get_user();
-        sys_info();
-        get_external_ip();
-        get_local_ip();
-    }
-});
-
-if (importPsutil) {
-    setInterval(function () {
-        get_diskinfo();
-        network_usage_table();
-        return_stats_settings();
-        uptime();
-        get_user();
-        sys_info();
-        get_external_ip(); // dont want to spam a external service.
-        get_local_ip();
-    }, 10000);
 }

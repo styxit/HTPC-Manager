@@ -55,9 +55,7 @@ class Stats:
             boot = str(boot)
             uptime = boot[:-7]
             d['uptime'] = uptime
-
             return json.dumps(d)
-
         except Exception as e:
             self.logger.error("Could not get uptime %s" % e)
 
@@ -131,7 +129,6 @@ class Stats:
             cpu = psutil.cpu_times_percent(interval=0.4, percpu=False)
             cpu = cpu._asdict()
             jcpu = json.dumps(cpu)
-
             return jcpu
         except Exception as e:
             self.logger.error("Error trying to pull cpu percent: %s" % e)
@@ -145,7 +142,6 @@ class Stats:
             cpu = psutil.cpu_times(percpu=False)
             dcpu = cpu._asdict()
             rr = json.dumps(dcpu)
-
             return rr
         except Exception as e:
             self.logger.error("Error trying to pull cpu times: %s" % e)
@@ -155,13 +151,10 @@ class Stats:
     @cherrypy.expose()
     def num_cpu(self):
         try:
-
             cpu = psutil.NUM_CPUS
             dcpu = cpu._asdict()
             jcpu  = json.dumps(dcpu)
-
             return jcpu
-
         except Exception as e:
             self.logger.error("Error trying to pull cpu cores %s" % e)
 
@@ -173,7 +166,6 @@ class Stats:
         d = {}
         rr = None
         try:
-
             for user in psutil.get_users():
                 duser = user._asdict()
                 td = datetime.now() - datetime.fromtimestamp(duser['started'])
@@ -181,13 +173,10 @@ class Stats:
                 td = td[:-7]
                 duser['started'] = td
                 rr = json.dumps(duser)
-
             return rr
 
         except Exception as e:
             self.logger.error("Pulling logged in info %s" % e)
-
-
         return rr
 
     @cherrypy.expose()
@@ -197,15 +186,12 @@ class Stats:
         d = {}
         rr = None
         try:
-
             ip = socket.socket(socket.AF_INET, socket.SOCK_DGRAM);
             ip.connect(('8.8.8.8', 80))
             local_ip =(ip.getsockname()[0])
             d['localip'] = local_ip
             rr = json.dumps(d)
-
             return rr
-
         except Exception as e:
             self.logger.error("Pulling  local ip %s" % e)
 
@@ -214,14 +200,11 @@ class Stats:
     def get_external_ip(self):
         d = {}
         rr = None
-
         try:
             s = urllib2.urlopen('http://myexternalip.com/raw').read()
             d['externalip'] = s.strip()
             rr = json.dumps(d)
-
             return rr
-
         except Exception as e:
             self.logger.error("Pulling external ip %s" % e)
 
@@ -230,7 +213,6 @@ class Stats:
     def sys_info(self):
         d = {}
         rr = None
-
         try:
             computer = platform.uname()
             d['system'] = computer[0]
@@ -240,9 +222,7 @@ class Stats:
             d['machine'] = computer[4]
             d['processor'] = computer[5]
             rr = json.dumps(d)
-
             return rr
-
         except Exception as e:
             self.logger.error("Pulling system info %s" % e )
 
@@ -259,7 +239,6 @@ class Stats:
 
         except Exception as e:
             self.logger.error("Pulling network info %s" % e)
-
 
 
     @cherrypy.expose()
@@ -284,7 +263,6 @@ class Stats:
         rr = None
 
         try:
-
             mem = psutil.swap_memory()
             dmem = mem._asdict()
             rr = json.dumps(dmem)
@@ -299,7 +277,6 @@ class Stats:
     def return_settings(self):
         d = {}
         try:
-
             if str(htpc.settings.get('stats_use_bars')) == str('False'):
                 d['stats_use_bars'] = 'false'
             else:
@@ -312,4 +289,3 @@ class Stats:
             self.logger.error("Getting stats settings %s" % e)
 
         return json.dumps(d)
-
