@@ -2,6 +2,32 @@
 <% settings = self.attr.settings %>
 <div class="container">
     <div class="content">
+            <h1 class="page-header page-title">
+            <a href="webinterface" target="_blank">${settings.get('plex_name', 'Plex')}</a>
+            <div class="btn-toolbar pull-right">
+
+                <div class="btn-group">
+                    <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-th-list"></i>
+                    <i class="caret"></i></a>
+                    <ul class="dropdown-menu pull-right">
+                        %if settings.get('xbmc_hide_watched', 0):
+                        <li><a href="#" id="hidewatched" class="active"><i class="icon-eye-open"></i> Show Watched</a></li>
+                        %else:
+                        <li><a href="#" id="hidewatched"><i class="icon-eye-open"></i> Hide Watched</a></li>
+                        %endif
+                        <li><a href="UpdateLibrary" class="ajax-link"><i class="icon-search"></i> Update All Sections</a></li>
+                        <li><a href="UpdateLibrary?section_type=movie" class="ajax-link"><i class="icon-search"></i> Update Movie Section</a></li>
+                        <li><a href="UpdateLibrary?section_type=movie" class="ajax-link"><i class="icon-search"></i> Update Show Section</a></li>
+                        <li><a href="UpdateLibrary?section_type=artist" class="ajax-link"><i class="icon-search"></i> Update Music Section</a></li>
+                    </ul>
+                </div>
+                %if settings.get('plex_mac', 0):
+                <div class="btn-group">
+                    <a href="Wake" id="plex_wake_button" class="ajax-link btn"><i class="icon-off"></i> Wake</a>
+                </div>
+                %endif
+            </div>
+        </h1>
             <div class="well hide" id="nowplaying">
             <div class="row">
                 <div class="span2 hidden-phone thumb">
@@ -27,14 +53,6 @@
                         </div>
                         <div class="btn-group">
                             <button class="btn btn-small" data-player-control="mute"><i class="icon-volume-off"></i></button>
-                        </div>
-                        <div class="input-prepend pull-right">
-                            <span class="add-on"><i class="icon-text-width"></i></span>
-                            <select id="subtitles"></select>
-                        </div>
-                        <div class="input-prepend pull-right">
-                            <span class="add-on"><i class="icon-volume-up"></i></span>
-                            <select id="audio"></select>
                         </div>
                     </div>
                 </div>

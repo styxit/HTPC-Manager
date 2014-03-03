@@ -23,7 +23,7 @@ $(document).ready(function() {
             reloadTab();
         }
     });
-    playerLoader = setInterval('loadNowPlaying()', 5000);
+    playerLoader = setInterval('loadNowPlaying()', 2000);
 
 });
 
@@ -52,19 +52,18 @@ function loadMovies(options) {
         data: sendData,
         dataType: 'json',
         success: function (data) {
-            var parsedJson = JSON.parse(data);
-            if (parsedJson === null) return errorHandler();
+            if (data === null) return errorHandler();
 
             movieLoad.last += movieLoad.limit;
 
-            if (parsedJson.limits.end == parsedJson.limits.total) {
+            if (data.limits.end == data.limits.total) {
                 movieLoad.last = -1;
             } else {
                 movieLoad.last += movieLoad.limit;
             }
 
-            if (parsedJson.movies != undefined) {
-                $.each(parsedJson.movies, function (i, movie) {
+            if (data.movies != undefined) {
+                $.each(data.movies, function (i, movie) {
                     var movieItem = $('<li>').attr('title', movie.title);
 
                     var movieAnchor = $('<a>').attr('href', '#').click(function(e) {
@@ -165,7 +164,6 @@ function loadShows(options) {
         data: sendData,
         dataType: 'json',
         success: function (data) {
-            data = JSON.parse(data);
             if (data === null) return errorHandler();
 
             if (data.limits.end == data.limits.total) {
@@ -241,7 +239,6 @@ function loadEpisodes(options) {
         data: sendData,
         dataType: 'json',
         success: function (data) {
-            data = JSON.parse(data);
             if (data==null || data.limits.total==0) return errorHandler();
 
             if (data.limits.end == data.limits.total) {
@@ -293,7 +290,7 @@ function loadNowPlaying() {
         type: 'get',
         dataType: 'json',
         success: function(data) {
-            data = JSON.parse(data);
+
             if (data.playing_items.length == 0) {
                 $('#nowplaying').hide();
                 $('a[href=#playlist]').parent().hide();
@@ -301,7 +298,7 @@ function loadNowPlaying() {
             }
             if (data.playing_items.length !== 0) {
                 $.each(data.playing_items, function (i, item) {
-                                var nowPlayingThumb = encodeURIComponent(item.thumbnail);
+                var nowPlayingThumb = encodeURIComponent(item.thumbnail);
                 var thumbnail = $('#nowplaying .thumb img').attr('alt', item.label);
                 if (nowPlayingThumb == '') {
                     thumbnail.attr('src', 'holder.js/140x140/text:No artwork');
@@ -323,7 +320,7 @@ function loadNowPlaying() {
                     }
                 }
                     //console.log(item)
-                    var itemTime = $('#nowplaying #player-item-time').html((item.viewOffset/1000).toString().toHHMMSS() + ' / ' + (item.duration/1000).toString().toHHMMSS());
+                    var itemTime = $('#nowplaying #player-item-time').html(parseSec(item.viewOffset/1000) + ' / ' + parseSec(item.duration/1000));
                     var itemTitel = $('#nowplaying #player-item-title')
                     var itemSubtitel = $('#nowplaying #player-item-subtitle')
                     var playingTitle = '';
@@ -376,18 +373,4 @@ function errorHandler() {
     notify('Error','Error connecting to Plex','error');
     moviesLoading = false;
     return false;
-}
-
-
-String.prototype.toHHMMSS = function () {
-    var sec_num = parseInt(this, 10); // don't forget the second param
-    var hours   = Math.floor(sec_num / 3600);
-    var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
-    var seconds = sec_num - (hours * 3600) - (minutes * 60);
-
-    if (hours   < 10) {hours   = "0"+hours;}
-    if (minutes < 10) {minutes = "0"+minutes;}
-    if (seconds < 10) {seconds = "0"+seconds;}
-    var time    = hours+':'+minutes+':'+seconds;
-    return time;
 }
