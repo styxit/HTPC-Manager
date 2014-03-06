@@ -9,6 +9,8 @@ var movieLoad = {
 }
 
 $(document).ready(function() {
+    hideWatched = $('#hidewatched').hasClass('active')?1:0;
+    playerLoader = setInterval('loadNowPlaying()', 2000);
 
     // Load data on tab display
     $('a[data-toggle=\'tab\']').click(function(e) {
@@ -23,7 +25,17 @@ $(document).ready(function() {
             reloadTab();
         }
     });
-    playerLoader = setInterval('loadNowPlaying()', 2000);
+
+
+    // Toggle wether to show already seen episodes
+    $('#hidewatched').click(function(e) {
+        e.preventDefault();
+        hideWatched = $(this).toggleClass('active').hasClass('active')?1:0;
+        $(this).text(hideWatched?' Show Watched':' Hide Watched');
+        $(this).prepend('<i class="icon-eye-open"></i>');
+        $.get(WEBDIR + 'settings?plex_hide_watched='+hideWatched);
+        reloadTab();
+    });
 
 });
 
@@ -41,6 +53,7 @@ function loadMovies(options) {
     var sendData = {
         start: movieLoad.last,
         end: (movieLoad.last + movieLoad.limit),
+        hidewatched: hideWatched
     };
 
     $.extend(sendData, options);
@@ -153,13 +166,14 @@ function loadShows(options) {
 
     var sendData = {
         start: showLoad.last,
-        end: (showLoad.last + showLoad.limit)
+        end: (showLoad.last + showLoad.limit),
+        hidewatched: hideWatched
     };
     $.extend(sendData, options);
 
     $('.spinner').show();
     showLoad.request = $.ajax({
-        url: WEBDIR + 'plex/ListShows',
+        url: WEBDIR + 'plex/GetShows',
         type: 'get',
         data: sendData,
         dataType: 'json',
@@ -187,7 +201,7 @@ function loadShows(options) {
                     }
                     showAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
-                    if (show.playcount >= 1) {
+                    if (show.playcount >= show.itemcount) {
                         showAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched'));
                     }
 
@@ -283,6 +297,264 @@ function loadEpisodes(options) {
     $('#episode-grid').slideDown()
 }
 
+var artistLoad = {
+    last: 0,
+    request: null,
+    limit: 50,
+    options: null
+}
+function loadArtists(options) {
+    var optionstr = JSON.stringify(options);
+    if (artistLoad.options != optionstr) {
+        artistLoad.last = 0;
+        $('#artist-grid').empty();
+    }
+    artistLoad.options = optionstr;
+
+    var active = (artistLoad.request!=null && artistLoad.request.readyState!=4);
+    if (active || artistLoad.last == -1) return;
+
+    var sendData = {
+        start: artistLoad.last,
+        end: (artistLoad.last + artistLoad.limit)
+    }
+    $.extend(sendData, options);
+
+    $('.spinner').show();
+    artistLoad.request = $.ajax({
+        url: WEBDIR + 'plex/GetArtists',
+        type: 'get',
+        data: sendData,
+        dataType: 'json',
+        success: function (data) {
+            if (data == null) return errorHandler();
+
+            if (data.limits.end == data.limits.total) {
+                artistLoad.last = -1;
+            } else {
+                artistLoad.last += artistLoad.limit;
+            }
+
+            if (data.artists != undefined) {
+                $.each(data.artists, function (i, artist) {
+                    $('#artist-grid').append($('<tr>').append(
+                        $('<td>').append(
+                            $('<a>').attr('href','#').attr('title', 'Play all').html('<i class="icon-play">').click(function(e) {
+                                e.preventDefault();
+                                playItem(artist.artistid, 'artist');
+                            }),
+                            $('<a>').attr('href','#').attr('title', 'Enqueue all').html('<i class="icon-plus">').click(function(e) {
+                                e.preventDefault();
+                                queueItem(artist.artistid, 'artist');
+                            })
+                        ),
+                        $('<td>').append(
+                            $('<a>').attr('href','#').addClass('artist-link').html(artist.title).click(function(e) {
+                                e.preventDefault(e);
+                                $(this).parent().append(loadAlbums({'artistid' : artist.artistid}));
+                            })
+                        )
+                    ));
+                });
+            }
+            Holder.run();
+        },
+        complete: function() {
+            $('.spinner').hide();
+        }
+    });
+}
+
+var albumLoad = {
+    last: 0,
+    request: null,
+    limit: 50,
+    options: null,
+    artist: null
+}
+function loadAlbums(options) {
+    var elem = $('#album-grid');
+    if (options && options.artistid!=undefined) {
+        $('.artist-albums:visible').slideUp(300, function() {
+            $(this).remove();
+        });
+        if (options.artistid == loadAlbums.artist) {
+            loadAlbums.artist = null;
+            return;
+        }
+        loadAlbums.artist = options.artistid;
+        var elem = $('<ul>').addClass('artist-albums thumbnails').hide()
+    }
+
+    var optionstr = JSON.stringify(options);
+    if (albumLoad.options != optionstr) {
+        albumLoad.last = 0;
+        elem.empty();
+    }
+    albumLoad.options = optionstr;
+
+    var active = (albumLoad.request!=null && albumLoad.request.readyState!=4);
+    if (active || albumLoad.last == -1) return;
+
+    var sendData = {
+        start: albumLoad.last,
+        end: (albumLoad.last + albumLoad.limit)
+    }
+    $.extend(sendData, options);
+
+    $('.spinner').show();
+    albumLoad.request = $.ajax({
+        url: WEBDIR + 'plex/GetAlbums',
+        type: 'get',
+        data: sendData,
+        dataType: 'json',
+        success: function (data) {
+            if (data == null) return errorHandler();
+
+            if (data.limits.end == data.limits.total) {
+                albumLoad.last = -1;
+            } else {
+                albumLoad.last += albumLoad.limit;
+            }
+
+            if (data.albums != undefined) {
+                $.each(data.albums, function (i, album) {
+                    var albumItem = $('<li>').hover(function() {
+                        $(this).children('div').fadeToggle()
+                    });
+
+                    var src = 'holder.js/150x150/text:No artwork';
+                    if (album.thumbnail != '') {
+                        src = WEBDIR + 'plex/GetThumb?w=150&h=150&thumb='+encodeURIComponent(album.thumbnail);
+                    }
+                    albumItem.append($('<img>').attr('src', src).addClass('thumbnail'));
+
+                    var albumCaption = $('<div>').addClass('grid-caption hide').append(
+                        $('<a>').attr('href', '#').append(
+                                $('<h6>').html(album.title),
+                                $('<h6>').html(album.artist).addClass('artist')
+                            ).click(function(e) {
+                                e.preventDefault();
+                                loadSongs({'albumid': album.albumid, 'search': album.title});
+                            }),
+                        $('<div>').addClass('grid-control').append(
+                            $('<a>').attr('href', '#').append(
+                                $('<img>').attr('src',WEBDIR + 'img/play.png').attr('title','Play')
+                            ).click(function(e) {
+                                e.preventDefault();
+                                playItem(album.albumid, 'album');
+                            }),
+                            $('<a>').attr('href', '#').append(
+                                $('<img>').attr('src',WEBDIR + 'img/add.png').attr('title','Queue')
+                            ).click(function(e) {
+                                e.preventDefault();
+                                queueItem(album.albumid, 'album');
+                                notify('Added', 'Album has been added to the playlist.', 'info');
+                            })
+                        )
+                    )
+                    albumItem.append(albumCaption);
+                    elem.append(albumItem);
+                });
+            }
+            Holder.run();
+            elem.slideDown();
+        },
+        complete: function() {
+            $('.spinner').hide();
+        }
+    });
+    return elem;
+}
+
+var songsLoad = {
+    last: 0,
+    request: null,
+    limit: 50,
+    options: {},
+    filter: ''
+}
+function loadSongs(options) {
+    searchString = $('#search').val()
+    if (options != undefined || searchString != songsLoad.filter) {
+        songsLoad.last = 0
+        $('#songs-grid tbody').empty()
+        if (options != undefined) {
+            songsLoad.options = options
+            if (options.search) {
+                $("#search").val(options.search);
+                songsLoad.filter = options.search
+            }
+        } else {
+            songsLoad.options = {}
+            songsLoad.filter = searchString
+        }
+    }
+
+    var active = (songsLoad.request!=null && songsLoad.request.readyState!=4)
+    if (active || songsLoad.last == -1) return
+
+    var sendData = {
+        start: songsLoad.last,
+        end: (songsLoad.last + songsLoad.limit),
+        filter: (options && options.search ? '' : songsLoad.filter)
+    }
+    $.extend(sendData, songsLoad.options)
+
+    $('.spinner').show();
+    songsLoad.request = $.ajax({
+        url: WEBDIR + 'plex/GetSongs',
+        type: 'get',
+        data: sendData,
+        dataType: 'json',
+        success: function (data) {
+            if (data==null || data.limits.total==0) return;
+
+            if (data.limits.end == data.limits.total) {
+                songsLoad.last = -1;
+            } else {
+                songsLoad.last += songsLoad.limit;
+            }
+            if (data.songs != undefined) {
+                $.each(data.songs, function (i, song) {
+                    var row = $('<tr>');
+                    row.append(
+                        $('<td>').append(
+                            $('<a>').attr('href','#').append($('<i>').addClass('icon-plus')).click(function(e) {
+                                e.preventDefault();
+                                queueItem(song.songid, 'song')
+                            }),
+                            $('<a>').attr('href','#').text(' ' + song.label).click(function(e) {
+                                e.preventDefault();
+                                playItem(song.songid, 'song')
+                            })
+                        ),
+                        $('<td>').append(
+                            $('<a>').attr('href','#').text(song.artist).click(function(e) {
+                                e.preventDefault();
+                                loadSongs({'artistid': song.artistid[0], 'search': song.artist})
+                            })
+                        ),
+                        $('<td>').append(
+                            $('<a>').attr('href','#').text(song.album).click(function(e) {
+                                e.preventDefault();
+                                loadSongs({'albumid': song.albumid, 'search': song.album})
+                            })
+                        ),
+                        $('<td>').append(parseSec(song.duration))
+                    )
+                    $('#songs-grid tbody').append(row);
+                });
+            }
+        },
+        complete: function() {
+            $('a[href=#songs]').tab('show');
+            $('.spinner').hide();
+        }
+    });
+}
+
+
 var nowPlayingId = false
 function loadNowPlaying() {
     $.ajax({
@@ -361,6 +633,12 @@ function reloadTab() {
     } else if ($('#episodes').is(':visible')) {
         options = $.extend(options, {'tvshowid': currentShow});
         loadEpisodes(options);
+    } else if ($('#artists').is(':visible')) {
+        loadArtists(options);
+    } else if ($('#albums').is(':visible')) {
+        loadAlbums(options);
+    } else if ($('#songs').is(':visible')) {
+        loadSongs();
 }
 }
 

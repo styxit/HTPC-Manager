@@ -155,7 +155,7 @@ function loadRecentTVshowsPlex () {
 }
 function loadRecentAlbumsPlex () {
     if (!$('#albums-content-plex').length) return
-    $.getJSON(WEBDIR + 'plex/GetRecentAlbums/4', function (data) {
+    $.getJSON(WEBDIR + 'plex/GetRecentAlbums', function (data) {
         if (data == null) return
         $.each(data.albums, function (i, album) {
             var imageSrc = WEBDIR + 'js/libs/holder.js/45x45/text:No cover'
@@ -163,15 +163,16 @@ function loadRecentAlbumsPlex () {
                 imageSrc = WEBDIR + 'plex/GetThumb?h=45&w=45&thumb='+encodeURIComponent(album.thumbnail)
             }
 
-            var label = album.label
+            var label = album.title
             if (album.year != '0') label += ' (' + album.year + ')'
+            console.log(album.artist)
 
-            $('#albums-content').append(
+            $('#albums-content-plex').append(
                 $('<li>').addClass('media').append(
                     $('<img>').addClass('media-object pull-left img-rounded').attr('src', imageSrc),
                     $('<div>').addClass('media-body').append(
                         $('<h5>').addClass('media-heading').html(label),
-                        $('<p>').text(album.artist[0])
+                        $('<p>').text(album.artist)
                     )
                 ).click(function(e) {
                     location.href = 'plex/#albums'

@@ -23,7 +23,8 @@ class Plex:
                 {'type': 'text', 'label': 'Menu name', 'name': 'plex_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'plex_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'plex_port'},
-                {'type': 'text', 'label': 'Mac addr.', 'name':'plex_mac'}]})
+                {'type': 'text', 'label': 'Mac addr.', 'name':'plex_mac'},
+                {'type':'bool', 'label':'Hide watched', 'name':'plex_hide_watched'}]})
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -144,6 +145,44 @@ class Plex:
             return
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetRecentAlbums(self, limit=5):
+        """ Get a list of recently added albums """
+        try:
+            plex_host = htpc.settings.get('plex_host', 'localhost')
+            plex_port = htpc.settings.get('plex_port', '32400')
+            albums = []
+
+            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+                if section['type'] == "artist":
+                    for album in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/recentlyAdded?X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_host, plex_port, section["key"], limit), headers={"Accept": "application/json"})).read())["_children"]:
+                        jalbum = {}
+        
+                        jalbum['title'] = album["title"]
+        
+                        if 'thumb'in album:
+                            jalbum['thumbnail'] = album["thumb"]
+
+                        if 'parentTitle'in album:
+                            jalbum['artist'] = album["parentTitle"]
+
+                        if 'year'in album:
+                            jalbum['year'] = album["year"]
+                            
+                        if 'addedAt'in album:
+                           jalbum['addedAt'] = album["addedAt"]
+        
+                        albums.append(jalbum)
+
+
+            return {'albums': sorted(albums, key=lambda k: k['addedAt'], reverse=True)[:int(limit)]}
+        except Exception, e:
+            print ("Exception: " + str(e))
+            print ("Unable to fetch albums!")
+            return
+
+
+    @cherrypy.expose()
     def GetThumb(self, thumb=None, h=None, w=None, o=100):
         """ Parse thumb to get the url and send to htpc.proxy.get_image """
         #url = self.url('/images/DefaultVideo.png')
@@ -163,7 +202,7 @@ class Plex:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetMovies(self, start=0, end=0):
+    def GetMovies(self, start=0, end=0, hidewatched=0):
         """ Get a list of recently added movies """
         self.logger.debug("Fetching Movies")
 
@@ -172,18 +211,24 @@ class Plex:
             plex_port = htpc.settings.get('plex_port', '32400')
             movies = []
 
+            if hidewatched == '1':
+               hidewatched = "unwatched"
+            else:
+               hidewatched = "all"
+
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
                 if section['type'] == "movie":
-                    for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all' % (plex_host, plex_port, section["key"]), headers={"Accept": "application/json"})).read())["_children"]:
+                    for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section["key"], hidewatched), headers={"Accept": "application/json"})).read())["_children"]:
                         jmovie = {}
                         genre = []
+                        jmovie['playcount'] = 0
 
                         jmovie['title'] = movie["title"]
                         if 'thumb'in movie:
                            jmovie['thumbnail'] = movie["thumb"]
 
                         if 'year'in movie:
-                           jmovie['year'] = movie["year"]
+                           jmovie['year'] = int(movie["year"])
 
                         if 'summary'in movie:
                            jmovie['plot'] = movie["summary"]
@@ -200,12 +245,15 @@ class Plex:
                         if 'rating'in movie:
                            jmovie['rating'] = movie["rating"]
 
+                        if 'viewCount' in movie:
+                           jmovie['playcount'] = int(movie["viewCount"])
+
                         for attrib in movie['_children']:
                             if attrib['_elementType'] == 'Genre':
                                 genre.append(attrib['tag'])
 
                         if len(genre) != 0:
-                            jmovie['genre'] = ', '.join(genre)
+                            jmovie['genre'] = genre
 
                         movies.append(jmovie)
 
@@ -221,18 +269,25 @@ class Plex:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def ListShows(self, start=0, end=0):
+    def GetShows(self, start=0, end=0, hidewatched=0):
         """ Get a list of recently added movies """
         try:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
             tvShows = []
 
+            if hidewatched == '1':
+               hidewatched = "unwatched"
+            else:
+               hidewatched = "all"
+
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
                 if section['type'] == "show":
 
-                    for tvShow in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all' % (plex_host, plex_port, section['key']), headers={"Accept": "application/json"})).read())["_children"]:
+                    for tvShow in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], hidewatched), headers={"Accept": "application/json"})).read())["_children"]:
                         jshow = {}
+                        jshow['itemcount'] = 0
+                        jshow['playcount'] = 0
 
                         jshow['title'] = tvShow["title"]
                         
@@ -242,14 +297,17 @@ class Plex:
                            jshow['thumbnail'] = tvShow["thumb"]
 
                         if 'year'in tvShow:
-                           jshow['year'] = tvShow["year"]
+                           jshow['year'] = int(tvShow["year"])
 
                         if 'summary'in tvShow:
                            jshow['plot'] = tvShow["summary"]
                            
                         if 'viewedLeafCount'in tvShow:
-                           jshow['playcount'] = tvShow["viewedLeafCount"]
-                        
+                           jshow['playcount'] = int(tvShow["viewedLeafCount"])
+
+                        if 'leafCount'in tvShow:
+                           jshow['itemcount'] = int(tvShow["leafCount"])
+
                         tvShows.append(jshow)
                     
                     limits = {'start': int(start), 'total': len(tvShows), 'end': int(end)}
@@ -264,7 +322,73 @@ class Plex:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetEpisodes(self, start=0, end=0, sortmethod='episode', sortorder='ascending', tvshowid=None, hidewatched=False):
+    def GetArtists(self, start=0, end=0):
+        """ Get a list of recently added artists """
+        try:
+            plex_host = htpc.settings.get('plex_host', '')
+            plex_port = htpc.settings.get('plex_port', '32400')
+            artists = []
+
+            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+                if section['type'] == "artist":
+
+                    for artist in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all' % (plex_host, plex_port, section['key']), headers={"Accept": "application/json"})).read())["_children"]:
+                        jartist = {}
+                        genre = []
+
+                        jartist['title'] = artist["title"]
+                        
+                        jartist['artistid'] = artist["ratingKey"]
+                        
+                        artists.append(jartist)
+                    
+                    limits = {'start': int(start), 'total': len(artists), 'end': int(end)}
+                    if int(end) >= len(artists):
+                        limits['end'] = len(artists)
+
+            return {'limits': limits, 'artists': sorted(artists, key=lambda k: k['title'])[int(start):int(end)] }
+        except Exception, e:
+            print ("Exception: " + str(e))
+            print ("Unable to fetch all artists!")
+            return
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetAlbums(self, start=0, end=0):
+        """ Get a list of Albums """
+        try:
+            plex_host = htpc.settings.get('plex_host', '')
+            plex_port = htpc.settings.get('plex_port', '32400')
+            albums = []
+
+            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+                if section['type'] == "artist":
+
+                    for album in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/albums' % (plex_host, plex_port, section['key']), headers={"Accept": "application/json"})).read())["_children"]:
+                        jalbum = {}
+
+                        jalbum['title'] = album["title"]
+                        
+                        jalbum['albumid'] = album["ratingKey"]
+
+                        if 'thumb'in album:
+                            jalbum['thumbnail'] = album["thumb"]
+                        
+                        albums.append(jalbum)
+                    
+                    limits = {'start': int(start), 'total': len(albums), 'end': int(end)}
+                    if int(end) >= len(albums):
+                        limits['end'] = len(albums)
+            print albums
+            return {'limits': limits, 'albums': sorted(albums, key=lambda k: k['title'])[int(start):int(end)] }
+        except Exception, e:
+            print ("Exception: " + str(e))
+            print ("Unable to fetch all Albums!")
+            return
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetEpisodes(self, start=0, end=0, tvshowid=None, hidewatched=0):
         """ Get information about a single TV Show """
         self.logger.debug("Loading information for TVID" + str(tvshowid))
         try:
@@ -274,6 +398,7 @@ class Plex:
 
             for episode in self.JsonLoader(urlopen(Request('http://%s:%s/library/metadata/%s/allLeaves' % (plex_host, plex_port, tvshowid), headers={"Accept": "application/json"})).read())["_children"]:
                 jepisode = {}
+                jepisode['playcount'] = 0
 
                 jepisode['label'] = "%sx%s. %s" % (episode["parentIndex"], episode["index"], episode["title"])
 
@@ -290,14 +415,19 @@ class Plex:
                     jepisode['season'] = episode["parentIndex"]
 
                 if 'viewCount'in episode:
-                    jepisode['playcount'] = episode["viewCount"]
+                    jepisode['playcount'] = int(episode["viewCount"])
 
                 if 'thumb'in episode:
                     jepisode['thumbnail'] = episode["thumb"]
 
-                episodes.append(jepisode)
+                if hidewatched == '1':
+                    if jepisode['playcount'] <= 0:
+                        episodes.append(jepisode)
+                else:
+                    episodes.append(jepisode)
                     
             limits = {'start': int(start), 'total': len(episodes), 'end': int(end)}
+            # TODO plocka total from headern.
             if int(end) >= len(episodes):
                 limits['end'] = len(episodes)
 
