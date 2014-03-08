@@ -492,6 +492,7 @@ class Plex:
 
             for video in self.JsonLoader(urlopen(Request('http://%s:%s/status/sessions' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
                 jplaying_item = {}
+                jplaying_item['protocolCapabilities'] = []
 
                 if 'index' in video:
                     jplaying_item['episode'] = int(video['index'])
@@ -517,10 +518,11 @@ class Plex:
                     if children['_elementType'] == 'Player':
                         jplaying_item['state'] = children['state']
                         jplaying_item['player'] = children['title']
-                        jplaying_item['platform'] = children['platform']
-                        jplaying_item['machineIdentifier'] = children['machineIdentifier']
-                        if jplaying_item['platform'] == "Plex Home Theater":
-                            jplaying_item['capabilities'] = "playback"
+                        # We need some more info to see what the client supports
+                        for client in self.JsonLoader(urlopen(Request('http://%s:%s/clients' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+                            if client['machineIdentifier'] == children['machineIdentifier']:
+                                jplaying_item['protocolCapabilities'] = client['protocolCapabilities'].split(',')
+                                jplaying_item['address'] = client['address']
 
                     if children['_elementType'] == 'User':
                         if 'title' in children:
@@ -532,8 +534,6 @@ class Plex:
                 if jplaying_item['viewOffset'] < (int(jplaying_item['duration']) - 60000):
                     playing_items.append(jplaying_item)
                 
-                    
-            print dumps({'playing_items': playing_items}) 
             return {'playing_items': playing_items}
             
         except Exception, e:
@@ -562,3 +562,30 @@ class Plex:
             print ("Exception: " + str(e))
             self.logger.error("Failed to update library!")
             return 'Failed to update library!'
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def ControlPlayer(self, player, action, value=''):
+        """ Various commands to control Plex Player """
+        self.logger.debug("Sending control to Plex: " + action)
+        try:
+
+            self.navigationCommands = ['moveUp', 'moveDown', 'moveLeft', 'moveRight', 'pageUp', 'pageDown', 'nextLetter', 'previousLetter', 'select', 'back', 'contextMenu', 'toggleOSD']
+            self.playbackCommands = ['play', 'pause', 'stop', 'rewind', 'fastForward', 'stepForward', 'bigStepForward', 'stepBack', 'bigStepBack', 'skipNext', 'skipPrevious']
+            self.applicationCommands = ['playFile', 'playMedia', 'screenshot', 'sendString', 'sendKey', 'sendVirtualKey']
+
+            plex_host = htpc.settings.get('plex_host', '')
+            plex_port = htpc.settings.get('plex_port', '32400')
+            if action in self.navigationCommands:
+                urllib.urlopen('http://%s:%s/system/players/%s/naviation/%s' % (plex_host, plex_port, player, action))
+            elif action in self.playbackCommands:
+                print urllib.urlopen('http://%s:%s/system/players/%s/playback/%s' % (plex_host, plex_port, player, action))
+            elif action in self.applicationCommands:
+                urllib.urlopen('http://%s:%s/system/players/%s/application/%s' % (plex_host, plex_port, player, action))
+            else:
+                raise ValueError("Unable to control Plex with action: " + action)
+
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
+            self.logger.error("Unable to control Plex with action: " + action)
+            return 'error'

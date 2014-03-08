@@ -1,5 +1,6 @@
 var searchString = '';
 var hideWatched = 0;
+var player = '';
 
 var movieLoad = {
     last: 0,
@@ -26,6 +27,11 @@ $(document).ready(function() {
         }
     });
 
+    // Enable player controls
+    $('[data-player-control]').click(function () {
+        var action = $(this).attr('data-player-control');
+        $.get(WEBDIR + 'plex/ControlPlayer?player='+player+'&action='+action);
+    });
 
     // Toggle wether to show already seen episodes
     $('#hidewatched').click(function(e) {
@@ -611,9 +617,12 @@ function loadNowPlaying() {
             }
             itemTitel.html(playingTitle);
             itemSubtitel.html(playingSubtitle);
+            player = item.address;
             
             var progressBar = $('#nowplaying #player-progressbar .bar');
             progressBar.css('width', (item.viewOffset / item.duration)*100 + '%');
+            if (item.protocolCapabilities.indexOf('playback') == -1) {
+                $('#nowplaying_control').hide(); }
         });
                  $('#nowplaying').slideDown();
     }
