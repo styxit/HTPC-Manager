@@ -47,6 +47,16 @@ class Plex:
         return htpc.LOOKUP.get_template('plex.html').render(scriptname='plex')
 
     @cherrypy.expose()
+    def webinterface(self):
+        """ Generate page from template """
+        plex_host = htpc.settings.get('plex_host', 'localhost')
+        plex_port = htpc.settings.get('plex_port', '32400')
+
+        url = "http://%s:%s/web" % (plex_host, plex_port)
+
+        raise cherrypy.HTTPRedirect(url('', True))
+        
+    @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetRecentMovies(self, limit=5):
         """ Get a list of recently added movies """
