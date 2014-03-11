@@ -109,6 +109,6 @@ def start():
     logger.info("Starting up webserver")
     print '******************************************************'
     print 'Starting HTPC Manager on port ' + str(htpc.PORT) + '.'
-    print 'Start your browser and go to http://localhost:' + str(htpc.PORT)
+    print 'Start your browser and go to http://localhost:' + str(htpc.PORT) + '/' + htpc.WEBDIR[:-1]
     print '******************************************************'
     cherrypy.quickstart(htpc.ROOT, htpc.WEBDIR[:-1], config=app_config)
