@@ -1,6 +1,6 @@
 """ Class for handling settings and generating settings page """
 import os
-import json
+from json import loads
 import cherrypy
 import htpc
 import logging
@@ -84,4 +84,4 @@ class Settings:
     """ Get custom defined urls feorm database in json format """
     def getUrls(self):
         links = self.get('custom_urls')
-        return json.loads(links)
+        return loads(links)
