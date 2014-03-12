@@ -168,7 +168,7 @@ function showMovie(movie) {
         })
     }
 
-    if (info.images.backdrop.length > 0) {
+    if (info.images.backdrop && info.images.backdrop.length > 0) {
         var backdrop = WEBDIR + 'couchpotato/GetImage?w=675&h=400&o=10&url=' + encodeURIComponent(info.images.backdrop)
         $('.modal-fanart').css({
             'background-image' : 'url('+backdrop+')'

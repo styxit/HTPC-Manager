@@ -45,6 +45,20 @@ settings = self.attr.settings
                 </table>
             </div>
             %endif
+            %if settings.get('dash_nzbget', 0):
+            <div class="span4">
+                <h3><a href="nzbget/#history">Latest Downloads</a></h3>
+                <table class="table table-striped table-main">
+                    <thead>
+                        <tr>
+                            <th>File</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="nzbgetdownloads_table_body"></tbody>
+                </table>
+            </div>
+            %endif
             %if settings.get('dash_couchpotato', 0):
             <div class="span4">
                 <h3><a href="couchpotato/#wanted">Wanted Movies</a></h3>

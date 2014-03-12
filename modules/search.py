@@ -1,7 +1,7 @@
 import cherrypy
 import htpc
 from htpc.proxy import get_image
-from urllib2 import urlopen, quote
+import urllib2
 from json import loads
 import logging
 
@@ -22,15 +22,6 @@ class Search:
     @cherrypy.expose()
     def index(self, query='', **kwargs):
         return htpc.LOOKUP.get_template('search.html').render(query=query, scriptname='search')
-
-    """
-    NOT IMPLEMENTET
-    @cherrypy.expose()
-    @cherrypy.tools.json_out()
-    def ping(self, newznab_host, newznab_apikey, **kwargs):
-        self.logger.debug("Pinging newznab-host")
-        return 1
-    """
 
     @cherrypy.expose()
     def thumb(self, url, h=None, w=None, o=100):
@@ -54,7 +45,7 @@ class Search:
     def search(self, q='', cat='', **kwargs):
         if cat:
             cat = '&cat=' + cat
-        result = self.fetch('search&q=' + quote(q) + cat + '&extended=1')
+        result = self.fetch('search&q=' + urllib2.quote(q) + cat + '&extended=1')
         try:
             return result['channel']['item']
         except:
@@ -66,11 +57,15 @@ class Search:
             host = settings.get('newznab_host', '').replace('http://', '').replace('https://', '')
             ssl = 's' if settings.get('newznab_ssl', 0) else ''
             apikey = settings.get('newznab_apikey', '')
-
             url = 'http' + ssl + '://' + host + '/api?o=json&apikey=' + apikey + '&t=' + cmd
-
             self.logger.debug("Fetching information from: " + url)
-            return loads(urlopen(url, timeout=10).read())
+            request = urllib2.Request(url)
+            request.add_header('User-agent', 'HTPC Manager')
+            try:
+                resource = urllib2.urlopen(request)
+                return loads(resource.read())
+            except urllib2.HTTPError, err:
+                self.logger.error("HTTP Error Code Received: " + str(err.code))
         except:
             self.logger.error("Unable to fetch information from: " + url)
             return

@@ -10,6 +10,15 @@ import logging
 from threading import Thread
 
 
+def do_restart():
+    arguments = sys.argv[:]
+    arguments.insert(0, sys.executable)
+    if sys.platform == 'win32':
+        arguments = ['"%s"' % arg for arg in arguments]
+    os.chdir(os.getcwd())
+    cherrypy.engine.exit()
+    os.execv(sys.executable, arguments)
+
 class Root:
     """ Root class """
     def __init__(self):
@@ -39,16 +48,5 @@ class Root:
     def restart(self):
         """ Shutdown script and rerun with the same variables """
         self.logger.info("Restarting htpc-manager.")
-        Thread(target=self.do_restart).start()
+        Thread(target=do_restart).start()
         return "Restart in progress."
-
-    def do_restart(self):
-        arguments = sys.argv[:]
-        arguments.insert(0, sys.executable)
-        if sys.platform == 'win32':
-            arguments = ['"%s"' % arg for arg in arguments]
-        os.chdir(os.getcwd())
-        self.logger.info("Stopping.")
-        cherrypy.engine.exit()
-        self.logger.info("Starting up again,")
-        os.execv(sys.executable, arguments)
