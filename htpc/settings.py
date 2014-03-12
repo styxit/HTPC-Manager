@@ -1,5 +1,6 @@
 """ Class for handling settings and generating settings page """
 import os
+import json
 import cherrypy
 import htpc
 import logging
@@ -71,3 +72,16 @@ class Settings:
             current = bool(theme == self.get('app_theme', 'default'))
             themes.append({'name': theme, 'value': theme, 'selected': current})
         return themes
+
+    """ Save json with custom urls """
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def urls(self, **kwargs):
+        if kwargs:
+            for key, val in kwargs.items():
+                self.set('custom_urls', key)
+
+    """ Get custom defined urls feorm database in json format """
+    def getUrls(self):
+        links = self.get('custom_urls')
+        return json.loads(links)

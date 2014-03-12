@@ -1,12 +1,39 @@
 $(document).ready(function () {
-    $('#other button').on('click', function(event){
+    $('#other button.save').on('click', function(event){
         event.preventDefault();
-        console.log('add');
 
+        data = [];
+        $('#other table tbody tr').each(function(index){
+            tr = $(this);
+            data.push({
+                name: tr.find("input[name='name']").val(),
+                url: tr.find("input[name='url']").val(),
+            });
+        });
 
-        values = $('#other').serialize();
-        console.log(values);
-        $('#other input#external_urls').val(values);
+        // Save data
+        $.ajax({
+            method: 'POST',
+            url: '/settings/urls',
+            data: JSON.stringify(data)
+        });
+    });
+
+    $(document.body).off('click', '#other button.delete');
+    $(document.body).on('click', '#other button.delete', function(event) {
+      event.preventDefault();
+      $(this).closest('tr').remove();
+    });
+
+    $('#other button.add').on('click', function(event){
+        event.preventDefault();
+        $('#other table tbody').append(
+          $('<tr>').append(
+            $('<td>').html('<input type="text" value=""name="name">'),
+            $('<td>').html('<input type="text" value=""name="url">'),
+            $('<td>').html('<button class="btn btn-mini delete">Delete</button>')
+          )
+        );
     });
 
 

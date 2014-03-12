@@ -1,58 +1,7 @@
 html, body {
     background: #eee url('../../../img/bodybg.jpg');
 }
-.navbar, .navbar-inner {
-    background: url('../../../img/headerbg.jpg') !important;
-}
-.navbar .brand,
-.navbar .nav > li > a {
-    color: #999999;
-    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-}
-.navbar .brand:hover,
-.navbar .nav > li > a:hover,
-.navbar .brand:focus,
-.navbar .nav > li > a:focus {
-  color: #ffffff;
-}
 
-.navbar .brand {
-  color: #999999;
-}
-
-.navbar .navbar-text {
-  color: #999999;
-}
-
-.navbar .nav > li > a:focus,
-.navbar .nav > li > a:hover {
-  color: #ffffff;
-  background-color: transparent;
-}
-
-.navbar .nav .active > a,
-.navbar .nav .active > a:hover,
-.navbar .nav .active > a:focus {
-  color: #ffffff;
-  background-color: #111111;
-}
-
-.navbar .navbar-link {
-  color: #999999;
-}
-
-.navbar .navbar-link:hover,
-.navbar .navbar-link:focus {
-  color: #ffffff;
-}
-
-.navbar .divider-vertical {
-  border-right-color: #222222;
-  border-left-color: #111111;
-}
-.navbar input {
-    background: #eee;
-}
 .content {
     background: #fff;
     margin: -20px;

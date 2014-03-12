@@ -63,27 +63,29 @@
                 <fieldset>
                     <legend>Other apps</legend>
                     <blockquote>Are you using software that is not supported by Htpc Manager or want to have you selfmade dashboard url in the menu bar? Add them right here.</blockquote>
-                    <button class="btn btn-primary">Add</button>
+                    <button class="btn btn-primary add">Add</button>
 
-                    <input type="text" value="kjh" id="other_urls" name="other_urls.0.name">
-                    <input type="text" value="kjh" id="other_urls" name="other_urls.0.url">
-                    <input type="text" value="kjh" id="other_urls" name="other_urls.1.name">
-                    <input type="text" value="kjh" id="other_urls" name="other_urls.1.url">
-                    <table class="table table-striped">
+                    <table class="table table-striped table-condensed">
+                      <thead>
                         <tr>
-                            <td>BitTorrent</td>
-                            <td>http://www.bittorrent.com/webui</td>
-                            <td>delete</td>
+                            <th class="span3">Name</th>
+                            <th>Url <small class="muted">including http://ect</small</th>
+                            <th class="span1">Actions</th>
                         </tr>
+                      </thead>
+                      <tbody>
+                        % for link in self.attr.settings.getUrls():
+                        <tr>
+                          <td><input type="text" value="${link['name']}"name="name"></td>
+                          <td><input type="text" value="${link['url']}"name="url"></td>
+                          <td><button class="btn btn-mini delete">Delete</button></td>
+                        </tr>
+                        % endfor
+                      </tbody>
                     </table>
-                    <div class="control-group">
-                            <input type="text" value="kjh" id="other_urls" name="other_urls" class="hide">
-                    </div>
-
-                    <input type="text" value="{}" id="external_urls" name="external_urls">
 
                     <div class="form-actions">
-                        <button class="btn btn-primary" type="submit">Save</button>
+                        <button class="btn btn-primary save" type="submit">Save</button>
                         <button class="btn " type="reset">Clear</button>
                     </div>
                 </fieldset>
