@@ -469,6 +469,8 @@ class Xbmc:
                 return xbmc.Player.GoTo(playerid=player[u'playerid'], to=int(value))
             elif action == 'party':
                 return xbmc.Player.Open(item={'partymode': 'audio'})
+            elif action == 'volume':
+                return xbmc.Application.SetVolume(volume=int(value))
             else:
                 return xbmc.Input.ExecuteAction(action=action)
         except Exception, e:
