@@ -83,5 +83,5 @@ class Settings:
 
     """ Get custom defined urls feorm database in json format """
     def getUrls(self):
-        links = self.get('custom_urls')
+        links = self.get('custom_urls', '{}')
         return loads(links)
