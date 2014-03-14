@@ -140,40 +140,46 @@ function showMovie(movie) {
     modalInfo.append(titles, profiles)
 
     if (movie.releases && movie.releases.length > 0) {
-        var releaseTable = $('<table>').addClass('table table-striped table-hover')
-        $.each(movie.releases, function(i, item){
-            if (item.info == undefined || item.info.id === undefined) return
-            releaseTable.append(
-                $('<tr>').append(
-                    $('<td>').append(
-                        $('<a>').attr('href', '#').append(
-                            $('<i>').attr('title', 'Download').addClass('icon-download')
-                        ).click(function(e) {
-                            e.preventDefault()
-                            hideModal()
-                            $.getJSON('DownloadRelease/?id='+item.id)
-                        }),
-                        $('<a>').attr('href','DownloadRelease?id='+item.info.id).append(
-                            $('<i>').attr('title', 'Ignore').addClass('icon-remove-sign')
-                        ).click(function(e) {
-                            e.preventDefault()
-                            $(this).closest('tr').toggleClass('ignore')
-                            $.getJSON('IgnoreRelease/?id='+item.id)
-                        })
-                    ),
-                    $('<td>').append(
-                        $('<a>').attr('href', '#').text(item.info.name).click(function(e) {
-                            e.preventDefault()
-                            window.open(item.info.detail_url)
-                        })
-                    ),
-                    $('<td>').html(bytesToSize(item.info.size*1000000))
-                ).toggleClass('ignore', item.status_id == 3)
-            )
-        })
+        var strTable = $("<table>").addClass("table table-striped table-hover").append(
+			$("<tr>").append("<th>Action</th>").append("<th>Name</th>").append("<th>Score</th>").append("<th>Size</th>"));
+		
+		// Grab actual releases
+		$.getJSON(WEBDIR + "couchpotato/GetReleases/" + movie.library_id, function (pResult) {
+			$.each(pResult.releases, function(nIndex, pRelease) {
+				strTable.append(
+					$("<tr>").append(
+						$("<td>").append(
+							$("<a>").attr("href", "#").append(
+								$("<i>").attr("title", "Download").addClass("icon-download")
+							).click(function(pEvent) {
+								pEvent.preventDefault();
+								hideModal();
+								$.getJSON("DownloadRelease/?id=" + pRelease.id);
+							}),
+							$("<a>").attr("href","DownloadRelease?id=" + pRelease.info.id).append(
+								$("<i>").attr("title", "Ignore").addClass("icon-remove-sign")
+							).click(function(pEvent) {
+								pEvent.preventDefault();
+								$(this).closest("tr").toggleClass("ignore");
+								$.getJSON("IgnoreRelease/?id=" + pRelease.id);
+							})
+						),
+						$("<td>").append(
+							$("<a>").attr("href", "#").text(pRelease.info.name).click(function(pEvent) {
+								pEvent.preventDefault()
+								window.open(pRelease.info.detail_url);
+							})
+						),
+						$("<td>").append(pRelease.info.score),
+						$("<td>").html(bytesToSize(pRelease.info.size * 1000000))
+					).toggleClass("ignore", pRelease.status_id == 3)
+				);
+			});
+		});
+		
         $.extend(modalButtons,{
             'Releases' : function() {
-                $('.modal-body').html(releaseTable)
+                $('.modal-body').html(strTable)
             }
         })
     }

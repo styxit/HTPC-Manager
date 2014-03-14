@@ -129,7 +129,7 @@ function loadNZBGetDownloadHistory() {
 }
 function loadWantedMovies() {
     if (!$('#wantedmovies_table_body').length) return
-    $.getJSON(WEBDIR + 'couchpotato/GetMovieList?limit=5', function (result) {
+    $.getJSON(WEBDIR + 'couchpotato/GetMovieList/active/5', function (result) {
         if (result == null) {
             $('#wantedmovies_table_body').append(
                 $('<tr>').append($('<td>').html('No wanted movies found').attr('colspan', '2'))
