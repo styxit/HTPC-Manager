@@ -146,6 +146,10 @@ function showMovie(movie) {
 		// Grab actual releases
 		$.getJSON(WEBDIR + "couchpotato/GetReleases/" + movie.library_id, function (pResult) {
 			$.each(pResult.releases, function(nIndex, pRelease) {
+				if (pRelease.info == undefined || pRelease.info.id === undefined) {
+					return;
+				}
+			
 				strTable.append(
 					$("<tr>").append(
 						$("<td>").append(
