@@ -56,7 +56,6 @@ $(document).ready(function(){
 			return;
 		}
 		
-		// Need manual encoding for '?', apparently.
 		$.post(WEBDIR + "transmission/Add", { filename: $("#add_torrent_filename").val() });
 	});
 });
