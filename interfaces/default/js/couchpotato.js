@@ -1,7 +1,7 @@
 var profiles = $('<select>')
 $(document).ready(function() {
     $(window).trigger('hashchange')
-    getMovieList()
+    getMovieLists()
     getNotificationList()
     getHistory()
     $('#searchform').submit(function(e) {
@@ -17,31 +17,41 @@ $(document).ready(function() {
     })
 })
 
-function getMovieList() {
-    var wanted = $('#wanted-grid').empty()
-    $('.spinner').show()
-    $.getJSON(WEBDIR + 'couchpotato/GetMovieList', function (result) {
-        $('.spinner').hide()
-        if (result == null || result.total == 0) {
-            wanted.append($('<li>').html('No wanted movies found'))
-            return
+function getMovies(strStatus, pHTMLElement) {
+	pHTMLElement.empty();
+    $(".spinner").show();
+	
+    $.getJSON(WEBDIR + "couchpotato/GetMovieList/" + strStatus, function (pResult) {
+         $(".spinner").hide();
+		
+        if (pResult == null || pResult.total == 0) {
+            pHTMLElement.append($("<li>").html("No " + strStatus + " movies found"));
+            return;
         }
-        $.each(result.movies, function(i, movie) {
-            var link = $('<a>').attr('href', '#').click(function(e) {
-                e.preventDefault()
-                showMovie(movie)
-            })
-            var src = WEBDIR + 'couchpotato/GetImage?w=100&h=150&url=' + movie.library.info.images.poster[0]
-            link.append($('<img>').attr('src', src).addClass('thumbnail'))
-            if (movie.releases.length > 0) {
-                link.append($('<i>').attr('title', 'Download').addClass('icon-white icon-download status'));
+		
+        $.each(pResult.movies, function(nIndex, pMovie) {
+            var strHTML = $("<a>").attr("href", "#").click(function(pEvent) {
+                pEvent.preventDefault();
+                showMovie(pMovie);
+            });
+			
+            strHTML.append($("<img>").attr("src", WEBDIR + "couchpotato/GetImage?w=100&h=150&url=" + pMovie.library.info.images.poster[0]).attr("width", "100").attr("height", "150").addClass("thumbnail"));
+			
+            if (pMovie.releases.length > 0) {
+                strHTML.append($("<i>").attr("title", "Download").addClass("icon-white icon-download status"));
             }
-            var title = shortenText(movie.library.info.original_title, 12)
-            link.append($('<h6>').addClass('movie-title').html(title))
-            wanted.append($('<li>').attr('id', movie.id).append(link))
+			
+            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(pMovie.library.info.original_title, 12)));
+            pHTMLElement.append($("<li>").attr("id", pMovie.id).append(strHTML));
         })
     })
 }
+
+function getMovieLists() {
+	getMovies("active", $("#wanted-grid"));
+	getMovies("done", $("#library-grid"));
+}
+
 function showMovie(movie) {
     if (movie.library) {
         var info = movie.library.info
@@ -132,7 +142,7 @@ function showMovie(movie) {
     if (movie.releases && movie.releases.length > 0) {
         var releaseTable = $('<table>').addClass('table table-striped table-hover')
         $.each(movie.releases, function(i, item){
-            if (item.info.id === undefined) return
+            if (item.info == undefined || item.info.id === undefined) return
             releaseTable.append(
                 $('<tr>').append(
                     $('<td>').append(
