@@ -28,11 +28,11 @@ function showEPG(pChannel) {
 			
 			$.each(pResult.entries, function(nIndex, pEntry) {
 				strTable.append($("<tr>")
-					.append($("<td>").html(pEntry.title))
-					.append($("<td>").html(convertTimestamp(pEntry.start)))
-					.append($("<td>").html(convertTimestamp(pEntry.end)))
+					.append($("<td>").text(pEntry.title))
+					.append($("<td>").text(convertTimestamp(pEntry.start)))
+					.append($("<td>").text(convertTimestamp(pEntry.end)))
 					.append($("<td>")
-						.append($("<a>").html("REC").click(function(pEvent) {
+						.append($("<a>").text("REC").click(function(pEvent) {
 							pEvent.preventDefault();
 							parseJSON("DVRAdd/" + pEntry.id, null);
 						}))
@@ -59,7 +59,7 @@ function getChannelTags() {
 				.append($("<a>")
 					.attr("href", "#tag-" + pEntry.identifier)
 					.attr("data-toggle", "tab")
-						.html(pEntry.name)));
+						.text(pEntry.name)));
 			
 			// Add tab pane
 			var strTabPane = $("<div>").attr("id", "tag-" + pEntry.identifier)
@@ -82,7 +82,7 @@ function getChannels() {
 				pHTMLEntry = $("<img>").attr("src", pEntry.icon);
 			}
 			else {
-				pHTMLEntry = $("<a>").html(pEntry.name);
+				pHTMLEntry = $("<a>").text(pEntry.name);
 			}
 			
 			pHTMLEntry.click(function (pEvent) {
@@ -113,12 +113,12 @@ function parseRecordings(strType) {
 	parseJSON("DVRList/" + strType, function(pResult) {
 		$.each(pResult.entries, function(nIndex, pEntry) {
 			strTable.append($("<tr>").attr("id", "recording-" + pEntry.id)
-				.append($("<td>").html(pEntry.channel))		
-				.append($("<td>").html(pEntry.title))
-				.append($("<td>").html(convertTimestamp(pEntry.start)))
-				.append($("<td>").html(convertTimestamp(pEntry.end)))
-				.append($("<td>").html(pEntry.status))
-				.append($("<td>").append($("<a>").html("DEL").click(function(pEvent) {
+				.append($("<td>").text(pEntry.channel))		
+				.append($("<td>").text(pEntry.title))
+				.append($("<td>").text(convertTimestamp(pEntry.start)))
+				.append($("<td>").text(convertTimestamp(pEntry.end)))
+				.append($("<td>").text(pEntry.status))
+				.append($("<td>").append($("<a>").text("DEL").click(function(pEvent) {
 						pEvent.preventDefault();
 						
 						parseJSON("DVRDel/" + pEntry.id, function(pResult) {
