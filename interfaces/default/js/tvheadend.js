@@ -1,0 +1,147 @@
+function parseJSON(strQuery, pCallback) {
+	$(".spinner").show();
+
+	$.getJSON(WEBDIR + "tvheadend/" + strQuery, function (pResult) {
+		if (pCallback == null) {
+			$(".spinner").hide();
+			return;
+		}
+	
+		pCallback(pResult);
+		$(".spinner").hide();
+	});
+}
+
+function convertTimestamp(nTimestamp) {
+	var strDate = new Date(nTimestamp * 1000).toString();
+	return strDate.substring(0, strDate.indexOf(' GMT')); // Strip GMT crap
+}
+
+function showEPG(pChannel) {
+	parseJSON("GetEPG/300/" + pChannel.uuid, function(pResult) {
+        var strTable = $("<table>").addClass("table table-striped table-hover").append(
+			$("<tr>").append("<th>Name</th>")
+				.append("<th>Start</th>")
+				.append("<th>End</th>")
+				.append("<th>Actions</th>")
+			);
+			
+			$.each(pResult.entries, function(nIndex, pEntry) {
+				strTable.append($("<tr>")
+					.append($("<td>").html(pEntry.title))
+					.append($("<td>").html(convertTimestamp(pEntry.start)))
+					.append($("<td>").html(convertTimestamp(pEntry.end)))
+					.append($("<td>")
+						.append($("<a>").html("REC").click(function(pEvent) {
+							pEvent.preventDefault();
+							parseJSON("DVRAdd/" + pEntry.id, null);
+						}))
+					));
+			});
+
+		showModal(pChannel.name, strTable, 
+			{
+				/*'Watch' : function() {
+					strTable.html("<video controls autoplay>"
+						+ "<source src=\"http://192.168.1.11:9981/stream/channel/" + pChannel.uuid + "\"></source>"
+						+ "</video>");
+				}*/
+			}
+		);
+	});
+}
+
+function getChannelTags() {
+	parseJSON("GetChannelTags", function(pResult) {
+		$.each(pResult.entries, function(nIndex, pEntry) {
+			// Add nav tabs
+			$(".nav.nav-tabs").append($("<li>")
+				.append($("<a>")
+					.attr("href", "#tag-" + pEntry.identifier)
+					.attr("data-toggle", "tab")
+						.html(pEntry.name)));
+			
+			// Add tab pane
+			var strTabPane = $("<div>").attr("id", "tag-" + pEntry.identifier)
+				.attr("class", "tab-pane");
+				
+			$(".tab-content").append(strTabPane.append($("<ul>").attr("id", "tag-" + pEntry.identifier + "-grid").attr("class", "thumbnails")));
+		});
+	});
+	
+	$(window).trigger("hashchange");
+}
+
+function getChannels() {
+	parseJSON("GetChannels", function(pResult) {
+		$.each(pResult.entries, function(nIndex, pEntry) {
+			var strHTML = $("<div>").attr("class", "channel");
+			var pHTMLEntry = null;
+			
+			if (pEntry.icon != undefined) {
+				pHTMLEntry = $("<img>").attr("src", pEntry.icon);
+			}
+			else {
+				pHTMLEntry = $("<a>").html(pEntry.name);
+			}
+			
+			pHTMLEntry.click(function (pEvent) {
+				showEPG(pEntry);
+			});
+			
+			strHTML.append(pHTMLEntry);
+			
+			$.each(pEntry.tags, function(nIndex, nTag) {
+				$("#tag-" + nTag + "-grid").append($("<li>").append(strHTML));
+			});
+		});
+	});
+}
+
+function parseRecordings(strType) {
+	var strTable = $("<table>").attr("id", "recordings_" + strType)
+		.attr("class", "recordingtable")
+			.append($("<tr>")
+				.append("<th>Channel</th>")
+				.append("<th>Title</th>")
+				.append("<th>Start</th>")
+				.append("<th>End</th>")
+				.append("<th>Status</th>")
+				.append("<th>Actions</th>")
+			);
+		
+	parseJSON("DVRList/" + strType, function(pResult) {
+		$.each(pResult.entries, function(nIndex, pEntry) {
+			strTable.append($("<tr>").attr("id", "recording-" + pEntry.id)
+				.append($("<td>").html(pEntry.channel))		
+				.append($("<td>").html(pEntry.title))
+				.append($("<td>").html(convertTimestamp(pEntry.start)))
+				.append($("<td>").html(convertTimestamp(pEntry.end)))
+				.append($("<td>").html(pEntry.status))
+				.append($("<td>").append($("<a>").html("DEL").click(function(pEvent) {
+						pEvent.preventDefault();
+						
+						parseJSON("DVRDel/" + pEntry.id, function(pResult) {
+							if (pResult.success == 1) {
+								$("#recording-" + pEntry.id).fadeOut();
+							}
+						});
+					})))
+			);
+		});
+	});
+	
+	$("#recordings").append("<h2>" + strType.charAt(0).toUpperCase() + strType.slice(1) + " recordings</h2>")
+		.append(strTable);
+}
+
+function getRecordings() {
+	parseRecordings("upcoming");
+	parseRecordings("finished");
+}
+
+$(document).ready(function () {
+	getChannelTags();
+	getChannels();
+	getRecordings();
+});

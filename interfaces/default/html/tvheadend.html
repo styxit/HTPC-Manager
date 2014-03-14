@@ -1,0 +1,17 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+<div class="container">
+	<div class="content maincontent">
+        <h1 class="page-header page-title">
+            <a href="webinterface" target="_blank">${settings.get('tvheadend_name', 'TVHeadend')}</a>
+        </h1>		
+        <ul class="nav nav-tabs">
+			<li><a href="#recordings" data-toggle="tab">Recordings</a></li>
+        </ul>
+		<div class="tab-content">
+            <div id="recordings" class="tab-pane">
+            </div>
+		</div>
+		<div class="spinner"></div>
+	</div>
+</div>
