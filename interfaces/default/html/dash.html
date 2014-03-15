@@ -88,6 +88,10 @@ settings = self.attr.settings
                 </table>
             </div>
             %endif
+            %if settings.get('dash_samsungtv', 0):
+            <div id="samsungt" class="span4">
+            </div>
+            %endif
         </div>
         <%
         dashcount = settings.get('dash_sickbeard', 0);

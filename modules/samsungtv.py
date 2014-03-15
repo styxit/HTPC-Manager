@@ -9,12 +9,12 @@ class Samsungtv:
     def __init__(self):
         self.logger = logging.getLogger('modules.samsungtv')
         htpc.MODULES.append({
-            'name': 'Samsung tvremote',
+            'name': 'Samsung Remote',
             'id': 'samsungtv',
-            #'test': htpc.WEBDIR + 'sickbeard/ping',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'samsungtv_enable'},
-                {'type': 'text', 'label': 'Menu name', 'name': 'samsungtv_name'},
+                #Disabled to since i dont want to be in the menu, but still have access via url.
+                #{'type': 'text', 'label': 'Menu name', 'name': 'samsungtv_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'samsungtv_host'},
                 {'type': 'text', 'label': 'Tv model', 'name': 'samsungtv_model'},
                 {'type': 'text', 'label': 'Htpc-Manager MAC', 'name': 'samsung_htpcmac'},
@@ -29,10 +29,7 @@ class Samsungtv:
     @cherrypy.expose()
     def sendkey(self, action):
         try:
-            #key = None
             key = action
-            print 'action: ', action
-            print 'key: ', key
             if key == 'undefined':
                 pass
             else:
