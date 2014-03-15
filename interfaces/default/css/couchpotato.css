@@ -1,5 +1,8 @@
 .thumbnails li {
     position: relative;
+	width: 100px;
+	height: 175px;
+	text-align: center;
 }
 #wanted-grid img.thumbnail,
 #result-grid img.thumbnail {
