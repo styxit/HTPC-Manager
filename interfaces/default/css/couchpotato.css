@@ -1,6 +1,6 @@
 .thumbnails li {
     position: relative;
-	width: 100px;
+	width: auto;
 	height: 175px;
 	text-align: center;
 }
