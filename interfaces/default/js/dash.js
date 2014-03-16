@@ -115,7 +115,7 @@ function loadNZBGetDownloadHistory() {
     $.getJSON(WEBDIR + 'nzbget/GetHistory?limit=5', function (data) {
         $.each(data.result, function (i, slot) {
             var status = $('<i>').addClass('icon-ok')
-            if (slot.ParStatus == 'Failed') {
+            if (slot.ParStatus == 'FAILURE') {
                 status.removeClass().addClass('icon-remove').attr('title', slot.fail_message)
             }
             $('#nzbgetdownloads_table_body').append(
