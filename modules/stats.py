@@ -34,7 +34,8 @@ class Stats:
                 {'type': 'text', 'label': 'Menu name', 'name': 'stats_name'},
                 {'type': 'bool', 'label': 'Bar', 'name': 'stats_use_bars'},
                 {'type': 'text', 'label': 'Ignore filesystem', 'name': 'stats_ignore_filesystem'},
-                {'type': 'text', 'label': 'Ignore Mountpoint', 'name': 'stats_ignore_mountpoint'}
+                {'type': 'text', 'label': 'Ignore mountpoint', 'name': 'stats_ignore_mountpoint'},
+                {'type': 'text', 'label': 'Limit processes', 'name': 'stats_limit_processes'}
         ]})
 
     @cherrypy.expose()
@@ -50,8 +51,12 @@ class Stats:
     @cherrypy.expose()
     def uptime(self):
         try:
+            if psutil.version_info >= (2, 0, 0):
+                b = psutil.boot_time()
+            else:
+                b = psutil.get_boot_time()
             d = {}
-            boot = datetime.now() - datetime.fromtimestamp(psutil.get_boot_time())
+            boot = datetime.now() - datetime.fromtimestamp(b)
             boot = str(boot)
             uptime = boot[:-7]
             d['uptime'] = uptime
@@ -119,6 +124,46 @@ class Stats:
             self.logger.error("Could not get disk info %s" % e)
 
         return rr
+    
+    @cherrypy.expose()
+    def processes(self):
+        rr = None
+        limit = str(htpc.settings.get('stats_limit_processes'))
+        procs = []
+        procs_status = {}
+        for p in psutil.process_iter():
+            
+            try:
+                p.dict = p.as_dict(['username', 'get_memory_percent', 
+                                    'get_cpu_percent', 'name', 'status', 'pid', 'get_memory_info', 'create_time'])
+                #Create a readable time
+                r_time = datetime.now() - datetime.fromtimestamp(p.dict['create_time'])
+                r_time = str(r_time)[:-7]
+                p.dict['r_time'] = r_time
+                try:
+                    procs_status[p.dict['status']] += 1
+                except KeyError:
+                    procs_status[p.dict['status']] = 1
+            except psutil.NoSuchProcess:
+                pass
+            else:
+                procs.append(p.dict)
+
+        # return processes sorted by CPU percent usage
+        processes = sorted(procs, key=lambda p: p['cpu_percent'],
+                        reverse=True)
+        
+        #Adds the total number of processes running, not in use atm
+        processes.append(procs_status)
+        
+        #if limit is a empty string
+        if not limit:
+            rr = json.dumps(processes)
+        else:
+            rr = json.dumps(processes[:int(limit)])
+            
+        return rr
+
 
 
     #Returns cpu usage
@@ -146,12 +191,14 @@ class Stats:
         except Exception as e:
             self.logger.error("Error trying to pull cpu times: %s" % e)
 
-
-    #Not in use as it returns threads aswell on windows, will added in psutil 2.0
+    #Not in use
     @cherrypy.expose()
     def num_cpu(self):
         try:
-            cpu = psutil.NUM_CPUS
+            if psutil.version_info >= (2,0,0):
+                cpu = psutil.cpu_count(logical=False)
+            else:
+                cpu = psutil.NUM_CPUS
             dcpu = cpu._asdict()
             jcpu  = json.dumps(dcpu)
             return jcpu

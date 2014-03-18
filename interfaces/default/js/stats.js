@@ -2,7 +2,8 @@
 $(document).ready(function () {
     if (importPsutil) {
         $('.spinner').show();
-        get_diskinfo();
+        //get_diskinfo();
+        reloadtab();
         network_usage_table();
         return_stats_settings();
         uptime();
@@ -16,7 +17,8 @@ $(document).ready(function () {
 if (importPsutil) {
     // Set timeintercal to refresh stats
     setInterval(function () {
-        get_diskinfo();
+        //get_diskinfo();
+        reloadtab();
         network_usage_table();
         return_stats_settings();
         uptime();
@@ -77,6 +79,34 @@ function get_diskinfo() {
                 $('<td>').addClass('stats_disk_percent').text(disk.percent));
                 $('#disklist').append(row);
 		});
+            $('.spinner').hide();
+        }
+    });
+}
+
+function processes() {
+    $.ajax({
+        'url': WEBDIR + 'stats/processes',
+            'dataType': 'json' ,
+            'success': function (response) {
+            $('#proclist').html("");
+            $('#error_message').text("");
+
+            $.each(response, function (i, proc) {
+                var row = $('<tr>');
+                //Pid might be used for popen stuff later
+                row.attr('data-pid', proc.pid); 
+                row.append(
+                $('<td>').addClass('').text(proc.name),
+                $('<td>').addClass('processes-name hidden-phone').text(proc.status),
+                $('<td>').addClass('processes-status hidden-phone').text(proc.username),
+                $('<td>').addClass('processes-memory-percent').text(proc.memory_percent.toFixed(2) + ' %'),
+                $('<td>').addClass('processes-memory-info').text(getReadableFileSizeString(proc.memory_info[0])),
+                $('<td>').addClass('processes-runningtime').text(proc.r_time),
+                //$('<td>').text(proc.open_files), //Not supported on windows, just hangs on my computer
+                $('<td>').addClass('processes-percent').text(proc.cpu_percent+ ' %'));
+                $('#proclist').append(row);
+            });
             $('.spinner').hide();
         }
     });
@@ -187,3 +217,22 @@ function return_stats_settings() {
         }
     });
 }
+
+function reloadtab() {
+    if ($('#diskt').is(':visible')) {
+        get_diskinfo();
+    } else if ($('#proc').is(':visible')) {
+        processes();
+    }
+}
+
+   $('#diskt').click(function () {
+       get_diskinfo();
+   });
+    $('#proc').click(function () {
+       processes();
+   });
+
+
+    
+
