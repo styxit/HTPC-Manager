@@ -336,3 +336,36 @@ class Stats:
             self.logger.error("Getting stats settings %s" % e)
 
         return json.dumps(d)
+    
+    @cherrypy.expose()
+    def command(self, cmd=None, pid=None, signal=None, popen=None):
+        arg = ''
+        msg = None
+        dmsg = {}
+        try:
+            p = psutil.Process(pid=int(pid))
+            name = p.name()
+            # some argparse
+            if arg == '':
+                if cmd == 'kill':
+                    p.kill()
+                    msg = 'Killed %s pid %s successfully'% (name, pid)
+                elif cmd == 'signal':
+                    psutil.send_signal(signal)
+                elif cmd == 'popen':
+                    r = psutil.Popen([popen], stdout=PIPE)
+                    msg = r.communicate()
+                
+            else:
+                self.logger.error('HTPC-Manager is not started with --statscmd')
+                #dmsg['msg'] = msg
+                msg = 'HTPC-Manager is not started with --statscmd'
+            
+            dmsg['msg'] = msg
+            jmsg = json.dumps(dmsg)
+            
+            return jmsg
+        except Exception as e:
+            print 'error stats command function :', e
+    
+    

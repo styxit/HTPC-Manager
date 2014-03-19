@@ -104,7 +104,8 @@ function processes() {
                 $('<td>').addClass('processes-memory-info').text(getReadableFileSizeString(proc.memory_info[0])),
                 $('<td>').addClass('processes-runningtime').text(proc.r_time),
                 //$('<td>').text(proc.open_files), //Not supported on windows, just hangs on my computer
-                $('<td>').addClass('processes-percent').text(proc.cpu_percent+ ' %'));
+                $('<td>').addClass('processes-percent').text(proc.cpu_percent+ ' %'),
+                $('<td>').append('<button class="btn btn-mini"><i class="icon-remove cmd" data-cmd="kill" data-pid='+proc.pid+'></i></button>'));
                 $('#proclist').append(row);
             });
             $('.spinner').hide();
@@ -231,6 +232,18 @@ function reloadtab() {
    });
     $('#proc').click(function () {
        processes();
+   });
+   
+   //test
+   $(document).on('click', '.cmd', function(){
+       var x = $(this).attr('data-pid');
+       //alert(x);
+       if (confirm('Are you sure?')) {
+       $.getJSON(WEBDIR + "stats/command/"+ $(this).attr('data-cmd')+"/" + $(this).attr('data-pid'), function (response) {
+            alert('click');
+       
+       });
+   }
    });
 
 
