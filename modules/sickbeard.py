@@ -16,9 +16,9 @@ class Sickbeard:
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'sickbeard_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'sickbeard_name'},
-                {'type': 'text', 'label': 'IP / Host *', 'name': 'sickbeard_host'},
-                {'type': 'text', 'label': 'Port *', 'name': 'sickbeard_port'},
-                {'type': 'text', 'label': 'Basepath', 'name': 'sickbeard_basepath'},
+                {'type': 'text', 'label': 'IP / Host', 'placeholder':'localhost','name': 'sickbeard_host'},
+                {'type': 'text', 'label': 'Port', 'placeholder':'8081', 'name': 'sickbeard_port'},
+                {'type': 'text', 'label': 'Basepath', 'placeholder':'/sickbeard' ,'name': 'sickbeard_basepath'},
                 {'type': 'text', 'label': 'API key', 'name': 'sickbeard_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'sickbeard_ssl'}
         ]})

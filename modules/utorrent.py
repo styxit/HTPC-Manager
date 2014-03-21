@@ -101,7 +101,7 @@ class UTorrent:
 			{'type': 'bool', 'label': 'Enable', 'name': 'utorrent_enable'},
 			{'type': 'text', 'label': 'Menu name', 'name': 'utorrent_name'},
 			{'type': 'text', 'label': 'IP / Host *', 'name': 'utorrent_host'},
-			{'type': 'text', 'label': 'Port *', 'name': 'utorrent_port'},
+			{'type': 'text', 'label': 'Port', 'placeholder':'8080', 'name': 'utorrent_port'},
 			{'type': 'text', 'label': 'Username', 'name': 'utorrent_username'},
 			{'type': 'password', 'label': 'Password', 'name': 'utorrent_password'}
 		]})

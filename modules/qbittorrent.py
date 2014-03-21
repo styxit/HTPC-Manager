@@ -17,8 +17,8 @@ class qbittorrent:
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'qbittorrent_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'qbittorrent_name'},
-                {'type': 'text', 'label': 'IP / Host *', 'name': 'qbittorrent_host'},
-                {'type': 'text', 'label': 'Port *', 'name': 'qbittorrent_port'},
+                {'type': 'text', 'label': 'IP / Host', 'placeholder':'localhost', 'name': 'qbittorrent_host'},
+                {'type': 'text', 'label': 'Port', 'placeholder':'8080', 'name': 'qbittorrent_port'},
                 {'type': 'text', 'label': 'Username', 'name': 'qbittorrent_username'},
                 {'type': 'password', 'label': 'Password', 'name': 'qbittorrent_password'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'qbittorrent_ssl'}

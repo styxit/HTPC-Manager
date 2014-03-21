@@ -17,8 +17,8 @@ class Couchpotato:
                 {'type': 'bool', 'label': 'Enable', 'name': 'couchpotato_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'couchpotato_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'couchpotato_host'},
-                {'type': 'text', 'label': 'Port *', 'name': 'couchpotato_port'},
-                {'type': 'text', 'label': 'Basepath', 'name': 'couchpotato_basepath'},
+                {'type': 'text', 'label': 'Port', 'placeholder':'5050', 'name': 'couchpotato_port'},
+                {'type': 'text', 'label': 'Basepath', 'placeholder':'/couchpotato', 'name': 'couchpotato_basepath'},
                 {'type': 'text', 'label': 'API key', 'name': 'couchpotato_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'couchpotato_ssl'}
         ]})

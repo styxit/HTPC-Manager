@@ -17,9 +17,9 @@ class NZBGet:
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'nzbget_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'nzbget_name'},
-                {'type': 'text', 'label': 'IP / Host *', 'name': 'nzbget_host'},
-                {'type': 'text', 'label': 'Port *', 'name': 'nzbget_port'},
-                {'type': 'text', 'label': 'Basepath', 'name': 'nzbget_basepath'},
+                {'type': 'text', 'label': 'IP / Host', 'placeholder':'localhost', 'name': 'nzbget_host'},
+                {'type': 'text', 'label': 'Port', 'placeholder':'6789', 'name': 'nzbget_port'},
+                {'type': 'text', 'label': 'Basepath', 'placeholder':'/nzbget', 'name': 'nzbget_basepath'},
                 {'type': 'text', 'label': 'User', 'name': 'nzbget_username'},
                 {'type': 'password', 'label': 'Password', 'name': 'nzbget_password'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'nzbget_ssl'}
