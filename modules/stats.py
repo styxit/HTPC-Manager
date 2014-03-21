@@ -8,6 +8,7 @@ import os
 import socket
 import urllib2
 import platform
+from subprocess import PIPE
 
 import cherrypy
 import htpc
@@ -339,33 +340,64 @@ class Stats:
     
     @cherrypy.expose()
     def command(self, cmd=None, pid=None, signal=None, popen=None):
-        arg = ''
         msg = None
         dmsg = {}
+        jmsg =  None
         try:
-            p = psutil.Process(pid=int(pid))
-            name = p.name()
-            # some argparse
-            if arg == '':
+            if pid:
+                p = psutil.Process(pid=int(pid))
+                name = p.name()
+            else:
+                pass
+            
+            #Only send the command if htpc-manager is started with --psutilcmd
+            if htpc.PSUTILCMD:
                 if cmd == 'kill':
+                    #Try to terminate the process gracefully
+                    p.terminate()
+                    # Wait for the process to terminate, if it hasnt within the timeout
+                    p.wait(timeout=5)
+                    # PEW kill process with laz0rbeams
                     p.kill()
                     msg = 'Killed %s pid %s successfully'% (name, pid)
                 elif cmd == 'signal':
                     psutil.send_signal(signal)
                 elif cmd == 'popen':
-                    r = psutil.Popen([popen], stdout=PIPE)
+                    r = psutil.Popen(popen, stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
                     msg = r.communicate()
                 
             else:
-                self.logger.error('HTPC-Manager is not started with --statscmd')
-                #dmsg['msg'] = msg
-                msg = 'HTPC-Manager is not started with --statscmd'
-            
+                msg = 'HTPC-Manager is not started with --psutilcmd'
+                self.logger.error(msg)
+                
+            #print msg
+            self.logger.info(msg)
             dmsg['msg'] = msg
             jmsg = json.dumps(dmsg)
             
             return jmsg
         except Exception as e:
             print 'error stats command function :', e
+            
+    @cherrypy.expose()
+    def cmdpopen(self, cmd=None, popen=None):
+        d = {}
+        msg = None
+        if htpc.PSUTILCMD:
+            if cmd == 'popen':
+                r = psutil.Popen(popen,stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=True)
+                msg = r.communicate()
+            else:
+                pass
+            
+            d['msg'] = msg
+            jmsg = json.dumps(d['msg'])
+            return jmsg
+        else:
+            msg = 'HTPC-Manager is not started with --psutilcmd'
+            self.logger.error(msg)
+            d['msg'] = msg
+            return json.dumps(d['msg'])
+            
     
     

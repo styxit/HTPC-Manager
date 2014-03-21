@@ -234,13 +234,23 @@ function reloadtab() {
        processes();
    });
    
-   //test
+   //Used for kill and signal command
    $(document).on('click', '.cmd', function(){
        var x = $(this).attr('data-pid');
-       //alert(x);
        if (confirm('Are you sure?')) {
        $.getJSON(WEBDIR + "stats/command/"+ $(this).attr('data-cmd')+"/" + $(this).attr('data-pid'), function (response) {
-            alert('click');
+            alert(response.msg);
+       
+       });
+   }
+   });
+   
+   // Used for popen
+    $(document).on('click', '#sendcmd', function(){
+       var i = $('#cmdinput').val()
+       if (confirm('Are you sure?')) {
+       $.getJSON(WEBDIR + "stats/cmdpopen/"+ $(this).attr('data-cmd')+"/" + i, function (response) {
+            alert(response.msg);
        
        });
    }

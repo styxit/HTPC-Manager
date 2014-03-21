@@ -32,7 +32,7 @@
     </div>
    
     <ul class="nav nav-tabs">
-    <li><a href="#diskt" data-toggle="tab">Disk</a></li>
+    <li class="active"><a href="#diskt" data-toggle="tab">Disk</a></li>
     <li><a href="#proc">Process</a></li>
     </ul>
     
@@ -72,6 +72,11 @@
                 </thead>
                 <tbody id="proclist"></tbody>
             </table>
+            <div class="input-append pull-left">
+                <input id="cmdinput" class="span4" type="text" placeholder="mkdir, dir1"></input>
+                <button id="sendcmd" data-cmd="popen" class="btn" type="button">Go!</button>
+            </div>
+            <div class="span4">WARNING! What is written here is passed to the shell! Dont come crying if you delete your hardrive</div>
             <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
         </div>
     </div>
