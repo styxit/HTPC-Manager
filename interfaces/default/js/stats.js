@@ -236,10 +236,8 @@ function reloadtab() {
    //Used for kill and signal command
    $(document).on('click', '.cmd', function(){
        var x = $(this).attr('data-pid');
-       var n = 'Terminated' + ' '+ $(this).attr('data-name') + ' ' + $(this).attr('data-pid')
        if (confirm('Are you sure you want to terminate '+ $(this).attr('data-name')+'?')) {
        $.getJSON(WEBDIR + "stats/command/"+ $(this).attr('data-cmd')+"/" + $(this).attr('data-pid'), function (response) {
-            //$.notify({pnotify_title:"Removed", pnotify_text:n});
             $.pnotify({
                 title: 'Success',
                 text: response.msg,
@@ -253,7 +251,7 @@ function reloadtab() {
    // Used for popen
     $(document).on('click', '#sendcmd', function(){
        var i = $('#cmdinput').val()
-       if (confirm('Are you sure to send "'+ i +'" to shell?')) {
+       if (confirm('Are you sure you want to send "'+ i +'" to shell?')) {
        $.getJSON(WEBDIR + "stats/cmdpopen/"+ $(this).attr('data-cmd')+"/" + i, function (response) {
             $.pnotify({
                 title: 'Response',

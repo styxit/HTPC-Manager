@@ -363,15 +363,16 @@ class Stats:
                     p.kill()
                     msg = 'Killed process %s %s' % (name, pid)
                     
-                #msg = '%sed %s pid %s successfully'% (cmd, name, pid)
                 dmsg['msg'] = msg
                 jmsg = json.dumps(dmsg)
+                self.logger.info(msg)
                 return jmsg
             elif cmd == 'signal':
                 p.send_signal(signal)
                 msg = '%ed pid %s successfully with %s'% (cmd, name, pid, signal)
                 dmsg['msg'] = msg
                 jmsg = json.dumps(dmsg)
+                self.logger.info(msg)
                 return jmsg
             '''
             elif cmd == 'popen':
@@ -381,15 +382,14 @@ class Stats:
             
         except Exception as e:
             self.logger.error("Error trying to %s" % cmd, e)
+        
       
     @cherrypy.expose()
     def cmdpopen(self, cmd=None, popen=None):
-        print cmd, popen
         d = {}
         popen = popen.split(',')
         msg = None
         try:
-            
             if htpc.PSUTILCMD:
                 if cmd == 'popen':
                     r = psutil.Popen([popen], stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
@@ -398,12 +398,14 @@ class Stats:
                     pass
                 d['msg'] = msg
                 jmsg = json.dumps(d)
+                self.logger.info(msg)
                 return jmsg
             else:
                 msg = 'HTPC-Manager is not started with --psutilcmd'
                 self.logger.error(msg)
                 d['msg'] = msg
                 jmsg = json.dumps(d)
+                self.logger.error(msg)
                 return jmsg
         except Exception as e:
             self.logger.error('Sending command from stat module failed: %s'% e)
