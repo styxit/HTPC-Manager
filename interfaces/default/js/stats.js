@@ -104,7 +104,7 @@ function processes() {
                 $('<td>').addClass('processes-runningtime').text(proc.r_time),
                 //$('<td>').text(proc.open_files), //Not supported on windows, just hangs on my computer
                 $('<td>').addClass('processes-percent').text(proc.cpu_percent+ '%'),
-                $('<td>').append('<button class="btn btn-mini cmd" data-cmd="kill" data-name='+proc.name+' data-cwd='+proc.cwd+' data-pid='+proc.pid+'><i class="icon-remove" title="" data-original-title="Wil try to terminate, then kill"></i></button>'));
+                $('<td>').append('<a href="#" class="btn btn-mini cmd" data-cmd="kill" data-name='+proc.name+' data-cwd='+proc.cwd+' data-pid='+proc.pid+'><i class="icon-remove"></i></a>'));
                 $('#proclist').append(row);
             });
             $('.spinner').hide();
@@ -234,25 +234,30 @@ function reloadtab() {
    });
    
    //Used for kill and signal command
-   $(document).on('click', '.cmd', function(){
-       var x = $(this).attr('data-pid');
+   $(document).on('click', '.cmd', function(e){
+       e.preventDefault();
+       var par = {'cmd':$(this).attr('data-cmd'), 'pid':$(this).attr('data-pid'), 'signal':$(this).attr('data-signal'),'cwd':$(this).attr('data-cwd')};
        if (confirm('Are you sure you want to terminate '+ $(this).attr('data-name')+'?')) {
-       $.getJSON(WEBDIR + "stats/command/"+ $(this).attr('data-cmd')+"/" + $(this).attr('data-pid'), function (response) {
+       $.getJSON(WEBDIR + "stats/command/", par, function (response) {
             $.pnotify({
-                title: 'Success',
+                title: response.status,
                 text: response.msg,
+                type: response.status,
                 addclass: "stack-bottomright",
                 stack: {"dir1": "up", "dir2": "left", push: 'top'}
             });
+            //Update info inside the tab
+            processes();
        });
    }
    });
    
    // Used for popen
     $(document).on('click', '#sendcmd', function(){
-       var i = $('#cmdinput').val()
+       var i = $('#cmdinput').val();
+       param = {'cmd':i};
        if (confirm('Are you sure you want to send "'+ i +'" to shell?')) {
-       $.getJSON(WEBDIR + "stats/cmdpopen/"+ $(this).attr('data-cmd')+"/" + i, function (response) {
+       $.getJSON(WEBDIR + "stats/cmdpopen/",param, function (response) {
             $.pnotify({
                 title: 'Response',
                 text: response.msg,
@@ -264,6 +269,7 @@ function reloadtab() {
        });
    }
    });
+
 
 
     

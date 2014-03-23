@@ -339,7 +339,7 @@ class Stats:
         return json.dumps(d)
     
     @cherrypy.expose()
-    def command(self, cmd=None, pid=None, signal=None):
+    def command(self, cmd=None, pid=None, signal=None, cwd=None):
         dmsg = {}
         jmsg =  None
         try:
@@ -350,23 +350,29 @@ class Stats:
                 pass
             
             if cmd == 'kill':
-                #Try to terminate the process gracefully
                 try:
                     p.terminate()
+                    dmsg['status'] = 'success'
                     msg = 'Terminated process %s %s' % (name, pid)
                     p.wait()
+                    
                 except psutil.NoSuchProcess:
                     msg = 'Process %s does not exist' % name
+                    
                 except psutil.AccessDenied:
                     msg = 'Dont have permission to terminate/kill %s %s' % (name,pid)
+                    dmsg['status'] = 'error'
+                    
                 except psutil.TimeoutExpired:
                     p.kill()
+                    dmsg['status'] = 'success'
                     msg = 'Killed process %s %s' % (name, pid)
-                    
+                
                 dmsg['msg'] = msg
                 jmsg = json.dumps(dmsg)
                 self.logger.info(msg)
                 return jmsg
+                
             elif cmd == 'signal':
                 p.send_signal(signal)
                 msg = '%ed pid %s successfully with %s'% (cmd, name, pid, signal)
@@ -376,7 +382,8 @@ class Stats:
                 return jmsg
             '''
             elif cmd == 'popen':
-                r = psutil.Popen(popen, stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
+                cmd = popen.split(', ')
+                r = psutil.Popen(cmd, stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
                 msg = r.communicate()
             '''
             
@@ -385,21 +392,19 @@ class Stats:
         
       
     @cherrypy.expose()
-    def cmdpopen(self, cmd=None, popen=None):
+    def cmdpopen(self, cmd=None):
         d = {}
-        popen = popen.split(',')
-        msg = None
+        cmd = cmd.split(', ')
+        
         try:
             if htpc.PSUTILCMD:
-                if cmd == 'popen':
-                    r = psutil.Popen([popen], stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
-                    msg = r.communicate()
-                else:
-                    pass
+                r = psutil.Popen(cmd, stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
+                msg = r.communicate()
                 d['msg'] = msg
                 jmsg = json.dumps(d)
                 self.logger.info(msg)
                 return jmsg
+                
             else:
                 msg = 'HTPC-Manager is not started with --psutilcmd'
                 self.logger.error(msg)
@@ -407,7 +412,9 @@ class Stats:
                 jmsg = json.dumps(d)
                 self.logger.error(msg)
                 return jmsg
+                
         except Exception as e:
+            print e
             self.logger.error('Sending command from stat module failed: %s'% e)
             
     
