@@ -94,18 +94,17 @@ function processes() {
 
             $.each(response, function (i, proc) {
                 var row = $('<tr>');
-                //Pid might be used for popen stuff later
-                row.attr('data-pid', proc.pid); 
                 row.append(
-                $('<td>').addClass('').text(proc.name),
-                $('<td>').addClass('processes-name hidden-phone').text(proc.status),
-                $('<td>').addClass('processes-status hidden-phone').text(proc.username),
-                $('<td>').addClass('processes-memory-percent').text(proc.memory_percent.toFixed(2) + ' %'),
+                $('<td>').addClass('processes-name').text(proc.name),
+                $('<td>').addClass('processes-pid').text(proc.pid),
+                $('<td>').addClass('processes-status hidden-phone').text(proc.status),
+                $('<td>').addClass('processes-username hidden-phone').text(proc.username),
+                $('<td>').addClass('processes-memory-percent').text(proc.memory_percent.toFixed(2) + '%'),
                 $('<td>').addClass('processes-memory-info').text(getReadableFileSizeString(proc.memory_info[0])),
                 $('<td>').addClass('processes-runningtime').text(proc.r_time),
                 //$('<td>').text(proc.open_files), //Not supported on windows, just hangs on my computer
-                $('<td>').addClass('processes-percent').text(proc.cpu_percent+ ' %'),
-                $('<td>').append('<button class="btn btn-mini"><i class="icon-remove cmd" data-cmd="kill" data-pid='+proc.pid+'></i></button>'));
+                $('<td>').addClass('processes-percent').text(proc.cpu_percent+ '%'),
+                $('<td>').append('<button class="btn btn-mini cmd" data-cmd="kill" data-name='+proc.name+' data-cwd='+proc.cwd+' data-pid='+proc.pid+'><i class="icon-remove" title="" data-original-title="Wil try to terminate, then kill"></i></button>'));
                 $('#proclist').append(row);
             });
             $('.spinner').hide();
@@ -227,20 +226,26 @@ function reloadtab() {
     }
 }
 
-   $('#diskt').click(function () {
+   $('#diskl').click(function () {
        get_diskinfo();
    });
-    $('#proc').click(function () {
+    $('#procl').click(function () {
        processes();
    });
    
    //Used for kill and signal command
    $(document).on('click', '.cmd', function(){
        var x = $(this).attr('data-pid');
-       if (confirm('Are you sure?')) {
+       var n = 'Terminated' + ' '+ $(this).attr('data-name') + ' ' + $(this).attr('data-pid')
+       if (confirm('Are you sure you want to terminate '+ $(this).attr('data-name')+'?')) {
        $.getJSON(WEBDIR + "stats/command/"+ $(this).attr('data-cmd')+"/" + $(this).attr('data-pid'), function (response) {
-            alert(response.msg);
-       
+            //$.notify({pnotify_title:"Removed", pnotify_text:n});
+            $.pnotify({
+                title: 'Success',
+                text: response.msg,
+                addclass: "stack-bottomright",
+                stack: {"dir1": "up", "dir2": "left", push: 'top'}
+            });
        });
    }
    });
@@ -248,9 +253,15 @@ function reloadtab() {
    // Used for popen
     $(document).on('click', '#sendcmd', function(){
        var i = $('#cmdinput').val()
-       if (confirm('Are you sure?')) {
+       if (confirm('Are you sure to send "'+ i +'" to shell?')) {
        $.getJSON(WEBDIR + "stats/cmdpopen/"+ $(this).attr('data-cmd')+"/" + i, function (response) {
-            alert(response.msg);
+            $.pnotify({
+                title: 'Response',
+                text: response.msg,
+                type: 'success',
+                width: '500px',
+                min_height: '400px'
+            });
        
        });
    }

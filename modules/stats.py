@@ -47,7 +47,7 @@ class Stats:
         else:
             self.logger.error("Psutil is outdated, needs atleast version 0,7")
 
-        return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats', importPsutil=importPsutil)
+        return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats', importPsutil=importPsutil, cmdline=htpc.PSUTILCMD)
 
     @cherrypy.expose()
     def uptime(self):
@@ -135,8 +135,8 @@ class Stats:
         for p in psutil.process_iter():
             
             try:
-                p.dict = p.as_dict(['username', 'get_memory_percent', 
-                                    'get_cpu_percent', 'name', 'status', 'pid', 'get_memory_info', 'create_time'])
+                p.dict = p.as_dict(['username', 'get_memory_percent', 'cwd', 'create_time',
+                                    'get_cpu_percent', 'name', 'status', 'pid', 'get_memory_info'])
                 #Create a readable time
                 r_time = datetime.now() - datetime.fromtimestamp(p.dict['create_time'])
                 r_time = str(r_time)[:-7]
@@ -339,8 +339,7 @@ class Stats:
         return json.dumps(d)
     
     @cherrypy.expose()
-    def command(self, cmd=None, pid=None, signal=None, popen=None):
-        msg = None
+    def command(self, cmd=None, pid=None, signal=None):
         dmsg = {}
         jmsg =  None
         try:
@@ -350,54 +349,64 @@ class Stats:
             else:
                 pass
             
-            #Only send the command if htpc-manager is started with --psutilcmd
-            if htpc.PSUTILCMD:
-                if cmd == 'kill':
-                    #Try to terminate the process gracefully
+            if cmd == 'kill':
+                #Try to terminate the process gracefully
+                try:
                     p.terminate()
-                    # Wait for the process to terminate, if it hasnt within the timeout
-                    p.wait(timeout=5)
-                    # PEW kill process with laz0rbeams
+                    msg = 'Terminated process %s %s' % (name, pid)
+                    p.wait()
+                except psutil.NoSuchProcess:
+                    msg = 'Process %s does not exist' % name
+                except psutil.AccessDenied:
+                    msg = 'Dont have permission to terminate/kill %s %s' % (name,pid)
+                except psutil.TimeoutExpired:
                     p.kill()
-                    msg = 'Killed %s pid %s successfully'% (name, pid)
-                elif cmd == 'signal':
-                    psutil.send_signal(signal)
-                elif cmd == 'popen':
-                    r = psutil.Popen(popen, stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
+                    msg = 'Killed process %s %s' % (name, pid)
+                    
+                #msg = '%sed %s pid %s successfully'% (cmd, name, pid)
+                dmsg['msg'] = msg
+                jmsg = json.dumps(dmsg)
+                return jmsg
+            elif cmd == 'signal':
+                p.send_signal(signal)
+                msg = '%ed pid %s successfully with %s'% (cmd, name, pid, signal)
+                dmsg['msg'] = msg
+                jmsg = json.dumps(dmsg)
+                return jmsg
+            '''
+            elif cmd == 'popen':
+                r = psutil.Popen(popen, stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
+                msg = r.communicate()
+            '''
+            
+        except Exception as e:
+            self.logger.error("Error trying to %s" % cmd, e)
+      
+    @cherrypy.expose()
+    def cmdpopen(self, cmd=None, popen=None):
+        print cmd, popen
+        d = {}
+        popen = popen.split(',')
+        msg = None
+        try:
+            
+            if htpc.PSUTILCMD:
+                if cmd == 'popen':
+                    r = psutil.Popen([popen], stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
                     msg = r.communicate()
-                
+                else:
+                    pass
+                d['msg'] = msg
+                jmsg = json.dumps(d)
+                return jmsg
             else:
                 msg = 'HTPC-Manager is not started with --psutilcmd'
                 self.logger.error(msg)
-                
-            #print msg
-            self.logger.info(msg)
-            dmsg['msg'] = msg
-            jmsg = json.dumps(dmsg)
-            
-            return jmsg
+                d['msg'] = msg
+                jmsg = json.dumps(d)
+                return jmsg
         except Exception as e:
-            print 'error stats command function :', e
-            
-    @cherrypy.expose()
-    def cmdpopen(self, cmd=None, popen=None):
-        d = {}
-        msg = None
-        if htpc.PSUTILCMD:
-            if cmd == 'popen':
-                r = psutil.Popen(popen,stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=True)
-                msg = r.communicate()
-            else:
-                pass
-            
-            d['msg'] = msg
-            jmsg = json.dumps(d['msg'])
-            return jmsg
-        else:
-            msg = 'HTPC-Manager is not started with --psutilcmd'
-            self.logger.error(msg)
-            d['msg'] = msg
-            return json.dumps(d['msg'])
+            self.logger.error('Sending command from stat module failed: %s'% e)
             
     
     

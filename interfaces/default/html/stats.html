@@ -32,8 +32,8 @@
     </div>
    
     <ul class="nav nav-tabs">
-    <li class="active"><a href="#diskt" data-toggle="tab">Disk</a></li>
-    <li><a href="#proc">Process</a></li>
+    <li id="diskl" class="active"><a href="#diskt" data-toggle="tab">Disk</a></li>
+    <li id="procl"><a href="#proc" data-toggle="tab">Process</a></li>
     </ul>
     
     <div class="tab-content">
@@ -60,6 +60,7 @@
                 <thead>
                     <tr>
                         <th>Name</th>
+                        <th>Pid</th>
                         <th>Status</th>
                         <th>User</th>
                         <th>Memory %</th>
@@ -72,11 +73,15 @@
                 </thead>
                 <tbody id="proclist"></tbody>
             </table>
-            <div class="input-append pull-left">
-                <input id="cmdinput" class="span4" type="text" placeholder="mkdir, dir1"></input>
-                <button id="sendcmd" data-cmd="popen" class="btn" type="button">Go!</button>
+            % if cmdline:
+            <div id="statscmd" class="span4">
+                <div class="input-append">
+                    <input id="cmdinput" class="span4" type="text" placeholder="mkdir, dir1"></input>
+                    <button id="sendcmd" data-cmd="popen" class="btn" type="button">Go!</button>
+                </div>
+                <div class="alert helper-block">WARNING! What is written here is passed to the shell! Dont come crying if you delete your hardrive</div>
             </div>
-            <div class="span4">WARNING! What is written here is passed to the shell! Dont come crying if you delete your hardrive</div>
+            % endif
             <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
         </div>
     </div>
