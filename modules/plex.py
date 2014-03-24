@@ -71,13 +71,8 @@ class Plex:
 
         url = "http://%s:%s/web" % (plex_host, plex_port)
 
-<<<<<<< HEAD
         raise cherrypy.HTTPRedirect(url)
 
-=======
-        raise cherrypy.HTTPRedirect(url('', True))
-        
->>>>>>> FETCH_HEAD
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetRecentMovies(self, limit=5):
@@ -629,7 +624,6 @@ class Plex:
             self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to control Plex with action: " + action)
             return 'error'
-<<<<<<< HEAD
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -758,5 +752,3 @@ class Plex:
             self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to play '" + item + "' on player " + player)
             return 'error'
-=======
->>>>>>> FETCH_HEAD
