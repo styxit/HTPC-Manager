@@ -9,6 +9,16 @@ from htpc.proxy import get_image
 import logging
 import urllib
 
+"""
+Credits.
+
+
+PlexGDM:
+Based on PlexConect:
+https://github.com/iBaa/PlexConnect/blob/master/PlexAPI.py
+
+"""
+
 
 class Plex:
     def __init__(self):
@@ -20,6 +30,13 @@ class Plex:
             'test': htpc.WEBDIR + 'plex/ping',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'plex_enable'},
+
+                {'type':'select',
+                 'label':'Existing Servers',
+                 'name':'gdm_plex_servers',
+                 'options':[
+                    {'name':'Select', 'value':0}
+                ]},
                 {'type': 'text', 'label': 'Menu name', 'name': 'plex_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'plex_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'plex_port'},
@@ -47,6 +64,21 @@ class Plex:
         return htpc.LOOKUP.get_template('plex.html').render(scriptname='plex')
 
     @cherrypy.expose()
+    def webinterface(self):
+        """ Generate page from template """
+        plex_host = htpc.settings.get('plex_host', 'localhost')
+        plex_port = htpc.settings.get('plex_port', '32400')
+
+        url = "http://%s:%s/web" % (plex_host, plex_port)
+
+<<<<<<< HEAD
+        raise cherrypy.HTTPRedirect(url)
+
+=======
+        raise cherrypy.HTTPRedirect(url('', True))
+        
+>>>>>>> FETCH_HEAD
+    @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetRecentMovies(self, limit=5):
         """ Get a list of recently added movies """
@@ -64,6 +96,8 @@ class Plex:
                         genre = []
 
                         jmovie['title'] = movie["title"]
+                        jmovie['id'] = int(movie["ratingKey"])
+
                         if 'thumb'in movie:
                            jmovie['thumbnail'] = movie["thumb"]
 
@@ -113,6 +147,7 @@ class Plex:
                         jepisode = {}
         
                         jepisode['label'] = "%sx%s. %s" % (episode["parentIndex"], episode["index"], episode["title"])
+                        jepisode['id'] = int(episode["ratingKey"])
         
                         if 'summary'in episode:
                             jepisode['plot'] = episode["summary"]
@@ -159,6 +194,7 @@ class Plex:
                         jalbum = {}
         
                         jalbum['title'] = album["title"]
+                        jalbum['id'] = album["ratingKey"]
         
                         if 'thumb'in album:
                             jalbum['thumbnail'] = album["thumb"]
@@ -222,6 +258,7 @@ class Plex:
                         jmovie = {}
                         genre = []
                         jmovie['playcount'] = 0
+                        jmovie['id'] = int(movie["ratingKey"])
 
                         jmovie['title'] = movie["title"]
                         if 'thumb'in movie:
@@ -291,7 +328,7 @@ class Plex:
 
                         jshow['title'] = tvShow["title"]
                         
-                        jshow['tvshowid'] = tvShow["ratingKey"]
+                        jshow['id'] = tvShow["ratingKey"]
                         
                         if 'thumb'in tvShow:
                            jshow['thumbnail'] = tvShow["thumb"]
@@ -369,7 +406,7 @@ class Plex:
 
                         jalbum['title'] = album["title"]
                         
-                        jalbum['albumid'] = album["ratingKey"]
+                        jalbum['id'] = album["ratingKey"]
 
                         if 'thumb'in album:
                             jalbum['thumbnail'] = album["thumb"]
@@ -401,6 +438,7 @@ class Plex:
                 jepisode['playcount'] = 0
 
                 jepisode['label'] = "%sx%s. %s" % (episode["parentIndex"], episode["index"], episode["title"])
+                jepisode['id'] = episode["ratingKey"]
 
                 if 'summary'in episode:
                     jepisode['plot'] = episode["summary"]
@@ -534,6 +572,8 @@ class Plex:
                 if jplaying_item['viewOffset'] < (int(jplaying_item['duration']) - 60000):
                     playing_items.append(jplaying_item)
                 
+                    
+            #print dumps({'playing_items': playing_items}) 
             return {'playing_items': playing_items}
             
         except Exception, e:
@@ -579,7 +619,7 @@ class Plex:
             if action in self.navigationCommands:
                 urllib.urlopen('http://%s:%s/system/players/%s/naviation/%s' % (plex_host, plex_port, player, action))
             elif action in self.playbackCommands:
-                print urllib.urlopen('http://%s:%s/system/players/%s/playback/%s' % (plex_host, plex_port, player, action))
+                urllib.urlopen('http://%s:%s/system/players/%s/playback/%s' % (plex_host, plex_port, player, action))
             elif action in self.applicationCommands:
                 urllib.urlopen('http://%s:%s/system/players/%s/application/%s' % (plex_host, plex_port, player, action))
             else:
@@ -589,3 +629,134 @@ class Plex:
             self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to control Plex with action: " + action)
             return 'error'
+<<<<<<< HEAD
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetPlayers(self):
+        """ Get list of active Players """
+        self.logger.debug("Getting players from Plex")
+        try:
+
+            plex_host = htpc.settings.get('plex_host', '')
+            plex_port = htpc.settings.get('plex_port', '32400')
+            players = []
+            for player in self.JsonLoader(urlopen(Request('http://%s:%s/clients' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+
+                try:
+                    del player["_elementType"]
+                except: pass
+
+                if 'protocolCapabilities' in player:
+                    player['protocolCapabilities'] = player['protocolCapabilities'].split(',')
+
+                players.append(player)
+
+            return {'players': players}
+
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
+            self.logger.error("Unable to get players")
+            return 'error'
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetServers(self, id=None):
+        """ Get list of servers """
+        self.logger.debug("Getting servers from Plex")
+        try:
+
+            IP_PlexGDM = '<broadcast>'
+            Port_PlexGDM = 32414
+            Msg_PlexGDM = 'M-SEARCH * HTTP/1.0'
+            
+            # setup socket for discovery -> multicast message
+            GDM = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            GDM.settimeout(1.0)
+            
+            # Set the time-to-live for messages to 1 for local network
+            GDM.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+            
+            returnData = []
+            try:
+                # Send data to the multicast group
+                self.logger.info("Sending discovery message: %s" % Msg_PlexGDM)
+                GDM.sendto(Msg_PlexGDM, (IP_PlexGDM, Port_PlexGDM))
+        
+                # Look for responses from all recipients
+                while True:
+                    try:
+                        data, server = GDM.recvfrom(1024)
+                        self.logger.debug("Received data from %s" % str(server))
+                        self.logger.debug("Data received: %s" % str(data))
+                        returnData.append( { 'from' : server,
+                                             'data' : data } )
+                    except socket.timeout:
+                        break
+            finally:
+                GDM.close()
+        
+            discovery_complete = True
+        
+            PMS_list = []
+            if returnData:
+                for response in returnData:
+                    update = { 'ip' : response.get('from')[0] }
+                    
+                    # Check if we had a positive HTTP response                        
+                    if "200 OK" in response.get('data'):
+                        for each in response.get('data').split('\n'): 
+                            # decode response data
+                            update['discovery'] = "auto"
+                            #update['owned']='1'
+                            #update['master']= 1
+                            #update['role']='master'
+                            
+                            if "Content-Type:" in each:
+                                update['content-type'] = each.split(':')[1].strip()
+                            elif "Resource-Identifier:" in each:
+                                update['uuid'] = each.split(':')[1].strip()
+                            elif "Name:" in each:
+                                update['serverName'] = each.split(':')[1].strip().decode('utf-8', 'replace')  # store in utf-8
+                            elif "Port:" in each:
+                                update['port'] = each.split(':')[1].strip()
+                            elif "Updated-At:" in each:
+                                update['updated'] = each.split(':')[1].strip()
+                            elif "Version:" in each:
+                                update['version'] = each.split(':')[1].strip()
+                    PMS_list.append(update)
+            
+            if len(PMS_list) == 0:
+                self.logger.info("GDM: No servers discovered")
+            else:
+                self.logger.info("GDM: Servers discovered: %s" % str(len(PMS_list)))
+
+            for server in PMS_list:
+                if server["uuid"] == id:
+                    return {'servers': server}
+
+            return {'servers': PMS_list}
+
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
+            self.logger.error("Unable to get players")
+            return 'error'
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def PlayItem(self, player, item=None, type=None, offset=0):
+        """ Play a file in Plex """
+        self.logger.debug("Playing '" + item + "' on player " + player)
+        try:
+
+            plex_host = htpc.settings.get('plex_host', '')
+            plex_port = htpc.settings.get('plex_port', '32400')
+            
+            urllib.urlopen('http://%s:%s/system/players/%s/application/playMedia?key=/library/metadata/%s&viewOffset=%s&path=http://%s:%s/library/metadata/%s' % (plex_host, plex_port, player, item, offset, plex_host, plex_port, item))
+
+        except Exception, e:
+            self.logger.debug("Exception: " + str(e))
+            self.logger.error("Unable to play '" + item + "' on player " + player)
+            return 'error'
+=======
+>>>>>>> FETCH_HEAD

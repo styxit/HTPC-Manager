@@ -45,6 +45,11 @@ $(document).ready(function() {
 
 });
 
+function playItem(item, player) {
+    type = typeof type !== 'undefined';
+    $.get(WEBDIR + 'plex/PlayItem?item='+item+ '&player='+player);
+}
+
 function loadMovies(options) {
     var optionstr = JSON.stringify(options) + hideWatched;
     if (movieLoad.options != optionstr) {
@@ -137,9 +142,27 @@ function loadMovie(movie) {
             score: (movie.rating / 2),
         }));
     }
-    var buttons = {
+    var buttons = {}
 
-    }
+    $.extend(buttons, {'Play' : function() {
+                playItem(movie.id, '11');
+                hideModal();
+                }});
+
+    $.get(WEBDIR + 'plex/GetPlayers', function(data) {
+        $.each(data.players, function (i, player) {
+            console.log(player.address);
+            console.log(player.name);
+            console.log(movie.id);
+            $.extend(buttons, {'Play ' : function() {
+                playItem(movie.id, player.address);
+                hideModal();
+                }});
+        });
+        console.log(buttons);
+        }, 'json');
+
+
     showModal(movie.title + ' ('+movie.year+')', $('<div>').append(
         $('<img>').attr('src', poster).addClass('thumbnail movie-poster pull-left'),
         info
@@ -198,7 +221,7 @@ function loadShows(options) {
 
                     var showAnchor = $('<a>').attr('href', '#').click(function(e) {
                         e.preventDefault();
-                        loadEpisodes({'tvshowid':show.tvshowid})
+                        loadEpisodes({'tvshowid':show.id})
                     });
 
                     var src = 'holder.js/100x150/text:No artwork';
@@ -273,7 +296,7 @@ function loadEpisodes(options) {
 
                     var episodeAnchor = $('<a>').attr('href', '#').click(function(e) {
                         e.preventDefault();
-                        playItem(episode.episodeid, 'episode');
+                        playItem(episode.id);
                     });
 
                     var src = 'holder.js/150x85/text:No artwork';
