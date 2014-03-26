@@ -129,7 +129,7 @@ class Plex:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetRecentShows(self, limit=5):
-        """ Get a list of recently added movies """
+        """ Get a list of recently added shows """
         try:
             plex_host = htpc.settings.get('plex_host', 'localhost')
             plex_port = htpc.settings.get('plex_port', '32400')
@@ -231,7 +231,7 @@ class Plex:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetMovies(self, start=0, end=0, hidewatched=0):
-        """ Get a list of recently added movies """
+        """ Get a list movies """
         self.logger.debug("Fetching Movies")
 
         try:
@@ -299,7 +299,7 @@ class Plex:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetShows(self, start=0, end=0, hidewatched=0):
-        """ Get a list of recently added movies """
+        """ Get a list of shows """
         try:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
