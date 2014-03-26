@@ -122,8 +122,7 @@ class Plex:
 
             return {'movies': sorted(movies, key=lambda k: k['addedAt'], reverse=True)[:int(limit)]}
         except Exception, e:
-            print ("Exception: " + str(e))
-            print ("Unable to fetch recent movies!")
+            self.logger.error("Unable to fetch recent movies! Exception: " + str(e))
             return
 
 
@@ -170,8 +169,7 @@ class Plex:
 
             return {'episodes': sorted(episodes, key=lambda k: k['addedAt'], reverse=True)[:int(limit)]}
         except Exception, e:
-            print ("Exception: " + str(e))
-            print ("Unable to fetch episodes movies!")
+            self.logger.error("Unable to fetch episodes movies! Exception: " + str(e))
             return
 
     @cherrypy.expose()
@@ -208,8 +206,7 @@ class Plex:
 
             return {'albums': sorted(albums, key=lambda k: k['addedAt'], reverse=True)[:int(limit)]}
         except Exception, e:
-            print ("Exception: " + str(e))
-            print ("Unable to fetch albums!")
+            self.logger.error("Unable to fetch albums! Exception: " + str(e))
             return
 
 
@@ -295,8 +292,8 @@ class Plex:
 
             return {'limits': limits, 'movies': sorted(movies, key=lambda k: k['title'])[int(start):int(end)] }
         except Exception, e:
-            print ("Exception: " + str(e))
-            print ("Unable to fetch all movies!")
+
+            self.logger.error("Unable to fetch all movies! Exception: " + str(e))
             return
 
     @cherrypy.expose()
@@ -348,8 +345,8 @@ class Plex:
 
             return {'limits': limits, 'tvShows': sorted(tvShows, key=lambda k: k['title'])[int(start):int(end)] }
         except Exception, e:
-            print ("Exception: " + str(e))
-            print ("Unable to fetch all shows!")
+
+            self.logger.error("Unable to fetch all shows! Exception: " + str(e))
             return
 
     @cherrypy.expose()
@@ -370,7 +367,7 @@ class Plex:
 
                         jartist['title'] = artist["title"]
                         
-                        jartist['artistid'] = artist["ratingKey"]
+                        jartist['id'] = artist["ratingKey"]
                         
                         artists.append(jartist)
                     
@@ -380,8 +377,7 @@ class Plex:
 
             return {'limits': limits, 'artists': sorted(artists, key=lambda k: k['title'])[int(start):int(end)] }
         except Exception, e:
-            print ("Exception: " + str(e))
-            print ("Unable to fetch all artists!")
+            self.logger.error("Unable to fetch all artists! Exception: " + str(e))
             return
 
     @cherrypy.expose()
@@ -411,11 +407,10 @@ class Plex:
                     limits = {'start': int(start), 'total': len(albums), 'end': int(end)}
                     if int(end) >= len(albums):
                         limits['end'] = len(albums)
-            print albums
+
             return {'limits': limits, 'albums': sorted(albums, key=lambda k: k['title'])[int(start):int(end)] }
         except Exception, e:
-            print ("Exception: " + str(e))
-            print ("Unable to fetch all Albums!")
+            self.logger.error("Unable to fetch all Albums! Exception: " + str(e))
             return
 
     @cherrypy.expose()
@@ -453,6 +448,9 @@ class Plex:
                 if 'thumb'in episode:
                     jepisode['thumbnail'] = episode["thumb"]
 
+                if 'rating'in episode:
+                    jepisode['rating'] = episode["rating"]
+
                 if hidewatched == '1':
                     if jepisode['playcount'] <= 0:
                         episodes.append(jepisode)
@@ -466,8 +464,7 @@ class Plex:
 
             return {'limits': limits, 'episodes': episodes[int(start):int(end)] }
         except Exception, e:
-            print ("Exception: " + str(e))
-            print ("Unable to fetch all episodes!")
+            self.logger.error("Unable to fetch all episodes! Exception: " + str(e))
             return
 
 
@@ -572,8 +569,7 @@ class Plex:
             return {'playing_items': playing_items}
             
         except Exception, e:
-            print ("Exception: " + str(e))
-            self.logger.error("Unable to fetch currently playing information!")
+            self.logger.error("Unable to fetch currently playing information! Exception: " + str(e))
             return
 
     @cherrypy.expose()
@@ -594,8 +590,7 @@ class Plex:
                         self.logger.error('Failed to update section %s on Plex: ' + (section['key'], ex(e)))
             return 'Update command sent to Plex'
         except Exception, e:
-            print ("Exception: " + str(e))
-            self.logger.error("Failed to update library!")
+            self.logger.error("Failed to update library! Exception: " + str(e))
             return 'Failed to update library!'
 
     @cherrypy.expose()
@@ -627,7 +622,7 @@ class Plex:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetPlayers(self):
+    def GetPlayers(self, filter=None):
         """ Get list of active Players """
         self.logger.debug("Getting players from Plex")
         try:
@@ -643,8 +638,8 @@ class Plex:
 
                 if 'protocolCapabilities' in player:
                     player['protocolCapabilities'] = player['protocolCapabilities'].split(',')
-
-                players.append(player)
+                if filter == None or filter in player['protocolCapabilities']:
+                    players.append(player)
 
             return {'players': players}
 
@@ -701,10 +696,6 @@ class Plex:
                     if "200 OK" in response.get('data'):
                         for each in response.get('data').split('\n'): 
                             # decode response data
-                            update['discovery'] = "auto"
-                            #update['owned']='1'
-                            #update['master']= 1
-                            #update['role']='master'
                             
                             if "Content-Type:" in each:
                                 update['content-type'] = each.split(':')[1].strip()

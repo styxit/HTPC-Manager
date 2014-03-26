@@ -98,6 +98,12 @@ h6.title {
 .modal .modal-movieinfo {
     margin-left: 230px;
 }
+
+
+.modal .modal-episodeinfo {
+    margin-left: 230px;
+}
+
 .modal .modal-youtube {
     border: 0;
     height: 375px;
