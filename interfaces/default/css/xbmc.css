@@ -75,6 +75,11 @@ h6.title {
 #playlist tr td {
     cursor: pointer;
 }
+#player-volume-progressbar {
+	height: 25px !important;
+	margin: 0px !important;
+	cursor: pointer;
+}
 #nowplaying {
     background-size: 100%;
     background-position: 50% 20%;
