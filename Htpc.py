@@ -69,6 +69,8 @@ def load_modules():
     htpc.ROOT.qbittorrent = qbittorrent()
     from modules.stats import Stats
     htpc.ROOT.stats = Stats()
+    from modules.samsungtv import Samsungtv
+    htpc.ROOT.samsungtv = Samsungtv()
 
 
 def main():

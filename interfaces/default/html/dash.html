@@ -88,6 +88,10 @@ settings = self.attr.settings
                 </table>
             </div>
             %endif
+            %if settings.get('dash_samsungtv', 0):
+            <div id="samsungt" class="span4">
+            </div>
+            %endif
         </div>
         <%
         dashcount = settings.get('dash_sickbeard', 0);
@@ -96,6 +100,7 @@ settings = self.attr.settings
         dashcount += settings.get('dash_rec_music', 0);
         dashcount += settings.get('dash_rec_tv', 0);
         dashcount += settings.get('dash_rec_movies', 0);
+        dashcount += settings.get('dash_samsungtv', 0);
         %>
         %if dashcount == 0:
         <div class="row-fluid">
