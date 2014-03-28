@@ -646,6 +646,11 @@ function loadNowPlaying() {
                             thumbnail.attr('width', '140').attr('height', '140');
                     }
                 }
+                if (item.state == 'playing') {
+                    $('#nowplaying i.icon-play').removeClass().addClass('icon-pause')
+                } else {
+                    $('#nowplaying i.icon-pause').removeClass().addClass('icon-play')
+                }
                     //console.log(item)
                     var itemTime = $('#nowplaying #player-item-time').html(parseSec(item.viewOffset/1000) + ' / ' + parseSec(item.duration/1000));
                     var itemTitel = $('#nowplaying #player-item-title')

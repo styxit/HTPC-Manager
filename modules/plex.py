@@ -557,7 +557,6 @@ class Plex:
                     jplaying_item['viewOffset'] = int(video['viewOffset'])
                 except:
                     jplaying_item['viewOffset'] = 0
-                #jplaying_item['state'] = video['state']
 
                 for children in video["_children"]:
                     if children['_elementType'] == 'Player':
