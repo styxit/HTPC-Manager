@@ -610,7 +610,7 @@ class Plex:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def ControlPlayer(self, player, action, param, value=''):
+    def ControlPlayer(self, player, action, value=''):
         """ Various commands to control Plex Player """
         self.logger.debug("Sending control to Plex: " + action)
         try:
@@ -751,7 +751,6 @@ class Plex:
 
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
-            print 'http://%s:%s/system/players/%s/application/playMedia?key=/library/metadata/%s&viewOffset=%s&path=http://%s:%s/library/metadata/%s' % (plex_host, plex_port, player, item, offset, plex_host, plex_port, item)
             urllib.urlopen('http://%s:%s/system/players/%s/application/playMedia?key=/library/metadata/%s&viewOffset=%s&path=http://%s:%s/library/metadata/%s' % (plex_host, plex_port, player, item, offset, plex_host, plex_port, item))
 
         except Exception, e:
