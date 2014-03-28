@@ -166,7 +166,6 @@ function loadMovie(movie) {
 }
 
 function loadEpisode(episode) {
-    console.log(episode)
     var poster = WEBDIR + 'plex/GetThumb?w=200&h=300&thumb='+encodeURIComponent(episode.thumbnail)
     var info = $('<div>').addClass('modal-episodeinfo');
     if (episode.runtime) {

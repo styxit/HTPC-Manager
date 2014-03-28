@@ -238,6 +238,7 @@ class Plex:
             plex_host = htpc.settings.get('plex_host', 'localhost')
             plex_port = htpc.settings.get('plex_port', '32400')
             movies = []
+            limits = {}
 
             if hidewatched == '1':
                hidewatched = "unwatched"
@@ -286,7 +287,9 @@ class Plex:
 
                         movies.append(jmovie)
 
-                    limits = {'start': int(start), 'total': len(movies), 'end': int(end)}
+                    limits['start'] = int(start)
+                    limits['total'] = len(movies)
+                    limits['end'] = int(end)
                     if int(end) >= len(movies):
                         limits['end'] = len(movies)
 
@@ -304,6 +307,7 @@ class Plex:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
             tvShows = []
+            limits = {}
 
             if hidewatched == '1':
                hidewatched = "unwatched"
@@ -339,7 +343,9 @@ class Plex:
 
                         tvShows.append(jshow)
                     
-                    limits = {'start': int(start), 'total': len(tvShows), 'end': int(end)}
+                    limits['start'] = int(start)
+                    limits['total'] = len(tvShows)
+                    limits['end'] = int(end)
                     if int(end) >= len(tvShows):
                         limits['end'] = len(tvShows)
 
@@ -357,6 +363,7 @@ class Plex:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
             artists = []
+            limits = {}
 
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
                 if section['type'] == "artist":
@@ -371,7 +378,9 @@ class Plex:
                         
                         artists.append(jartist)
                     
-                    limits = {'start': int(start), 'total': len(artists), 'end': int(end)}
+                    limits['start'] = int(start)
+                    limits['total'] = len(artists)
+                    limits['end'] = int(end)
                     if int(end) >= len(artists):
                         limits['end'] = len(artists)
 
@@ -388,6 +397,7 @@ class Plex:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
             albums = []
+            limits = {}
 
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
                 if section['type'] == "artist":
@@ -404,7 +414,9 @@ class Plex:
                         
                         albums.append(jalbum)
                     
-                    limits = {'start': int(start), 'total': len(albums), 'end': int(end)}
+                    limits['start'] = int(start)
+                    limits['total'] = len(albums)
+                    limits['end'] = int(end)
                     if int(end) >= len(albums):
                         limits['end'] = len(albums)
 
@@ -422,6 +434,7 @@ class Plex:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
             episodes = []
+            limits = {}
 
             for episode in self.JsonLoader(urlopen(Request('http://%s:%s/library/metadata/%s/allLeaves' % (plex_host, plex_port, tvshowid), headers={"Accept": "application/json"})).read())["_children"]:
                 jepisode = {}
@@ -457,7 +470,9 @@ class Plex:
                 else:
                     episodes.append(jepisode)
                     
-            limits = {'start': int(start), 'total': len(episodes), 'end': int(end)}
+            limits['start'] = int(start)
+            limits['total'] = len(episodes)
+            limits['end'] = int(end)
             # TODO plocka total from headern.
             if int(end) >= len(episodes):
                 limits['end'] = len(episodes)
@@ -595,14 +610,14 @@ class Plex:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def ControlPlayer(self, player, action, value=''):
+    def ControlPlayer(self, player, action, param, value=''):
         """ Various commands to control Plex Player """
         self.logger.debug("Sending control to Plex: " + action)
         try:
 
             self.navigationCommands = ['moveUp', 'moveDown', 'moveLeft', 'moveRight', 'pageUp', 'pageDown', 'nextLetter', 'previousLetter', 'select', 'back', 'contextMenu', 'toggleOSD']
             self.playbackCommands = ['play', 'pause', 'stop', 'rewind', 'fastForward', 'stepForward', 'bigStepForward', 'stepBack', 'bigStepBack', 'skipNext', 'skipPrevious']
-            self.applicationCommands = ['playFile', 'playMedia', 'screenshot', 'sendString', 'sendKey', 'sendVirtualKey']
+            self.applicationCommands = ['playFile', 'playMedia', 'screenshot', 'sendString', 'sendKey', 'sendVirtualKey', 'setVolume']
 
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
@@ -610,7 +625,7 @@ class Plex:
                 urllib.urlopen('http://%s:%s/system/players/%s/naviation/%s' % (plex_host, plex_port, player, action))
             elif action in self.playbackCommands:
                 urllib.urlopen('http://%s:%s/system/players/%s/playback/%s' % (plex_host, plex_port, player, action))
-            elif action in self.applicationCommands:
+            elif action.split('?')[0] in self.applicationCommands:
                 urllib.urlopen('http://%s:%s/system/players/%s/application/%s' % (plex_host, plex_port, player, action))
             else:
                 raise ValueError("Unable to control Plex with action: " + action)
@@ -736,7 +751,7 @@ class Plex:
 
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
-            
+            print 'http://%s:%s/system/players/%s/application/playMedia?key=/library/metadata/%s&viewOffset=%s&path=http://%s:%s/library/metadata/%s' % (plex_host, plex_port, player, item, offset, plex_host, plex_port, item)
             urllib.urlopen('http://%s:%s/system/players/%s/application/playMedia?key=/library/metadata/%s&viewOffset=%s&path=http://%s:%s/library/metadata/%s' % (plex_host, plex_port, player, item, offset, plex_host, plex_port, item))
 
         except Exception, e:
