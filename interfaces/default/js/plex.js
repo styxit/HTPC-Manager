@@ -78,8 +78,6 @@ function loadMovies(options) {
         success: function (data) {
             if (data === null) return errorHandler();
 
-            movieLoad.last += movieLoad.limit;
-
             if (data.limits.end == data.limits.total) {
                 movieLoad.last = -1;
             } else {

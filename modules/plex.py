@@ -547,7 +547,8 @@ class Plex:
                 if 'parentIndex' in video:
                     jplaying_item['season'] = int(video['parentIndex'])
                 jplaying_item['title'] = video['title']
-                jplaying_item['year'] = int(video['year'])
+                if 'year' in video:
+                    jplaying_item['year'] = int(video['year'])
                 jplaying_item['id'] = int(video['ratingKey'])
                 jplaying_item['type'] = video['type']
                 if 'grandparentTitle' in video:
