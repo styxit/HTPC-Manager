@@ -50,3 +50,6 @@ table th.tablesorter-header {
 .icon-black {
     color:black;
 }
+.ofh {
+	overflow: auto;
+}
