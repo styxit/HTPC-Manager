@@ -25,7 +25,7 @@
     height: 16px;
 }
 .modal {
-    width: 650px;
+    //width: 650px;
 }
 .modal-fanart {
     background: #fff top center no-repeat;
@@ -46,4 +46,8 @@
 }
 .modal .modal-movieinfo select {
     margin-top: 10px;
+}
+.thumbnails > li { 
+	float: left;
+	//margin-left: 4px
 }
