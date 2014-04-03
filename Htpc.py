@@ -22,8 +22,8 @@ def parse_arguments():
                         help='Use a specific host/IP')
     parser.add_argument('--port', type=int,
                         help='Use a specific port')
-    parser.add_argument('--psutilcmd', default=False,
-                        help='WARNING! DO NOT USE UNLESS YOU KNOW WHAT .POPEN CAN BE USED FOR (LIKE WIPEING YOUR HARDDRIVE). If you active you can terminate/kill, send signals to processes and call shell/cmd')
+    parser.add_argument('--shell', default=False,
+                        help='WARNING! DO NOT USE UNLESS YOU KNOW WHAT .POPEN CAN BE USED FOR (LIKE WIPEING YOUR HARDDRIVE).')
     parser.add_argument('--daemon', action='store_true', default=False,
                         help='Daemonize process')
     parser.add_argument('--pid', default=False,
@@ -141,7 +141,7 @@ def main():
     htpc.PASSWORD = htpc.settings.get('app_password')
     
     #Select if you want to controll processes and popen from HTPC-Manager
-    htpc.PSUTILCMD = args.psutilcmd
+    htpc.SHELL = args.shell
     
     # Select wether to run as daemon
     htpc.DAEMON = args.daemon

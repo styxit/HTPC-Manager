@@ -47,7 +47,7 @@ class Stats:
         else:
             self.logger.error("Psutil is outdated, needs atleast version 0,7")
 
-        return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats', importPsutil=importPsutil, cmdline=htpc.PSUTILCMD)
+        return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats', importPsutil=importPsutil, cmdline=htpc.SHELL)
 
     @cherrypy.expose()
     def uptime(self):
@@ -380,12 +380,6 @@ class Stats:
                 jmsg = json.dumps(dmsg)
                 self.logger.info(msg)
                 return jmsg
-            '''
-            elif cmd == 'popen':
-                cmd = popen.split(', ')
-                r = psutil.Popen(cmd, stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
-                msg = r.communicate()
-            '''
             
         except Exception as e:
             self.logger.error("Error trying to %s" % cmd, e)
@@ -397,7 +391,7 @@ class Stats:
         cmd = cmd.split(', ')
         
         try:
-            if htpc.PSUTILCMD:
+            if htpc.SHELL:
                 r = psutil.Popen(cmd, stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
                 msg = r.communicate()
                 d['msg'] = msg
@@ -406,7 +400,7 @@ class Stats:
                 return jmsg
                 
             else:
-                msg = 'HTPC-Manager is not started with --psutilcmd'
+                msg = 'HTPC-Manager is not started with --shell'
                 self.logger.error(msg)
                 d['msg'] = msg
                 jmsg = json.dumps(d)
@@ -414,8 +408,6 @@ class Stats:
                 return jmsg
                 
         except Exception as e:
-            print e
             self.logger.error('Sending command from stat module failed: %s'% e)
-            
     
     

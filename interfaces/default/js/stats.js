@@ -2,7 +2,6 @@
 $(document).ready(function () {
     if (importPsutil) {
         $('.spinner').show();
-        //get_diskinfo();
         reloadtab();
         network_usage_table();
         return_stats_settings();
@@ -17,7 +16,6 @@ $(document).ready(function () {
 if (importPsutil) {
     // Set timeintercal to refresh stats
     setInterval(function () {
-        //get_diskinfo();
         reloadtab();
         network_usage_table();
         return_stats_settings();
@@ -84,6 +82,7 @@ function get_diskinfo() {
     });
 }
 
+//Makes the process table
 function processes() {
     $.ajax({
         'url': WEBDIR + 'stats/processes',
@@ -91,7 +90,7 @@ function processes() {
             'success': function (response) {
             $('#proclist').html("");
             $('#error_message').text("");
-
+                
             $.each(response, function (i, proc) {
                 var row = $('<tr>');
                 row.append(
@@ -104,7 +103,7 @@ function processes() {
                 $('<td>').addClass('processes-runningtime').text(proc.r_time),
                 //$('<td>').text(proc.open_files), //Not supported on windows, just hangs on my computer
                 $('<td>').addClass('processes-percent').text(proc.cpu_percent+ '%'),
-                $('<td>').append('<a href="#" class="btn btn-mini cmd" data-cmd="kill" data-name='+proc.name+' data-cwd='+proc.cwd+' data-pid='+proc.pid+'><i class="icon-remove"></i></a>'));
+                $('<td>').append('<a href="#" class="btn btn-mini cmd" data-cmd="kill" data-name='+proc.name+' data-pid='+proc.pid+'><i class="icon-remove"></i></a>'));
                 $('#proclist').append(row);
             });
             $('.spinner').hide();
