@@ -43,7 +43,7 @@ $(document).ready(function () {
         return(confirm($(this).attr('title') + '?'))
     })
 
-    $('#btn-check-update').click(function (e) {
+    $('.btn-check-update').click(function (e) {
         e.preventDefault()
         notify('Update','Checking for update.','info')
 
