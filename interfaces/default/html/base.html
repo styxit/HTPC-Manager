@@ -38,28 +38,14 @@ webdir = htpc.WEBDIR
                     <li id="nav-${m.get('id')}"><a href="${htpc.WEBDIR}${m.get('id')}/">${s.get(m.get('id')+'_name')}</a></li>
                     %endif
                     % endfor
-                    <li class="hidden-desktop visible-phone visible-tablet"><a href="#" id="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
-                    <li class="hidden-desktop visible-phone visible-tablet"><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
-                    <li class="hidden-desktop visible-phone visible-tablet"><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a></li>
-                    <li class="hidden-desktop visible-phone visible-tablet"><a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC-Manager"><i class="icon-refresh"></i> Restart</a></li>
-                    <li class="hidden-desktop visible-phone visible-tablet"><a href="${htpc.WEBDIR}shutdown" class="confirm" title="Shutdown HTPC-Manager"><i class="icon-off"></i> Shutdown</a></li>
                 </ul>
-                <div class="mobile-search hidden-desktop visible-phone visible-tablet">
-                    %if s.get('nzbsearch_enable'):
-                        <form action="${htpc.WEBDIR}search/" method="get">
-                    %else:
-                        <form class="navbar-form pull-right disabled">
-                    %endif
-                        <input type="text" name="query" id="search" class="span3 search" accesskey="s" placeholder="Search">
-                    </form>
-                </div>
-                <div class="pull-right hidden-tablet hidden-phone visible-desktop">
+                <div class="pull-right visible-desktop">
                     %if s.get('nzbsearch_enable'):
                     <form action="${htpc.WEBDIR}search/" method="get" class="navbar-form pull-right">
                     %else:
                     <form class="navbar-form pull-right disabled">
                     %endif
-                    <input type="text" name="query" id="search" class="span3 search" accesskey="s" placeholder="Search">
+                    <input type="text" name="query" id="search" class="span3" accesskey="s" placeholder="Search">
                         <div class="btn-group">
                           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                             <i class="icon-cogs"></i>
