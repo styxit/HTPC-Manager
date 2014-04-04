@@ -38,7 +38,7 @@ webdir = htpc.WEBDIR
                     <li id="nav-${m.get('id')}"><a href="${htpc.WEBDIR}${m.get('id')}/">${s.get(m.get('id')+'_name')}</a></li>
                     %endif
                     % endfor
-                    <li class="hidden-desktop visible-phone visible-tablet"><a href="#" id="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
+                    <li class="hidden-desktop visible-phone visible-tablet"><a href="#" class="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
                     <li class="hidden-desktop visible-phone visible-tablet"><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
                     <li class="hidden-desktop visible-phone visible-tablet"><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a></li>
                     <li class="hidden-desktop visible-phone visible-tablet"><a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC-Manager"><i class="icon-refresh"></i> Restart</a></li>
@@ -67,7 +67,7 @@ webdir = htpc.WEBDIR
                           </a>
                           <ul class="dropdown-menu pull-right">
                             <li><a href="http://github.com/styxit/HTPC-Manager"><i class="icon-github"></i> Github project</a></li>
-                            <li><a href="#" id="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
+                            <li><a href="#" class="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
                             <li><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
                             <li><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a></li>
                             <li><a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC-Manager"><i class="icon-refresh"></i> Restart</a></li>
