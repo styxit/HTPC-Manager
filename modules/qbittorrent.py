@@ -95,7 +95,7 @@ class qbittorrent:
     
     # Handles pause, resume, delete singel torrents
     @cherrypy.expose
-    def command(self, cmd=None, hash=None, name=None):
+    def command(self, cmd=None, hash=None, name=None, dlurl=None):
         try:
             self.logger.debug("%s %s" %(cmd, name))
             url = self.qbturl()
@@ -104,11 +104,13 @@ class qbittorrent:
         
             if cmd == 'delete':
                 data['hashes'] = hash
+            elif cmd == 'download':
+                data['urls'] = dlurl
             else:
                 data['hash'] = hash
         
             if cmd == 'resumeall' or 'pauseall':
-                r = urllib2.urlopen(url + cmd)
+                return urllib2.urlopen(url + cmd)
    
             data = urllib.urlencode(data)
         
