@@ -9,11 +9,12 @@
                 <i class="icon-arrow-up"></i> <span id="qbittorrent_speed_up"></span>
             </small>
         </h1>
-
+        
+        
         <div id="ss" class="row-fluid text-center">
-            <div class="span4 text-center"><input type="text" id="qbittorrent_set_speeddown" class="span3 qbt_setspeed" title="Download Limit" data-action="setGlobalDlLimit" placeholder="KiB/s" value=""></div>
+            <div class="span4 text-center"><input type="number" id="qbittorrent_set_speeddown" class="span4 qbt_setspeed" title="Download Limit" data-action="setGlobalDlLimit" placeholder="" value=""></div>
             <div class="span4 text-center"> <i id="qbt_rp_icon" style="" class="btn" title="Pause/Resume all"></i></div>
-            <div class="span4 text-center"><input type="text" id="qbittorrent_set_speedup" class="span3 qbt_setspeed" title="Upload Limit" data-action="setGlobalUpLimit" placeholder="KiB/s" value=""></div>
+            <div class="span4 text-center"><input type="number" id="qbittorrent_set_speedup" class="span4 qbt_setspeed" title="Upload Limit" data-action="setGlobalUpLimit" placeholder="" value=""></div>
         </div>
       
         <div class="ofa">
@@ -21,11 +22,11 @@
                 <thead>
                     <tr>
                         <th>File</th>
-                        <th>Seeds</th>
-                        <th>Peers</th>
-                        <th class="span1">Ratio</th>
+                        <th class="span2">Seeds</th>
+                        <th class="span2">Peers</th>
+                        <th class="">Ratio</th>
                         <th class="span2">ETA</th>
-                        <th class="span1">Status</th>
+                        <th class="">Status</th>
                         <th class="span3">Progress</th>
                         <th class="span1"></th>
                     </tr>
@@ -33,7 +34,8 @@
                 <tbody id="torrents-queue"></tbody>
             </table>
         </div>
-        <span id="error_message"/span>
+        <span id="error_message"></span>
         <i class="icon-spinner icon-spin spinner"></i>
+        <span id="qbittorrent_total_stats" class="pull-right"></span>
     </div>
 </div>

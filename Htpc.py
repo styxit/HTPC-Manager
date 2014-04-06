@@ -65,8 +65,8 @@ def load_modules():
     htpc.ROOT.utorrent = UTorrent()
     from modules.nzbget import NZBGet
     htpc.ROOT.nzbget = NZBGet()
-    from modules.qbittorrent import qbittorrent
-    htpc.ROOT.qbittorrent = qbittorrent()
+    from modules.qbittorrent import Qbittorrent
+    htpc.ROOT.qbittorrent = Qbittorrent()
     from modules.stats import Stats
     htpc.ROOT.stats = Stats()
 

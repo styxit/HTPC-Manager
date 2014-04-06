@@ -5,3 +5,6 @@
 .ofa {
 	overflow:auto;
 }
+table {
+	margin-bottom: 10px !important;
+}
