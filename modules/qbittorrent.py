@@ -71,7 +71,6 @@ class Qbittorrent:
             url = self.qbturl()
             result = urllib2.urlopen(url + 'json/transferInfo/').read()
             result = json.JSONDecoder('UTF-8').decode(result)
-            print result
 
             speeddown = result['dl_info']
             speedup = result['up_info']
