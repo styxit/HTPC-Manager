@@ -40,3 +40,7 @@ table.networktable {
 #statscmd {
 	margin-top:10px;
 }
+
+.alert.helper-block{
+	margin-bottom: 0px !important;
+}
