@@ -9,6 +9,7 @@ start function to start the server.
 import os
 import sys
 import htpc
+import webbrowser
 
 def parse_arguments():
     """ Get variables from commandline """
@@ -30,6 +31,8 @@ def parse_arguments():
                         help='Generate PID file at location')
     parser.add_argument('--debug', action='store_true', default=False,
                         help='Print debug text')
+    parser.add_argument('--nobrowser', action='store_true', default=False,
+                        help='Stop the browser from automatically open on server start')
     parser.add_argument('--webdir', default=None,
                         help='Use a custom webdir')
     parser.add_argument('--resetauth', action='store_true', default=False,
@@ -146,6 +149,12 @@ def main():
 
     htpc.USERNAME = htpc.settings.get('app_username')
     htpc.PASSWORD = htpc.settings.get('app_password')
+    
+    # Automatically open webbrowser
+    if not args.nobrowser and not htpc.DEBUG:
+        nb_ssl = 's' if htpc.SSLCERT and htpc.SSLKEY else ''
+        openbrowser = 'http%s://%s:%s%s' % (nb_ssl, str(htpc.settings.get('app_host', 'localhost')), htpc.PORT, htpc.WEBDIR[:-1])
+        webbrowser.open(openbrowser, new=2, autoraise=True)
 
     # Resets the htpc manager password and username
     if args.resetauth:
