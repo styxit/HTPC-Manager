@@ -104,6 +104,8 @@ class qbittorrent:
         
             if cmd == 'delete':
                 data['hashes'] = hash
+            elif cmd == 'download':
+                data['urls'] = hash
             else:
                 data['hash'] = hash
         
@@ -115,6 +117,7 @@ class qbittorrent:
             result = urllib2.urlopen(url, data).read()
         
         except Exception as e:
+            print e
             self.logger.error("Failed at %s %s %s %s" % (cmd, name, hash ,e))
     
     # Sets global upload and download speed

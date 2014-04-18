@@ -1,0 +1,32 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+<div class="container">
+    <div class="content">
+      <h1 class="page-header page-title">
+          <a href="https://broadcasthe.net/" target="_blank">${settings.get('torrentsearch_name', 'Torrentsearch')}</a>
+      </h1>
+        
+        <div>
+            <table class="table disktable table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th class="">Seeds</th>
+                        <th class="">Peers</th>
+                        <th class="">Filesize</th>
+                        <th class="">Source</th>
+                        <th class="">Res</th>
+                        <th class="">Ext</th>
+                        <th class="">Codec</th>
+                        <th class="">Snatches</th>
+                        <th class="">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody id="torrent_search_results"></tbody>
+            </table>
+            <div class="spinner hide"></div>
+            <!--<i class="icon-spinner icon-spin spinner hide"></i>-->
+        </div>
+        <div id="error_msg" class=""></div>
+    </div>
+</div>
