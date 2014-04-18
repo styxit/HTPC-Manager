@@ -24,7 +24,7 @@ webdir = htpc.WEBDIR
 
 <body>
 
-<div class="navbar navbar-fixed-top">
+<div class="navbar navbar-fixed-top navbar-inverse">
     <div class="navbar-inner">
         <div class="container">
             <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -38,11 +38,36 @@ webdir = htpc.WEBDIR
                     <li id="nav-${m.get('id')}"><a href="${htpc.WEBDIR}${m.get('id')}/">${s.get(m.get('id')+'_name')}</a></li>
                     %endif
                     % endfor
-                    <li class="hidden-desktop visible-phone visible-tablet"><a href="#" class="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
-                    <li class="hidden-desktop visible-phone visible-tablet"><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
-                    <li class="hidden-desktop visible-phone visible-tablet"><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a></li>
-                    <li class="hidden-desktop visible-phone visible-tablet"><a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC-Manager"><i class="icon-refresh"></i> Restart</a></li>
-                    <li class="hidden-desktop visible-phone visible-tablet"><a href="${htpc.WEBDIR}shutdown" class="confirm" title="Shutdown HTPC-Manager"><i class="icon-off"></i> Shutdown</a></li>
+                    <% customurls = s.getUrls() %>
+                    % if len(customurls) > 1:
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                        % for link in customurls:
+                            <li><a href="${link['url']}" target="_blank">${link['name']}</a></li>
+                        % endfor
+                        </ul>
+                    </li>
+                    % elif len(customurls) > 0:
+                      <li><a href="${customurls[0]['url']}" target="_blank">${customurls[0]['name']}</a></li>
+                    % endif
+
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a href="#" class="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a>
+                    </li>
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a>
+                    </li>
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a>
+                    </li>
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC-Manager"><i class="icon-refresh"></i> Restart</a>
+                    </li>
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a href="${htpc.WEBDIR}shutdown" class="confirm" title="Shutdown HTPC-Manager"><i class="icon-off"></i> Shutdown</a>
+                    </li>
+
                 </ul>
                 <div class="mobile-search hidden-desktop visible-phone visible-tablet">
                     %if s.get('nzbsearch_enable'):

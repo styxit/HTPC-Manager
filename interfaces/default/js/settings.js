@@ -1,4 +1,47 @@
 $(document).ready(function () {
+    $('#other button.save').on('click', function(event){
+        event.preventDefault();
+
+        data = [];
+        $('#other table tbody tr').each(function(index){
+            tr = $(this);
+            data.push({
+                name: tr.find("input[name='name']").val(),
+                url: tr.find("input[name='url']").val(),
+            });
+        });
+
+        // Save data
+        $.ajax({
+            method: 'POST',
+            url: '/settings/urls',
+            data: JSON.stringify(data),
+            success: function() {
+                notify('Settings', 'Save successful', 'info');
+            },
+            error: function() {
+                notify('Settings', 'Save failed', 'error');
+            }
+        });
+    });
+
+    $(document.body).off('click', '#other button.delete');
+    $(document.body).on('click', '#other button.delete', function(event) {
+      event.preventDefault();
+      $(this).closest('tr').remove();
+    });
+
+    $('#other button.add').on('click', function(event){
+        event.preventDefault();
+        $('#other table tbody').append(
+          $('<tr>').append(
+            $('<td>').html('<input type="text" value=""name="name">'),
+            $('<td>').html('<input type="text" value=""name="url">'),
+            $('<td>').html('<button class="btn btn-mini delete">Delete</button>')
+          )
+        );
+    });
+
     $(window).trigger('hashchange')
     $('.btn-test').click(function(e) {
         e.preventDefault();
