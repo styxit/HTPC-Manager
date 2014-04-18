@@ -36,3 +36,11 @@ table.networktable {
 	text-align: center;
 	font-weight: bold;
 }
+
+#statscmd {
+	margin-top:10px;
+}
+
+.alert.helper-block{
+	margin-bottom: 0px !important;
+}

@@ -8,6 +8,7 @@ import os
 import socket
 import urllib2
 import platform
+from subprocess import PIPE
 
 import cherrypy
 import htpc
@@ -46,7 +47,7 @@ class Stats:
         else:
             self.logger.error("Psutil is outdated, needs atleast version 0,7")
 
-        return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats', importPsutil=importPsutil)
+        return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats', importPsutil=importPsutil, cmdline=htpc.SHELL)
 
     @cherrypy.expose()
     def uptime(self):
@@ -124,7 +125,7 @@ class Stats:
             self.logger.error("Could not get disk info %s" % e)
 
         return rr
-    
+
     @cherrypy.expose()
     def processes(self):
         rr = None
@@ -132,10 +133,10 @@ class Stats:
         procs = []
         procs_status = {}
         for p in psutil.process_iter():
-            
+
             try:
-                p.dict = p.as_dict(['username', 'get_memory_percent', 
-                                    'get_cpu_percent', 'name', 'status', 'pid', 'get_memory_info', 'create_time'])
+                p.dict = p.as_dict(['username', 'get_memory_percent', 'create_time',
+                                    'get_cpu_percent', 'name', 'status', 'pid', 'get_memory_info'])
                 #Create a readable time
                 r_time = datetime.now() - datetime.fromtimestamp(p.dict['create_time'])
                 r_time = str(r_time)[:-7]
@@ -152,16 +153,16 @@ class Stats:
         # return processes sorted by CPU percent usage
         processes = sorted(procs, key=lambda p: p['cpu_percent'],
                         reverse=True)
-        
+
         #Adds the total number of processes running, not in use atm
         processes.append(procs_status)
-        
+
         #if limit is a empty string
         if not limit:
             rr = json.dumps(processes)
         else:
             rr = json.dumps(processes[:int(limit)])
-            
+
         return rr
 
 
@@ -336,3 +337,75 @@ class Stats:
             self.logger.error("Getting stats settings %s" % e)
 
         return json.dumps(d)
+
+    @cherrypy.expose()
+    def command(self, cmd=None, pid=None, signal=None):
+        dmsg = {}
+        jmsg =  None
+        try:
+            if pid:
+                p = psutil.Process(pid=int(pid))
+                name = p.name()
+            else:
+                pass
+
+            if cmd == 'kill':
+                try:
+                    p.terminate()
+                    dmsg['status'] = 'success'
+                    msg = 'Terminated process %s %s' % (name, pid)
+                    p.wait()
+
+                except psutil.NoSuchProcess:
+                    msg = 'Process %s does not exist' % name
+
+                except psutil.AccessDenied:
+                    msg = 'Dont have permission to terminate/kill %s %s' % (name,pid)
+                    dmsg['status'] = 'error'
+
+                except psutil.TimeoutExpired:
+                    p.kill()
+                    dmsg['status'] = 'success'
+                    msg = 'Killed process %s %s' % (name, pid)
+
+                dmsg['msg'] = msg
+                jmsg = json.dumps(dmsg)
+                self.logger.info(msg)
+                return jmsg
+
+            elif cmd == 'signal':
+                p.send_signal(signal)
+                msg = '%ed pid %s successfully with %s'% (cmd, name, pid, signal)
+                dmsg['msg'] = msg
+                jmsg = json.dumps(dmsg)
+                self.logger.info(msg)
+                return jmsg
+
+        except Exception as e:
+            self.logger.error("Error trying to %s" % cmd, e)
+
+
+    @cherrypy.expose()
+    def cmdpopen(self, cmd=None):
+        d = {}
+        cmd = cmd.split(', ')
+
+        try:
+            if htpc.SHELL:
+                r = psutil.Popen(cmd, stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
+                msg = r.communicate()
+                d['msg'] = msg
+                jmsg = json.dumps(d)
+                self.logger.info(msg)
+                return jmsg
+
+            else:
+                msg = 'HTPC-Manager is not started with --shell'
+                self.logger.error(msg)
+                d['msg'] = msg
+                jmsg = json.dumps(d)
+                self.logger.error(msg)
+                return jmsg
+
+        except Exception as e:
+            self.logger.error('Sending command from stat module failed: %s'% e)
