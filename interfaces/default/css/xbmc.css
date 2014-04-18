@@ -3,6 +3,8 @@ a:Hover {
 }
 .thumbnails li {
     position: relative;
+	float: left;
+	margin-left: 4px
 }
 #movie-grid img.thumbnail,
 #show-grid img.thumbnail {
@@ -89,9 +91,6 @@ h6.title {
 #playlist-table tr td:last-child {
     width: 35px;
 }
-.modal {
-    width: 700px;
-}
 .modal-fanart {
     background: #fff top center no-repeat;
     background-size: 100%;
@@ -101,7 +100,7 @@ h6.title {
     width: 200px;
 }
 .modal .modal-movieinfo {
-    margin-left: 230px;
+    margin-left: 171px;
 }
 .modal .modal-youtube {
     border: 0;

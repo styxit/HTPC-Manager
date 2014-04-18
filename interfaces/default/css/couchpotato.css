@@ -3,6 +3,8 @@
 	width: auto;
 	height: 175px;
 	text-align: center;
+    float: left;
+    margin-left: 4px
 }
 #wanted-grid img.thumbnail,
 #result-grid img.thumbnail {
@@ -26,9 +28,6 @@
     right: 5px;
     width: 16px;
     height: 16px;
-}
-.modal {
-    width: 650px;
 }
 .modal-fanart {
     background: #fff top center no-repeat;
