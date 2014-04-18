@@ -22,7 +22,7 @@ def parse_arguments():
                         help='Use a specific host/IP')
     parser.add_argument('--port', type=int,
                         help='Use a specific port')
-    parser.add_argument('--shell', default=False,
+    parser.add_argument('--shell', action='store_true', default=False,
                         help='WARNING! DO NOT USE UNLESS YOU KNOW WHAT .POPEN CAN BE USED FOR (LIKE WIPEING YOUR HARDDRIVE).')
     parser.add_argument('--daemon', action='store_true', default=False,
                         help='Daemonize process')
