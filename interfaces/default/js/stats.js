@@ -2,7 +2,6 @@
 $(document).ready(function () {
     if (importPsutil) {
         $('.spinner').show();
-        //get_diskinfo();
         reloadtab();
         network_usage_table();
         return_stats_settings();
@@ -17,7 +16,6 @@ $(document).ready(function () {
 if (importPsutil) {
     // Set timeintercal to refresh stats
     setInterval(function () {
-        //get_diskinfo();
         reloadtab();
         network_usage_table();
         return_stats_settings();
@@ -84,6 +82,7 @@ function get_diskinfo() {
     });
 }
 
+//Makes the process table
 function processes() {
     $.ajax({
         'url': WEBDIR + 'stats/processes',
@@ -91,20 +90,20 @@ function processes() {
             'success': function (response) {
             $('#proclist').html("");
             $('#error_message').text("");
-
+                
             $.each(response, function (i, proc) {
                 var row = $('<tr>');
-                //Pid might be used for popen stuff later
-                row.attr('data-pid', proc.pid); 
                 row.append(
-                $('<td>').addClass('').text(proc.name),
-                $('<td>').addClass('processes-name hidden-phone').text(proc.status),
-                $('<td>').addClass('processes-status hidden-phone').text(proc.username),
-                $('<td>').addClass('processes-memory-percent').text(proc.memory_percent.toFixed(2) + ' %'),
+                $('<td>').addClass('processes-name').text(proc.name),
+                $('<td>').addClass('processes-pid').text(proc.pid),
+                $('<td>').addClass('processes-status hidden-phone').text(proc.status),
+                $('<td>').addClass('processes-username hidden-phone').text(proc.username),
+                $('<td>').addClass('processes-memory-percent').text(proc.memory_percent.toFixed(2) + '%'),
                 $('<td>').addClass('processes-memory-info').text(getReadableFileSizeString(proc.memory_info[0])),
                 $('<td>').addClass('processes-runningtime').text(proc.r_time),
                 //$('<td>').text(proc.open_files), //Not supported on windows, just hangs on my computer
-                $('<td>').addClass('processes-percent').text(proc.cpu_percent+ ' %'));
+                $('<td>').addClass('processes-percent').text(proc.cpu_percent+ '%'),
+                $('<td>').append('<a href="#" class="btn btn-mini cmd" data-cmd="kill" data-name='+proc.name+' data-pid='+proc.pid+'><i class="icon-remove"></i></a>'));
                 $('#proclist').append(row);
             });
             $('.spinner').hide();
@@ -226,12 +225,50 @@ function reloadtab() {
     }
 }
 
-   $('#diskt').click(function () {
+   $('#diskl').click(function () {
        get_diskinfo();
    });
-    $('#proc').click(function () {
+    $('#procl').click(function () {
        processes();
    });
+   
+   //Used for kill and signal command
+   $(document).on('click', '.cmd', function(e){
+       e.preventDefault();
+       var par = {'cmd':$(this).attr('data-cmd'), 'pid':$(this).attr('data-pid'), 'signal':$(this).attr('data-signal'),'cwd':$(this).attr('data-cwd')};
+       if (confirm('Are you sure you want to terminate '+ $(this).attr('data-name')+'?')) {
+       $.getJSON(WEBDIR + "stats/command/", par, function (response) {
+            $.pnotify({
+                title: response.status,
+                text: response.msg,
+                type: response.status,
+                addclass: "stack-bottomright",
+                stack: {"dir1": "up", "dir2": "left", push: 'top'}
+            });
+            //Update info inside the tab
+            processes();
+       });
+   }
+   });
+   
+   // Used for popen
+    $(document).on('click', '#sendcmd', function(){
+       var i = $('#cmdinput').val();
+       param = {'cmd':i};
+       if (confirm('Are you sure you want to send "'+ i +'" to shell?')) {
+       $.getJSON(WEBDIR + "stats/cmdpopen/",param, function (response) {
+            $.pnotify({
+                title: 'Response',
+                text: response.msg,
+                type: 'success',
+                width: '500px',
+                min_height: '400px'
+            });
+       
+       });
+   }
+   });
+
 
 
     
