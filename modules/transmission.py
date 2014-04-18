@@ -68,6 +68,11 @@ class Transmission:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    def Add(self, filename):
+        return self.fetch('torrent-add', {'filename': filename})		
+		
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def remove(self, torrentId):
         try:
             torrentId = int(torrentId)

@@ -105,6 +105,11 @@ class Sickbeard:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    def GetEpisode(self, strShowID, strSeason, strEpisode):
+        return self.fetch("episode&tvdbid=" + strShowID + "&season=" + strSeason + "&episode=" + strEpisode + "&full_path=1")
+		
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def GetSeason(self, tvdbid, season):
         self.logger.debug("Fetching Season")
         return self.fetch('show.seasons&tvdbid=' + tvdbid + '&season=' + season)

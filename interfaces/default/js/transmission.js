@@ -46,6 +46,18 @@ $(document).ready(function(){
     });
   });
 
+	/**
+		Add a torrent
+	*/
+	$("#add_torrent_button").click(function (pEvent) {
+		pEvent.preventDefault();
+		
+		if ($("#add_torrent_filename").val().length == 0) {
+			return;
+		}
+		
+		$.post(WEBDIR + "transmission/Add", { filename: $("#add_torrent_filename").val() });
+	});
 });
 
 function getTorrents(){

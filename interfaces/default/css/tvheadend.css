@@ -1,0 +1,12 @@
+.channel {
+	width: 100px;
+	height: 150px;
+}
+
+.recordingtable {
+	width: 100%;
+}
+
+td {
+	text-align: center;
+}

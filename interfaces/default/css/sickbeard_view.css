@@ -59,3 +59,12 @@
     border-radius: 6px;
   }
 }
+
+.episodeinfo tr {
+	border-bottom: 1px solid #CCCCCC;
+}
+
+.episodeinfo  td {
+	width: auto;
+	padding-right: 20px;
+}

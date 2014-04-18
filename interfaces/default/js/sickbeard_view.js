@@ -70,6 +70,34 @@ function renderSeasonTabs(showid, seasons){
  list.find('li:first-child a').trigger('click');
 }
 
+function showEpisodeInfo(nShowID, nSeason, nEpisode) {
+	$.getJSON(WEBDIR + "sickbeard/GetEpisode/" + nShowID + "/" + nSeason + "/" + nEpisode, function(pResult) {
+		var strHTML = $("<table>").attr("class", "episodeinfo")
+			.append($("<tr>")
+				.append($("<td>").html("<b>Name</b>"))
+				.append($("<td>").text(pResult.data.name)))
+			.append($("<tr>")
+				.append($("<td>").html("<b>Description</b>"))
+				.append($("<td>").text(pResult.data.description)));
+				
+				if (pResult.data.status == "Downloaded") {
+					strHTML.append($("<tr>")
+						.append($("<td>").html("<b>Air date</b>"))
+						.append($("<td>").text(pResult.data.airdate)))
+					.append($("<tr>")
+						.append($("<td>").html("<b>Quality</b>"))
+						.append($("<td>").text(pResult.data.quality)))						
+					.append($("<tr>")
+						.append($("<td>").html("<b>File size</b>"))
+						.append($("<td>").text(pResult.data.file_size_human)))
+					.append($("<tr>")
+						.append($("<td>").html("<b>Location</b>"))
+						.append($("<td>").text(pResult.data.location)));
+				}
+	
+		showModal(pResult.data.name, strHTML, []);
+	});
+}
 
 function renderSeason(){
   $('#season-list li').removeClass('active');
@@ -102,7 +130,10 @@ function renderSeason(){
 
         row.append(
           $('<td>').text(index),
-          $('<td>').text(value.name),
+          $('<td>').append($("<a>").text(value.name).click(function(pEvent) {
+				pEvent.preventDefault();
+				showEpisodeInfo(showid, season, index);
+		  })),
           $('<td>').text(value.airdate),
           $('<td>').append(sickbeardStatusLabel(value.status)),
           $('<td>').text(value.quality),
