@@ -15,7 +15,8 @@ settings =  htpc.settings
             <div class="controls">
                 % if field.get('type') in ['text', 'password']:
                 <% value = field.get('value') if field.get('value') else settings.get(field.get('name')) %>
-                <input type="${field.get('type')}" name="${field.get('name')}" id="${field.get('name')}" value="${value}"/>
+                <% placeholder = field.get('placeholder') if field.get('placeholder') else '' %>
+                <input type="${field.get('type')}" name="${field.get('name')}" id="${field.get('name')}" placeholder="${placeholder}" value="${value}"/>
                 % elif field.get('type') == 'bool':
                 <% checked = field.get('checked') if field.get('checked') else settings.get(field.get('name')) %>
                 <input type="checkbox" name="${field.get('name')}" id="${field.get('name')}"${
@@ -28,6 +29,9 @@ settings =  htpc.settings
                     ' selected="selected"' if option.get('selected', 0) else ''}>${option.get('name')}</option>
                     % endfor
                 </select>
+                % endif
+                % if field.get('desc'):
+                    <span class="help-block">${field.get('desc')}</span>
                 % endif
             </div>
         </div>

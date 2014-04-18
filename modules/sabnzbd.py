@@ -16,8 +16,8 @@ class Sabnzbd:
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'sabnzbd_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'sabnzbd_name'},
-                {'type': 'text', 'label': 'IP / Host *', 'name': 'sabnzbd_host'},
-                {'type': 'text', 'label': 'Port *', 'name': 'sabnzbd_port'},
+                {'type': 'text', 'label': 'IP / Host', 'placeholder':'localhost','name': 'sabnzbd_host'},
+                {'type': 'text', 'label': 'Port', 'placeholder':'8080', 'name': 'sabnzbd_port'},
                 {'type': 'text', 'label': 'Basepath', 'name': 'sabnzbd_basepath'},
                 {'type': 'text', 'label': 'API key', 'name': 'sabnzbd_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'sabnzbd_ssl'}

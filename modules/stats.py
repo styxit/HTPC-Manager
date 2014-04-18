@@ -33,9 +33,9 @@ class Stats:
                 {'type': 'bool', 'label': 'Enable', 'name': 'stats_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'stats_name'},
                 {'type': 'bool', 'label': 'Bar', 'name': 'stats_use_bars'},
-                {'type': 'text', 'label': 'Ignore filesystem', 'name': 'stats_ignore_filesystem'},
-                {'type': 'text', 'label': 'Ignore mountpoint', 'name': 'stats_ignore_mountpoint'},
-                {'type': 'text', 'label': 'Limit processes', 'name': 'stats_limit_processes'}
+                {'type': 'text', 'label': 'Ignore filesystem', 'placeholder':'NTFS', 'desc':'Write the filesystems you want to ignore. Serperate with ,', 'name': 'stats_ignore_filesystem'},
+                {'type': 'text', 'label': 'Ignore mountpoint', 'placeholder': 'mountpoint1, mountpoint2', 'desc':'Write the mountpoints that you want to ignore.Seperate with ,','name': 'stats_ignore_mountpoint'},
+                {'type': 'text', 'label': 'Limit processes', 'placeholder':'50', 'desc':'Blank for all processes', 'name': 'stats_limit_processes'}
         ]})
 
     @cherrypy.expose()

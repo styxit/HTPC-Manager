@@ -18,8 +18,8 @@ class Transmission:
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'transmission_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'transmission_name'},
-                {'type': 'text', 'label': 'IP / Host *', 'name': 'transmission_host'},
-                {'type': 'text', 'label': 'Port *', 'name': 'transmission_port'},
+                {'type': 'text', 'label': 'IP / Host', 'placeholder':'localhost', 'name': 'transmission_host'},
+                {'type': 'text', 'label': 'Port', 'placeholder':'9091', 'name': 'transmission_port'},
                 {'type': 'text', 'label': 'Username', 'name': 'transmission_username'},
                 {'type': 'password', 'label': 'Password', 'name': 'transmission_password'}
         ]})
