@@ -13,7 +13,7 @@ $(document).ready(function() {
 
     // Load data on tab display
     $('a[data-toggle="tab"]').click(function(e) {
-        $('#search').val('')
+        $('.search').val('')
         searchString = ''
     }).on('shown', reloadTab);
     $(window).trigger('hashchange')
@@ -125,7 +125,7 @@ $(document).ready(function() {
     });
 
     // Filter on searchfield changes
-    $("#search").on('input', function (e) {
+    $(".search").on('input', function (e) {
         searchString = $(this).val();
         reloadTab()
     });
@@ -599,14 +599,14 @@ var songsLoad = {
     filter: ''
 }
 function loadSongs(options) {
-    searchString = $('#search').val()
+    searchString = $('.search').val()
     if (options != undefined || searchString != songsLoad.filter) {
         songsLoad.last = 0
         $('#songs-grid tbody').empty()
         if (options != undefined) {
             songsLoad.options = options
             if (options.search) {
-                $("#search").val(options.search);
+                $(".search").val(options.search);
                 songsLoad.filter = options.search
             }
         } else {
