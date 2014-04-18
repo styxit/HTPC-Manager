@@ -125,7 +125,7 @@ class Stats:
             self.logger.error("Could not get disk info %s" % e)
 
         return rr
-    
+
     @cherrypy.expose()
     def processes(self):
         rr = None
@@ -133,9 +133,9 @@ class Stats:
         procs = []
         procs_status = {}
         for p in psutil.process_iter():
-            
+
             try:
-                p.dict = p.as_dict(['username', 'get_memory_percent', 'cwd', 'create_time',
+                p.dict = p.as_dict(['username', 'get_memory_percent', 'create_time',
                                     'get_cpu_percent', 'name', 'status', 'pid', 'get_memory_info'])
                 #Create a readable time
                 r_time = datetime.now() - datetime.fromtimestamp(p.dict['create_time'])
@@ -153,16 +153,16 @@ class Stats:
         # return processes sorted by CPU percent usage
         processes = sorted(procs, key=lambda p: p['cpu_percent'],
                         reverse=True)
-        
+
         #Adds the total number of processes running, not in use atm
         processes.append(procs_status)
-        
+
         #if limit is a empty string
         if not limit:
             rr = json.dumps(processes)
         else:
             rr = json.dumps(processes[:int(limit)])
-            
+
         return rr
 
 
@@ -337,9 +337,9 @@ class Stats:
             self.logger.error("Getting stats settings %s" % e)
 
         return json.dumps(d)
-    
+
     @cherrypy.expose()
-    def command(self, cmd=None, pid=None, signal=None, cwd=None):
+    def command(self, cmd=None, pid=None, signal=None):
         dmsg = {}
         jmsg =  None
         try:
@@ -348,31 +348,31 @@ class Stats:
                 name = p.name()
             else:
                 pass
-            
+
             if cmd == 'kill':
                 try:
                     p.terminate()
                     dmsg['status'] = 'success'
                     msg = 'Terminated process %s %s' % (name, pid)
                     p.wait()
-                    
+
                 except psutil.NoSuchProcess:
                     msg = 'Process %s does not exist' % name
-                    
+
                 except psutil.AccessDenied:
                     msg = 'Dont have permission to terminate/kill %s %s' % (name,pid)
                     dmsg['status'] = 'error'
-                    
+
                 except psutil.TimeoutExpired:
                     p.kill()
                     dmsg['status'] = 'success'
                     msg = 'Killed process %s %s' % (name, pid)
-                
+
                 dmsg['msg'] = msg
                 jmsg = json.dumps(dmsg)
                 self.logger.info(msg)
                 return jmsg
-                
+
             elif cmd == 'signal':
                 p.send_signal(signal)
                 msg = '%ed pid %s successfully with %s'% (cmd, name, pid, signal)
@@ -380,16 +380,16 @@ class Stats:
                 jmsg = json.dumps(dmsg)
                 self.logger.info(msg)
                 return jmsg
-            
+
         except Exception as e:
             self.logger.error("Error trying to %s" % cmd, e)
-        
-      
+
+
     @cherrypy.expose()
     def cmdpopen(self, cmd=None):
         d = {}
         cmd = cmd.split(', ')
-        
+
         try:
             if htpc.SHELL:
                 r = psutil.Popen(cmd, stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
@@ -398,7 +398,7 @@ class Stats:
                 jmsg = json.dumps(d)
                 self.logger.info(msg)
                 return jmsg
-                
+
             else:
                 msg = 'HTPC-Manager is not started with --shell'
                 self.logger.error(msg)
@@ -406,8 +406,6 @@ class Stats:
                 jmsg = json.dumps(d)
                 self.logger.error(msg)
                 return jmsg
-                
+
         except Exception as e:
             self.logger.error('Sending command from stat module failed: %s'% e)
-    
-    

@@ -90,7 +90,7 @@ function processes() {
             'success': function (response) {
             $('#proclist').html("");
             $('#error_message').text("");
-                
+
             $.each(response, function (i, proc) {
                 var row = $('<tr>');
                 row.append(
@@ -231,11 +231,11 @@ function reloadtab() {
     $('#procl').click(function () {
        processes();
    });
-   
+
    //Used for kill and signal command
    $(document).on('click', '.cmd', function(e){
        e.preventDefault();
-       var par = {'cmd':$(this).attr('data-cmd'), 'pid':$(this).attr('data-pid'), 'signal':$(this).attr('data-signal'),'cwd':$(this).attr('data-cwd')};
+       var par = {'cmd':$(this).attr('data-cmd'), 'pid':$(this).attr('data-pid'), 'signal':$(this).attr('data-signal')};
        if (confirm('Are you sure you want to terminate '+ $(this).attr('data-name')+'?')) {
        $.getJSON(WEBDIR + "stats/command/", par, function (response) {
             $.pnotify({
@@ -250,7 +250,7 @@ function reloadtab() {
        });
    }
    });
-   
+
    // Used for popen
     $(document).on('click', '#sendcmd', function(){
        var i = $('#cmdinput').val();
@@ -264,12 +264,7 @@ function reloadtab() {
                 width: '500px',
                 min_height: '400px'
             });
-       
+
        });
    }
    });
-
-
-
-    
-
