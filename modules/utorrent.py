@@ -7,7 +7,7 @@ import htpc
 import cherrypy
 from HTMLParser import HTMLParser
 
-logger = logging.getLogger('modules.transmission')
+logger = logging.getLogger('modules.utorrent')
 
 
 class AuthTokenParser(HTMLParser):
