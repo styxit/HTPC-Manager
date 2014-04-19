@@ -8,7 +8,7 @@ start function to start the server.
 import os
 import sys
 import htpc
-
+import inspect
 
 def parse_arguments():
     """ Get variables from commandline """
@@ -49,7 +49,6 @@ def load_modules():
     htpc.ROOT.update = Updater()
 
     # Dynamically import all modules.
-    import inspect
     for module in os.listdir('modules'):
         if module.endswith('.py') and not module.startswith('_'):
             __import__('modules.' + module[0:-3])
