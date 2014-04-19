@@ -8,7 +8,6 @@ start function to start the server.
 import os
 import sys
 import htpc
-import inspect
 
 def parse_arguments():
     """ Get variables from commandline """
@@ -48,13 +47,33 @@ def load_modules():
     from htpc.updater import Updater
     htpc.ROOT.update = Updater()
 
-    # Dynamically import all modules.
-    for module in os.listdir('modules'):
-        if module.endswith('.py') and not module.startswith('_'):
-            __import__('modules.' + module[0:-3])
-            for name, obj in inspect.getmembers(sys.modules['modules.' + module[0:-3]]):
-                if inspect.isclass(obj) and name.lower() == module[0:-3]:
-                    setattr(htpc.ROOT, module[0:-3], obj())
+    # Import all modules.
+    from modules.xbmc import Xbmc
+    htpc.ROOT.xbmc = Xbmc()
+    from modules.sabnzbd import Sabnzbd
+    htpc.ROOT.sabnzbd = Sabnzbd()
+    from modules.couchpotato import Couchpotato
+    htpc.ROOT.couchpotato = Couchpotato()
+    from modules.sickbeard import Sickbeard
+    htpc.ROOT.sickbeard = Sickbeard()
+    from modules.transmission import Transmission
+    htpc.ROOT.transmission = Transmission()
+    from modules.deluge import Deluge
+    htpc.ROOT.deluge = Deluge()
+    from modules.squeezebox import Squeezebox
+    htpc.ROOT.squeezebox = Squeezebox()
+    from modules.search import Search
+    htpc.ROOT.search = Search()
+    from modules.utorrent import UTorrent
+    htpc.ROOT.utorrent = UTorrent()
+    from modules.nzbget import NZBGet
+    htpc.ROOT.nzbget = NZBGet()
+    from modules.qbittorrent import qbittorrent
+    htpc.ROOT.qbittorrent = qbittorrent()
+    from modules.stats import Stats
+    htpc.ROOT.stats = Stats()
+    from modules.tvheadend import TVHeadend
+    htpc.ROOT.tvheadend = TVHeadend()
 
 def main():
     """
