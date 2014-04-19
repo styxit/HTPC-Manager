@@ -14,7 +14,7 @@ $(document).ready(function () {
         // Save data
         $.ajax({
             method: 'POST',
-            url: '/settings/urls',
+            url: WEBDIR + 'settings/urls',
             data: JSON.stringify(data),
             success: function() {
                 notify('Settings', 'Save successful', 'info');
