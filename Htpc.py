@@ -141,15 +141,14 @@ def main():
     htpc.USERNAME = htpc.settings.get('app_username')
     htpc.PASSWORD = htpc.settings.get('app_password')
     
-    
     # Open webbrowser
     if args.openbrowser or htpc.settings.get('openbrowser') and not htpc.DEBUG:
-        b_ssl = 's' if htpc.SSLCERT and htpc.SSLKEY else ''
+        browser_ssl = 's' if htpc.SSLCERT and htpc.SSLKEY else ''
         if htpc.settings.get('app_host') == '0.0.0.0':
-            b_host = 'localhost'
+            browser_host = 'localhost'
         else:
-            nb_host = htpc.settings.get('app_host', 'localhost') 
-        openbrowser = 'http%s://%s:%s%s' % (b_ssl, str(b_host), htpc.PORT, htpc.WEBDIR[:-1])
+            browser_host = htpc.settings.get('app_host', 'localhost') 
+        openbrowser = 'http%s://%s:%s%s' % (browser_ssl, str(browser_host), htpc.PORT, htpc.WEBDIR[:-1])
         webbrowser.open(openbrowser, new=2, autoraise=True)
 
     # Select wether to run as daemon
