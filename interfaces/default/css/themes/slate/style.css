@@ -1,0 +1,50 @@
+html, body {
+    //background: #eee url('../../../img/bodybg.jpg');
+}
+
+.navbar {
+	background-color: #3a3f44;
+}
+
+
+h1.page-header.page-title {
+	background: #272b30;
+	color: #7a8288;
+}
+
+h1.page-header.page-title a{
+	color: #7a8288;
+}
+
+.well{
+	background-image: none !important;
+}
+
+.modal-fanart,
+.modal-body {
+	background-image: none;
+}
+
+.navbar .btn-group {
+	margin: 0px;
+	margin-top: 8px;
+}
+
+.content {
+    //background: #fff;
+	background: #272b30;
+    margin: -20px;
+    padding: 20px;
+    -webkit-border-radius: 0 0 10px 10px;
+    -moz-border-radius: 0 0 10px 10px;
+    border-radius: 0 0 10px 10px;
+    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    -moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
+    box-shadow: 0 1px 2px rgba(0,0,0,.15);
+}
+@media (min-width: 980px) {
+    .content {
+        margin: 0 0 20px 0;
+        padding-top: 60px;
+    }
+}
