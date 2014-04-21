@@ -41,7 +41,8 @@ class Plex:
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'plex_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'plex_port', 'placeholder':'32400'},
                 {'type': 'text', 'label': 'Mac addr.', 'name':'plex_mac'},
-                {'type':'bool', 'label':'Hide watched', 'name':'plex_hide_watched'}]})
+                {'type':'bool', 'label':'Hide watched', 'name':'plex_hide_watched'},
+                {'type':'bool', 'label':'Hide homemovies', 'name':'plex_hide_homemovies'}]})
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -82,43 +83,45 @@ class Plex:
         try:
             plex_host = htpc.settings.get('plex_host', 'localhost')
             plex_port = htpc.settings.get('plex_port', '32400')
+            plex_hide_homemovies = htpc.settings.get('plex_hide_homemovies', False)
             movies = []
 
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
                 if section['type'] == "movie":
-                    for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all?type=1&sort=addedAt:desc&X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_host, plex_port, section["key"], limit), headers={"Accept": "application/json"})).read())["_children"]:
-                        jmovie = {}
-                        genre = []
-
-                        jmovie['title'] = movie["title"]
-                        jmovie['id'] = int(movie["ratingKey"])
-
-                        if 'thumb'in movie:
-                           jmovie['thumbnail'] = movie["thumb"]
-
-                        if 'year'in movie:
-                           jmovie['year'] = movie["year"]
-
-                        if 'summary'in movie:
-                           jmovie['plot'] = movie["summary"]
-
-                        if 'duration'in movie:
-                           jmovie['runtime'] = int(movie['duration']) / 60000
-
-                        if 'art'in movie:
-                           jmovie['fanart'] = movie["art"]
-
-                        if 'addedAt'in movie:
-                           jmovie['addedAt'] = movie["addedAt"]
-
-                        for attrib in movie['_children']:
-                            if attrib['_elementType'] == 'Genre':
-                                genre.append(attrib['tag'])
-                           
-
-                        jmovie['genre'] = [genre]
-
-                        movies.append(jmovie)
+                    if section['agent'] != "com.plexapp.agents.none" or not plex_hide_homemovies:
+                        for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all?type=1&sort=addedAt:desc&X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_host, plex_port, section["key"], limit), headers={"Accept": "application/json"})).read())["_children"]:
+                            jmovie = {}
+                            genre = []
+    
+                            jmovie['title'] = movie["title"]
+                            jmovie['id'] = int(movie["ratingKey"])
+    
+                            if 'thumb'in movie:
+                               jmovie['thumbnail'] = movie["thumb"]
+    
+                            if 'year'in movie:
+                               jmovie['year'] = movie["year"]
+    
+                            if 'summary'in movie:
+                               jmovie['plot'] = movie["summary"]
+    
+                            if 'duration'in movie:
+                               jmovie['runtime'] = int(movie['duration']) / 60000
+    
+                            if 'art'in movie:
+                               jmovie['fanart'] = movie["art"]
+    
+                            if 'addedAt'in movie:
+                               jmovie['addedAt'] = movie["addedAt"]
+    
+                            for attrib in movie['_children']:
+                                if attrib['_elementType'] == 'Genre':
+                                    genre.append(attrib['tag'])
+                               
+    
+                            jmovie['genre'] = [genre]
+    
+                            movies.append(jmovie)
 
             return {'movies': sorted(movies, key=lambda k: k['addedAt'], reverse=True)[:int(limit)]}
         except Exception, e:
@@ -237,6 +240,7 @@ class Plex:
         try:
             plex_host = htpc.settings.get('plex_host', 'localhost')
             plex_port = htpc.settings.get('plex_port', '32400')
+            plex_hide_homemovies = htpc.settings.get('plex_hide_homemovies', False)
             movies = []
             limits = {}
 
@@ -247,51 +251,52 @@ class Plex:
 
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
                 if section['type'] == "movie":
-                    for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section["key"], hidewatched), headers={"Accept": "application/json"})).read())["_children"]:
-                        jmovie = {}
-                        genre = []
-                        jmovie['playcount'] = 0
-                        jmovie['id'] = int(movie["ratingKey"])
-
-                        jmovie['title'] = movie["title"]
-                        if 'thumb'in movie:
-                           jmovie['thumbnail'] = movie["thumb"]
-
-                        if 'year'in movie:
-                           jmovie['year'] = int(movie["year"])
-
-                        if 'summary'in movie:
-                           jmovie['plot'] = movie["summary"]
-
-                        if 'studio'in movie:
-                           jmovie['studio'] = movie["studio"]
-
-                        if 'duration'in movie:
-                           jmovie['runtime'] = int(movie['duration']) / 60000
-
-                        if 'art'in movie:
-                           jmovie['fanart'] = movie["art"]
-
-                        if 'rating'in movie:
-                           jmovie['rating'] = movie["rating"]
-
-                        if 'viewCount' in movie:
-                           jmovie['playcount'] = int(movie["viewCount"])
-
-                        for attrib in movie['_children']:
-                            if attrib['_elementType'] == 'Genre':
-                                genre.append(attrib['tag'])
-
-                        if len(genre) != 0:
-                            jmovie['genre'] = genre
-
-                        movies.append(jmovie)
-
-                    limits['start'] = int(start)
-                    limits['total'] = len(movies)
-                    limits['end'] = int(end)
-                    if int(end) >= len(movies):
-                        limits['end'] = len(movies)
+                    if section['agent'] != "com.plexapp.agents.none" or not plex_hide_homemovies:
+                        for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section["key"], hidewatched), headers={"Accept": "application/json"})).read())["_children"]:
+                            jmovie = {}
+                            genre = []
+                            jmovie['playcount'] = 0
+                            jmovie['id'] = int(movie["ratingKey"])
+    
+                            jmovie['title'] = movie["title"]
+                            if 'thumb'in movie:
+                               jmovie['thumbnail'] = movie["thumb"]
+    
+                            if 'year'in movie:
+                               jmovie['year'] = int(movie["year"])
+    
+                            if 'summary'in movie:
+                               jmovie['plot'] = movie["summary"]
+    
+                            if 'studio'in movie:
+                               jmovie['studio'] = movie["studio"]
+    
+                            if 'duration'in movie:
+                               jmovie['runtime'] = int(movie['duration']) / 60000
+    
+                            if 'art'in movie:
+                               jmovie['fanart'] = movie["art"]
+    
+                            if 'rating'in movie:
+                               jmovie['rating'] = movie["rating"]
+    
+                            if 'viewCount' in movie:
+                               jmovie['playcount'] = int(movie["viewCount"])
+    
+                            for attrib in movie['_children']:
+                                if attrib['_elementType'] == 'Genre':
+                                    genre.append(attrib['tag'])
+    
+                            if len(genre) != 0:
+                                jmovie['genre'] = genre
+    
+                            movies.append(jmovie)
+    
+                        limits['start'] = int(start)
+                        limits['total'] = len(movies)
+                        limits['end'] = int(end)
+                        if int(end) >= len(movies):
+                            limits['end'] = len(movies)
 
             return {'limits': limits, 'movies': sorted(movies, key=lambda k: k['title'])[int(start):int(end)] }
         except Exception, e:
