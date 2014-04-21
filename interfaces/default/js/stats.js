@@ -145,7 +145,7 @@ function network_usage_table() {
     $.getJSON(WEBDIR + "stats/network_usage", function (response) {
         $("#stat-sent").text(getReadableFileSizeString(response.bytes_sent));
         $("#stat-recv").text(getReadableFileSizeString(response.bytes_recv));
-        $(".nw").html("<table class='table nwtable'><tr><td class=span4>Network</td><td class=span4>In</td><td class=span4>Out</td</tr><tr><td>Drop</td><td>" + response.dropin + "</td><td>" + response.dropout + "</td></tr><tr><td>Error</td><td>" + response.errin + "</td><td>" + response.errout + "</td></tr><tr><td>IP</td><td class=tlip></td><td class=txip></td></tr></tbody></table>");
+        $(".nw").html("<table class='table nwtable'><tr><td class=span4>Network</td><td class=span4>In</td><td class=span4>Out</td></tr><tr><td>Drop</td><td>" + response.dropin + "</td><td>" + response.dropout + "</td></tr><tr><td>Error</td><td>" + response.errin + "</td><td>" + response.errout + "</td></tr><tr><td>IP</td><td class=tlip></td><td class=txip></td></tr></tbody></table>");
     });
 }
 
