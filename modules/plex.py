@@ -39,7 +39,7 @@ class Plex:
                 ]},
                 {'type': 'text', 'label': 'Menu name', 'name': 'plex_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'plex_host'},
-                {'type': 'text', 'label': 'Port *', 'name': 'plex_port'},
+                {'type': 'text', 'label': 'Port *', 'name': 'plex_port', 'placeholder':'32400'},
                 {'type': 'text', 'label': 'Mac addr.', 'name':'plex_mac'},
                 {'type':'bool', 'label':'Hide watched', 'name':'plex_hide_watched'}]})
 
@@ -530,10 +530,12 @@ class Plex:
     def NowPlaying(self):
         """ Get information about current playing item """
         self.logger.debug("Fetching currently playing information")
+
+        playing_items = []
+
         try:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
-            playing_items = []
 
             for video in self.JsonLoader(urlopen(Request('http://%s:%s/status/sessions' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
                 jplaying_item = {}
@@ -579,13 +581,11 @@ class Plex:
                 if jplaying_item['viewOffset'] < (int(jplaying_item['duration']) - 60000):
                     playing_items.append(jplaying_item)
                 
-                    
-            #print dumps({'playing_items': playing_items}) 
-            return {'playing_items': playing_items}
-            
+
         except Exception, e:
             self.logger.error("Unable to fetch currently playing information! Exception: " + str(e))
-            return
+            pass
+        return {'playing_items': playing_items}
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()

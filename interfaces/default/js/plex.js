@@ -27,12 +27,6 @@ $(document).ready(function() {
         }
     });
 
-    // Enable player controls
-    $('[data-player-control]').click(function () {
-        var action = $(this).attr('data-player-control');
-        $.get(WEBDIR + 'plex/ControlPlayer?player='+player+'&action='+action);
-    });
-
     // Toggle wether to show already seen episodes
     $('#hidewatched').click(function(e) {
         e.preventDefault();
@@ -44,6 +38,13 @@ $(document).ready(function() {
     });
 
 });
+
+// Enable player controls
+$(document).delegate('[data-player-control]', 'click', function () {
+        var action = $(this).attr('data-player-control');
+        var player = $(this).attr('data-player');
+        $.get(WEBDIR + 'plex/ControlPlayer?player='+player+'&action='+action);
+    });
 
 function playItem(item, player) {
     type = typeof type !== 'undefined';
@@ -622,9 +623,12 @@ function loadNowPlaying() {
                 return;
             }
             if (data.playing_items.length !== 0) {
+                $('#nowplaying').html('');
                 $.each(data.playing_items, function (i, item) {
+                var playingTitle = '';
+                var playingSubtitle = '';
                 var nowPlayingThumb = encodeURIComponent(item.thumbnail);
-                var thumbnail = $('#nowplaying .thumb img').attr('alt', item.label);
+                var thumbnail = $('<img>').addClass("img-polaroid img-rounded").attr('alt', item.label);
                 if (nowPlayingThumb == '') {
                     thumbnail.attr('src', 'holder.js/140x140/text:No artwork');
                     thumbnail.attr('width', '140').attr('height', '140');
@@ -644,39 +648,49 @@ function loadNowPlaying() {
                             thumbnail.attr('width', '140').attr('height', '140');
                     }
                 }
-                if (item.state == 'playing') {
-                    $('#nowplaying i.icon-play').removeClass().addClass('icon-pause')
-                } else {
-                    $('#nowplaying i.icon-pause').removeClass().addClass('icon-play')
+                if (item.type == 'episode') {
+                    playingTitle = item.show;
+                    playingSubtitle = item.title + ' ' +
+                    item.season + 'x' +
+                    item.episode;
                 }
-                    //console.log(item)
-                    var itemTime = $('#nowplaying #player-item-time').html(parseSec(item.viewOffset/1000) + ' / ' + parseSec(item.duration/1000));
-                    var itemTitel = $('#nowplaying #player-item-title')
-                    var itemSubtitel = $('#nowplaying #player-item-subtitle')
-                    var playingTitle = '';
-                    var playingSubtitle = '';
-            if (item.type == 'episode') {
-                playingTitle = item.show;
-                playingSubtitle = item.title + ' ' +
-                                  item.season + 'x' +
-                                  item.episode;
-            }
-            else if (item.type == 'movie') {
-                playingTitle = item.title;
-                playingSubtitle  = item.year;
-            } else {
-                playingTitle = item.title;
-            }
-            itemTitel.html(playingTitle);
-            itemSubtitel.html(playingSubtitle);
-            player = item.address;
-            
-            var progressBar = $('#nowplaying #player-progressbar .bar');
-            progressBar.css('width', (item.viewOffset / item.duration)*100 + '%');
-            if (item.protocolCapabilities.indexOf('playback') == -1) {
-                $('#nowplaying_control').hide(); }
-        });
-                 $('#nowplaying').slideDown();
+                else if (item.type == 'movie') {
+                    playingTitle = item.title;
+                    playingSubtitle  = item.year;
+                } else {
+                    playingTitle = item.title;
+                }
+
+
+                var thumb = $('<div>').addClass("span2 hidden-phone thumb").append(thumbnail);
+                var info = $('<div>').addClass("span9");
+                info.append('<h2><span id="player-item-title">' + playingTitle +'</span>&nbsp;<small id="player-item-subtitle" class="muted">' + playingSubtitle + '</small></h2>');
+                info.append('<h2><small id="player-item-time">' + parseSec(item.viewOffset/1000) + ' / ' + parseSec(item.duration/1000) + '</small></h2>');
+                info.append($('<div id="player-progressbar"/>').addClass("progress").append($('<div>').addClass("bar active").css('width', (item.viewOffset / item.duration)*100 + '%')));
+                if (item.protocolCapabilities.indexOf('playback') != -1) {
+                    var btn_toolbar = $('<div id="nowplaying_control"/>').addClass("btn-toolbar");
+                    var btn_group = $('<div>').addClass("btn-group");
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'skipPrevious').attr('data-player', item.address).append('<i class="icon-fast-backward"></i>'));
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stepBack').attr('data-player', item.address).append('<i class="icon-backward"></i>'));
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stop').attr('data-player', item.address).append('<i class="icon-stop"></i>'));
+                    if (item.state == 'playing') {
+                        btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'play').attr('data-player', item.address).append('<i class="icon-pause"></i>'));
+                    } else {
+                        btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'play').attr('data-player', item.address).append('<i class="icon-play"></i>'));
+                    }
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stepForward').attr('data-player', item.address).append('<i class="icon-forward"></i>'));
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'skipNext').attr('data-player', item.address).append('<i class="icon-fast-forward"></i>'));
+                    
+                    btn_toolbar.append(btn_group);
+                    info.append(btn_toolbar);
+                    
+                }
+                
+                var row = $('<div>').addClass("row").append(thumb, info);
+                
+                $('#nowplaying').append(row);
+                });
+                $('#nowplaying').slideDown();
     }
 }
 });
