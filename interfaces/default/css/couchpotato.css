@@ -4,15 +4,16 @@
 	height: 175px;
 	text-align: center;
     float: left;
-    margin-left: 4px
 }
+
 #wanted-grid img.thumbnail,
 #result-grid img.thumbnail {
     height: 150px;
     width: 100px;
 }
-#wanted-grid h6.movie-title,
-#result-grid h6.movie-title {
+
+#wanted-grid
+#wanted-grid #result-grid h6.movie-title {
     color: #555555;
     text-align: center;
     margin: 0;
@@ -48,4 +49,28 @@
 }
 .modal .modal-movieinfo select {
     margin-top: 10px;
+}
+
+@media (max-width: 767px) {
+.thumbnails>li{margin-left:4px}
+}
+
+@media (max-width: 320px) {
+	.modal .movie-poster {
+		height: 207px !important;
+		width: 144px !important;
+	}
+	.modal-body {
+		max-height: 280px;
+	}
+	.thumbnails>li {
+		padding: 0px;
+		margin-left: 12px;
+	}
+	.thumbnail {
+		padding: 6px;
+	}
+	.modal .modal-movieinfo {
+		margin-left: 0px;
+	}
 }
