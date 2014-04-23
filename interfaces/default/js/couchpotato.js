@@ -196,7 +196,7 @@ function showMovie(movie) {
     }
 
     var modalBody = $('<div>').append(modalImg, modalInfo)
-    showModal(title + ' ('+year+')',  modalBody, modalButtons)
+    showModal(title,  modalBody, modalButtons)
     Holder.run()
 }
 function addMovie(movieid, profile, title) {
