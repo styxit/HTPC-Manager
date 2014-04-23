@@ -22,9 +22,9 @@ a:hover {
 	text-decoration: none;
 }
 
-h3.a {
-	color: #7a8288 !important;
-}
+//h3.a {
+	//color: #7a8288 !important;
+//}
 
 .well{
 	background-image: none !important;
@@ -39,7 +39,15 @@ h3.a {
 
 .navbar .btn-group {
 	margin: 0px;
-	margin-top: 8px;
+	margin-top: 5px;
+}
+
+.navbar-form input {
+	margin-top: 0px !important;
+}
+
+.ui-pnotify-title{
+	color: white !important;
 }
 
 .content {
