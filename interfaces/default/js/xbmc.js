@@ -255,7 +255,7 @@ function loadMovie(movie) {
             'Trailer' : function() {
                 var trailerid = movie.trailer.substr(movie.trailer.length-11);
                 var src = 'http://www.youtube.com/embed/'+trailerid+'?rel=0&autoplay=1'
-                var youtube = $('<iframe>').attr('src',src).addClass('modal-youtube');
+                var youtube = $('<iframe allowfullscreen>').attr('src',src).addClass('modal-youtube');
                 $('#modal_dialog .modal-body').html(youtube);
             }
         });
