@@ -101,10 +101,15 @@ h6.title {
 .modal .modal-movieinfo {
     margin-left: 171px;
 }
+.modal-body {
+	overflow: hidden;
+}
+
 .modal .modal-youtube {
     border: 0;
-    height: 375px;
-    width: 670px;
+    height: 400px;
+	width: 100%;
+	overflow: hidden;
 }
 
 @media (max-width: 767px) {
@@ -118,6 +123,9 @@ h6.title {
 	}
 	.modal-body {
 		max-height: 280px;
+	}
+	.modal .modal-youtube {
+		max-height: 200px;
 	}
 	.thumbnails>li {
 		padding: 0px;
