@@ -106,6 +106,9 @@ function loadQueue(once) {
 
                 var  progress = $('<div>');
                 progress.addClass('progress');
+                if (status == 'Downloading') {
+                    progress.addClass('progress-striped active');
+                }
                 progress.append(progressBar);
 
                 if (job.Category != '') {
