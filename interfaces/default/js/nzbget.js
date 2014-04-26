@@ -70,15 +70,6 @@ function loadQueue(once) {
         dataType: 'json',
         success: function (object) {
             data = object.result;
-            $('#nzb_pause_button').button('reset');
-            if (data.status == 'Paused') {
-                $('#nzb_pause_button').html('<i class="icon-play"></i> Resume');
-                queueToggleStatusAction = 'resume';
-            } else {
-                $('#nzb_pause_button').html('<i class="icon-pause"></i> Pause')
-                queueToggleStatusAction = 'pause';
-            }
-
 
             $('#active_table_body').html('');
 
