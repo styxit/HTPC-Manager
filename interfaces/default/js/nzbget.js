@@ -109,17 +109,6 @@ function loadQueue(once) {
                 var eta = hours > 0 ? hours + 'h ' + min + 'm' : min + 'm';
                 row.append($('<td>').html(eta + ' / ' + job.RemainingSizeMB + ' MB').addClass('span3'));
 
-                var deleteImage = $('<a>');
-                deleteImage.html('&times;');
-                deleteImage.attr('alt', 'Remove');
-                deleteImage.addClass('close');
-                deleteImage.attr('href', '#');
-                deleteImage.click(function () {
-                    removeQueueItem(job.NZBID);//editqueue('GroupDelete',0,'',[ID])
-                });
-
-                //row.append($('<td>').html(deleteImage)); 
-
                 $('#active_table_body').append(row);
             });
         }
