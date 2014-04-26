@@ -80,7 +80,26 @@ function loadQueue(once) {
             }
 
             $.each(data, function (i, job) {
-                var percentage = (100 * (job.FileSizeLo -job.RemainingSizeLo)) / job.FileSizeLo;
+
+                /*
+                 * Concat filesizes.
+                 * The file sizes consist of two 32bit ints that makeup a 64bit int.
+                 * The Hi comes first, followed by the Low.
+                 * Preceded with an empty string so the two values do not sum, but concat.
+                 */
+                totalSize = "" + job.FileSizeHi + job.FileSizeLo;
+                remainingSize = "" + job.RemainingSizeHi + job.RemainingSizeLo;
+                pausedSize = "" + job.PausedSizeHi + job.PausedSizeLo;
+
+                // determine status
+                status = 'Queued';
+                if (job.ActiveDownloads > 0) {
+                    status = 'Downloading';
+                } else if (pausedSize == remainingSize) {
+                    status = 'Paused';
+                }
+
+                var percentage = (100 * (pausedSize - remainingSize)) / pausedSize;
                 var progressBar = $('<div>');
                 progressBar.addClass('bar');
                 progressBar.css('width', percentage + '%');
@@ -89,10 +108,18 @@ function loadQueue(once) {
                 progress.addClass('progress');
                 progress.append(progressBar);
 
-                var row = $('<tr>')
-                row.append($('<td>').html(job.NZBName));
+                if (job.Category != '') {
+                    categoryLabel = ' <span class="label" title="Category '+job.Category+'">' + job.Category + '</span>';
+                } else {
+                    categoryLabel = '';
+                }
 
-                row.append($('<td>').html(job.Category));
+                var row = $('<tr>');
+                // Job status
+                row.append($('<td>').append(nzbgetStatusLabel(status)));
+
+                // job name + category
+                row.append($('<td>').html(job.NZBName + categoryLabel));
 
                 row.append($('<td>').html(progress));
                 var min = job.MaxPostTime - job.MinPostTime;
@@ -126,7 +153,7 @@ function loadWarnings() {
     });
 }
 function nzbgetStatusLabel(text){
-  var statusOK = ['SUCCESS'];
+  var statusOK = ['SUCCESS', 'Downloading'];
   var statusInfo = ['Extracting', 'Running'];
   var statusError = ['FAILURE'];
   var statusWarning = ['Verifying', 'Repairing'];
