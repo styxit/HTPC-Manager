@@ -99,7 +99,7 @@ function loadQueue(once) {
                     status = 'Paused';
                 }
 
-                var percentage = (100 * (pausedSize - remainingSize)) / pausedSize;
+                var percentage = (100 * (totalSize - remainingSize)) / totalSize;
                 var progressBar = $('<div>');
                 progressBar.addClass('bar');
                 progressBar.css('width', percentage + '%');
