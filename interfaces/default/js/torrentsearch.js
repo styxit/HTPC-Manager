@@ -1,61 +1,45 @@
 
 $(document).ready(function () {
+    $('.torrent_search_table').tablesorter();
+    // Disables nzb search if torrent search page is open
     if ($('.formsearch').length) {
-        alert('we found formsearch');
-        //$('.formsearch').attr('action', '/torrentsearch/');
         $('.formsearch').addClass('disabled');
     } else {
-        //alert('we didnt not find formsearch');
+        //pass
     }
 
-    $('#search').val("test");
-    $('form.disabled').submit(function (e) {
-        alert('Fired');
+    $('.formsearch').submit(function (e) {
         e.preventDefault();
+        query = $(e.target).find('.search').val();
+        if (query === undefined) return;
+        search(query);
     });
 });
 
-
-$(document).on('click', '.TorrentToQbt', function (e) {
+// Sends torrent to the client on click
+$(document).on('click', '.dlt', function (e) {
     e.preventDefault();
     var torrent_name = $(this).attr('data-name');
-    $.get(WEBDIR + 'qbittorrent/command/' + $(this).attr('data-action') + '/' + $(this).attr('data-hash') + '/' + $(this).attr('data-name') + '/', function() {
-        notify(torrent_name, 'Sent to qBittorrent', 'success');
+    var client = $(this).attr('data-client'); //
+    var path = $(this).attr('data-path');
+    var par = {'cmd':$(this).attr('data-cmd'), 'hash':$(this).attr('data-hash'), 'name':$(this).attr('data-name')};
+    $.get(WEBDIR + path, par, function(response) {
+        notify(torrent_name, 'Sent to ' + client, 'success');
     });
 });
-
-/*
-$(document).on('click', '#search', function () {
-    query = $(this).val();
-    qq = typeof(query);
-    alert(qq);
-    if (query === undefined) return;
-    search(query);
-});
-*/
-
-
 
 
 function search(query) {
-    alert('running search')
     if (query.length === 0) return;
     $('.spinner').show();
     $('#torrent_search_results').empty();
     $('#error_msg').empty();
-    //remove the /?query if needed was to test form.
+
     $.getJSON(WEBDIR + "torrentsearch/search/" + query, function (response) {
-        //alert(response.results);
-        /*
-        if (response.results === 0) {
-            alert(response.results);
-            $('#error_msg').text('Didnt find any torrents with that name');
-            return;
-        }
-        */
+
         // Stops the function from running if the search dont get any hits
         if (response.results === "0") {
-            $('#error_msg').text('Didnt find any torrents with the query' +q);
+            $('#error_msg').text('Didnt find any torrents with the query ' + query);
             $('#error_msg').css({"font-weight": "bold"});
             $('.spinner').hide();
             return;
@@ -63,100 +47,64 @@ function search(query) {
 
         $.each(response, function (index, torrent) {
             tr = $('<tr>');
-            var buttons = '';
-            
-            //btn group
-            //buttons = $('<div>').addClass('btn-group');
-            //download_clientbutton = gen_buttons(torrent);
-            //buttons.append(download_clientbutton);
-            //lol
-            //http://localhost:8086/qbittorrent/command?cmd=download&hash=http://torcache.net/torrent/D926540C7129877DFDC6D1A33AD0338872F349B8.torrent
-            /*
-            $('a.ajax-link').click(function (e) {
-                    e.preventDefault();
-                    var link = $(this);
-                    $.getJSON(link.attr('href'), function () {
-                    notify('', 'Sent to qBittorrent', 'success');
-                    });
-                });
-            */
-            
-            var itemlink = $('<a class="TorrentToQbt" data-action="download" data-name="" data-hash="">').
-            //attr('href', WEBDIR + 'qbittorrent/command?cmd=download&hash=' + torrent.DownloadURL + '/' + torrent.ReleaseName).
-            attr('data-hash', torrent.DownloadURL).
-            attr('data-name', torrent.ReleaseName).
-            attr('title', 'Send to qBittorrent');
 
-            var toqbtIcon = $('<i>');
-            toqbtIcon.addClass('icon-download-alt');
-            toqbtIcon.css('cursor', 'pointer');
-            itemlink.append(toqbtIcon);
-            
             tr.append(
+            $('<td>').addClass('torrentsearch_releasename').text(torrent.ReleaseName),
+            $('<td>').addClass('torrentsearch_seeders').text(torrent.Seeders),
+            $('<td>').addClass('torrentsearch_leechers').text(torrent.Leechers),
+            $('<td>').addClass('torrentsearch_size').text(bytesToSize(torrent.Size, 2)),
+            $('<td>').addClass('torrentsearch_source').text(torrent.Source),
+            $('<td>').addClass('torrentsearch_resolution').text(torrent.Resolution),
+            $('<td>').addClass('torrentsearch_container').text(torrent.Container),
+            $('<td>').addClass('torrentsearch_codec').text(torrent.Codec),
+            $('<td>').addClass('torrentsearch_snatched').text(torrent.Snatched),
+            $('<td>').append(atc(torrent)));
 
-            $('<td>').addClass('qbt_name').text(torrent.ReleaseName),
-            $('<td>').addClass('qbt_ratio').text(torrent.Seeders),
-            $('<td>').addClass('qbit_eta').text(torrent.Leechers),
-            $('<td>').addClass('qbt_state').text(bytesToSize(torrent.Size, 2)),
-            $('<td>').addClass('qbt_state').text(torrent.Source),
-            $('<td>').addClass('qbt_state').text(torrent.Resolution),
-            $('<td>').addClass('qbt_state').text(torrent.Container),
-            $('<td>').addClass('qbt_state').text(torrent.Codec),
-            $('<td>').addClass('qbt_state').text(torrent.Snatched),
-
-            $('<td>').append(itemlink));//.addClass('qbit_progress').text('test')); // test
-            //$('<td>').addClass('torrent-action').append(download_clientbutton));
-            //DownloadURL
             $('#torrent_search_results').append(tr);
             $('.spinner').hide();
-            //alert(response.results);
 
         });
+    // Leting sort plugin know that there was a ajax call
+    $('.torrent_search_table').trigger('update');
+    //Sort on seeds and snatches descending
+    $('table').trigger("sorton", [[[1,1],[8,1]]]);
+
     });
 }
 
-/*
-$( '#hellow').click(function() {
-  //alert( "Handler for .click() called." );
-    alert("click");
-    gen_buttons('torrent');
-});
-*/
 
-// test for buttons
-/*
-function gen_buttons(torrent) {
-$.get('torrentsearch/getclients'), function (data) {
-    alert data;
-    var btn = $('<div>').addClass('btn-group');
-    $.each(data, function(k, v) {
-        if (v === 1) {
-            alert(k);
-            if(k === 'qbittorrent') {
-                //upload torrent command
-                u = WEBDIR + '/qbittorrent/command/urls/' + torrent.DownloadURL;
-                var clientname = k
-                alert(u);
+// Get active torrent clients
+function atc(torrent) {
+    var b = $('<div>').addClass('btn-group');
+    $.getJSON(WEBDIR + "torrentsearch/getclients", function (response) {
+        // Used to check if there is any active clients
+        var n = 0;
+        $.each(response, function (i, client) {
+            if (client.active === 1) {
+                var button = $('<a>').addClass('btn btn-mini dlt').
+                attr('data-client', client.title).
+                attr('data-path', client.path).
+                attr('data-cmd', client.cmd).
+                attr('data-name', torrent.ReleaseName). // not correct
+                attr('data-hash', torrent.DownloadURL).
+                attr('href', "#");
+                // If there any active clients add 1 to n
+                n += 1;
+                // Makes icon and pop title
+                var img = makeIcon("icon-download-alt", client.title);
+                button.append(img);
+                b.append(button);
             }
-            else if (k === 'deluge') {
-                //
-            }
-              else if (k === 'utorrent') {
-                //
-            }
-              else if (k === 'transmission') {
-                //
-            }
-            downloadbtn = $('<a class="download_torrent">').addClass('btn btn-mini');
-            downloadbtn.html('<i class="icon-download-alt"></i>');
-            downloadbtn.attr('title', clientname);
-            downloadbtn.attr('href', u);
-            btn.append(downloadbtn);
-            alert(btn);
-            return btn
-
+        });
+        // Checks if there is any active clients, if it isnt add a error message.
+        if (n === 0) { // remove || 1 if needed was to test
+            b.append('No active clients').removeClass('btn-group');
+            return b;
+        } 
+        else if (n === 1) {
+            b.removeClass('btn-group');
         }
-});
+
+    });
+    return b;
 }
-}
-*/

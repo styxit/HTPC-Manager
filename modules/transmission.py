@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import cherrypy
 import htpc
 import urllib2
@@ -75,6 +78,12 @@ class Transmission:
             return False
         return self.fetch('torrent-remove', {'ids': torrentId})
 
+    #added this, its new, needs test
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def addurl(self, cmd=None, filename=None, title=None):
+        return self.fetch(cmd, {'filename': filename})
+
     # Wrapper to access the Transmission Api
     # If the first call fails, there probably is no valid Session ID so we try it again
     def fetch(self, method, arguments=''):
@@ -83,7 +92,7 @@ class Transmission:
 
         host = htpc.settings.get('transmission_host', '')
         port = str(htpc.settings.get('transmission_port', ''))
-
+    
         url = 'http://' +  host + ':' + str(port) + '/transmission/rpc/'
 
         # format post data

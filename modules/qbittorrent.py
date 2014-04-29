@@ -1,4 +1,5 @@
-# coding=utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import htpc
 import cherrypy
@@ -92,7 +93,7 @@ class qbittorrent:
             self.logger.error("Couldn't get total download and uploads speed %s" % e)
             
         return rr
-    
+
     # Handles pause, resume, delete singel torrents
     @cherrypy.expose
     def command(self, cmd=None, hash=None, name=None):
@@ -117,7 +118,6 @@ class qbittorrent:
             result = urllib2.urlopen(url, data).read()
         
         except Exception as e:
-            print e
             self.logger.error("Failed at %s %s %s %s" % (cmd, name, hash ,e))
     
     # Sets global upload and download speed

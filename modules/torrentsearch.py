@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 # coding=utf-8
 
 import htpc
@@ -23,16 +26,11 @@ class Torrentsearch:
                 {'type': 'text', 'label': 'Menu name', 'name': 'torrentsearch_name'},
                 #{'type': 'bool', 'label': 'Enable', 'name': 'torrentsearch_btn_enable'},
                 {'type': 'text', 'label': 'BTN apikey', 'name': 'torrentsearch_btn_apikey'}
-                #{'type': 'text', 'label': 'IP / Host *', 'name': 'qbittorrent_host'},
-                #{'type': 'text', 'label': 'Port *', 'name': 'qbittorrent_port'},
-                #{'type': 'text', 'label': 'Username', 'name': 'qbittorrent_username'},
-                #{'type': 'password', 'label': 'Password', 'name': 'qbittorrent_password'},
-                #{'type': 'bool', 'label': 'Use SSL', 'name': 'qbittorrent_ssl'}
         ]})
 
     @cherrypy.expose()
-    def index(self):
-        return htpc.LOOKUP.get_template('torrentsearch.html').render(scriptname='torrentsearch')
+    def index(self, query='', **kwargs):
+        return htpc.LOOKUP.get_template('torrentsearch.html').render(query=query, scriptname='torrentsearch')
     
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -42,7 +40,7 @@ class Torrentsearch:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def query(self, query=None):
+    def query(self, **kwargs):
         s = self.btn(query)
         return s
 
@@ -67,21 +65,70 @@ class Torrentsearch:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def getclients(self):
-        d = {}
+        #print 'qbittorrent_enable is: ',htpc.settings.get('qbittorrent_enable', '')
+        #print 'qbittorrent_enable tpye is', type(htpc.settings.get('qbittorrent_enable', ''))
+        #print 'utorrent_enable is: ',htpc.settings.get('utorrent_enable', '')
+        l = []
+        qbt = {}
+        trans = {}
+        utor = {}
+        delu = {}
         if htpc.settings.get('qbittorrent_enable', ''):
-            d['qbittorrent'] = 1
+            qbt['title'] = 'qBittorrent'
+            qbt['active'] = 1
+            qbt['cmd'] = 'download'
+            qbt['path'] = 'qbittorrent/command/'
+
+            l.append(qbt)
+            #print l
         else:
-            d['qbittorrent'] = 0
+            print 'qbittorent is checking if its false even when its true'
+            qbt['title'] = 'qBittorrent'
+            qbt['active'] = 0
+            qbt['cmd'] = 'download'
+            qbt['path'] = 'qbittorrent/command/'
+            #l.append(d)
+
         if htpc.settings.get('transmission_enable', ''):
-            d['transmission'] = 1
+            trans['title'] = 'transmission'
+            trans['active'] = 1
+            trans['path'] = 'transmission/addurl/'
+            trans['cmd'] = 'torrent-add'
+            l.append(trans)
+            #print l
+            #d['transmission'] = 1
         else:
-            d['transmission'] = 0
+            trans['title'] = 'transmission'
+            trans['active'] = 0
+            trans['cmd'] = 'torrent-add'
+            trans['path'] = 'transmission/addurl/'
+            l.append(trans)
+            #print l
+
         if htpc.settings.get('deluge_enable', ''):
-            d['deluge'] = 1
+            delu['title'] = 'Deluge'
+            delu['active'] = 1
+            delu['cmd'] = 'download'
+            delu['path'] = '/Add/'
+            l.append(delu)
+            #d['deluge'] = 1
         else:
-            d['deluge'] = 0
+            delu['title'] = 'Deluge'
+            delu['active'] = 0
+            delu['cmd'] = 'download'
+            delu['path'] = 'path/to/cmd'
+            l.append(delu)
+
         if htpc.settings.get('utorrent_enable', ''):
-            d['utorrent'] = 1
+            utor['title'] = 'uTorrent'
+            utor['active'] = 1
+            utor['cmd'] = 'download'
+            utor['path'] = 'path'
+            l.append(utor)
         else:
-            d['utorrent'] = 0
-        return d
+            utor['title'] = 'uTorrent'
+            utor['active'] = 0
+            utor['path'] = 'path'
+            utor['cmd'] = 'download'
+            l.append(utor)
+        return l
