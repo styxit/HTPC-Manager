@@ -25,14 +25,34 @@
 			<i>Both magnet URL's and (server located) .torrent files are accepted.</i>
 	  </div>
 
-      <table class="table table-striped table-hover">
+      <table id="torrent-table" class="table table-striped table-hover">
         <thead>
-          <tr>
-            <th>File</th>
-            <th class="span1">Ratio</th>
-            <th class="span1">ETA</th>
-            <th class="span2">Status</th>
-            <th class="span3">Progress</th>
+          <tr class="sort-fields">
+            <th>
+	      <a class="btn btn-default" data-sort-field="name">
+		File&nbsp;<i></i>
+	      </a>
+	    </th>
+            <th>
+	      <a class="btn btn-default" data-sort-field="uploadRatio">
+		Ratio&nbsp;<i></i>
+	      </a>
+	    </th>
+            <th>
+	      <a class="btn btn-default" data-sort-field="eta">
+		ETA&nbsp;<i></i>
+	      </a>
+	    </th>
+            <th>
+	      <a class="btn btn-default" data-sort-field="status">
+		Status&nbsp;<i></i>
+	      </a>
+	    </th>
+            <th>
+	      <a class="btn btn-default" data-sort-field="percentDone">
+		Progress&nbsp;<i></i>
+	      </a>
+	    </th>
             <th class="span1"></th>
           </tr>
         </thead>
