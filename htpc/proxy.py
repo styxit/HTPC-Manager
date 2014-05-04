@@ -17,7 +17,7 @@ except ImportError:
         PIL = False
 
 
-def get_image(url, height=None, width=None, opacity=100, auth=None):
+def get_image(url, height=None, width=None, opacity=100, auth=None, headers=None):
     """ Load image form cache if possible, else download. Resize if needed """
     opacity = float(opacity)
     logger = logging.getLogger('htpc.proxy')
@@ -37,7 +37,7 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
     # If there is no local copy of the original
     if not os.path.isfile(image):
         logger.debug("No local image found for " + image + ". Downloading")
-        download_image(url, image, auth)
+        download_image(url, image, auth, headers)
 
     # Check if resize is needed
     if (height and width) or (opacity < 100):
@@ -63,7 +63,7 @@ def get_image(url, height=None, width=None, opacity=100, auth=None):
         return serve_file(path=image, content_type='image/' + imagetype)
 
 
-def download_image(url, dest, auth=None):
+def download_image(url, dest, auth=None, headers=None):
     """ Download image and save to disk """
     logger = logging.getLogger('htpc.proxy')
     logger.debug("Downloading image from " + url + " to " + dest)
@@ -73,6 +73,11 @@ def download_image(url, dest, auth=None):
 
         if (auth):
             request.add_header("Authorization", "Basic %s" % auth)
+
+        if (headers):
+            for key, value in headers.iteritems():
+                request.add_header(key, value)
+                
 
         with open(dest, "wb") as local_file:
             local_file.write(urlopen(request).read())

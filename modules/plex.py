@@ -4,16 +4,19 @@ import re
 import socket
 import struct
 from json import loads, dumps
-from urllib2 import Request, urlopen
+from urllib2 import Request, urlopen, quote
 from htpc.proxy import get_image
 import logging
 import urllib
+import base64
+import uuid
+from lxml import etree
 
 """
 Credits.
 
 
-PlexGDM:
+PlexGDM & myPlex Auth:
 Based on PlexConect:
 https://github.com/iBaa/PlexConnect/blob/master/PlexAPI.py
 
@@ -40,20 +43,24 @@ class Plex:
                 {'type': 'text', 'label': 'Menu name', 'name': 'plex_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'plex_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'plex_port', 'placeholder':'32400'},
+                {'type':'text', 'label':'Username (optional)', 'name':'plex_username'},
+                {'type':'password', 'label':'Password (optional)', 'name':'plex_password'},
                 {'type': 'text', 'label': 'Mac addr.', 'name':'plex_mac'},
                 {'type':'bool', 'label':'Hide watched', 'name':'plex_hide_watched'},
                 {'type':'bool', 'label':'Hide homemovies', 'name':'plex_hide_homemovies'}]})
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def ping(self, plex_host='', plex_port='', **kwargs):
+    def ping(self, plex_host='', plex_port='', plex_username='', plex_password='', **kwargs):
         """ Tests settings, returns server name on success and null on fail """
         try:
             self.logger.debug("Testing Plex connectivity")
-
             url = "http://%s:%s" % (plex_host, plex_port)
+            if plex_username != '' and plex_password != '':
+                if self.getToken(username = plex_username, password = plex_password) == None:
+                    return
             self.logger.debug("Trying to contact Plex via " + url)
-            request =  loads(urlopen(Request(url, headers={"Accept": "application/json"})).read())
+            request =  loads(urlopen(Request(url, headers=self.getHeaders())).read())
             self.logger.info("Connected to the Plex Media Server %s at %s" % (request.get('friendlyName'), url))
             return True
         except:
@@ -86,10 +93,10 @@ class Plex:
             plex_hide_homemovies = htpc.settings.get('plex_hide_homemovies', False)
             movies = []
 
-            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
                 if section['type'] == "movie":
                     if section['agent'] != "com.plexapp.agents.none" or not plex_hide_homemovies:
-                        for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all?type=1&sort=addedAt:desc&X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_host, plex_port, section["key"], limit), headers={"Accept": "application/json"})).read())["_children"]:
+                        for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all?type=1&sort=addedAt:desc&X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_host, plex_port, section["key"], limit), headers=self.getHeaders())).read())["_children"]:
                             jmovie = {}
                             genre = []
     
@@ -138,9 +145,9 @@ class Plex:
             plex_port = htpc.settings.get('plex_port', '32400')
             episodes = []
 
-            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
                 if section['type'] == "show":
-                    for episode in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all?type=4&sort=addedAt:desc&X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_host, plex_port, section["key"], limit), headers={"Accept": "application/json"})).read())["_children"]:
+                    for episode in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all?type=4&sort=addedAt:desc&X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_host, plex_port, section["key"], limit), headers=self.getHeaders())).read())["_children"]:
                         jepisode = {}
         
                         jepisode['label'] = "%sx%s. %s" % (episode["parentIndex"], episode["index"], episode["title"])
@@ -184,9 +191,9 @@ class Plex:
             plex_port = htpc.settings.get('plex_port', '32400')
             albums = []
 
-            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
                 if section['type'] == "artist":
-                    for album in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/recentlyAdded?X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_host, plex_port, section["key"], limit), headers={"Accept": "application/json"})).read())["_children"]:
+                    for album in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/recentlyAdded?X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_host, plex_port, section["key"], limit), headers=self.getHeaders())).read())["_children"]:
                         jalbum = {}
         
                         jalbum['title'] = album["title"]
@@ -229,7 +236,7 @@ class Plex:
             url = "/images/DefaultVideo.png"
 
         self.logger.debug("Trying to fetch image via " + url)
-        return get_image(url, h, w, o, "")
+        return get_image(url, h, w, o, headers=self.getHeaders())
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -249,10 +256,10 @@ class Plex:
             else:
                hidewatched = "all"
 
-            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
                 if section['type'] == "movie":
                     if section['agent'] != "com.plexapp.agents.none" or not plex_hide_homemovies:
-                        for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section["key"], hidewatched), headers={"Accept": "application/json"})).read())["_children"]:
+                        for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section["key"], hidewatched), headers=self.getHeaders())).read())["_children"]:
                             jmovie = {}
                             genre = []
                             jmovie['playcount'] = 0
@@ -319,10 +326,10 @@ class Plex:
             else:
                hidewatched = "all"
 
-            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
                 if section['type'] == "show":
 
-                    for tvShow in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], hidewatched), headers={"Accept": "application/json"})).read())["_children"]:
+                    for tvShow in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], hidewatched), headers=self.getHeaders())).read())["_children"]:
                         jshow = {}
                         jshow['itemcount'] = 0
                         jshow['playcount'] = 0
@@ -370,10 +377,10 @@ class Plex:
             artists = []
             limits = {}
 
-            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
                 if section['type'] == "artist":
 
-                    for artist in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all' % (plex_host, plex_port, section['key']), headers={"Accept": "application/json"})).read())["_children"]:
+                    for artist in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all' % (plex_host, plex_port, section['key']), headers=self.getHeaders())).read())["_children"]:
                         jartist = {}
                         genre = []
 
@@ -404,10 +411,10 @@ class Plex:
             albums = []
             limits = {}
 
-            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
                 if section['type'] == "artist":
 
-                    for album in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/albums' % (plex_host, plex_port, section['key']), headers={"Accept": "application/json"})).read())["_children"]:
+                    for album in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/albums' % (plex_host, plex_port, section['key']), headers=self.getHeaders())).read())["_children"]:
                         jalbum = {}
 
                         jalbum['title'] = album["title"]
@@ -441,7 +448,7 @@ class Plex:
             episodes = []
             limits = {}
 
-            for episode in self.JsonLoader(urlopen(Request('http://%s:%s/library/metadata/%s/allLeaves' % (plex_host, plex_port, tvshowid), headers={"Accept": "application/json"})).read())["_children"]:
+            for episode in self.JsonLoader(urlopen(Request('http://%s:%s/library/metadata/%s/allLeaves' % (plex_host, plex_port, tvshowid), headers=self.getHeaders())).read())["_children"]:
                 jepisode = {}
                 jepisode['playcount'] = 0
 
@@ -529,6 +536,41 @@ class Plex:
                 s = s[:closg] + r'\"' + s[closg+1:]
         return result
 
+    def getToken(self, username = '', password = ''):
+        try:
+            self.logger.debug("Fetching auth token")
+            if username == '':
+                username = htpc.settings.get('plex_username', '')
+            if password == '':
+                password = htpc.settings.get('plex_password', '')
+            headers=self.getHeaders()
+            headers["Authorization"] = "Basic %s" % base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+            headers["X-Plex-Client-Identifier"] = quote(str(uuid.uuid4()))
+            headers["X-Plex-Product"] = "HTPC-Manager"
+            headers["X-Plex-Device-Name"] = socket.gethostname()
+            r = Request("https://my.plexapp.com/users/sign_in.xml", data="", headers=headers)
+            r = urlopen(r)
+            el = etree.fromstring(r.read())
+            return el.find('authentication-token').text
+        except Exception, e:
+            self.logger.error("Exception: " + str(e))
+            return
+
+    def getHeaders(self):
+        self.logger.debug("Getting Headers")
+        username = htpc.settings.get('plex_username', '')
+        password = htpc.settings.get('plex_password', '')
+        authtoken = htpc.settings.get('plex_authtoken', '')
+        
+        if username != '' and password != '':
+            if authtoken == '':
+                authtoken = self.getToken()
+                htpc.settings.set('plex_authtoken', authtoken)
+        
+        headers={"Accept": "application/json"}
+        headers["X-Plex-Token"] = authtoken
+
+        return headers
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -542,7 +584,7 @@ class Plex:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
 
-            for video in self.JsonLoader(urlopen(Request('http://%s:%s/status/sessions' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+            for video in self.JsonLoader(urlopen(Request('http://%s:%s/status/sessions' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
                 jplaying_item = {}
                 jplaying_item['protocolCapabilities'] = []
 
@@ -571,7 +613,7 @@ class Plex:
                         jplaying_item['state'] = children['state']
                         jplaying_item['player'] = children['title']
                         # We need some more info to see what the client supports
-                        for client in self.JsonLoader(urlopen(Request('http://%s:%s/clients' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+                        for client in self.JsonLoader(urlopen(Request('http://%s:%s/clients' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
                             if client['machineIdentifier'] == children['machineIdentifier']:
                                 jplaying_item['protocolCapabilities'] = client['protocolCapabilities'].split(',')
                                 jplaying_item['address'] = client['address']
@@ -583,7 +625,7 @@ class Plex:
                             jplaying_item['avatar'] = children['thumb']
 
                 # Sometimes the client doesn't send the last timeline event. Ignore all client that almost have played the entire lenght.
-                if jplaying_item['viewOffset'] < (int(jplaying_item['duration']) - 60000):
+                if jplaying_item['viewOffset'] < (int(jplaying_item['duration']) - 10000):
                     playing_items.append(jplaying_item)
                 
 
@@ -601,7 +643,7 @@ class Plex:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
 
-            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+            for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
                 if section_type == None or section_type == section['type']:
                     self.logger.debug("Updating section %s" % section['key'])
                     try:
@@ -650,7 +692,7 @@ class Plex:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
             players = []
-            for player in self.JsonLoader(urlopen(Request('http://%s:%s/clients' % (plex_host, plex_port), headers={"Accept": "application/json"})).read())["_children"]:
+            for player in self.JsonLoader(urlopen(Request('http://%s:%s/clients' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
 
                 try:
                     del player["_elementType"]

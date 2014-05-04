@@ -1,6 +1,5 @@
 var searchString = '';
 var hideWatched = 0;
-var player = '';
 
 var movieLoad = {
     last: 0,
@@ -11,7 +10,7 @@ var movieLoad = {
 
 $(document).ready(function() {
     hideWatched = $('#hidewatched').hasClass('active')?1:0;
-    playerLoader = setInterval('loadNowPlaying()', 2000);
+    playerLoader = setInterval('loadNowPlaying()', 4000);
 
     // Load data on tab display
     $('a[data-toggle=\'tab\']').click(function(e) {
