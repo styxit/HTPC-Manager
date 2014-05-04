@@ -45,6 +45,7 @@ class Plex:
                 {'type': 'text', 'label': 'Port *', 'name': 'plex_port', 'placeholder':'32400'},
                 {'type':'text', 'label':'Username (optional)', 'name':'plex_username'},
                 {'type':'password', 'label':'Password (optional)', 'name':'plex_password'},
+                {'type':'text', 'label':'myPlex token', 'name':'plex_authtoken'},
                 {'type': 'text', 'label': 'Mac addr.', 'name':'plex_mac'},
                 {'type':'bool', 'label':'Hide watched', 'name':'plex_hide_watched'},
                 {'type':'bool', 'label':'Hide homemovies', 'name':'plex_hide_homemovies'}]})
@@ -561,12 +562,12 @@ class Plex:
         username = htpc.settings.get('plex_username', '')
         password = htpc.settings.get('plex_password', '')
         authtoken = htpc.settings.get('plex_authtoken', '')
-        
+
         if username != '' and password != '':
             if authtoken == '':
                 authtoken = self.getToken()
                 htpc.settings.set('plex_authtoken', authtoken)
-        
+
         headers={"Accept": "application/json"}
         headers["X-Plex-Token"] = authtoken
 
