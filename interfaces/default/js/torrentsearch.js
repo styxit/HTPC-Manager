@@ -22,7 +22,7 @@ $(document).on('click', '.dlt', function (e) {
     var torrent_name = $(this).attr('data-name');
     var client = $(this).attr('data-client'); //
     var path = $(this).attr('data-path');
-    var par = {'cmd':$(this).attr('data-cmd'), 'hash':$(this).attr('data-hash'), 'name':$(this).attr('data-name')};
+    var par = {'cmd':$(this).attr('data-cmd'), 'link':$(this).attr('data-hash'), 'torrentname':$(this).attr('data-name')};
     $.get(WEBDIR + path, par, function(response) {
         notify(torrent_name, 'Sent to ' + client, 'success');
     });

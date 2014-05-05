@@ -78,11 +78,15 @@ class Transmission:
             return False
         return self.fetch('torrent-remove', {'ids': torrentId})
 
-    #added this, its new, needs test
+    #For torrent search
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def addurl(self, cmd=None, filename=None, title=None):
-        return self.fetch(cmd, {'filename': filename})
+    def to_client(self, link, torrentname, **kwargs):
+        try:
+            self.logger.info('Added %s to uTorrent' % torrentname)
+            return self.fetch('torrent-add', {'filename': link})
+        except Exception as e:
+            self.logger.debug('Failed to add %s to uTorrent %s %s'(torrentname, link, e))
 
     # Wrapper to access the Transmission Api
     # If the first call fails, there probably is no valid Session ID so we try it again

@@ -60,14 +60,11 @@ class Torrentsearch:
             else:
                 return result
         except Exception as e:
-            print e
+            self.logger.error("Failed to fetch search results from BTN %s" %e)
             
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def getclients(self):
-        #print 'qbittorrent_enable is: ',htpc.settings.get('qbittorrent_enable', '')
-        #print 'qbittorrent_enable tpye is', type(htpc.settings.get('qbittorrent_enable', ''))
-        #print 'utorrent_enable is: ',htpc.settings.get('utorrent_enable', '')
         l = []
         qbt = {}
         trans = {}
@@ -76,8 +73,8 @@ class Torrentsearch:
         if htpc.settings.get('qbittorrent_enable', ''):
             qbt['title'] = 'qBittorrent'
             qbt['active'] = 1
-            qbt['cmd'] = 'download'
-            qbt['path'] = 'qbittorrent/command/'
+            #qbt['cmd'] = 'download'
+            qbt['path'] = 'qbittorrent/to_client/'
 
             l.append(qbt)
             #print l
@@ -85,50 +82,40 @@ class Torrentsearch:
             print 'qbittorent is checking if its false even when its true'
             qbt['title'] = 'qBittorrent'
             qbt['active'] = 0
-            qbt['cmd'] = 'download'
+            #qbt['cmd'] = 'download'
             qbt['path'] = 'qbittorrent/command/'
             #l.append(d)
 
         if htpc.settings.get('transmission_enable', ''):
             trans['title'] = 'transmission'
             trans['active'] = 1
-            trans['path'] = 'transmission/addurl/'
-            trans['cmd'] = 'torrent-add'
+            trans['path'] = 'transmission/to_client/'
             l.append(trans)
-            #print l
-            #d['transmission'] = 1
         else:
             trans['title'] = 'transmission'
             trans['active'] = 0
-            trans['cmd'] = 'torrent-add'
-            trans['path'] = 'transmission/addurl/'
+            trans['path'] = 'transmission/to_client/'
             l.append(trans)
-            #print l
 
         if htpc.settings.get('deluge_enable', ''):
             delu['title'] = 'Deluge'
             delu['active'] = 1
-            delu['cmd'] = 'download'
-            delu['path'] = '/Add/'
+            delu['path'] = 'deluge/to_client'
             l.append(delu)
-            #d['deluge'] = 1
         else:
             delu['title'] = 'Deluge'
             delu['active'] = 0
-            delu['cmd'] = 'download'
-            delu['path'] = 'path/to/cmd'
+            delu['path'] = 'deluge/to_client'
             l.append(delu)
 
         if htpc.settings.get('utorrent_enable', ''):
             utor['title'] = 'uTorrent'
             utor['active'] = 1
-            utor['cmd'] = 'download'
-            utor['path'] = 'path'
+            utor['path'] = 'utorrent/to_client/'
             l.append(utor)
         else:
             utor['title'] = 'uTorrent'
             utor['active'] = 0
-            utor['path'] = 'path'
-            utor['cmd'] = 'download'
+            utor['path'] = 'utorrent/to_client/'
             l.append(utor)
         return l

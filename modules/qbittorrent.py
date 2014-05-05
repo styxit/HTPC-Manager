@@ -95,7 +95,7 @@ class qbittorrent:
         return rr
 
     # Handles pause, resume, delete singel torrents
-    @cherrypy.expose
+    @cherrypy.expose()
     def command(self, cmd=None, hash=None, name=None):
         try:
             self.logger.debug("%s %s" %(cmd, name))
@@ -119,9 +119,23 @@ class qbittorrent:
         
         except Exception as e:
             self.logger.error("Failed at %s %s %s %s" % (cmd, name, hash ,e))
+
+    #Torrent search send to torrent
+    @cherrypy.expose()
+    def to_client(self, link, torrentname, **kwargs):
+        try:
+            url = self.qbturl()
+            url += 'command/download/'
+            data = {}
+            data['urls'] = link
+            params = urllib.urlencode(data)
+            result = urllib2.urlopen(url, params).read()
+            self.logger.debug('%s %s is sendt to qBittorrent' % (torrentname, link))
+        except Exception as e:
+            self.logger.error('Failed to send %s %s to qBittorrent %s' % (link, torrentname, e))
     
     # Sets global upload and download speed
-    @cherrypy.expose
+    @cherrypy.expose()
     def set_speedlimit(self, type=None, speed=None):
         try:
             self.logger.debug("Setting %s to %s"% (type, speed))
