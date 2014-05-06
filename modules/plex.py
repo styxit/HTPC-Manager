@@ -11,6 +11,7 @@ import urllib
 import base64
 import uuid
 from lxml import etree
+import platform
 
 """
 Credits.
@@ -45,21 +46,17 @@ class Plex:
                 {'type': 'text', 'label': 'Port *', 'name': 'plex_port', 'placeholder':'32400'},
                 {'type':'text', 'label':'Username (optional)', 'name':'plex_username'},
                 {'type':'password', 'label':'Password (optional)', 'name':'plex_password'},
-                {'type':'text', 'label':'myPlex token', 'name':'plex_authtoken'},
                 {'type': 'text', 'label': 'Mac addr.', 'name':'plex_mac'},
                 {'type':'bool', 'label':'Hide watched', 'name':'plex_hide_watched'},
                 {'type':'bool', 'label':'Hide homemovies', 'name':'plex_hide_homemovies'}]})
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def ping(self, plex_host='', plex_port='', plex_username='', plex_password='', **kwargs):
+    def ping(self, plex_host='', plex_port='', **kwargs):
         """ Tests settings, returns server name on success and null on fail """
         try:
             self.logger.debug("Testing Plex connectivity")
             url = "http://%s:%s" % (plex_host, plex_port)
-            if plex_username != '' and plex_password != '':
-                if self.getToken(username = plex_username, password = plex_password) == None:
-                    return
             self.logger.debug("Trying to contact Plex via " + url)
             request =  loads(urlopen(Request(url, headers=self.getHeaders())).read())
             self.logger.info("Connected to the Plex Media Server %s at %s" % (request.get('friendlyName'), url))
@@ -537,39 +534,50 @@ class Plex:
                 s = s[:closg] + r'\"' + s[closg+1:]
         return result
 
-    def getToken(self, username = '', password = ''):
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def myPlexSignin(self, username = '', password = ''):
         try:
-            self.logger.debug("Fetching auth token")
-            if username == '':
-                username = htpc.settings.get('plex_username', '')
-            if password == '':
-                password = htpc.settings.get('plex_password', '')
-            headers=self.getHeaders()
-            headers["Authorization"] = "Basic %s" % base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
-            headers["X-Plex-Client-Identifier"] = quote(str(uuid.uuid4()))
-            headers["X-Plex-Product"] = "HTPC-Manager"
-            headers["X-Plex-Device-Name"] = socket.gethostname()
-            r = Request("https://my.plexapp.com/users/sign_in.xml", data="", headers=headers)
-            r = urlopen(r)
-            el = etree.fromstring(r.read())
-            return el.find('authentication-token').text
+
+            username = htpc.settings.get('plex_username', '')
+            password = htpc.settings.get('plex_password', '')
+
+            if username != '' and password != '':
+                self.logger.debug("Fetching auth token")
+                headers={}
+                headers["Authorization"] = "Basic %s" % base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
+                headers["X-Plex-Client-Identifier"] = quote(base64.encodestring(str(uuid.getnode())).replace('\n', ''))
+                headers["X-Plex-Product"] = "HTPC-Manager"
+                headers["X-Plex-Device"] = "HTPC-Manager"
+                headers["X-Plex-Device-Name"] = socket.gethostname()
+                headers["X-Plex-Platform"] = platform.system()
+                headers["X-Plex-Client-Platform"] = platform.system()
+                headers["X-Plex-Platform-Version"] = platform.version()
+                headers["X-Plex-Provides"] = "controller"
+                r = Request("https://plex.tv/users/sign_in.xml", data="", headers=headers)
+                r = urlopen(r)
+                el = etree.fromstring(r.read())
+                authtoken = el.find('authentication-token').text
+                if authtoken != None:
+                    htpc.settings.set('plex_authtoken', authtoken)
+                    return "Logged in to myPlex"
+                else:
+                    return "Failed to loggin to myPlex"
+            else:
+                if htpc.settings.get('plex_authtoken', '') != '':
+                    htpc.settings.set('plex_authtoken', '')
+                    self.logger.debug("Removed myPlex Token")
+                return
         except Exception, e:
             self.logger.error("Exception: " + str(e))
-            return
+            return "Failed to logg in to myPlex: %s" % str(e)
 
     def getHeaders(self):
-        self.logger.debug("Getting Headers")
-        username = htpc.settings.get('plex_username', '')
-        password = htpc.settings.get('plex_password', '')
         authtoken = htpc.settings.get('plex_authtoken', '')
 
-        if username != '' and password != '':
-            if authtoken == '':
-                authtoken = self.getToken()
-                htpc.settings.set('plex_authtoken', authtoken)
-
         headers={"Accept": "application/json"}
-        headers["X-Plex-Token"] = authtoken
+        if authtoken != '':
+            headers["X-Plex-Token"] = authtoken
 
         return headers
 

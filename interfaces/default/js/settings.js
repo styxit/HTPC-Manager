@@ -38,6 +38,12 @@ $(document).ready(function () {
                 xbmc_update_servers(0);
                 this.reset();
             }
+            if ($('#plex_name').is(":visible")) {
+                $.post(WEBDIR + 'plex/myPlexSignin', '', function(data) {
+                if (data==null) return
+                    notify('myPlex', data, 'info');
+                });
+            }
         });
     });
     $('input.enable-module').change(function() {
