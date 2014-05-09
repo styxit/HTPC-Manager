@@ -70,15 +70,6 @@ function loadQueue(once) {
         dataType: 'json',
         success: function (object) {
             data = object.result;
-            $('#nzb_pause_button').button('reset');
-            if (data.status == 'Paused') {
-                $('#nzb_pause_button').html('<i class="icon-play"></i> Resume');
-                queueToggleStatusAction = 'resume';
-            } else {
-                $('#nzb_pause_button').html('<i class="icon-pause"></i> Pause')
-                queueToggleStatusAction = 'pause';
-            }
-
 
             $('#active_table_body').html('');
 
@@ -89,36 +80,55 @@ function loadQueue(once) {
             }
 
             $.each(data, function (i, job) {
-                var percentage = (100 * (job.FileSizeLo -job.RemainingSizeLo)) / job.FileSizeLo;
+
+                /*
+                 * Concat filesizes.
+                 * The file sizes consist of two 32bit ints that makeup a 64bit int.
+                 * The Hi comes first, followed by the Low.
+                 * Preceded with an empty string so the two values do not sum, but concat.
+                 */
+                totalSize = "" + job.FileSizeHi + job.FileSizeLo;
+                remainingSize = "" + job.RemainingSizeHi + job.RemainingSizeLo;
+                pausedSize = "" + job.PausedSizeHi + job.PausedSizeLo;
+
+                // determine status
+                status = 'Queued';
+                if (job.ActiveDownloads > 0) {
+                    status = 'Downloading';
+                } else if (pausedSize == remainingSize) {
+                    status = 'Paused';
+                }
+
+                var percentage = (100 * (totalSize - remainingSize)) / totalSize;
                 var progressBar = $('<div>');
                 progressBar.addClass('bar');
                 progressBar.css('width', percentage + '%');
 
                 var  progress = $('<div>');
                 progress.addClass('progress');
+                if (status == 'Downloading') {
+                    progress.addClass('progress-striped active');
+                }
                 progress.append(progressBar);
 
-                var row = $('<tr>')
-                row.append($('<td>').html(job.NZBName));
+                if (job.Category != '') {
+                    categoryLabel = ' <span class="label" title="Category '+job.Category+'">' + job.Category + '</span>';
+                } else {
+                    categoryLabel = '';
+                }
 
-                row.append($('<td>').html(job.Category));
+                var row = $('<tr>');
+                // Job status
+                row.append($('<td>').append(nzbgetStatusLabel(status)));
+
+                // job name + category
+                row.append($('<td>').html(job.NZBName + categoryLabel));
 
                 row.append($('<td>').html(progress));
                 var min = job.MaxPostTime - job.MinPostTime;
                 var hours = Math.floor(min / 60);
                 var eta = hours > 0 ? hours + 'h ' + min + 'm' : min + 'm';
                 row.append($('<td>').html(eta + ' / ' + job.RemainingSizeMB + ' MB').addClass('span3'));
-
-                var deleteImage = $('<a>');
-                deleteImage.html('&times;');
-                deleteImage.attr('alt', 'Remove');
-                deleteImage.addClass('close');
-                deleteImage.attr('href', '#');
-                deleteImage.click(function () {
-                    removeQueueItem(job.NZBID);//editqueue('GroupDelete',0,'',[ID])
-                });
-
-                //row.append($('<td>').html(deleteImage)); 
 
                 $('#active_table_body').append(row);
             });
@@ -146,7 +156,7 @@ function loadWarnings() {
     });
 }
 function nzbgetStatusLabel(text){
-  var statusOK = ['SUCCESS'];
+  var statusOK = ['SUCCESS', 'Downloading'];
   var statusInfo = ['Extracting', 'Running'];
   var statusError = ['FAILURE'];
   var statusWarning = ['Verifying', 'Repairing'];
