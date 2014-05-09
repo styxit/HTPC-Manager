@@ -473,12 +473,12 @@ class Xbmc(object):
             elif action == 'getsub':
                 try:
                     #Frodo
-                    xbmc.Addons.ExecuteAddon(addonid='script.xbmc.subtitles')
+                    return xbmc.Addons.ExecuteAddon(addonid='script.xbmc.subtitles')
                 except:
                     pass
                 try:
                     #Gotham
-                    xbmc.GUI.ActivateWindow(window='subtitlesearch')
+                    return xbmc.GUI.ActivateWindow(window='subtitlesearch')
                 except:
                     pass
             elif action == 'volume':
