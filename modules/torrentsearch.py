@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# coding=utf-8
-
 import htpc
 import cherrypy
 import urllib2
@@ -12,6 +10,7 @@ import jsonrpclib
 import logging
 
 #http://btnapps.net/apigen/class-btnapi.html
+#Only adding btn for now, kat and ptp will be added later.
 
 
 class Torrentsearch:
@@ -20,11 +19,9 @@ class Torrentsearch:
         htpc.MODULES.append({
             'name': 'torrentsearch',
             'id': 'torrentsearch',
-            #'test': htpc.WEBDIR + 'qbittorrent/ping',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'torrentsearch_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'torrentsearch_name'},
-                #{'type': 'bool', 'label': 'Enable', 'name': 'torrentsearch_btn_enable'},
                 {'type': 'text', 'label': 'BTN apikey', 'name': 'torrentsearch_btn_apikey'}
         ]})
 
@@ -45,7 +42,6 @@ class Torrentsearch:
         return s
 
     @cherrypy.expose()
-    #@cherrypy.tools.json_out()
     def btn(self, query=None):
         btn = jsonrpclib.Server('http://api.btnapps.net')
         result = btn.getTorrents(htpc.settings.get('torrentsearch_btn_apikey', ''), query, 999)
@@ -73,19 +69,14 @@ class Torrentsearch:
         if htpc.settings.get('qbittorrent_enable', ''):
             qbt['title'] = 'qBittorrent'
             qbt['active'] = 1
-            #qbt['cmd'] = 'download'
             qbt['path'] = 'qbittorrent/to_client/'
-
             l.append(qbt)
-            #print l
         else:
             print 'qbittorent is checking if its false even when its true'
             qbt['title'] = 'qBittorrent'
             qbt['active'] = 0
-            #qbt['cmd'] = 'download'
             qbt['path'] = 'qbittorrent/command/'
-            #l.append(d)
-
+            l.append(qbt)
         if htpc.settings.get('transmission_enable', ''):
             trans['title'] = 'transmission'
             trans['active'] = 1
@@ -96,7 +87,6 @@ class Torrentsearch:
             trans['active'] = 0
             trans['path'] = 'transmission/to_client/'
             l.append(trans)
-
         if htpc.settings.get('deluge_enable', ''):
             delu['title'] = 'Deluge'
             delu['active'] = 1
@@ -107,7 +97,6 @@ class Torrentsearch:
             delu['active'] = 0
             delu['path'] = 'deluge/to_client'
             l.append(delu)
-
         if htpc.settings.get('utorrent_enable', ''):
             utor['title'] = 'uTorrent'
             utor['active'] = 1

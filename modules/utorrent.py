@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# coding=utf-8
-
 import requests
 
 
@@ -157,7 +155,6 @@ class UTorrent:
 			res = self.do_action('add-url', s=link)
 			return {'result': res.status_code}
 		except Exception as e:
-			print 'to_client error', e
 			logger.error('Failed to sendt %s to uTorrent %s' % (link, torrentname))
 
 	@cherrypy.expose()
@@ -179,12 +176,12 @@ class UTorrent:
 
 	def do_action(self, action, hash=None, s=None, **kwargs):
 		"""
-        :param action:
-        :param hash:
-        :param kwargs:
-        :rtype: requests.Response
-        :return:
-        """
+		:param action:
+		:param hash:
+		:param kwargs:
+		:rtype: requests.Response
+		:return:
+		"""
 		if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove', 'add-url'):
 			raise AttributeError
 		if action == 'add-url':
@@ -217,6 +214,7 @@ class UTorrent:
         :rtype: requests.Response
         :return:
         """
+
 		if not self._cookies or not self._token:
 			self.auth(host, port, username, pwd)
 		if not args:
@@ -229,17 +227,15 @@ class UTorrent:
 
 	def fetch(self, args):
 		"""
-
-        :param args:
-        :rtype: requests.Response
-        :return:
-        """
+		:param args:
+		:rtype: requests.Response
+		:return:
+		"""
 		password = htpc.settings.get('utorrent_password', '')
 		username = htpc.settings.get('utorrent_username', '')
 		host = htpc.settings.get('utorrent_host')
 		port = htpc.settings.get('utorrent_port')
 		try:
-			print 'fetch!!', self._fetch(host, port, username, password, args)
 			return self._fetch(host, port, username, password, args)
 		except requests.ConnectionError:
 			raise ConnectionError

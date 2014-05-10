@@ -130,7 +130,7 @@ class qbittorrent:
             data['urls'] = link
             params = urllib.urlencode(data)
             result = urllib2.urlopen(url, params).read()
-            self.logger.debug('%s %s is sendt to qBittorrent' % (torrentname, link))
+            self.logger.info('%s %s is sendt to qBittorrent' % (torrentname, link))
         except Exception as e:
             self.logger.error('Failed to send %s %s to qBittorrent %s' % (link, torrentname, e))
     
