@@ -24,6 +24,12 @@ class Couchpotato:
         ]})
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetSuggestions(self):
+    	self.logger.debug("Fetching Suggested Movies")
+    	return self.fetch('suggestion.view')
+    
+    @cherrypy.expose()
     def index(self):
         return htpc.LOOKUP.get_template('couchpotato.html').render(scriptname='couchpotato')
 
