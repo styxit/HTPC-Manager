@@ -4,7 +4,6 @@ $(document).ready(function() {
     getMovieLists()
     getNotificationList()
     getHistory()
-    getSuggestionsList()
     $('#searchform').submit(function(e) {
         e.preventDefault()
         var search = $('#moviename').val()
@@ -18,34 +17,30 @@ $(document).ready(function() {
     })
 })
 
-function getSuggestions(pHTMLElement) {
-	pHTMLElement.empty();
+function getSuggestions() {
+    $('#suggestions-grid').empty();
     $(".spinner").show();
-    
+
     $.getJSON(WEBDIR + "couchpotato/GetSuggestions/", function (pResult) {
-    	$(".spinner").hide();
-    	
-    	if (pResult === null || pResult.total === 0) {
-            pHTMLElement.append($("<li>").html("No movies found"));
+        $(".spinner").hide();
+
+        if (pResult === null || pResult.total === 0) {
+            $('#suggestions-grid').append($("<li>").html("No suggestions found"));
             return;
         }
-		
-        $.each(pResult.movies, function(nIndex, pMovie) {
-            var strHTML = $("<a>").attr("href", "#").click(function(pEvent) {
+
+        $.each(pResult.suggestions, function (nIndex, pMovie) {
+            var strHTML = $("<a>").attr("href", "#").click(function (pEvent) {
                 pEvent.preventDefault();
                 showMovie(pMovie);
             });
-			
-            strHTML.append($("<img>").attr("src", WEBDIR + "couchpotato/GetImage?w=100&h=150&url=" + pMovie.library.info.images.poster[0]).attr("width", "100").attr("height", "150").addClass("thumbnail"));
-			
-            if (pMovie.releases.length > 0) {
-                strHTML.append($("<i>").attr("title", "Download").addClass("icon-white icon-download status"));
-            }
-			
-            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(pMovie.library.info.original_title, 12)));
-            pHTMLElement.append($("<li>").attr("id", pMovie.id).append(strHTML));
-        })  
-    })
+
+            strHTML.append($("<img>").attr("src", WEBDIR + "couchpotato/GetImage?w=100&h=150&url=" + pMovie.images.poster_original[0]).attr("width", "100").attr("height", "150").addClass("thumbnail"));
+
+            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(pMovie.original_title, 15)));
+            $('#suggestions-grid').append($("<li>").attr("id", pMovie.id).append(strHTML));
+        });
+    });
 }
 
 function getMovies(strStatus, pHTMLElement) {
@@ -81,10 +76,7 @@ function getMovies(strStatus, pHTMLElement) {
 function getMovieLists() {
 	getMovies("active", $("#wanted-grid"));
 	getMovies("done", $("#library-grid"));
-}
-
-function getSuggestionsLists() {
-	getSuggestions($("#suggestions-grid"));
+	getSuggestions($("#suggested-grid"));
 }
 
 function showMovie(movie) {
