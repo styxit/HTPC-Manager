@@ -101,7 +101,6 @@ function processes() {
                 $('<td>').addClass('processes-memory-percent').text(proc.memory_percent.toFixed(2) + '%'),
                 $('<td>').addClass('processes-memory-info').text(getReadableFileSizeString(proc.memory_info[0])),
                 $('<td>').addClass('processes-runningtime').text(proc.r_time),
-                //$('<td>').text(proc.open_files), //Not supported on windows, just hangs on my computer
                 $('<td>').addClass('processes-percent').text(proc.cpu_percent+ '%'),
                 $('<td>').append('<a href="#" class="btn btn-mini cmd" data-cmd="kill" data-name='+proc.name+' data-pid='+proc.pid+'><i class="icon-remove"></i></a>'));
                 $('#proclist').append(row);
