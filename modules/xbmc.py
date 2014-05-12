@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """ Module for connecting to XBMC """
 import cherrypy
 import htpc
@@ -652,3 +655,24 @@ class Xbmc(object):
         self.logger.debug("Generating authentication string")
         if self.current.username and self.current.password:
             return base64.encodestring('%s:%s' % (self.current.username, self.current.password)).strip('\n')
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def download_media(self, path):
+        try:
+            xbmc = Server(self.url('/jsonrpc', True))
+            path = xbmc.Files.PrepareDownload(path=path)['details']['path']
+            url = self.current.host + ':' + str(self.current.port) + '/' + path
+
+            if self.current.username and self.current.password:
+                url = self.current.username + ':' + self.current.password + '@' + url
+            
+            url = 'http://' + url
+
+            self.logger.info(url)
+            return {'result': 'success', 'url': url}
+            #return url
+
+        except Exception as e:
+            self.logger.error('Error wile trying to download %s %s', (path, e))
+            return {'result': 'failed', 'url': None}

@@ -241,6 +241,10 @@ function loadMovie(movie) {
         'Play' : function() {
             playItem(movie.movieid, 'movie');
             hideModal();
+        },
+        'Download': function() {
+            downloadFiles(movie);
+            hideModal();
         }
     }
     if (movie.imdbnumber) {
@@ -940,6 +944,33 @@ function loadShowFromHash(hash) {
         var tvShowId = hash.substring(8);
         loadEpisodes({'tvshowid':tvShowId})
     }
+}
+
+function downloadFiles(movie) {
+    var path = {'path':movie.file};
+    $.getJSON(WEBDIR + 'xbmc/download_media/', path, function(data) {
+        if (data.result === "success") {
+            notify('Download started', (movie.title) , 'success');
+            var link = document.createElement('a');
+            link.href = data.url;
+
+            //split filename from filepath
+            var filename = data.url.substring(data.url.lastIndexOf('%2f') + 3, data.url.length);
+            filename = decodeURI(filename);
+
+            //HTML 5 download att
+            link.download = filename;
+
+            //Make a virual click
+            var e = document.createEvent('MouseEvents');
+            e.initEvent('click', true, true);
+            link.dispatchEvent(e);
+            return true;
+            
+        } else if (data.result === "failed"){
+            notify('Download Failed', (movie.title) , 'error');
+        }
+    });
 }
 
 function reloadTab() {
