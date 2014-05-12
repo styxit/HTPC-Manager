@@ -7,6 +7,7 @@ import htpc
 import base64
 import socket
 import struct
+from urllib import unquote_plus
 from urllib2 import quote
 from jsonrpclib import Server
 from sqlobject import SQLObject, SQLObjectNotFound
@@ -666,12 +667,14 @@ class Xbmc(object):
 
             if self.current.username and self.current.password:
                 url = self.current.username + ':' + self.current.password + '@' + url
-            
-            url = 'http://' + url
 
-            self.logger.info(url)
+            url = 'http://' + url
+            p = unquote_plus(path)
+            filename = p.split('/')
+            filename = filename[-1]
+            
+            self.logger.info('Starting dowload of %s' % filename)
             return {'result': 'success', 'url': url}
-            #return url
 
         except Exception as e:
             self.logger.error('Error wile trying to download %s %s', (path, e))
