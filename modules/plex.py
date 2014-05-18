@@ -10,14 +10,13 @@ import logging
 import urllib
 import base64
 import uuid
-from lxml import etree
 import platform
 
 """
 Credits.
 
 
-PlexGDM & myPlex Auth:
+PlexGDM:
 Based on PlexConect:
 https://github.com/iBaa/PlexConnect/blob/master/PlexAPI.py
 
@@ -556,8 +555,11 @@ class Plex:
                 headers["X-Plex-Provides"] = "controller"
                 r = Request("https://plex.tv/users/sign_in.xml", data="", headers=headers)
                 r = urlopen(r)
-                el = etree.fromstring(r.read())
-                authtoken = el.find('authentication-token').text
+                
+                compiled = re.compile("<authentication-token>(.*)<\/authentication-token>", re.DOTALL)
+                authtoken = compiled.search(r.read()).group(1).strip()
+
+                
                 if authtoken != None:
                     htpc.settings.set('plex_authtoken', authtoken)
                     return "Logged in to myPlex"
