@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-A
+# -*- coding: utf-8 -*-
+
 """
 This is the main executable of HTPC Manager. It parses the
 command line arguments, sets globals variables and calls the
@@ -31,6 +32,8 @@ def parse_arguments():
                         help='Print debug text')
     parser.add_argument('--webdir', default=None,
                         help='Use a custom webdir')
+    parser.add_argument('--resetauth', action='store_true', default=False,
+                        help='Resets the username and password to HTPC-Manager')
     parser.add_argument('--loglevel', default='info',
                         help='Set a loglevel. Allowed values: debug, info, warning, error, critical')
     return parser.parse_args()
@@ -141,6 +144,11 @@ def main():
 
     htpc.USERNAME = htpc.settings.get('app_username')
     htpc.PASSWORD = htpc.settings.get('app_password')
+
+    # Resets the htpc manager password and username
+    if args.resetauth:
+        htpc.USERNAME = htpc.settings.set('app_username', '')
+        htpc.PASSWORD = htpc.settings.set('app_password', '')
 
     #Select if you want to controll processes and popen from HTPC-Manager
     htpc.SHELL = args.shell
