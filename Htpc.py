@@ -165,6 +165,11 @@ def main():
         htpc.USERNAME = htpc.settings.set('app_username', '')
         htpc.PASSWORD = htpc.settings.set('app_password', '')
 
+    # Resets the htpc manager password and username
+    if args.resetauth:
+        htpc.USERNAME = htpc.settings.set('app_username', '')
+        htpc.PASSWORD = htpc.settings.set('app_password', '')
+
     #Select if you want to controll processes and popen from HTPC-Manager
     htpc.SHELL = args.shell
 
