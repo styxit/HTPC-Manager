@@ -392,16 +392,6 @@ function loadArtists(options) {
                 $.each(data.artists, function (i, artist) {
                     $('#artist-grid').append($('<tr>').append(
                         $('<td>').append(
-                            $('<a>').attr('href','#').attr('title', 'Play all').html('<i class="icon-play">').click(function(e) {
-                                e.preventDefault();
-                                playItem(artist.id, 'artist');
-                            }),
-                            $('<a>').attr('href','#').attr('title', 'Enqueue all').html('<i class="icon-plus">').click(function(e) {
-                                e.preventDefault();
-                                queueItem(artist.id, 'artist');
-                            })
-                        ),
-                        $('<td>').append(
                             $('<a>').attr('href','#').addClass('artist-link').html(artist.title).click(function(e) {
                                 e.preventDefault(e);
                                 $(this).parent().append(loadAlbums({'artistid' : artist.id}));
@@ -488,23 +478,8 @@ function loadAlbums(options) {
                                 $('<h6>').html(album.artist).addClass('artist')
                             ).click(function(e) {
                                 e.preventDefault();
-                                loadSongs({'albumid': album.id, 'search': album.title});
-                            }),
-                        $('<div>').addClass('grid-control').append(
-                            $('<a>').attr('href', '#').append(
-                                $('<img>').attr('src',WEBDIR + 'img/play.png').attr('title','Play')
-                            ).click(function(e) {
-                                e.preventDefault();
-                                playItem(album.id, 'album');
-                            }),
-                            $('<a>').attr('href', '#').append(
-                                $('<img>').attr('src',WEBDIR + 'img/add.png').attr('title','Queue')
-                            ).click(function(e) {
-                                e.preventDefault();
-                                queueItem(album.id, 'album');
-                                notify('Added', 'Album has been added to the playlist.', 'info');
+                                loadSongs({'albumid': album.id});
                             })
-                        )
                     )
                     albumItem.append(albumCaption);
                     elem.append(albumItem);
@@ -525,24 +500,14 @@ var songsLoad = {
     request: null,
     limit: 50,
     options: {},
-    filter: ''
+    albumid: ''
 }
 function loadSongs(options) {
-    searchString = $('#search').val()
-    if (options != undefined || searchString != songsLoad.filter) {
+    if (options != undefined) {
         songsLoad.last = 0
         $('#songs-grid tbody').empty()
-        if (options != undefined) {
-            songsLoad.options = options
-            if (options.search) {
-                $("#search").val(options.search);
-                songsLoad.filter = options.search
-            }
-        } else {
-            songsLoad.options = {}
-            songsLoad.filter = searchString
+        songsLoad.options = options
         }
-    }
 
     var active = (songsLoad.request!=null && songsLoad.request.readyState!=4)
     if (active || songsLoad.last == -1) return
@@ -550,7 +515,7 @@ function loadSongs(options) {
     var sendData = {
         start: songsLoad.last,
         end: (songsLoad.last + songsLoad.limit),
-        filter: (options && options.search ? '' : songsLoad.filter)
+        albumid: (options && options.albumid ? '' : songsLoad.albumid)
     }
     $.extend(sendData, songsLoad.options)
 
@@ -573,25 +538,19 @@ function loadSongs(options) {
                     var row = $('<tr>');
                     row.append(
                         $('<td>').append(
-                            $('<a>').attr('href','#').append($('<i>').addClass('icon-plus')).click(function(e) {
-                                e.preventDefault();
-                                queueItem(song.songid, 'song')
-                            }),
+                            
                             $('<a>').attr('href','#').text(' ' + song.label).click(function(e) {
                                 e.preventDefault();
-                                playItem(song.songid, 'song')
                             })
                         ),
                         $('<td>').append(
                             $('<a>').attr('href','#').text(song.artist).click(function(e) {
                                 e.preventDefault();
-                                loadSongs({'artistid': song.artistid[0], 'search': song.artist})
                             })
                         ),
                         $('<td>').append(
                             $('<a>').attr('href','#').text(song.album).click(function(e) {
                                 e.preventDefault();
-                                loadSongs({'albumid': song.albumid, 'search': song.album})
                             })
                         ),
                         $('<td>').append(parseSec(song.duration))

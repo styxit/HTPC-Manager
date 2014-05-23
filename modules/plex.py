@@ -387,11 +387,11 @@ class Plex:
                         
                         artists.append(jartist)
                     
-                    limits['start'] = int(start)
-                    limits['total'] = len(artists)
-                    limits['end'] = int(end)
-                    if int(end) >= len(artists):
-                        limits['end'] = len(artists)
+            limits['start'] = int(start)
+            limits['total'] = len(artists)
+            limits['end'] = int(end)
+            if int(end) >= len(artists):
+                limits['end'] = len(artists)
 
             return {'limits': limits, 'artists': sorted(artists, key=lambda k: k['title'])[int(start):int(end)] }
         except Exception, e:
@@ -400,7 +400,7 @@ class Plex:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetAlbums(self, start=0, end=0):
+    def GetAlbums(self, start=0, end=0, artistid=""):
         """ Get a list of Albums """
         try:
             plex_host = htpc.settings.get('plex_host', '')
@@ -412,26 +412,88 @@ class Plex:
                 if section['type'] == "artist":
 
                     for album in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/albums' % (plex_host, plex_port, section['key']), headers=self.getHeaders())).read())["_children"]:
-                        jalbum = {}
-
-                        jalbum['title'] = album["title"]
-                        
-                        jalbum['id'] = album["ratingKey"]
-
-                        if 'thumb'in album:
-                            jalbum['thumbnail'] = album["thumb"]
-                        
-                        albums.append(jalbum)
+                        if (str(album["parentRatingKey"]) == artistid) or (artistid == ""):
+                            jalbum = {}
+    
+                            jalbum['title'] = album["title"]
+                            
+                            jalbum['id'] = album["ratingKey"]
+    
+                            if 'thumb'in album:
+                                jalbum['thumbnail'] = album["thumb"]
+                            
+                            albums.append(jalbum)
                     
-                    limits['start'] = int(start)
-                    limits['total'] = len(albums)
-                    limits['end'] = int(end)
-                    if int(end) >= len(albums):
-                        limits['end'] = len(albums)
+            limits['start'] = int(start)
+            limits['total'] = len(albums)
+            limits['end'] = int(end)
+            if int(end) >= len(albums):
+                limits['end'] = len(albums)
 
             return {'limits': limits, 'albums': sorted(albums, key=lambda k: k['title'])[int(start):int(end)] }
         except Exception, e:
             self.logger.error("Unable to fetch all Albums! Exception: " + str(e))
+            return
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetSongs(self, start=0, end=0, albumid=""):
+        """ Get a list of songs """
+        try:
+            plex_host = htpc.settings.get('plex_host', '')
+            plex_port = htpc.settings.get('plex_port', '32400')
+            songs = []
+            limits = {}
+
+            if albumid != "":
+                request = self.JsonLoader(urlopen(Request('http://%s:%s/library/metadata/%s/children' % (plex_host, plex_port, albumid), headers=self.getHeaders())).read())
+                for song in request["_children"]:
+                    jsong = {}
+
+                    try:
+                        jsong['artist'] = song["originalTitle"]
+                    except:
+                        jsong['artist'] = request["title1"]
+
+                    jsong['label'] = song["title"]
+                            
+                    jsong['album'] = request["parentTitle"]
+                        
+                    jsong['id'] = song["ratingKey"]
+                    try:
+                        jsong['duration'] = song["duration"] / 1000
+                    except: pass
+
+                    songs.append(jsong)
+            else:
+
+                for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
+                    if section['type'] == "artist":
+
+                        for song in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/search?type=10' % (plex_host, plex_port, section['key']), headers=self.getHeaders())).read())["_children"]:
+                            jsong = {}
+
+                            jsong['artist'] = song["grandparentTitle"]
+                            jsong['label'] = song["title"]
+                            
+                            jsong['album'] = song["parentTitle"]
+                        
+                            jsong['id'] = song["ratingKey"]
+                            try:
+                                jsong['duration'] = song["duration"] / 1000
+                            except: pass
+                        
+                            songs.append(jsong)
+                    
+            limits['start'] = int(start)
+            limits['total'] = len(songs)
+            limits['end'] = int(end)
+            if int(end) >= len(songs):
+                limits['end'] = len(songs)
+
+            return {'limits': limits, 'songs': songs[int(start):int(end)] }
+        except Exception, e:
+            self.logger.error("Unable to fetch all songs! Exception: " + str(e))
             return
 
     @cherrypy.expose()
@@ -576,10 +638,13 @@ class Plex:
 
     def getHeaders(self):
         authtoken = htpc.settings.get('plex_authtoken', '')
+        username = htpc.settings.get('plex_username', '')
 
         headers={"Accept": "application/json"}
         if authtoken != '':
             headers["X-Plex-Token"] = authtoken
+        if username != '':
+            headers["X-Plex-Username"] = username
 
         return headers
 
