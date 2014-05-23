@@ -330,7 +330,7 @@ function loadEpisodes(options) {
                     episodeAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (episode.playcount >= 1) {
-                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched'));
+                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched_episode'));
                     }
 
                     episodeAnchor.append($('<h6>').addClass('title').html(shortenText(episode.label, 18)));

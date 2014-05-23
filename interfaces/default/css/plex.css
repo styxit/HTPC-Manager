@@ -30,6 +30,13 @@ a:Hover {
     width: 16px;
     height: 16px;
 }
+.watched_episode {
+    position: absolute;
+    top: 73px;
+    right: 5px;
+    width: 16px;
+    height: 16px;
+}
 .grid-caption {
     position: absolute;
     bottom: 5px;
