@@ -81,6 +81,12 @@ $(document).ready(function () {
                 xbmc_update_servers(0);
                 this.reset();
             }
+            if ($('#plex_name').is(":visible")) {
+                $.post(WEBDIR + 'plex/myPlexSignin', '', function(data) {
+                if (data==null) return
+                    notify('myPlex', data, 'info');
+                });
+            }
         });
     });
     $('input.enable-module').change(function() {
@@ -115,6 +121,18 @@ $(document).ready(function () {
         });
     });
     xbmc_update_servers(0);
+    $('#gdm_plex_servers').change(function() {
+        var item = $(this)
+        var id = item.val()
+        $.get(WEBDIR + 'plex/GetServers?id='+id, function(data) {
+            if (data==null) return
+            console.log(data.servers.serverName);
+            $('#plex_name').val(data.servers.serverName);
+            $('#plex_host').val(data.servers.ip);
+            $('#plex_port').val(data.servers.port);
+        });
+    });
+    gdm_plex_servers(0);
 });
 
 function xbmc_update_servers(id) {
@@ -123,6 +141,18 @@ function xbmc_update_servers(id) {
         var servers = $('#xbmc_server_id').empty().append($('<option>').text('New').val(0));
         $.each(data.servers, function(i, item) {
             var option = $('<option>').text(item.name).val(item.id);
+            if (id == item.id) option.attr('selected', 'selected');
+            servers.append(option);
+        });
+    }, 'json');
+}
+
+function gdm_plex_servers(id) {
+    $.get(WEBDIR + 'plex/GetServers', function(data) {
+        if (data==null) return;
+        var servers = $('#gdm_plex_servers').empty().append($('<option>').text('Select').val(0));
+        $.each(data.servers, function(i, item) {
+            var option = $('<option>').text(item.serverName).val(item.uuid);
             if (id == item.id) option.attr('selected', 'selected');
             servers.append(option);
         });

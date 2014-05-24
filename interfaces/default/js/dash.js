@@ -2,12 +2,15 @@ $(document).ready(function () {
     loadRecentMovies()
     loadRecentTVshows()
     loadRecentAlbums()
+    loadRecentMoviesPlex()
+    loadRecentTVshowsPlex()
+    loadRecentAlbumsPlex()
     loadDownloadHistory()
     loadNZBGetDownloadHistory()
     loadWantedMovies()
     loadNextAired()
 })
-    
+
 function loadRecentMovies () {
     if (!$('#movie-carousel').length) return
     $.getJSON(WEBDIR + 'xbmc/GetRecentMovies',function (data) {
@@ -21,7 +24,7 @@ function loadRecentMovies () {
             itemDiv.attr('style', 'background-image: url("' + src + '")')
 
             itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
-                location.href = 'xbmc/#movies'
+                location.href = WEBDIR +'xbmc/#movies'
             }).hover(function() {
                 var text = $(this).children('p').stop().slideToggle()
             }).append(
@@ -91,6 +94,93 @@ function loadRecentAlbums () {
         })
         Holder.run()
         $('#albums-content').parent().show()
+    })
+}
+
+function loadRecentMoviesPlex () {
+    if (!$('#movie-carousel-plex').length) return
+    $.getJSON(WEBDIR + 'plex/GetRecentMovies',function (data) {
+        if (data == null) return
+        $.each(data.movies, function (i, movie) {
+            var itemDiv = $('<div>').addClass('item carousel-item')
+
+            if (i == 0) itemDiv.addClass('active')
+
+            var src = WEBDIR + 'plex/GetThumb?h=240&w=430&thumb='+encodeURIComponent(movie.fanart)
+            itemDiv.attr('style', 'background-image: url("' + src + '")')
+
+            itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
+                location.href = WEBDIR + 'plex/#movies'
+            }).hover(function() {
+                var text = $(this).children('p').stop().slideToggle()
+            }).append(
+                $('<h4>').html(movie.title + ' (' + movie.year + ')'),
+                $('<p>').html(
+                    '<b>Runtime</b>: ' + parseSec(movie.runtime) + '<br />' +
+                    '<b>Genre</b>: ' + movie.genre.join(', ') + '<br />' +
+                    movie.plot
+                ).hide()
+            ))
+            $('#movie-carousel-plex .carousel-inner').append(itemDiv)
+        })
+        $('#movie-carousel-plex').show()
+    })
+}
+function loadRecentTVshowsPlex () {
+    if (!$('#tvshow-carousel-plex').length) return
+    $.getJSON(WEBDIR + 'plex/GetRecentShows', function (data) {
+        if (data == null) return
+        $.each(data.episodes, function (i, episode) {
+            var itemDiv = $('<div>').addClass('item carousel-item')
+
+            if (i == 0) itemDiv.addClass('active')
+
+            var src = WEBDIR + "plex/GetThumb?h=240&w=430&thumb="+encodeURIComponent(episode.fanart)
+            itemDiv.attr('style', 'background-image: url("' + src + '")')
+
+            itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
+                location.href = 'plex/#shows'
+            }).hover(function() {
+                var text = $(this).children('p').stop().slideToggle()
+            }).append(
+                $('<h4>').html(episode.showtitle + ': ' + episode.label),
+                $('<p>').html(
+                    '<b>Runtime</b>: ' + parseSec(episode.runtime) + '<br />' + episode.plot
+                ).hide()
+            ))
+            $('#tvshow-carousel-plex .carousel-inner').append(itemDiv)
+        })
+        $('#tvshow-carousel-plex').show()
+    })
+}
+function loadRecentAlbumsPlex () {
+    if (!$('#albums-content-plex').length) return
+    $.getJSON(WEBDIR + 'plex/GetRecentAlbums', function (data) {
+        if (data == null) return
+        $.each(data.albums, function (i, album) {
+            var imageSrc = WEBDIR + 'js/libs/holder.js/45x45/text:No cover'
+            if (album.thumbnail != '') {
+                imageSrc = WEBDIR + 'plex/GetThumb?h=45&w=45&thumb='+encodeURIComponent(album.thumbnail)
+            }
+
+            var label = album.title
+            if (album.year != '0') label += ' (' + album.year + ')'
+            console.log(album.artist)
+
+            $('#albums-content-plex').append(
+                $('<li>').addClass('media').append(
+                    $('<img>').addClass('media-object pull-left img-rounded').attr('src', imageSrc),
+                    $('<div>').addClass('media-body').append(
+                        $('<h5>').addClass('media-heading').html(label),
+                        $('<p>').text(album.artist)
+                    )
+                ).click(function(e) {
+                    location.href = 'plex/#albums'
+                })
+            )
+        })
+        Holder.run()
+        $('#albums-content-plex').parent().show()
     })
 }
 function loadDownloadHistory() {

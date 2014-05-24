@@ -1,3 +1,6 @@
+// Globally define download speed in bytes per second
+var downloadSpeed = 0;
+
 $(document).ready(function () {
     $(window).trigger('hashchange')
     if ($('.nav-tabs li.active a').attr('href') == "#warnings")
@@ -10,6 +13,12 @@ $(document).ready(function () {
         else if (e.target.text == 'History')
             loadHistory();
     });
+
+    getStatus(1);
+    setInterval(function() {
+        getStatus(0);
+    }, 5000);
+
     loadQueue(1);
     setInterval(function() {
         loadQueue(0);
@@ -57,15 +66,35 @@ function loadHistory() {
     });
 }
 function prettySize(bytes) {
+    if (!bytes) {
+        return '0 kb';
+    }
     var units = ['bytes', 'kb', 'MB', 'GB', 'TB', 'PB'];
     var e = Math.floor( Math.log( bytes ) / Math.log( 1024 ) );
     var size = ( bytes / Math.pow( 1024, Math.floor( e ) ) ).toFixed( 2 );
     var unit = units[ e ];
     return size + ' ' + unit;
 }
+
+function getStatus(initial) {
+     $.ajax({
+        url: WEBDIR + 'nzbget/status',
+        type: 'get',
+        dataType: 'json',
+        success: function(response){
+            data = response.result;
+
+            // write download speed to global var
+            downloadSpeed = data.DownloadRate;
+
+            $('#queue_speed').text(prettySize(data.DownloadRate) + '/s')
+        }
+    });
+}
+
 function loadQueue(once) {
     $.ajax({
-        url: WEBDIR + 'nzbget/GetStatus',
+        url: WEBDIR + 'nzbget/queue',
         type: 'get',
         dataType: 'json',
         success: function (object) {
@@ -78,9 +107,7 @@ function loadQueue(once) {
                 row.append($('<td>').html('Queue is empty').attr('colspan', 5));
                 $('#active_table_body').append(row);
             }
-
             $.each(data, function (i, job) {
-
                 /*
                  * Concat filesizes.
                  * The file sizes consist of two 32bit ints that makeup a 64bit int.
@@ -90,6 +117,7 @@ function loadQueue(once) {
                 totalSize = "" + job.FileSizeHi + job.FileSizeLo;
                 remainingSize = "" + job.RemainingSizeHi + job.RemainingSizeLo;
                 pausedSize = "" + job.PausedSizeHi + job.PausedSizeLo;
+                queuedSize = "" + remainingSize - pausedSize;
 
                 // determine status
                 status = 'Queued';
@@ -99,7 +127,7 @@ function loadQueue(once) {
                     status = 'Paused';
                 }
 
-                var percentage = (100 * (totalSize - remainingSize)) / totalSize;
+                var percentage = (100 * (totalSize - queuedSize)) / totalSize;
                 var progressBar = $('<div>');
                 progressBar.addClass('bar');
                 progressBar.css('width', percentage + '%');
@@ -125,10 +153,17 @@ function loadQueue(once) {
                 row.append($('<td>').html(job.NZBName + categoryLabel));
 
                 row.append($('<td>').html(progress));
-                var min = job.MaxPostTime - job.MinPostTime;
-                var hours = Math.floor(min / 60);
-                var eta = hours > 0 ? hours + 'h ' + min + 'm' : min + 'm';
-                row.append($('<td>').html(eta + ' / ' + job.RemainingSizeMB + ' MB').addClass('span3'));
+
+                if (status == 'Downloading' && downloadSpeed) {
+                    var min = Math.round((remainingSize / downloadSpeed) / 60);
+                    var hours = Math.floor(min / 60);
+                    min = min - (hours * 60);
+                    var eta = hours > 0 ? hours + 'h ' + min + 'm' : min + 'm';
+                    eta += ' / ';
+                } else {
+                    var eta = '';
+                }
+                row.append($('<td>').html(eta + prettySize(queuedSize)).addClass('span3'));
 
                 $('#active_table_body').append(row);
             });

@@ -31,6 +31,34 @@ settings = self.attr.settings
             %endif
         </div>
         <div class="row-fluid">
+            %if settings.get('dash_rec_movies_plex', 0):
+            <div class="span4">
+                <h3><a href="plex/#movies">Latest Movies</a></h3>
+                <div id="movie-carousel-plex" class="carousel slide hide">
+                    <div class="carousel-inner"></div>
+                    <a class="carousel-control left" href="#movie-carousel-plex" data-slide="prev">&lsaquo;</a>
+                    <a class="carousel-control right" href="#movie-carousel-plex" data-slide="next">&rsaquo;</a>
+                </div>
+            </div>
+            %endif
+            %if settings.get('dash_rec_tv_plex', 0):
+            <div class="span4">
+                <h3><a href="plex/#shows">Latest TV Shows</a></h3>
+                <div id="tvshow-carousel-plex" class="carousel slide hide">
+                    <div class="carousel-inner"></div>
+                    <a class="carousel-control left" href="#tvshow-carousel-plex" data-slide="prev">&lsaquo;</a>
+                    <a class="carousel-control right" href="#tvshow-carousel-plex" data-slide="next">&rsaquo;</a>
+                </div>
+            </div>
+            %endif
+            %if settings.get('dash_rec_music_plex', 0):
+            <div class="span4">
+                <h3><a href="plex/#music">Latest Music</a></h3>
+                <ul id="albums-content-plex" class="media-list"></ul>
+            </div>
+            %endif
+        </div>
+        <div class="row-fluid">
             %if settings.get('dash_sabnzbd', 0):
             <div class="span4">
                 <h3><a href="sabnzbd/#history">Latest Downloads</a></h3>
