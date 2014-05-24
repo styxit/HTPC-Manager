@@ -102,7 +102,7 @@ class Xbmc(object):
             if xbmc_server_username and xbmc_server_password:
                 url = xbmc_server_username + ':' + xbmc_server_password + '@' + url
             xbmc = Server('http://' + url + '/jsonrpc')
-            self.logger.debug("Trying to contact xbmc via %s", url)
+            self.logger.debug("Trying to contact xbmc via %s" % url)
             return xbmc.XBMC.GetInfoLabels(labels=["Network.MacAddress"])
         except Exception, e:
             self.logger.exception(e)
@@ -471,7 +471,16 @@ class Xbmc(object):
             elif action == 'party':
                 return xbmc.Player.Open(item={'partymode': 'audio'})
             elif action == 'getsub':
-                return xbmc.Addons.ExecuteAddon(addonid='script.xbmc.subtitles')
+                try:
+                    #Frodo
+                    return xbmc.Addons.ExecuteAddon(addonid='script.xbmc.subtitles')
+                except:
+                    pass
+                try:
+                    #Gotham
+                    return xbmc.GUI.ActivateWindow(window='subtitlesearch')
+                except:
+                    pass
             elif action == 'volume':
                 return xbmc.Application.SetVolume(volume=int(value))
             else:
