@@ -66,9 +66,15 @@ class NZBGet:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetStatus(self):
+    def queue(self):
         self.logger.debug("Fetching queue")
         return self.fetch('listgroups')
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def status(self):
+        self.logger.debug("Fetching nzbget status")
+        return self.fetch('status')
 
     def fetch(self, path):
         try:
