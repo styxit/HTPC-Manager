@@ -585,6 +585,7 @@ function loadNowPlaying() {
                 $.each(data.playing_items, function (i, item) {
                 var playingTitle = '';
                 var playingSubtitle = '';
+                var username = $('<span>').addClass('pull-right muted nowplayinguser').text(item.user);
                 var nowPlayingThumb = encodeURIComponent(item.thumbnail);
                 var thumbnail = $('<img>').addClass("img-polaroid img-rounded").attr('alt', item.label);
                 if (nowPlayingThumb == '') {
@@ -622,6 +623,7 @@ function loadNowPlaying() {
 
                 var thumb = $('<div>').addClass("span2 hidden-phone thumb").append(thumbnail);
                 var info = $('<div>').addClass("span9");
+                info.append(username);
                 info.append('<h2><span id="player-item-title">' + playingTitle +'</span>&nbsp;<small id="player-item-subtitle" class="muted">' + playingSubtitle + '</small></h2>');
                 info.append('<h2><small id="player-item-time">' + parseSec(item.viewOffset/1000) + ' / ' + parseSec(item.duration/1000) + '</small></h2>');
                 info.append($('<div id="player-progressbar"/>').addClass("progress").append($('<div>').addClass("bar active").css('width', (item.viewOffset / item.duration)*100 + '%')));
