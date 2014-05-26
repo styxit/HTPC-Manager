@@ -160,3 +160,13 @@ function checkUpdate() {
         setTimeout(checkUpdate, 1000)
     })
 }
+
+// Fix for dropdown menu on small devices. Credits https://github.com/twbs/bootstrap/issues/4550#issuecomment-21361314
+$('.dropdown-toggle').click(function(e) {
+  e.preventDefault();
+  setTimeout($.proxy(function() {
+    if ('ontouchstart' in document.documentElement) {
+      $(this).siblings('.dropdown-backdrop').off().remove();
+    }
+  }, this), 0);
+});
