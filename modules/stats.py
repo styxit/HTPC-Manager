@@ -1,4 +1,5 @@
-# coding=utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import time
 import json
@@ -21,7 +22,7 @@ try:
     importPsutil = True
 
 except ImportError:
-    logger.error("Could't import psutil. See http://psutil.googlecode.com/hg/INSTALL")
+    logger.error("Could't import psutil. See https://raw.githubusercontent.com/giampaolo/psutil/master/INSTALL.rst")
     importPsutil = False
 
 class Stats:
