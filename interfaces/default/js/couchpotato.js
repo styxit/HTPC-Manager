@@ -20,28 +20,28 @@ $(document).ready(function() {
 function getMovies(strStatus, pHTMLElement) {
 	pHTMLElement.empty();
     $(".spinner").show();
-	
+
     $.getJSON(WEBDIR + "couchpotato/GetMovieList/" + strStatus, function (pResult) {
          $(".spinner").hide();
-		
+
         if (pResult == null || pResult.total == 0) {
             pHTMLElement.append($("<li>").html("No " + strStatus + " movies found"));
             return;
         }
-		
+
         $.each(pResult.movies, function(nIndex, pMovie) {
             var strHTML = $("<a>").attr("href", "#").click(function(pEvent) {
                 pEvent.preventDefault();
                 showMovie(pMovie);
             });
-			
-            strHTML.append($("<img>").attr("src", WEBDIR + "couchpotato/GetImage?w=100&h=150&url=" + pMovie.library.info.images.poster[0]).attr("width", "100").attr("height", "150").addClass("thumbnail"));
-			
+
+            strHTML.append($("<img>").attr("src", WEBDIR + "couchpotato/GetImage?w=100&h=150&url=" + pMovie.info.images.poster[0]).attr("width", "100").attr("height", "150").addClass("thumbnail"));
+
             if (pMovie.releases.length > 0) {
                 strHTML.append($("<i>").attr("title", "Download").addClass("icon-white icon-download status"));
             }
-			
-            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(pMovie.library.info.original_title, 12)));
+
+            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(pMovie.info.original_title, 12)));
             pHTMLElement.append($("<li>").attr("id", pMovie.id).append(strHTML));
         })
     })
@@ -142,14 +142,14 @@ function showMovie(movie) {
     if (movie.releases && movie.releases.length > 0) {
         var strTable = $("<table>").addClass("table table-striped table-hover").append(
 			$("<tr>").append("<th>Action</th>").append("<th>Name</th>").append("<th>Score</th>").append("<th>Size</th>"));
-		
+
 		// Grab actual releases
 		$.getJSON(WEBDIR + "couchpotato/GetReleases/" + movie.library_id, function (pResult) {
 			$.each(pResult.releases, function(nIndex, pRelease) {
 				if (pRelease.info == undefined || pRelease.info.id === undefined) {
 					return;
 				}
-			
+
 				strTable.append(
 					$("<tr>").append(
 						$("<td>").append(
@@ -180,7 +180,7 @@ function showMovie(movie) {
 				);
 			});
 		});
-		
+
         $.extend(modalButtons,{
             'Releases' : function() {
                 $('.modal-body').html(strTable)
