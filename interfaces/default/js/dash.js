@@ -229,8 +229,8 @@ function loadWantedMovies() {
         $.each(result.movies, function(i, item) {
             $('#wantedmovies_table_body').append(
                 $('<tr>').append(
-                    $('<td>').html(item.library.info.original_title),
-                    $('<td>').addClass('alignright').html(item.library.year)
+                    $('<td>').html(item.info.original_title),
+                    $('<td>').addClass('alignright').html(item.info.year)
                 )
             )
         })
