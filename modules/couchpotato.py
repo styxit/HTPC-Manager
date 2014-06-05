@@ -4,6 +4,7 @@ from htpc.proxy import get_image
 from json import loads
 from urllib2 import urlopen
 import logging
+import hashlib
 
 
 class Couchpotato:
@@ -12,14 +13,16 @@ class Couchpotato:
         htpc.MODULES.append({
             'name': 'CouchPotato',
             'id': 'couchpotato',
-            'test': htpc.WEBDIR + 'couchpotato/ping',
+            'test': htpc.WEBDIR + 'couchpotato/getapikey',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'couchpotato_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'couchpotato_name'},
+                {'type': 'text', 'label': 'Username', 'name': 'couchpotato_username'},
+                {'type': 'text', 'label': 'Password', 'name': 'couchpotato_password'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'couchpotato_host'},
                 {'type': 'text', 'label': 'Port', 'placeholder':'5050', 'name': 'couchpotato_port'},
                 {'type': 'text', 'label': 'Basepath', 'placeholder':'/couchpotato', 'name': 'couchpotato_basepath'},
-                {'type': 'text', 'label': 'API key', 'name': 'couchpotato_apikey'},
+                {'type': 'text', 'label': 'API key', 'desc': 'Press test get apikey', 'name': 'couchpotato_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'couchpotato_ssl'}
         ]})
 
@@ -54,6 +57,28 @@ class Couchpotato:
             self.logger.error("Unable to connect to couchpotato")
             self.logger.debug("connection-URL: " + url)
             return
+    
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def getapikey(self, couchpotato_username, couchpotato_password, couchpotato_host, couchpotato_port, couchpotato_apikey, couchpotato_basepath, couchpotato_ssl=False, **kwargs):
+        self.logger.debug("Testing connectivity to couchpotato")
+        if couchpotato_password and couchpotato_username != '':
+            couchpotato_password = hashlib.md5(couchpotato_password).hexdigest()
+            couchpotato_username = hashlib.md5(couchpotato_username).hexdigest()
+            
+        getkey = 'getkey/?p=%s&u=%s' % (couchpotato_password, couchpotato_username)
+        
+        if not(couchpotato_basepath.endswith('/')):
+            couchpotato_basepath += "/"
+    
+        ssl = 's' if couchpotato_ssl else ''
+        url = 'http' + ssl + '://' + couchpotato_host + ':' + couchpotato_port + couchpotato_basepath + getkey
+        try:
+            return loads(urlopen(url, timeout=2).read())
+        except:
+            self.logger.error("Unable to connect to couchpotato")
+            self.logger.debug("connection-URL: " + url)
+            return loads(urlopen(url, timeout=2).read())
 
     @cherrypy.expose()
     def GetImage(self, url, h=None, w=None, o=100):
