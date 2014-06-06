@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import cherrypy
 import htpc
 from htpc.proxy import get_image
@@ -82,12 +85,19 @@ class Couchpotato:
 
     @cherrypy.expose()
     def GetImage(self, url, h=None, w=None, o=100):
-        return get_image(url, h, w, o)
+        try:
+            return get_image(url, h, w, o)
+        except:
+            pass
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetMovieList(self, status='', limit=''):
+        if status == 'done' and not limit:
+            status += '/&release_status=done&status_or=1'
+        print status
         self.logger.debug("Fetching Movies")
+        #print self.fetch('movie.list/?status=' + status + '&limit_offset=' + limit)
         return self.fetch('movie.list/?status=' + status + '&limit_offset=' + limit)
 
     @cherrypy.expose()
@@ -125,6 +135,8 @@ class Couchpotato:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def DeleteMovie(self, id=''):
+        if htpc.DEBUG:
+            print self.fetch('movie.delete/?id=' + id)
         self.logger.debug("Deleting movie")
         return self.fetch('movie.delete/?id=' + id)
 
@@ -132,12 +144,16 @@ class Couchpotato:
     @cherrypy.tools.json_out()
     def GetReleases(self, id=''):
         self.logger.debug("Downloading movie")
-        return self.fetch('release.for_movie/?id=' + id)		
+        if htpc.DEBUG:
+            print self.fetch('release.media.get/?id=' + id)
+        return self.fetch('release.media.get/?id=' + id)		
 		
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def DownloadRelease(self, id=''):
         self.logger.debug("Downloading movie")
+        if htpc.DEBUG:
+            print self.fetch('release.manual_download/?id=' + id)
         return self.fetch('release.manual_download/?id=' + id)
 
     @cherrypy.expose()
@@ -166,7 +182,12 @@ class Couchpotato:
             url = 'http' + ssl + '://' + host + ':' + port + basepath + 'api/' + apikey + '/' + path
 
             self.logger.debug("Fetching information from: " + url)
-            return loads(urlopen(url, timeout=10).read())
+            result = loads(urlopen(url, timeout=15).read())
+            if htpc.DEBUG:
+                #print result
+                return result
+
+            return loads(urlopen(url, timeout=15).read())
         except Exception, e:
             self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to fetch information")
