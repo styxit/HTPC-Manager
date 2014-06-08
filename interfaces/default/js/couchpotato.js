@@ -245,17 +245,22 @@ function showMovie(movie) {
         })
     }
 
-    //Loop all with movies with releases. Dont add button if its done (#wanted tab) 
-    $.each(movie.releases, function (nIndex, rr) {
-        if (movie.releases && movie.releases.length > 0 && rr.status !== 'done') {
-            $.extend(modalButtons, {
-                'Releases': function () {
-                    $('.modal-body').html(strTable);
-                }
-            });
+    
+    //Make sure that this isnt a search call...
+    if (typeof movie.plot === 'undefined') {
+        //Loop all with movies with releases. Dont add button if its done (#wanted tab)
+        if (movie.releases && movie.releases.length > 0) {
+            $.each(movie.releases, function (nIndex, rr) {
+                if (rr.status !== 'done') {
+                    $.extend(modalButtons, {
+                        'Releases': function () {
+                            $('.modal-body').html(strTable);
+                            }
+                        });
+                    }
+                });
         }
-
-    });
+    }
     
 
     modalInfo.append(titles, profiles);
