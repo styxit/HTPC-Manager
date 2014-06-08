@@ -135,8 +135,6 @@ class Couchpotato:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def DeleteMovie(self, id=''):
-        if htpc.DEBUG:
-            print self.fetch('movie.delete/?id=' + id)
         self.logger.debug("Deleting movie")
         return self.fetch('movie.delete/?id=' + id)
 
@@ -144,16 +142,12 @@ class Couchpotato:
     @cherrypy.tools.json_out()
     def GetReleases(self, id=''):
         self.logger.debug("Downloading movie")
-        if htpc.DEBUG:
-            print self.fetch('release.media.get/?id=' + id)
-        return self.fetch('release.media.get/?id=' + id)		
+        return self.fetch('media.get/?id=' + id)		
 		
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def DownloadRelease(self, id=''):
         self.logger.debug("Downloading movie")
-        if htpc.DEBUG:
-            print self.fetch('release.manual_download/?id=' + id)
         return self.fetch('release.manual_download/?id=' + id)
 
     @cherrypy.expose()
@@ -183,10 +177,8 @@ class Couchpotato:
 
             self.logger.debug("Fetching information from: " + url)
             result = loads(urlopen(url, timeout=15).read())
-            if htpc.DEBUG:
-                #print result
-                return result
-
+    
+    
             return loads(urlopen(url, timeout=15).read())
         except Exception, e:
             self.logger.debug("Exception: " + str(e))
