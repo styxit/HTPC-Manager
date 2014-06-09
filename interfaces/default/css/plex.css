@@ -3,6 +3,7 @@ a:Hover {
 }
 .thumbnails li {
     position: relative;
+	float: left !important;
 }
 #movie-grid img.thumbnail,
 #show-grid img.thumbnail {
@@ -114,5 +115,36 @@ h6.title {
 .modal .modal-youtube {
     border: 0;
     height: 375px;
-    width: 670px;
+	width: 100%;
+	overflow: hidden;
+}
+
+@media (max-width: 767px) {
+	.thumbnails>li{margin-left:4px}
+	}
+	.modal {
+		width: initial;
+	}
+
+@media (max-width: 320px) {
+	.modal .movie-poster {
+		height: 207px !important;
+		width: 144px !important;
+	}
+	.modal-body {
+		max-height: 280px;
+	}
+	.modal .modal-youtube {
+		max-height: 200px;
+	}
+	.thumbnails>li {
+		padding: 0px;
+		margin-left: 12px;
+	}
+	.thumbnail {
+		padding: 6px;
+	}
+	.modal .modal-movieinfo {
+		margin-left: 0px;
+	}
 }
