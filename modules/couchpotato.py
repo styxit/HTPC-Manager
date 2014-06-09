@@ -5,6 +5,7 @@ import cherrypy
 import htpc
 from htpc.proxy import get_image
 from json import loads
+import json
 from urllib2 import urlopen
 import logging
 
@@ -60,19 +61,17 @@ class Couchpotato:
 
     @cherrypy.expose()
     def GetImage(self, url, h=None, w=None, o=100):
-        try:
-            return get_image(url, h, w, o)
-        except:
-            pass
+        return get_image(url, h, w, o)
+        
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetMovieList(self, status='', limit=''):
-        if status == 'done' and not limit:
-            status += '/&release_status=done&status_or=1'
-        print status
+        if status == 'done':
+            new_status += '&type=movie&release_status=done&status_or=1'
+            return self.fetch('movie.list/?status=' + new_status)
+
         self.logger.debug("Fetching Movies")
-        #print self.fetch('movie.list/?status=' + status + '&limit_offset=' + limit)
         return self.fetch('movie.list/?status=' + status + '&limit_offset=' + limit)
 
     @cherrypy.expose()
@@ -149,12 +148,10 @@ class Couchpotato:
                 basepath += "/"
 
             url = 'http' + ssl + '://' + host + ':' + port + basepath + 'api/' + apikey + '/' + path
-
             self.logger.debug("Fetching information from: " + url)
-            result = loads(urlopen(url, timeout=15).read())
-    
-    
-            return loads(urlopen(url, timeout=15).read())
+
+            return json.JSONDecoder('UTF-8').decode(urlopen(url, timeout=30).read())
+
         except Exception, e:
             self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to fetch information")

@@ -12,7 +12,7 @@ $(document).ready(function() {
     $.get(WEBDIR + 'couchpotato/GetProfiles', function(data) {
         if (data === null) return
         $.each(data.list, function(i, item) {
-            if (!item.hide) profiles.append($('<option>').val(item.id).text(item.label))
+            if (!item.hide) profiles.append($('<option>').val(item._id).text(item.label))
         })
     })
 })
@@ -23,7 +23,8 @@ function getMovies(strStatus, pHTMLElement) {
     $(".spinner").show();
 
     $.getJSON(WEBDIR + "couchpotato/GetMovieList/" + strStatus, function (pResult) {
-        
+        $(".spinner").hide();
+
         if (pResult === null || pResult.total === 0) {
             pHTMLElement.append($("<li>").html("No " + strStatus + " movies found"));
             return;
@@ -45,7 +46,6 @@ function getMovies(strStatus, pHTMLElement) {
 
             strHTML.append($("<h6>").addClass("movie-title").html(shortenText(pMovie.info.original_title, 12)));
             pHTMLElement.append($("<li>").attr("id", pMovie.id).append(strHTML));
-            $(".spinner").hide();
         });
     });
     
@@ -66,6 +66,7 @@ function addMovie(movieid, profile, title) {
     $.getJSON(WEBDIR + 'couchpotato/AddMovie', data, function (result) {
         if (result.success) {
             notify('CouchPotato', 'Added ' + title, 'info');
+            $('a[href=#wanted]').tab('show')
         } else {
             notify('CouchPotato', 'Failed to add ' + title, 'info')
         }
@@ -79,7 +80,6 @@ function editMovie(id, profile, title) {
     }, function (result) {
         if (result.success) {
             notify('CouchPotato', 'Profile changed', 'info')
-            getMovieLists();
         } else {
             notify('CouchPotato', 'An error occured.', 'error')
         }
@@ -89,8 +89,7 @@ function deleteMovie(id, name) {
     $.getJSON(WEBDIR + 'couchpotato/DeleteMovie', {id: id}, function (result) {
         if (result.success) {
             $('#' + id).fadeOut()
-            getMovieList();
-            $('a[href=#wanted]').tab('show') // NEW
+            getMovieLists();
         } else { 
             notify('CouchPotato', 'An error occured.', 'error')
         }
@@ -199,10 +198,19 @@ function showMovie(movie) {
     }
 
     var titles = $('<select>').attr('id', 'titles');
+    // http://localhost:8988/couchpotato/api/c7cd7b3adb43429598ca123b186bfaf6/media.list/?t=D0ua7wFy&type=movie&status=done&limit_offset=50%2C0&release_status=done&status_or=1
+    if (typeof movie.plot === 'undefined') {
+        $.each(info.titles, function(i, item) {
+            titles.append($('<option>').text(item).val(item).prop('selected', item.default));
+        })
+    } else {
+        $.each(info.titles, function (i, item) {
+            titles.append($('<option>').text(item).val(item));
+        });
 
-    $.each(info.titles, function (i, item) {
-        titles.append($('<option>').text(item).val(item));
-    });
+    }
+
+    
 
     profiles.unbind();
     var title = info.original_title + ' (' + year + ')';
@@ -248,7 +256,7 @@ function showMovie(movie) {
     
     //Make sure that this isnt a search call...
     if (typeof movie.plot === 'undefined') {
-        //Loop all with movies with releases. Dont add button if its done (#wanted tab)
+        //Loop all with movies with releases. Dont add button if its done.
         if (movie.releases && movie.releases.length > 0) {
             $.each(movie.releases, function (nIndex, rr) {
                 if (rr.status !== 'done') {
@@ -267,8 +275,6 @@ function showMovie(movie) {
     if (movie.releases && movie.releases.length > 0 && movie.releases.status !== 'done') {
         var strTable = $("<table>").addClass("table table-striped table-hover").append(
         $("<tr>").append("<th>Action</th>").append("<th>Name</th>").append("<th>Score</th>").append("<th>Size</th>"));
-
-        $.getJSON(WEBDIR + "couchpotato/GetReleases/" + movie._id, function (pResult) {
 
             $.each(movie.releases, function (nIndex, pRelease) {
                 if (pRelease.info === undefined || pRelease.info.id === undefined) {
@@ -299,7 +305,6 @@ function showMovie(movie) {
                 $("<td>").html(bytesToSize(pRelease.info.size * 1000000))).toggleClass("ignore", pRelease.status_id == 3));
 
             });
-        });
     }
     
 
