@@ -198,7 +198,6 @@ function showMovie(movie) {
     }
 
     var titles = $('<select>').attr('id', 'titles');
-    // http://localhost:8988/couchpotato/api/c7cd7b3adb43429598ca123b186bfaf6/media.list/?t=D0ua7wFy&type=movie&status=done&limit_offset=50%2C0&release_status=done&status_or=1
     if (typeof movie.plot === 'undefined') {
         $.each(info.titles, function(i, item) {
             titles.append($('<option>').text(item).val(item).prop('selected', item.default));
