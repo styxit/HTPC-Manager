@@ -4,7 +4,6 @@
 import cherrypy
 import htpc
 from htpc.proxy import get_image
-from json import loads
 import json
 from urllib2 import urlopen
 import logging
@@ -56,7 +55,7 @@ class Couchpotato:
         ssl = 's' if couchpotato_ssl else ''
         url = 'http' + ssl + '://' + couchpotato_host + ':' + couchpotato_port + couchpotato_basepath + 'api/' + couchpotato_apikey
         try:
-            return loads(urlopen(url + '/app.available/', timeout=10).read())
+            return json.loads(urlopen(url + '/app.available/', timeout=10).read())
         except:
             self.logger.error("Unable to connect to couchpotato")
             self.logger.debug("connection-URL: " + url)
@@ -93,8 +92,8 @@ class Couchpotato:
     @cherrypy.tools.json_out()
     def GetMovieList(self, status='', limit=''):
         if status == 'done':
-            new_status += '&type=movie&release_status=done&status_or=1'
-            return self.fetch('movie.list/?status=' + new_status)
+            status += '&type=movie&release_status=done&status_or=1'
+            return self.fetch('movie.list/?status=' + status)
 
         self.logger.debug("Fetching Movies")
         return self.fetch('movie.list/?status=' + status + '&limit_offset=' + limit)
