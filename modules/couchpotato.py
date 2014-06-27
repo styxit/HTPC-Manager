@@ -92,6 +92,12 @@ class Couchpotato:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    def GetSuggestions(self, limit='8'):
+        self.logger.debug("Fetching Suggested Movies")
+        return self.fetch('suggestion.view/?limit=' + limit)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def GetNotificationList(self, limit='20'):
         self.logger.debug("Fetching Notification")
         data = self.fetch('notification.list/?limit_offset=' + limit)
@@ -109,6 +115,18 @@ class Couchpotato:
     def AddMovie(self, movieid, profile, title):
         self.logger.debug("Adding movie")
         return self.fetch('movie.add/?profile_id=' + profile + '&identifier=' + movieid + '&title=' + title)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def IgnoreSuggestions(self, movieid):
+        self.logger.debug("Ignoring Suggested movie")
+        return self.fetch('suggestion.ignore/?imdb=' + movieid)
+ 
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def SeenSuggestions(self, movieid, seen='true'):
+        self.logger.debug("Marking movie as seen and liked")
+        return self.fetch('suggestion.ignore/?imdb=' + movieid + '&mark_seen=' + seen)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
