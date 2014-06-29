@@ -1,7 +1,10 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import cherrypy
 import htpc
 from htpc.proxy import get_image
-from json import loads
+import json
 from urllib2 import urlopen
 import logging
 import hashlib
@@ -52,7 +55,7 @@ class Couchpotato:
         ssl = 's' if couchpotato_ssl else ''
         url = 'http' + ssl + '://' + couchpotato_host + ':' + couchpotato_port + couchpotato_basepath + 'api/' + couchpotato_apikey
         try:
-            return loads(urlopen(url + '/app.available/', timeout=10).read())
+            return json.loads(urlopen(url + '/app.available/', timeout=10).read())
         except:
             self.logger.error("Unable to connect to couchpotato")
             self.logger.debug("connection-URL: " + url)
@@ -83,10 +86,15 @@ class Couchpotato:
     @cherrypy.expose()
     def GetImage(self, url, h=None, w=None, o=100):
         return get_image(url, h, w, o)
+        
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetMovieList(self, status='', limit=''):
+        if status == 'done':
+            status += '&type=movie&release_status=done&status_or=1'
+            return self.fetch('movie.list/?status=' + status)
+
         self.logger.debug("Fetching Movies")
         return self.fetch('movie.list/?status=' + status + '&limit_offset=' + limit)
 
@@ -132,7 +140,7 @@ class Couchpotato:
     @cherrypy.tools.json_out()
     def GetReleases(self, id=''):
         self.logger.debug("Downloading movie")
-        return self.fetch('release.for_movie/?id=' + id)		
+        return self.fetch('media.get/?id=' + id)		
 		
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -164,9 +172,10 @@ class Couchpotato:
                 basepath += "/"
 
             url = 'http' + ssl + '://' + host + ':' + port + basepath + 'api/' + apikey + '/' + path
-
             self.logger.debug("Fetching information from: " + url)
-            return loads(urlopen(url, timeout=10).read())
+
+            return json.JSONDecoder('UTF-8').decode(urlopen(url, timeout=30).read())
+
         except Exception, e:
             self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to fetch information")
