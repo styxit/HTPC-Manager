@@ -77,11 +77,11 @@ class Couchpotato:
         ssl = 's' if couchpotato_ssl else ''
         url = 'http' + ssl + '://' + couchpotato_host + ':' + couchpotato_port + couchpotato_basepath + getkey
         try:
-            return loads(urlopen(url, timeout=2).read())
+            return json.loads(urlopen(url, timeout=10).read())
         except:
             self.logger.error("Unable to connect to couchpotato")
             self.logger.debug("connection-URL: " + url)
-            return loads(urlopen(url, timeout=2).read())
+            return json.loads(urlopen(url, timeout=10).read())
 
     @cherrypy.expose()
     def GetImage(self, url, h=None, w=None, o=100):
