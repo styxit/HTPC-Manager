@@ -150,6 +150,11 @@ def main():
     htpc.USERNAME = htpc.settings.get('app_username')
     htpc.PASSWORD = htpc.settings.get('app_password')
 
+     # Resets the htpc manager password and username
+    if args.resetauth:
+        htpc.USERNAME = htpc.settings.set('app_username', '')
+        htpc.PASSWORD = htpc.settings.set('app_password', '')
+
     # Open webbrowser
     if args.openbrowser or htpc.settings.get('openbrowser') and not htpc.DEBUG:
         browser_ssl = 's' if htpc.SSLCERT and htpc.SSLKEY else ''
@@ -160,10 +165,6 @@ def main():
         openbrowser = 'http%s://%s:%s%s' % (browser_ssl, str(browser_host), htpc.PORT, htpc.WEBDIR[:-1])
         webbrowser.open(openbrowser, new=2, autoraise=True)
 
-    # Resets the htpc manager password and username
-    if args.resetauth:
-        htpc.USERNAME = htpc.settings.set('app_username', '')
-        htpc.PASSWORD = htpc.settings.set('app_password', '')
 
     #Select if you want to controll processes and popen from HTPC-Manager
     htpc.SHELL = args.shell
