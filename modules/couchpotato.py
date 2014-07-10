@@ -60,7 +60,7 @@ class Couchpotato:
             self.logger.error("Unable to connect to couchpotato")
             self.logger.debug("connection-URL: " + url)
             return
-    
+
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def getapikey(self, couchpotato_username, couchpotato_password, couchpotato_host, couchpotato_port, couchpotato_apikey, couchpotato_basepath, couchpotato_ssl=False, **kwargs):
@@ -68,25 +68,25 @@ class Couchpotato:
         if couchpotato_password and couchpotato_username != '':
             couchpotato_password = hashlib.md5(couchpotato_password).hexdigest()
             couchpotato_username = hashlib.md5(couchpotato_username).hexdigest()
-            
+
         getkey = 'getkey/?p=%s&u=%s' % (couchpotato_password, couchpotato_username)
-        
+
         if not(couchpotato_basepath.endswith('/')):
             couchpotato_basepath += "/"
-    
+
         ssl = 's' if couchpotato_ssl else ''
         url = 'http' + ssl + '://' + couchpotato_host + ':' + couchpotato_port + couchpotato_basepath + getkey
         try:
-            return loads(urlopen(url, timeout=2).read())
+            return json.loads(urlopen(url, timeout=10).read())
         except:
             self.logger.error("Unable to connect to couchpotato")
             self.logger.debug("connection-URL: " + url)
-            return loads(urlopen(url, timeout=2).read())
+            return json.loads(urlopen(url, timeout=10).read())
 
     @cherrypy.expose()
     def GetImage(self, url, h=None, w=None, o=100):
         return get_image(url, h, w, o)
-        
+
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -140,8 +140,8 @@ class Couchpotato:
     @cherrypy.tools.json_out()
     def GetReleases(self, id=''):
         self.logger.debug("Downloading movie")
-        return self.fetch('media.get/?id=' + id)		
-		
+        return self.fetch('media.get/?id=' + id)
+
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def DownloadRelease(self, id=''):

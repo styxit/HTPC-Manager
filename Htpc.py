@@ -149,14 +149,14 @@ def main():
 
     htpc.USERNAME = htpc.settings.get('app_username')
     htpc.PASSWORD = htpc.settings.get('app_password')
-    
+
     # Open webbrowser
     if args.openbrowser or htpc.settings.get('openbrowser') and not htpc.DEBUG:
         browser_ssl = 's' if htpc.SSLCERT and htpc.SSLKEY else ''
         if htpc.settings.get('app_host') == '0.0.0.0':
             browser_host = 'localhost'
         else:
-            browser_host = htpc.settings.get('app_host', 'localhost') 
+            browser_host = htpc.settings.get('app_host', 'localhost')
         openbrowser = 'http%s://%s:%s%s' % (browser_ssl, str(browser_host), htpc.PORT, htpc.WEBDIR[:-1])
         webbrowser.open(openbrowser, new=2, autoraise=True)
 
