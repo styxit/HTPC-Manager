@@ -7,13 +7,16 @@
 
         <div class="tabbable tabs-left">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#general" data-toggle="tab">General</a></li>
-                % for m in htpc.MODULES:
+                <% l = [] %>
+                <% l.append({'name': 'General'})%>
+                <% l.append({'name': 'Style'})%>
+                <% l.append({'name': 'Dashboard'})%>
+                <% l.append({'name': 'Other Apps'})%>
+                <% navz = htpc.MODULES + l %>
+                % for m in sorted(navz, key=lambda d: d['name']):
                 <li><a href="#${m.get('id')}" data-toggle="tab">${m.get('name')}</a></li>
                 % endfor
-                <li><a href="#dashboard" data-toggle="tab">Dashboard</a></li>
-                <li><a href="#style" data-toggle="tab">Style</a></li>
-                <li><a href="#other" data-toggle="tab">Other apps</a></li>
+                
             </ul>
 
             <div class="tab-content">
