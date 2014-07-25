@@ -93,8 +93,6 @@ function getChannels() {
 			
 			strHTML.append(pHTMLEntry);
 			
-			console.log(pEntry.tags);
-			
 			$.each(pEntry.tags, function(nIndex, nTag) {
 				$("#tag-" + nTag + "-grid").append($("<li>").append(strHTML));
 			});
