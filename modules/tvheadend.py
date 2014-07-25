@@ -35,7 +35,7 @@ class TVHeadend:
 	@cherrypy.expose()
 	@cherrypy.tools.json_out()
 	def GetChannels(self):
-		return self.fetch("api/channel/grid", None)
+		return self.fetch("api/channel/grid", { 'dir': 'ASC', 'sort': 'tags', 'limit': 1000 })
 	
 	@cherrypy.expose()
 	@cherrypy.tools.json_out()
@@ -71,7 +71,7 @@ class TVHeadend:
 		try:
 			pRequest = urllib2.Request("http://%s:%s/%s" % (htpc.settings.get("tvheadend_host", ""), htpc.settings.get("tvheadend_port", ""), strQuery), data = strData, headers = rgpHeaders)
 			strResponse = urllib2.urlopen(pRequest).read()
-		except urllib2.HTTPError, e:
-			print e
+		except:
+			pass
 
 		return json.loads(strResponse)

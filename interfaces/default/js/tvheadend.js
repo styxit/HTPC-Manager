@@ -67,6 +67,8 @@ function getChannelTags() {
 				
 			$(".tab-content").append(strTabPane.append($("<ul>").attr("id", "tag-" + pEntry.identifier + "-grid").attr("class", "thumbnails")));
 		});
+		
+		getChannels();
 	});
 	
 	$(window).trigger("hashchange");
@@ -90,6 +92,8 @@ function getChannels() {
 			});
 			
 			strHTML.append(pHTMLEntry);
+			
+			console.log(pEntry.tags);
 			
 			$.each(pEntry.tags, function(nIndex, nTag) {
 				$("#tag-" + nTag + "-grid").append($("<li>").append(strHTML));
@@ -142,6 +146,5 @@ function getRecordings() {
 
 $(document).ready(function () {
 	getChannelTags();
-	getChannels();
 	getRecordings();
 });
