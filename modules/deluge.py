@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import traceback
 import sys
 import os
@@ -79,7 +82,7 @@ class Deluge:
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def remove(self, torrentId, removeData):
-        removeDataBool = bool(removeData);
+        removeDataBool = bool(int(removeData));
         return self.fetch('core.remove_torrent', [torrentId,removeDataBool])
 
     # Wrapper to access the Deluge Api
