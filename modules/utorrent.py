@@ -1,5 +1,8 @@
-# coding=utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import requests
+from cherrypy.lib.auth2 import require
 
 __author__ = 'quentingerome'
 import logging
@@ -107,10 +110,12 @@ class UTorrent:
 		]})
 
 	@cherrypy.expose()
+	@require()
 	def index(self):
 		return htpc.LOOKUP.get_template('utorrent.html').render(scriptname='utorrent')
 
 	@cherrypy.expose()
+	@require()
 	@cherrypy.tools.json_out()
 	def torrents(self):
 		try:
@@ -121,21 +126,25 @@ class UTorrent:
 		return {'torrents': [TorrentResult(tor) for tor in torrents], 'result': req.status_code}
 
 	@cherrypy.expose()
+	@require()
 	@cherrypy.tools.json_out()
 	def start(self, torrent_id):
 		return self.do_action('start', hash=torrent_id).json()
 
 	@cherrypy.expose()
+	@require()
 	@cherrypy.tools.json_out()
 	def stop(self, torrent_id):
 		return self.do_action('stop', hash=torrent_id).json()
 
 	@cherrypy.expose()
+	@require()
 	@cherrypy.tools.json_out()
 	def remove(self, torrent_id):
 		return self.do_action('remove', hash=torrent_id).json()
 
 	@cherrypy.expose()
+	@require()
 	@cherrypy.tools.json_out()
 	def add_url(self, url):
 		try:
@@ -145,6 +154,7 @@ class UTorrent:
 			logger.exception(e)
 
 	@cherrypy.expose()
+	@require()
 	@cherrypy.tools.json_out()
 	def ping(self, utorrent_host='', utorrent_port='',
 			 utorrent_username='', utorrent_password='', **kwargs):

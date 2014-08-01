@@ -1,4 +1,5 @@
-# coding=utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import htpc
 import cherrypy
@@ -6,6 +7,7 @@ import urllib2
 import urllib
 import json
 import logging
+from cherrypy.lib.auth2 import require
 
 class qbittorrent:
     def __init__(self):
@@ -25,11 +27,13 @@ class qbittorrent:
         ]})
         
     @cherrypy.expose()
+    @require()
     def index(self):
         return htpc.LOOKUP.get_template('qbittorrent.html').render(scriptname='qbittorrent')
     
     #Get url from settings and handles auth
     @cherrypy.expose()
+    @require()
     def qbturl(self):
         host = htpc.settings.get('qbittorrent_host', '')
         port = htpc.settings.get('qbittorrent_port',  '')
@@ -49,6 +53,7 @@ class qbittorrent:
         
     #Fetches torrentlist from the client
     @cherrypy.expose()
+    @require()
     def fetch(self):
         result = None
        
@@ -63,6 +68,7 @@ class qbittorrent:
     
     # Gets total download and upload speed
     @cherrypy.expose()
+    @require()
     def get_speed(self):
         rr = None
         try:
@@ -95,6 +101,7 @@ class qbittorrent:
     
     # Handles pause, resume, delete singel torrents
     @cherrypy.expose
+    @require()
     def command(self, cmd=None, hash=None, name=None):
         try:
             self.logger.debug("%s %s" %(cmd, name))
@@ -119,6 +126,7 @@ class qbittorrent:
     
     # Sets global upload and download speed
     @cherrypy.expose
+    @require()
     def set_speedlimit(self, type=None, speed=None):
         try:
             self.logger.debug("Setting %s to %s"% (type, speed))

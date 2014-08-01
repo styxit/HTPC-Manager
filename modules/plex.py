@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import cherrypy
 import htpc
 import re
@@ -11,6 +14,7 @@ import urllib
 import base64
 import uuid
 import platform
+from cherrypy.lib.auth2 import require
 
 """
 Credits.
@@ -47,6 +51,7 @@ class Plex:
                 {'type':'bool', 'label':'Hide homemovies', 'name':'plex_hide_homemovies'}]})
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def ping(self, plex_host='', plex_port='', **kwargs):
         """ Tests settings, returns server name on success and null on fail """
@@ -62,10 +67,12 @@ class Plex:
             return
 
     @cherrypy.expose()
+    @require()
     def index(self):
         return htpc.LOOKUP.get_template('plex.html').render(scriptname='plex')
 
     @cherrypy.expose()
+    @require()
     def webinterface(self):
         """ Generate page from template """
         plex_host = htpc.settings.get('plex_host', 'localhost')
@@ -76,6 +83,7 @@ class Plex:
         raise cherrypy.HTTPRedirect(url)
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetRecentMovies(self, limit=5):
         """ Get a list of recently added movies """
@@ -131,6 +139,7 @@ class Plex:
 
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetRecentShows(self, limit=5):
         """ Get a list of recently added shows """
@@ -177,6 +186,7 @@ class Plex:
             return
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetRecentAlbums(self, limit=5):
         """ Get a list of recently added albums """
@@ -215,6 +225,7 @@ class Plex:
 
 
     @cherrypy.expose()
+    @require()
     def GetThumb(self, thumb=None, h=None, w=None, o=100):
         """ Parse thumb to get the url and send to htpc.proxy.get_image """
         #url = self.url('/images/DefaultVideo.png')
@@ -233,6 +244,7 @@ class Plex:
         return get_image(url, h, w, o, headers=self.getHeaders())
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetMovies(self, start=0, end=0, hidewatched=0):
         """ Get a list movies """
@@ -306,6 +318,7 @@ class Plex:
             return
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetShows(self, start=0, end=0, hidewatched=0):
         """ Get a list of shows """
@@ -362,6 +375,7 @@ class Plex:
             return
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetArtists(self, start=0, end=0):
         """ Get a list of recently added artists """
@@ -396,6 +410,7 @@ class Plex:
             return
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetAlbums(self, start=0, end=0, artistid=""):
         """ Get a list of Albums """
@@ -433,6 +448,7 @@ class Plex:
             return
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetSongs(self, start=0, end=0, albumid=""):
         """ Get a list of songs """
@@ -494,6 +510,7 @@ class Plex:
             return
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetEpisodes(self, start=0, end=0, tvshowid=None, hidewatched=0):
         """ Get information about a single TV Show """
@@ -552,6 +569,7 @@ class Plex:
 
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def Wake(self):
         """ Send WakeOnLan package """
@@ -593,6 +611,7 @@ class Plex:
         return result
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def myPlexSignin(self, username = '', password = ''):
         try:
@@ -646,6 +665,7 @@ class Plex:
         return headers
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def NowPlaying(self):
         """ Get information about current playing item """
@@ -708,6 +728,7 @@ class Plex:
         return {'playing_items': playing_items}
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def UpdateLibrary(self, section_type=None):
         """ Get information about current playing item """
@@ -729,6 +750,7 @@ class Plex:
             return 'Failed to update library!'
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def ControlPlayer(self, player, action, value=''):
         """ Various commands to control Plex Player """
@@ -756,6 +778,7 @@ class Plex:
             return 'error'
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetPlayers(self, filter=None):
         """ Get list of active Players """
@@ -784,6 +807,7 @@ class Plex:
             return 'error'
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetServers(self, id=None):
         """ Get list of servers """
@@ -863,6 +887,7 @@ class Plex:
             return 'error'
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def PlayItem(self, player, item=None, type=None, offset=0):
         """ Play a file in Plex """

@@ -1,9 +1,13 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import cherrypy
 import htpc
 import urllib2
 import base64
 from json import loads, dumps
 import logging
+from cherrypy.lib.auth2 import require
 
 class Transmission:
     # Transmission Session ID
@@ -25,22 +29,26 @@ class Transmission:
         ]})
 
     @cherrypy.expose()
+    @require()
     def index(self):
         return htpc.LOOKUP.get_template('transmission.html').render(scriptname='transmission')
 
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def queue(self):
         fields = ['id', 'name', 'status', 'comment', 'downloadDir', 'downloadDir', 'percentDone', 'isFinished', 'eta', 'rateDownload', 'rateUpload', 'uploadRatio']
         return self.fetch('torrent-get', {'fields': fields})
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def stats(self):
         return self.fetch('session-stats')
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def start(self, torrentId = False):
 
@@ -54,6 +62,7 @@ class Transmission:
         return self.fetch('torrent-start-now', {'ids': torrentId})
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def stop(self, torrentId = False):
 
@@ -67,11 +76,13 @@ class Transmission:
         return self.fetch('torrent-stop', {'ids': torrentId})
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def Add(self, filename):
         return self.fetch('torrent-add', {'filename': filename})		
 		
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def remove(self, torrentId):
         try:
