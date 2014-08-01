@@ -63,7 +63,7 @@ webdir = htpc.WEBDIR
                     </li>
                     % if htpc.AUTH:
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="${htpc.WEBDIR}logout" class="ajax-confirm" title="Logout of HTPC-Manager"><i class="icon-signout"></i> Logout</a>
+                        <a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC-Manager"><i class="icon-signout"></i> Logout</a>
                     </li>
                     % endif
                     <li class="hidden-desktop visible-phone visible-tablet">
@@ -101,7 +101,7 @@ webdir = htpc.WEBDIR
                             <li><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
                             <li><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a></li>
                             % if htpc.AUTH:
-                            <li><a href="${htpc.WEBDIR}logout" class="ajax-confirm" title="Logout of HTPC-Manager"><i class="icon-signout"></i> Logout</a></li>
+                            <li><a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC-Manager"><i class="icon-signout"></i> Logout</a></li>
                             % endif
                             <li><a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC-Manager"><i class="icon-refresh"></i> Restart</a></li>
                             <li><a href="${htpc.WEBDIR}shutdown" class="confirm" title="Shutdown HTPC-Manager"><i class="icon-off"></i> Shutdown</a></li>
