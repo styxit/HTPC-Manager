@@ -88,6 +88,7 @@ function processes() {
         'url': WEBDIR + 'stats/processes',
             'dataType': 'json' ,
             'success': function (response) {
+            byteSizeOrdering()
             $('#proclist').html("");
             $('#error_message').text("");
 
@@ -104,6 +105,7 @@ function processes() {
                 $('<td>').addClass('processes-percent').text(proc.cpu_percent+ '%'),
                 $('<td>').append('<a href="#" class="btn btn-mini cmd" data-cmd="kill" data-name='+proc.name+' data-pid='+proc.pid+'><i class="icon-remove"></i></a>'));
                 $('#proclist').append(row);
+                $('table').trigger("update");
             });
             $('.spinner').hide();
         }
