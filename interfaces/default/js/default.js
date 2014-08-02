@@ -128,8 +128,9 @@ function notify(title, text, type, time) {
 }
 function showModal(title, content, buttons) {
     $('#modal_dialog .modal-h3').html(title)
-    $('#modal_dialog .modal-body').html(content)
-    var footer = $('#modal_dialog .modal-footer').empty()
+    $('#modal_dialog').attr('tabindex', '-1');
+    $('#modal_dialog .modal-body').html(content);
+    var footer = $('#modal_dialog .modal-footer').empty();
     $.each(buttons, function (name, action) {
         footer.append(
             $('<button>').html(name).addClass('btn btn-primary').click(function() {
@@ -144,7 +145,11 @@ function showModal(title, content, buttons) {
         })
     )
 
-    $('#modal_dialog').modal({show: true, backdrop: true})
+    $('#modal_dialog').modal({
+        show: true,
+        backdrop: true,
+        keyboard: true
+    })
 }
 function hideModal() {
     $('#modal_dialog').modal('hide')
