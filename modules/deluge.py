@@ -92,7 +92,7 @@ class Deluge:
     @require()
     @cherrypy.tools.json_out()
     def remove(self, torrentId, removeData):
-        removeDataBool = bool(removeData);
+        removeDataBool = bool(int(removeData));
         return self.fetch('core.remove_torrent', [torrentId,removeDataBool])
 
     # Wrapper to access the Deluge Api
