@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """ Initiate the HTTP server according to settings """
 import os
 import sys
@@ -54,7 +57,8 @@ def start():
             'tools.staticdir.root': webdir,
             'tools.encode.on': True,
             'tools.encode.encoding': 'utf-8',
-            'tools.gzip.on': True
+            'tools.gzip.on': True,
+            'tools.gzip.mime_types': ['text/html', 'text/plain', 'text/css', 'text/javascript']
         },
         '/js': {
             'tools.caching.on': True,
