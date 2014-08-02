@@ -1,6 +1,6 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
+<div class="container-fluid">
     <div class="content">
       <h1 class="page-header page-title">
           <a href="http://${settings.get('qbittorrent_host')}:${settings.get('qbittorrent_port')}" target="_blank">${settings.get('qbittorrent_name', 'qBittorrent')}</a>

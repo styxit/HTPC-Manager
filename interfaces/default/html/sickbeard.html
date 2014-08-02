@@ -1,6 +1,6 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
+<div class="container-fluid">
     <div class="content maincontent">
         <h1 class="page-header page-title">
             <a href="http://${settings.get('sickbeard_host')}:${settings.get('sickbeard_port') + settings.get('sickbeard_basepath')}" target="_blank" title="Open original Sickbeard interface">${settings.get('sickbeard_name', 'Sickbeard')}</a>

@@ -1,6 +1,6 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
+<div class="container-fluid">
     <div class="content">
       <h1 class="page-header page-title">
           <a href="http://${settings.get('deluge_host')}:${settings.get('deluge_port')}" target="_blank">${settings.get('deluge_name', 'Deluge')}</a>
