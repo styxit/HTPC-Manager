@@ -1053,13 +1053,6 @@ function loadAddons(addon) {
 
     }
 
-    $.extend(buttons, {
-        'Close': function () {
-            hideModal();
-        } 
-
-    });
-
     content.append(img, info);
     showModal(head, content.addClass('modal-body-addon'), buttons);
 
