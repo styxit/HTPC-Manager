@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 Update HTPC-Manager from Github. Either through git command or tarball.
 
@@ -26,9 +29,9 @@ import shutil
 from htpc.root import do_restart
 
 # configure git repo
-gitUser =  'styxit'
+gitUser =  'Hellowlol'
 gitRepo = 'HTPC-Manager'
-gitBranch = 'master'
+gitBranch = 'master2'
 
 class Updater:
     """ Main class """
