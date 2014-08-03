@@ -95,6 +95,7 @@ class Settings:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    @require(member_of("admin"))
     def delete_cache(self):
         try:
             cache_folder = os.path.join(htpc.DATADIR, 'images/')
