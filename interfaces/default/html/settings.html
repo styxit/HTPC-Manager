@@ -30,7 +30,12 @@
                 {'type':'text', 'label':'SSL Key', 'name':'app_ssl_key', 'value':settings.get('app_ssl_key')},
                 {'type':'text', 'label':'Git Path', 'name':'git_path', 'value':settings.get('git_path', 'git')},
                 {'type':'bool', 'label':'Open Browser', 'name':'openbrowser', 'desc':'Automatically open brower on server start', 'value':settings.get('openbrowser')}
+                ], buttons=[
+                        {'name':'Save', 'type':'submit', 'classes':'btn-primary'},
+                        {'name':'Clear', 'type':'reset'},
+                        {'name':'Delete cache folder', 'type':'button', 'classes':'delete_cache'}
             ])}
+
             % for m in htpc.MODULES:
                 % if m.get('test'):
                     ${form.buildForm(action=m.get('action'), id=m.get('id'), classes='form-horizontal tab-pane', legend=m.get('name'),

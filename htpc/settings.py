@@ -10,6 +10,7 @@ import logging
 from cherrypy.lib.auth2 import require, member_of
 from sqlobject import connectionForURI, sqlhub, SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol
+import shutil
 
 
 class Setting(SQLObject):
@@ -91,3 +92,17 @@ class Settings:
     def getUrls(self):
         links = self.get('custom_urls', '{}')
         return loads(links)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def delete_cache(self):
+        try:
+            cache_folder = os.path.join(htpc.DATADIR, 'images/')
+            if os.path.exists(cache_folder):
+                self.logger.info('Cache folder was deleted')
+                shutil.rmtree(cache_folder)
+                return {'success': 'true'}
+            return {'failed': 'cache folder does not exist'}
+        except Exception as e:
+            self.logger.error('Failed to delete cache folder ', e)
+            return {'failed': e}
