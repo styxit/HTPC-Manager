@@ -54,7 +54,7 @@ class Couchpotato:
         ssl = 's' if couchpotato_ssl else ''
         url = 'http' + ssl + '://' + couchpotato_host + ':' + couchpotato_port + couchpotato_basepath + 'api/' + couchpotato_apikey
         try:
-            f = requests.get(url, timeout=10)
+            f = requests.get(url + '/app.available/', timeout=10)
             return f.json()
         except:
             self.logger.error("Unable to connect to couchpotato")
