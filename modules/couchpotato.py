@@ -4,8 +4,7 @@
 import cherrypy
 import htpc
 from htpc.proxy import get_image
-import json
-from urllib2 import urlopen
+import requests
 from cherrypy.lib.auth2 import require
 import logging
 import hashlib
@@ -59,7 +58,8 @@ class Couchpotato:
         ssl = 's' if couchpotato_ssl else ''
         url = 'http' + ssl + '://' + couchpotato_host + ':' + couchpotato_port + couchpotato_basepath + 'api/' + couchpotato_apikey
         try:
-            return json.loads(urlopen(url + '/app.available/', timeout=10).read())
+            f = requests.get(url + '/app.available/', timeout=10)
+            return f.json()
         except:
             self.logger.error("Unable to connect to couchpotato")
             self.logger.debug("connection-URL: " + url)
@@ -82,11 +82,12 @@ class Couchpotato:
         ssl = 's' if couchpotato_ssl else ''
         url = 'http' + ssl + '://' + couchpotato_host + ':' + couchpotato_port + couchpotato_basepath + getkey
         try:
-            return json.loads(urlopen(url, timeout=10).read())
+            f = requests.get(url, timeout=10)
+            return f.json()
         except:
             self.logger.error("Unable to connect to couchpotato")
             self.logger.debug("connection-URL: " + url)
-            return json.loads(urlopen(url, timeout=10).read())
+            return
 
     @cherrypy.expose()
     @require()
@@ -191,7 +192,9 @@ class Couchpotato:
             url = 'http' + ssl + '://' + host + ':' + port + basepath + 'api/' + apikey + '/' + path
             self.logger.debug("Fetching information from: " + url)
 
-            return json.JSONDecoder('UTF-8').decode(urlopen(url, timeout=30).read())
+            f = requests.get(url, timeout=60, stream=True)
+
+            return f.json()
 
         except Exception, e:
             self.logger.debug("Exception: " + str(e))
