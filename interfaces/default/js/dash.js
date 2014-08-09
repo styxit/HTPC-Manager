@@ -14,7 +14,7 @@ $(document).ready(function () {
 function loadRecentMovies () {
     if (!$('#movie-carousel').length) return
     $.getJSON(WEBDIR + 'xbmc/GetRecentMovies',function (data) {
-        if (data === null || data.movies == null) return
+        if (data === null || data.movies === null) return
         $.each(data.movies, function (i, movie) {
             var itemDiv = $('<div>').addClass('item carousel-item')
 
