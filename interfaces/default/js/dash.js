@@ -14,11 +14,11 @@ $(document).ready(function () {
 function loadRecentMovies () {
     if (!$('#movie-carousel').length) return
     $.getJSON(WEBDIR + 'xbmc/GetRecentMovies',function (data) {
-        if (data == null || data.movies == null) return
+        if (data === null || data.movies == null) return
         $.each(data.movies, function (i, movie) {
             var itemDiv = $('<div>').addClass('item carousel-item')
 
-            if (i == 0) itemDiv.addClass('active')
+            if (i === 0) itemDiv.addClass('active')
 
             var src = WEBDIR + 'xbmc/GetThumb?h=240&w=430&thumb='+encodeURIComponent(movie.fanart)
             itemDiv.attr('style', 'background-image: url("' + src + '")')
@@ -43,7 +43,7 @@ function loadRecentMovies () {
 function loadRecentTVshows () {
     if (!$('#tvshow-carousel').length) return
     $.getJSON(WEBDIR + 'xbmc/GetRecentShows', function (data) {
-        if (data == null) return
+        if (data === null) return
         $.each(data.episodes, function (i, episode) {
             var itemDiv = $('<div>').addClass('item carousel-item')
 
@@ -70,7 +70,7 @@ function loadRecentTVshows () {
 function loadRecentAlbums () {
     if (!$('#albums-content').length) return
     $.getJSON(WEBDIR + 'xbmc/GetRecentAlbums/4', function (data) {
-        if (data == null) return
+        if (data === null) return
         $.each(data.albums, function (i, album) {
             var imageSrc = WEBDIR + 'js/libs/holder.js/45x45/text:No cover'
             if (album.thumbnail != '') {
@@ -100,11 +100,11 @@ function loadRecentAlbums () {
 function loadRecentMoviesPlex () {
     if (!$('#movie-carousel-plex').length) return
     $.getJSON(WEBDIR + 'plex/GetRecentMovies',function (data) {
-        if (data == null) return
+        if (data === null) return
         $.each(data.movies, function (i, movie) {
             var itemDiv = $('<div>').addClass('item carousel-item')
 
-            if (i == 0) itemDiv.addClass('active')
+            if (i === 0) itemDiv.addClass('active')
 
             var src = WEBDIR + 'plex/GetThumb?h=240&w=430&thumb='+encodeURIComponent(movie.fanart)
             itemDiv.attr('style', 'background-image: url("' + src + '")')
@@ -129,7 +129,7 @@ function loadRecentMoviesPlex () {
 function loadRecentTVshowsPlex () {
     if (!$('#tvshow-carousel-plex').length) return
     $.getJSON(WEBDIR + 'plex/GetRecentShows', function (data) {
-        if (data == null) return
+        if (data === null) return
         $.each(data.episodes, function (i, episode) {
             var itemDiv = $('<div>').addClass('item carousel-item')
 
@@ -156,7 +156,7 @@ function loadRecentTVshowsPlex () {
 function loadRecentAlbumsPlex () {
     if (!$('#albums-content-plex').length) return
     $.getJSON(WEBDIR + 'plex/GetRecentAlbums', function (data) {
-        if (data == null) return
+        if (data === null) return
         $.each(data.albums, function (i, album) {
             var imageSrc = WEBDIR + 'js/libs/holder.js/45x45/text:No cover'
             if (album.thumbnail != '') {
@@ -220,7 +220,7 @@ function loadNZBGetDownloadHistory() {
 function loadWantedMovies() {
     if (!$('#wantedmovies_table_body').length) return
     $.getJSON(WEBDIR + 'couchpotato/GetMovieList/active/5', function (result) {
-        if (result == null) {
+        if (result === null) {
             $('#wantedmovies_table_body').append(
                 $('<tr>').append($('<td>').html('No wanted movies found').attr('colspan', '2'))
             )
@@ -239,7 +239,7 @@ function loadWantedMovies() {
 function loadNextAired(options) {
     if (!$('#nextaired_table_body').length) return
     $.getJSON(WEBDIR + 'sickbeard/GetNextAired', function (result) {
-        if (result == null || result.data.soon.legth == 0) {
+        if (result === null || result.data.soon.length === 0) {
             $('#nextaired_table_body').append(
                 $('<tr>').append($('<td>').html('No future episodes found'))
             )
