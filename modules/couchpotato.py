@@ -114,9 +114,9 @@ class Couchpotato:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def AddMovie(self, movieid, profile, title):
+    def AddMovie(self, movieid, profile, title, category_id):
         self.logger.debug("Adding movie")
-        return self.fetch('movie.add/?profile_id=' + profile + '&identifier=' + movieid + '&title=' + title)
+        return self.fetch('movie.add/?profile_id=' + profile + '&identifier=' + movieid + '&title=' + title + '&category_id=' + category_id)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -159,6 +159,12 @@ class Couchpotato:
     def GetProfiles(self):
         self.logger.debug("Fetching available profiles")
         return self.fetch('profile.list/')
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetCategorys(self):
+        self.logger.debug("Feching catagorys")
+        return self.fetch('category.list')
 
     def fetch(self, path):
         try:

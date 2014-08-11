@@ -1,4 +1,5 @@
 var profiles = $('<select>')
+var cpcat = '';
 $(document).ready(function() {
     $(window).trigger('hashchange')
     getMovieLists()
@@ -15,7 +16,14 @@ $(document).ready(function() {
             if (!item.hide) profiles.append($('<option>').val(item._id).text(item.label))
         })
     })
-})
+    $.get(WEBDIR + 'couchpotato/GetCategorys', function(data) {
+        if (data.categories.length <= 0) return
+        cpcat = $('<select>')
+        $.each(data.categories, function(i, item) {
+            cpcat.append($('<option>').val(item._id).text(item.label))
+        });
+    }); 
+});
 
 
 function getMovies(strStatus, pHTMLElement) {
@@ -56,11 +64,16 @@ function getMovieLists() {
 	getMovies("active", $("#wanted-grid"));	
 }
 
+function getCategorys() {
+    $.getJSON(WEBDIR + 'couchpotato/GetCategorys', function (data) {
+    });
+}
 
-function addMovie(movieid, profile, title) {
+function addMovie(movieid, profile, title, catid) {
     var data = {
         movieid: movieid,
         profile: profile,
+        category_id: catid,
         title: encodeURIComponent(title)
     }
     $.getJSON(WEBDIR + 'couchpotato/AddMovie', data, function (result) {
@@ -115,7 +128,7 @@ function searchMovie(q) {
         $.each(result.movies, function(i, movie) {
             var link = $('<a>').attr('href', '#').click(function(e) {
                 e.preventDefault()
-                showMovie(movie)
+                showMovie(movie, cpcat)
             })
             var src = 'holder.js/100x150/text:No artwork'
             if (movie.images.poster[0]) {
@@ -152,7 +165,7 @@ function getHistory() {
 }
 
 
-function showMovie(movie) {
+function showMovie(movie, was_search) {
     var plot;
     var info;
     var year;
@@ -209,8 +222,6 @@ function showMovie(movie) {
 
     }
 
-    
-
     profiles.unbind();
     var title = info.original_title + ' (' + year + ')';
     profiles.change(function () {
@@ -239,7 +250,7 @@ function showMovie(movie) {
         // Was called from search
         modalButtons = {
             'Add': function () {
-                addMovie(movie.imdb, profiles.val(), titles.val());
+                addMovie(movie.imdb, profiles.val(), titles.val(), cpcat.val());
                 hideModal();
             }
         };
@@ -269,8 +280,13 @@ function showMovie(movie) {
         }
     }
     
-
     modalInfo.append(titles, profiles);
+
+    // Adds the category id showmovie was run from search
+    if (was_search) {
+        modalInfo.append(cpcat);
+    }
+
     if (movie.releases && movie.releases.length > 0 && movie.releases.status !== 'done') {
         var strTable = $("<table>").addClass("table table-striped table-hover").append(
         $("<tr>").append("<th>Action</th>").append("<th>Name</th>").append("<th>Score</th>").append("<th>Size</th>"));
