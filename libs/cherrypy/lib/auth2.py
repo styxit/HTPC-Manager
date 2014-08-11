@@ -29,6 +29,7 @@ def check_auth(*args, **kwargs):
     """A tool that looks in config for 'auth.require'. If found and it
     is not None, a login is required and the entry is evaluated as a list of
     conditions that the user must fulfill"""
+    p = '%sauth/login' % htpc.WEBDIR
     conditions = cherrypy.request.config.get('auth.require', None)
     if conditions is not None:
         username = cherrypy.session.get(SESSION_KEY)
@@ -37,9 +38,9 @@ def check_auth(*args, **kwargs):
             for condition in conditions:
                 # A condition is just a callable that returns true or false
                 if not condition():
-                    raise cherrypy.HTTPRedirect("/auth/login")
+                    raise cherrypy.HTTPRedirect(p)
         else:
-            raise cherrypy.HTTPRedirect("/auth/login")
+            raise cherrypy.HTTPRedirect(p)
     
 cherrypy.tools.auth = cherrypy.Tool('before_handler', check_auth)
 
@@ -107,7 +108,7 @@ class AuthController(object):
     @cherrypy.expose()
     def login(self, username=None, password=None, from_page="/"):
         if username is None or password is None:
-            return self.get_loginform("", from_page=from_page)
+            return self.get_loginform("", from_page=str(htpc.WEBDIR))
         
         error_msg = check_credentials(username, password)
         if error_msg:
@@ -115,4 +116,4 @@ class AuthController(object):
         else:
             cherrypy.session.regenerate()
             cherrypy.session[SESSION_KEY] = cherrypy.request.login = username
-            raise cherrypy.HTTPRedirect(from_page or "/")
+            raise cherrypy.HTTPRedirect(str(htpc.WEBDIR))

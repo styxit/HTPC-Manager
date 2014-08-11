@@ -76,4 +76,4 @@ class Root:
         sess[SESSION_KEY] = None
         if username:
             cherrypy.request.login = None
-        raise cherrypy.HTTPRedirect(from_page or "/")
+        raise cherrypy.HTTPRedirect(str(htpc.WEBDIR) or from_page)

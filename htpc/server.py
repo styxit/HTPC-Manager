@@ -23,7 +23,9 @@ def start():
     cherrypy.config.update({
         'server.socket_host': htpc.HOST,
         'server.socket_port': htpc.PORT,
-        'log.screen': False
+        'log.screen': False,
+        'server.thread_pool': 15,
+        'server.socket_queue_size': 10
     })
 
     # Enable auth if username and pass is set, add to db as admin
@@ -76,7 +78,7 @@ def start():
             'tools.encode.on': True,
             'tools.encode.encoding': 'utf-8',
             'tools.gzip.on': True,
-            'tools.gzip.mime_types': ['text/html', 'text/plain', 'text/css', 'text/javascript']
+            'tools.gzip.mime_types': ['text/html', 'text/plain', 'text/css', 'text/javascript', 'application/json', 'application/javascript']
         },
         '/js': {
             'tools.caching.on': True,
