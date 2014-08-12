@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 # coding=utf-8
 
 import htpc
@@ -15,7 +18,7 @@ class Qbittorrent:
         htpc.MODULES.append({
             'name': 'qBittorrent',
             'id': 'qbittorrent',
-            'test': htpc.WEBDIR + 'qbittorrent/ping',
+            #'test': htpc.WEBDIR + 'qbittorrent/ping',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'qbittorrent_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'qbittorrent_name'},
