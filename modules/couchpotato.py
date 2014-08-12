@@ -162,8 +162,8 @@ class Couchpotato:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def GetCategorys(self):
-        self.logger.debug("Feching catagorys")
+    def GetCategories(self):
+        self.logger.debug("Feching categories")
         return self.fetch('category.list')
 
     def fetch(self, path):

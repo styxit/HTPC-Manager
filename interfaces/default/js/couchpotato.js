@@ -16,7 +16,7 @@ $(document).ready(function() {
             if (!item.hide) profiles.append($('<option>').val(item._id).text(item.label))
         })
     })
-    $.get(WEBDIR + 'couchpotato/GetCategorys', function(data) {
+    $.get(WEBDIR + 'couchpotato/GetCategories', function(data) {
         if (data.categories.length <= 0) return
         cpcat = $('<select>')
         $.each(data.categories, function(i, item) {
@@ -62,11 +62,6 @@ function getMovies(strStatus, pHTMLElement) {
 function getMovieLists() {
     getMovies("done", $("#library-grid"));
 	getMovies("active", $("#wanted-grid"));	
-}
-
-function getCategorys() {
-    $.getJSON(WEBDIR + 'couchpotato/GetCategorys', function (data) {
-    });
 }
 
 function addMovie(movieid, profile, title, catid) {
