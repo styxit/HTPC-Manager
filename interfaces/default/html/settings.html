@@ -23,7 +23,7 @@
             </ul>
 
             <div class="tab-content">
-            ${form.buildForm(id='general', classes='form-horizontal tab-pane active', legend='General',  fields=[
+            ${form.buildForm(id='general', classes='form-horizontal tab-pane active', description='Most of these settings require a HTPC-Manager restart after saving.', legend='General',  fields=[
                 {'type':'text', 'label':'IP / Host *', 'name':'app_host', 'value':settings.get('app_host', '0.0.0.0')},
                 {'type':'text', 'label':'Port *', 'name':'app_port', 'value':settings.get('app_port', 8085)},
                 {'type':'text', 'label':'Webdir *', 'name':'app_webdir', 'value':settings.get('app_webdir', '/')},
