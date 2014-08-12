@@ -35,6 +35,7 @@ class Users:
                 {'type':'select',
                  'label':'Role',
                  'name': 'users_user_role',
+                 'desc': 'Admin users can change settings while normal users can only view pages.',
                  'options': [
                     {'name': 'user', 'value':'user'},
                     {'name':'admin', 'value': 'admin'}
