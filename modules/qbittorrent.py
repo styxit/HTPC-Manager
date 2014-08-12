@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# coding=utf-8
-
 import htpc
 import cherrypy
 import urllib2
