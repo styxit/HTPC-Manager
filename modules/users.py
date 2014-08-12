@@ -15,6 +15,7 @@ class Users:
         Manageusers.createTable(ifNotExists=True)
         htpc.MODULES.append({
             'name': 'Manage users',
+            'isThirdParty': False,
             'id': 'users',
             'action': htpc.WEBDIR + 'users/setusers',
             'fields': [

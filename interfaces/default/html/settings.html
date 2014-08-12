@@ -6,17 +6,20 @@
         <h1 class="page-header page-title">Settings</h1>
 
         <div class="tabbable tabs-left">
-            
+
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#general" data-toggle="tab">General</a></li>
                 <li><a href="#dashboard" data-toggle="tab">Dashboard</a></li>
                 <li><a href="#style" data-toggle="tab">Style</a></li>
                 <li><a href="#other" data-toggle="tab">Other apps</a></li>
+                <li><a href="#users" data-toggle="tab">User management</a></li>
                 <li class="divider-tab"></li>
                 % for m in sorted(htpc.MODULES, key=lambda d: d['name']):
-                <li><a href="#${m.get('id')}" data-toggle="tab">${m.get('name')}</a></li>
+                  % if m.get('isThirdParty') != False:
+                  <li><a href="#${m.get('id')}" data-toggle="tab">${m.get('name')}</a></li>
+                  % endif
                 % endfor
-                
+
             </ul>
 
             <div class="tab-content">
