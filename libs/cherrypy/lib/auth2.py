@@ -16,8 +16,8 @@ def check_credentials(username, password):
     try:
         #Select  one item with in username col with username (there is only one as its unique)
         userexist = Manageusers.selectBy(username=username).getOne()
-        
-        if userexist and userexist.password == password: 
+
+        if userexist and userexist.password == password:
             return None
         else:
             return u"Incorrect username or password."
@@ -29,7 +29,7 @@ def check_auth(*args, **kwargs):
     """A tool that looks in config for 'auth.require'. If found and it
     is not None, a login is required and the entry is evaluated as a list of
     conditions that the user must fulfill"""
-    
+
     p = '%sauth/login' % htpc.WEBDIR
     conditions = cherrypy.request.config.get('auth.require', None)
     if conditions is not None:
@@ -42,7 +42,7 @@ def check_auth(*args, **kwargs):
                     raise cherrypy.HTTPRedirect(p)
         else:
             raise cherrypy.HTTPRedirect(p)
-    
+
 cherrypy.tools.auth = cherrypy.Tool('before_handler', check_auth)
 
 
@@ -110,7 +110,7 @@ class AuthController(object):
     def login(self, username=None, password=None, from_page="/"):
         if username is None or password is None:
             return self.get_loginform("", from_page=htpc.WEBDIR)
-        
+
         error_msg = check_credentials(username, password)
         if error_msg:
             return self.get_loginform(username, error_msg, from_page)
