@@ -10,10 +10,6 @@ $(document).ready(function () {
         });
     });
 
-    $('#add_nzb_button').click(function() {
-        $('#add_nzb_form').submit();
-    })
-
     $('#add_nzb_form').ajaxForm({
         url: WEBDIR + 'sabnzbd/AddNzbFromUrl',
         type: 'post',
