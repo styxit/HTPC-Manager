@@ -36,13 +36,13 @@
             ])}
             % for m in htpc.MODULES:
                 % if m.get('test'):
-                    ${form.buildForm(action=m.get('action'), id=m.get('id'), classes='form-horizontal tab-pane', legend=m.get('name'),
+                    ${form.buildForm(action=m.get('action'), id=m.get('id'), description=m.get('description'), classes='form-horizontal tab-pane', legend=m.get('name'),
                                      fields=m.get('fields'), buttons=[
                                          {'name':'Save changes', 'type':'submit', 'classes':'btn-primary'},
                                          {'name':'Clear', 'type':'reset'},
                                          {'name':'Test', 'type':'button', 'classes':'btn-test', 'test':m.get('test')}])}
                 % else:
-                    ${form.buildForm(action=m.get('action'), id=m.get('id'), classes='form-horizontal tab-pane', legend=m.get('name'),
+                    ${form.buildForm(action=m.get('action'), id=m.get('id'), description=m.get('description'), classes='form-horizontal tab-pane', legend=m.get('name'),
                                      fields=m.get('fields'))}
                 % endif
             % endfor

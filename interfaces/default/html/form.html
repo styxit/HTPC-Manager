@@ -1,4 +1,4 @@
-<%def name="buildForm(action='', method='POST', id='', classes='form-horizontal', legend='', fields=[], buttons=[
+<%def name="buildForm(action='', method='POST', id='', description='', classes='form-horizontal', legend='', fields=[], buttons=[
     {'name':'Save', 'type':'submit', 'classes':'btn-primary'},
     {'name':'Clear', 'type':'reset'}
 ])"><%
@@ -8,6 +8,12 @@ settings =  htpc.settings
     <fieldset>
         % if legend:
         <legend>${legend}</legend>
+        % endif
+        % if description != '':
+          <div class="alert alert-block alert-info">
+          <h4>Module description:</h4>
+          ${description}
+          </div>
         % endif
         % for field in fields:
         <div class="control-group">

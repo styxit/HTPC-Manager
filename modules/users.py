@@ -15,6 +15,7 @@ class Users:
         Manageusers.createTable(ifNotExists=True)
         htpc.MODULES.append({
             'name': 'Manage users',
+            'description': 'Add more users to HTPC-Manager. Make sure you enable authentication and have created a main user in General settings, otherwise authentication will not be used.',
             'isThirdParty': False,
             'id': 'users',
             'action': htpc.WEBDIR + 'users/setusers',
