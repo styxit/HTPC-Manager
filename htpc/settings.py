@@ -1,9 +1,13 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """ Class for handling settings and generating settings page """
 import os
 from json import loads
 import cherrypy
 import htpc
 import logging
+from cherrypy.lib.auth2 import require, member_of
 from sqlobject import connectionForURI, sqlhub, SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol
 
@@ -25,6 +29,7 @@ class Settings:
         Setting.createTable(ifNotExists=True)
 
     @cherrypy.expose()
+    @require(member_of("admin"))
     def index(self, **kwargs):
         """ Set keys if settings are received. Show settings page """
         if kwargs:
@@ -75,6 +80,7 @@ class Settings:
 
     """ Save json with custom urls """
     @cherrypy.expose()
+    @require(member_of("admin"))
     @cherrypy.tools.json_out()
     def urls(self, **kwargs):
         if kwargs:

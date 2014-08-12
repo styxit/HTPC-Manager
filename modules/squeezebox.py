@@ -1,8 +1,12 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import cherrypy
 import urllib2
 import base64
 import htpc
 from json import dumps, loads
+from cherrypy.lib.auth2 import require
 
 
 class Squeezebox:
@@ -20,26 +24,31 @@ class Squeezebox:
         ]})
 
     @cherrypy.expose()
+    @require()
     def index(self):
         return htpc.LOOKUP.get_template('squeezebox.html').render(scriptname='squeezebox')
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def PlayerControl(self, player, command):
         command = urllib2.unquote(command)
         return self.jsonRequest(player, command.split())
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetPlayers(self, start=0, end=999):
         return self.jsonRequest("", ["players", start, end])
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetPlayer(self, player):
         return self.jsonRequest(player, ["status", "0"])
 
     @cherrypy.expose()
+    @require()
     def GetCover(self, player):
         url = self.webhost('music/current/cover.jpg?player=' + player)
         request = urllib2.Request(url)
@@ -50,16 +59,19 @@ class Squeezebox:
         return urllib2.urlopen(request).read()
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetGenres(self):
         return self.jsonRequest("", ["genres", "0"])
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetArtists(self):
         return self.jsonRequest("", ["artists", "0"])
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetAlbums(self, artist=None, start=0, end=999):
         if artist:
@@ -68,21 +80,25 @@ class Squeezebox:
             return self.jsonRequest("", ["albums", "0"])
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetSongs(self, filter, start=0, end=999):
         return self.jsonRequest("", ["songs", start, end, filter])
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetStationGroups(self, start=0, end=999):
         return self.jsonRequest("", ["radios", start, end])
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetStationGroup(self, player='', group='local', start=0, end=999, filter=''):
         return self.jsonRequest(player, [group, 'items', start, end, filter])
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetPlaylists(self):
         return self.jsonRequest("", ["playlists", "0"])

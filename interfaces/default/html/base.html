@@ -11,14 +11,14 @@ webdir = htpc.WEBDIR
     <link rel="apple-touch-icon" href="${htpc.WEBDIR}img/ios/homescreen.png">
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
-    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/bootstrap.min.css" rel="stylesheet" />
-    <link href="${htpc.WEBDIR}css/bootstrap-responsive.min.css" rel="stylesheet" />
-    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet" />
-    <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet" />
-    <link href="${htpc.WEBDIR}css/base.css" rel="stylesheet" />
-    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css" rel="stylesheet" />
-    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet" />
-    <link href="${self.attr.webdir}css/${scriptname}.css" rel="stylesheet" />
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/bootstrap.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/base.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
+    <link href="${self.attr.webdir}css/${scriptname}.css" rel="stylesheet">
     <script type="text/javascript">var WEBDIR="${htpc.WEBDIR}";</script>
 </head>
 
@@ -61,6 +61,11 @@ webdir = htpc.WEBDIR
                     <li class="hidden-desktop visible-phone visible-tablet">
                         <a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a>
                     </li>
+                    % if htpc.AUTH:
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC-Manager"><i class="icon-signout"></i> Logout</a>
+                    </li>
+                    % endif
                     <li class="hidden-desktop visible-phone visible-tablet">
                         <a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC-Manager"><i class="icon-refresh"></i> Restart</a>
                     </li>
@@ -95,6 +100,9 @@ webdir = htpc.WEBDIR
                             <li><a href="#" class="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
                             <li><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
                             <li><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a></li>
+                            % if htpc.AUTH:
+                            <li><a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC-Manager"><i class="icon-signout"></i> Logout</a></li>
+                            % endif
                             <li><a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC-Manager"><i class="icon-refresh"></i> Restart</a></li>
                             <li><a href="${htpc.WEBDIR}shutdown" class="confirm" title="Shutdown HTPC-Manager"><i class="icon-off"></i> Shutdown</a></li>
                           </ul>

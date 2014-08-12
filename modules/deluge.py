@@ -13,6 +13,7 @@ from json import loads, dumps
 import logging
 import cookielib
 from StringIO import StringIO
+from cherrypy.lib.auth2 import require
 
 class Deluge:
 
@@ -37,49 +38,58 @@ class Deluge:
         ]})
 
     @cherrypy.expose()
+    @require()
     def index(self):
         return htpc.LOOKUP.get_template('deluge.html').render(scriptname='deluge')
    
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def connected(self):
         return self.fetch('web.connected')   
     
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def connect(self,hostid):
         return self.fetch('web.connect',[hostid])
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def get_hosts(self):
         return self.fetch('web.get_hosts')
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def queue(self):
         fields = ['progress','is_finished','ratio','name','download_payload_rate','upload_payload_rate','eta','state','hash','total_size']
         return self.fetch('core.get_torrents_status', [[],fields])
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def stats(self):
         fields = ["payload_download_rate","payload_upload_rate"]
         return self.fetch('core.get_session_status',[fields])
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def start(self, torrentId):
         torrents = [torrentId]
         return self.fetch('core.resume_torrent', [torrents])
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def stop(self, torrentId):
         torrents = [torrentId]
         return self.fetch('core.pause_torrent',[torrents])
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def remove(self, torrentId, removeData):
         removeDataBool = bool(int(removeData));

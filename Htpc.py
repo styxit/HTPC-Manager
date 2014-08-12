@@ -82,6 +82,8 @@ def load_modules():
     htpc.ROOT.tvheadend = TVHeadend()
     from modules.plex import Plex
     htpc.ROOT.plex = Plex()
+    from modules.users import Users
+    htpc.ROOT.users = Users()
 
 def main():
     """
@@ -149,6 +151,12 @@ def main():
 
     htpc.USERNAME = htpc.settings.get('app_username')
     htpc.PASSWORD = htpc.settings.get('app_password')
+
+    # Is used for hiding logout in the menu
+    if htpc.USERNAME and htpc.PASSWORD:
+        htpc.AUTH = True
+    else:
+        htpc.AUTH = False
 
      # Resets the htpc manager password and username
     if args.resetauth:

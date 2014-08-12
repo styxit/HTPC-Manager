@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import cherrypy
 import htpc
 from urllib import quote
@@ -5,6 +8,7 @@ from urllib2 import urlopen, Request
 from json import loads
 import logging
 import base64
+from cherrypy.lib.auth2 import require
 
 
 class NZBGet:
@@ -26,10 +30,12 @@ class NZBGet:
         ]})
 
     @cherrypy.expose()
+    @require()
     def index(self):
         return htpc.LOOKUP.get_template('nzbget.html').render(scriptname='nzbget')
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def version(self, nzbget_host, nzbget_basepath, nzbget_port, nzbget_username, nzbget_password, nzbget_ssl=False, **kwargs):
         self.logger.debug("Fetching version information from nzbget")
@@ -53,24 +59,28 @@ class NZBGet:
             return
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetHistory(self, limit=''):
         self.logger.debug("Fetching history")
         return self.fetch('history')
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetWarnings(self):
         self.logger.debug("Fetching warnings")
         return self.fetch('log?NumberOfEntries=1000&IDFrom=0')
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def queue(self):
         self.logger.debug("Fetching queue")
         return self.fetch('listgroups')
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def status(self):
         self.logger.debug("Fetching nzbget status")

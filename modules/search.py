@@ -1,10 +1,13 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import cherrypy
 import htpc
 from htpc.proxy import get_image
 import urllib2
 from json import loads
 import logging
-
+from cherrypy.lib.auth2 import require
 
 class Search:
     def __init__(self):
@@ -20,10 +23,12 @@ class Search:
         ]})
 
     @cherrypy.expose()
+    @require()
     def index(self, query='', **kwargs):
         return htpc.LOOKUP.get_template('search.html').render(query=query, scriptname='search')
 
     @cherrypy.expose()
+    @require()
     def thumb(self, url, h=None, w=None, o=100):
         if url.startswith('rageid'):
             settings = htpc.settings
@@ -35,12 +40,14 @@ class Search:
         return get_image(url, h, w, o)
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def getcategories(self, **kwargs):
         self.logger.debug("Fetching available categories")
         return self.fetch('caps')['categories']
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def search(self, q='', cat='', **kwargs):
         if cat:

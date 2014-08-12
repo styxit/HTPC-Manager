@@ -10,10 +10,10 @@ import socket
 import urllib2
 import platform
 from subprocess import PIPE
-
 import cherrypy
 import htpc
 import logging
+from cherrypy.lib.auth2 import require, member_of
 
 logger = logging.getLogger('modules.stats')
 
@@ -41,6 +41,7 @@ class Stats:
         ]})
 
     @cherrypy.expose()
+    @require()
     def index(self):
         #Since many linux repos still have psutil version 0.5
         if importPsutil and psutil.version_info >= (0, 7):
@@ -51,6 +52,7 @@ class Stats:
         return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats', importPsutil=importPsutil, cmdline=htpc.SHELL)
 
     @cherrypy.expose()
+    @require()
     def uptime(self):
         try:
             if psutil.version_info >= (2, 0, 0):
@@ -68,6 +70,7 @@ class Stats:
 
 
     @cherrypy.expose()
+    @require()
     def disk_usage(self):
         rr = None
         l = []
@@ -128,6 +131,7 @@ class Stats:
         return rr
 
     @cherrypy.expose()
+    @require()
     def processes(self):
         rr = None
         limit = str(htpc.settings.get('stats_limit_processes'))
@@ -170,6 +174,7 @@ class Stats:
 
     #Returns cpu usage
     @cherrypy.expose()
+    @require()
     def cpu_percent(self):
         jcpu = None
         try:
@@ -183,6 +188,7 @@ class Stats:
 
     # Not in use atm.
     @cherrypy.expose()
+    @require()
     def cpu_times(self):
         rr = None
         try:
@@ -195,6 +201,7 @@ class Stats:
 
     #Not in use
     @cherrypy.expose()
+    @require()
     def num_cpu(self):
         try:
             if psutil.version_info >= (2,0,0):
@@ -210,6 +217,7 @@ class Stats:
 
     #Fetches info about the user that is logged in.
     @cherrypy.expose()
+    @require()
     def get_user(self):
         l =[]
         d = {}
@@ -229,6 +237,7 @@ class Stats:
         return rr
 
     @cherrypy.expose()
+    @require()
     def get_local_ip(self):
         # added a small delay since getting local is faster then network usage (Does not render in the html)
         time.sleep(0.1)
@@ -246,6 +255,7 @@ class Stats:
 
 
     @cherrypy.expose()
+    @require()
     def get_external_ip(self):
         d = {}
         rr = None
@@ -259,6 +269,7 @@ class Stats:
 
 
     @cherrypy.expose()
+    @require()
     def sys_info(self):
         d = {}
         rr = None
@@ -278,6 +289,7 @@ class Stats:
 
     #get network usage
     @cherrypy.expose()
+    @require()
     def network_usage(self):
 
         try:
@@ -291,6 +303,7 @@ class Stats:
 
 
     @cherrypy.expose()
+    @require()
     def virtual_memory(self):
         d = {}
         rr = None
@@ -307,6 +320,7 @@ class Stats:
 
 
     @cherrypy.expose()
+    @require()
     def swap_memory(self):
         d = {}
         rr = None
@@ -323,6 +337,7 @@ class Stats:
 
     #Fetches settings in the db, is used for some styling, like bars or tables.
     @cherrypy.expose()
+    @require()
     def return_settings(self):
         d = {}
         try:
@@ -340,6 +355,7 @@ class Stats:
         return json.dumps(d)
 
     @cherrypy.expose()
+    @require(member_of("admin"))
     def command(self, cmd=None, pid=None, signal=None):
         dmsg = {}
         jmsg =  None
@@ -387,6 +403,7 @@ class Stats:
 
 
     @cherrypy.expose()
+    @require(member_of("admin"))
     def cmdpopen(self, cmd=None):
         d = {}
         cmd = cmd.split(', ')
