@@ -76,7 +76,7 @@ def start():
             'tools.encode.on': True,
             'tools.encode.encoding': 'utf-8',
             'tools.gzip.on': True,
-            'tools.gzip.mime_types': ['text/html', 'text/plain', 'text/css', 'text/javascript']
+            'tools.gzip.mime_types': ['text/html', 'text/plain', 'text/css', 'text/javascript', 'application/json', 'application/javascript']
         },
         '/js': {
             'tools.caching.on': True,
