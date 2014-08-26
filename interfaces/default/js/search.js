@@ -73,6 +73,16 @@ function search(query, catid) {
                 });
                 row.append($('<td>').append(toSabIcon));
 
+                var toGetIcon = $('<i>');
+                toGetIcon.addClass('icon-download-alt');
+                //toGetIcon.css('cursor', 'pointer');
+                toGetIcon.attr('title', 'Send to NzbGet')
+                toGetIcon.attr('alt', 'Send to NzbGet')
+                toGetIcon.click(function() {
+                    sendToGet(item.link)
+                });
+                row.append($('<td>').append(toGetIcon));
+
                 $('#results_table_body').append(row);
                 if (stop) return false;
             });
@@ -180,6 +190,18 @@ function sendToSab(url) {
         data: {nzb_url: url},
         success: function (result) {
             notify('', 'Sent to SabNZBd', 'info');
+        }
+    });
+}
+
+function sendToGet(url) {
+    return $.ajax({
+        url: WEBDIR + 'nzbget/AddNzb',
+        type: 'post',
+        dataType: 'json',
+        data: {nzb_url: url},
+        success: function (result) {
+            notify('', 'Sent to NzbGet', 'info');
         }
     });
 }

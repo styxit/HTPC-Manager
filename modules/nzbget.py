@@ -9,6 +9,7 @@ from json import loads
 import logging
 import base64
 from cherrypy.lib.auth2 import require
+from jsonrpclib import jsonrpc
 
 
 class NZBGet:
@@ -33,6 +34,30 @@ class NZBGet:
     @require()
     def index(self):
         return htpc.LOOKUP.get_template('nzbget.html').render(scriptname='nzbget')
+
+    @cherrypy.expose()
+    @require()
+    def nzbget_url(self):
+        host = htpc.settings.get('nzbget_host', '')
+        port = str(htpc.settings.get('nzbget_port', ''))
+        username = htpc.settings.get('nzbget_username', '')
+        password = htpc.settings.get('nzbget_password', '')
+        nzbget_basepath = htpc.settings.get('nzbget_basepath', '/')
+        ssl = 's' if htpc.settings.get('nzbget_ssl', True) else ''
+
+        if(nzbget_basepath == ""):
+            nzbget_basepath = "/"
+        if not(nzbget_basepath.endswith('/')):
+            nzbget_basepath += "/"
+        if username and  password:
+            authstring = '%s:%s@' % (username, password)
+        else:
+            authstring = ''
+
+        url = 'http' + ssl + '://' + authstring + host + ':' + port + nzbget_basepath + 'jsonrpc/'
+        print url
+        return url
+
 
     @cherrypy.expose()
     @require()
@@ -63,28 +88,55 @@ class NZBGet:
     @cherrypy.tools.json_out()
     def GetHistory(self, limit=''):
         self.logger.debug("Fetching history")
-        return self.fetch('history')
+        nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
+        #return self.fetch('history')
+        #return nzbget.listgroups()
+        return nzbget.history()
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def AddNzb(self, nzb_url= ''):
+        nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
+        nzb = urlopen(nzb_url).read()
+        #status = nzbget.append('test', '', False, base64.encode(nzb))
+        nzbget.append('tempname', '', False, base64.standard_b64encode(nzb))
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def GetConfig(self):
+        nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
+        return nzbget.config()
+
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def GetWarnings(self):
         self.logger.debug("Fetching warnings")
-        return self.fetch('log?NumberOfEntries=1000&IDFrom=0')
+        #array log(int IDFrom, int NumberOfEntries)
+        nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
+        return nzbget.log(0, 1000)
+        #return self.fetch('log?NumberOfEntries=1000&IDFrom=0')
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def queue(self):
         self.logger.debug("Fetching queue")
-        return self.fetch('listgroups')
+        nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
+        #return self.fetch('listgroups')
+        return nzbget.listgroups()
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def status(self):
         self.logger.debug("Fetching nzbget status")
-        return self.fetch('status')
+        nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
+        return nzbget.status()
+        #return self.fetch('status')
 
     def fetch(self, path):
         try:

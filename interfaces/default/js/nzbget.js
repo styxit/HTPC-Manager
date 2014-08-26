@@ -14,6 +14,10 @@ $(document).ready(function () {
             loadHistory();
     });
 
+    // Used to choose the nzb categorys
+    //getconfig()
+    getconfig('#nzb_category', 'Default');
+
     getStatus(1);
     setInterval(function() {
         getStatus(0);
@@ -37,7 +41,7 @@ function loadHistory() {
                 return false;
             }
             $('#history_table_body').html('');
-            $.each(data.result, function (i, slot) {
+            $.each(data, function (i, slot) {
 
                 var failMessage = $('<span>');
                 failMessage.addClass('label');
@@ -54,10 +58,19 @@ function loadHistory() {
                     $(name).append('&nbsp;').append(failMessage);
                 }
 
+                var deleteImage = $('<a>');
+                deleteImage.html('&times;');
+                deleteImage.attr('alt', 'Remove');
+                deleteImage.addClass('close');
+                deleteImage.attr('href', '#');
+                deleteImage.click(function () {
+                    //removeQueueItem(job.nzo_id);
+                });
+
                 row.append(name);
                 row.append($('<td>').append(nzbgetStatusLabel(slot.MoveStatus)));
                 row.append($('<td style="text-align:right;">').html(prettySize(slot.FileSizeMB*1048576)));
-                //row.append($('<td>').append(deleteImage));
+                row.append($('<td>').append(deleteImage));
                 //row.append($('<td>').append(retryImage));
 
                 $('#history_table_body').append(row);
@@ -82,12 +95,12 @@ function getStatus(initial) {
         type: 'get',
         dataType: 'json',
         success: function(response){
-            data = response.result;
+            //alert(response.DownloadRate);
 
             // write download speed to global var
-            downloadSpeed = data.DownloadRate;
+            downloadSpeed = response.DownloadRate;
 
-            $('#queue_speed').text(prettySize(data.DownloadRate) + '/s')
+            $('#queue_speed').text(prettySize(response.DownloadRate) + '/s')
         }
     });
 }
@@ -98,7 +111,7 @@ function loadQueue(once) {
         type: 'get',
         dataType: 'json',
         success: function (object) {
-            data = object.result;
+            data = object;
 
             $('#active_table_body').html('');
 
@@ -163,7 +176,17 @@ function loadQueue(once) {
                 } else {
                     var eta = '';
                 }
+                var nzbname = 'Remove ' + job.NZBName
+                var deleteImage = $('<a>');
+                deleteImage.html('&times;');
+                deleteImage.attr('alt', nzbname);
+                deleteImage.addClass('close');
+                deleteImage.attr('href', '#');
+                deleteImage.click(function () {
+                    //removeQueueItem(job.nzo_id);
+                });
                 row.append($('<td>').html(eta + prettySize(queuedSize)).addClass('span3'));
+                row.append($('<td>').html(deleteImage));
 
                 $('#active_table_body').append(row);
             });
@@ -176,12 +199,13 @@ function loadWarnings() {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            if (data.result == 0) {
+            //alert(data)
+            if (!data) {
                 var row = $('<tr>')
                 row.append($('<td>').html('No warnings'));
                 $('#warning_table_body').append(row);
             }
-            $.each(data.result, function (i, warning) {
+            $.each(data, function (i, warning) {
                 var myDate = new Date( warning.Time *1000);
                 var row = $('<tr>')
                 row.prepend($('<td>').html('[' + myDate.toLocaleString() + '] ' + warning.Text));
@@ -246,3 +270,41 @@ function nzbgetStatusIcon(iconText, white){
   return '';
 }
 
+/*
+function getconfig() {
+    $.getJSON(WEBDIR + 'nzbget/GetConfig', function(data) {
+        
+}
+*/
+
+function getconfig(selector, select) {
+    $.ajax({
+        url: WEBDIR + 'nzbget/GetConfig',
+        type: 'get',
+        dataType: 'json',
+        success: function (data) {
+            console.log(data);
+            $.each(data, function (i, cat) {
+                //alert(cat.Name)
+                var re = new RegExp('(Category\d.Name)');
+                //var something = data.match('Category\d')
+                //cat2 = cat
+                //alert(cat);
+                if (cat.Name.match(re)) {
+                    alert(cat)
+
+
+                    var option = $('<option>');
+                    if (select == cat) {
+                        option.attr('selected', true);
+                    }
+                    option.attr('value', cat.Value);
+                    option.html(cat);
+                    $(selector).append(option);
+                } else {
+                    //alert('didnt find shit');
+                }
+            });
+        }
+    });
+}
