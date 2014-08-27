@@ -89,26 +89,28 @@ class NZBGet:
     def GetHistory(self, limit=''):
         self.logger.debug("Fetching history")
         nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
-        #return self.fetch('history')
-        #return nzbget.listgroups()
         return nzbget.history()
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def AddNzb(self, nzb_url= ''):
+    def AddNzbFromUrl(self, nzb_url= '', nzb_category='', nzb_name=''):
+        if not nzb_url:
+            return
         nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
         nzb = urlopen(nzb_url).read()
+        if not nzb_name:
+            nzb_name = ''
         #status = nzbget.append('test', '', False, base64.encode(nzb))
-        nzbget.append('tempname', '', False, base64.standard_b64encode(nzb))
+        nzbget.append(nzb_name, nzb_category, False, base64.standard_b64encode(nzb))
 
+    #Used to grab the categories from the config
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def GetConfig(self):
         nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
         return nzbget.config()
-
 
     @cherrypy.expose()
     @require()
@@ -118,7 +120,6 @@ class NZBGet:
         #array log(int IDFrom, int NumberOfEntries)
         nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
         return nzbget.log(0, 1000)
-        #return self.fetch('log?NumberOfEntries=1000&IDFrom=0')
 
     @cherrypy.expose()
     @require()
@@ -126,7 +127,6 @@ class NZBGet:
     def queue(self):
         self.logger.debug("Fetching queue")
         nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
-        #return self.fetch('listgroups')
         return nzbget.listgroups()
 
     @cherrypy.expose()
@@ -136,7 +136,52 @@ class NZBGet:
         self.logger.debug("Fetching nzbget status")
         nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
         return nzbget.status()
-        #return self.fetch('status')
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def QueueAction(self, action):
+        print 'action is %s' % action
+        self.logger.debug("nzbget " + action)
+        nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
+        if 'resume' in action:
+            status = nzbget.resume()
+        elif 'pause' in action:
+            status = nzbget.pause()
+
+        return status
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def IndividualAction(self, id='', name='', action=''):
+        print 'id ', id
+        print 'name ', name
+        print 'action ', action
+        nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
+        if 'resume' in action:
+            action = 'GroupResume'
+        elif 'pause' in action:
+            print 'pause is pause'
+            action = 'GroupPause'
+        elif 'delete' in action:
+            action = 'GroupDelete'
+        status = nzbget.editqueue(action, 0, '', [int(id)])
+        print status
+        return status
+
+
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def SetSpeed(self, speed):
+        try:
+            self.logger.debug("Setting speed-limit")
+            nzbget = jsonrpc.ServerProxy('%s/jsonrpc' % self.nzbget_url())
+            return nzbget.rate(int(speed))
+        except Exception as e:
+            print e
 
     def fetch(self, path):
         try:

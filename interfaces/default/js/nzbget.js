@@ -14,9 +14,39 @@ $(document).ready(function () {
             loadHistory();
     });
 
+    $('#nzb_pause_button').click(function () {
+            var clickItem = $(this);
+            clickItem.button('loading');
+            $.ajax({
+                url: WEBDIR + 'nzbget/QueueAction/'+queueToggleStatusAction,
+                dataType: 'json',
+                type: 'get'
+            });
+        });
+
+  $('#add_nzb_form').ajaxForm({
+        url: WEBDIR + 'nzbget/AddNzbFromUrl',
+        type: 'post',
+        dataType: 'json',
+        success: function (result) {
+            if (result.status != undefined && result.status) {
+                $('[href=#active]').trigger('click');
+                $('#nzb_url').val('');
+                $('#nzb_category').val('');
+            }
+        }
+    });
     // Used to choose the nzb categorys
-    //getconfig()
     getconfig('#nzb_category', 'Default');
+
+    $('#nzb_set_speed').click(function() {
+        var speed = ($('#nzb_get_speed').val());
+        $.ajax({
+            url: WEBDIR + 'nzbget/SetSpeed?speed=' + speed,
+            type: 'post',
+            dataType: 'json'
+        });
+    });
 
     getStatus(1);
     setInterval(function() {
@@ -95,15 +125,28 @@ function getStatus(initial) {
         type: 'get',
         dataType: 'json',
         success: function(response){
-            //alert(response.DownloadRate);
-
+            var status;
             // write download speed to global var
             downloadSpeed = response.DownloadRate;
+            $('#nzb_pause_button').button('reset');
+            if (response.ServerPaused) {
+                // if true
+                status = 'Paused'
+                queueToggleStatusAction = 'resume';
+                $('#nzb_pause_button').html('<i class="icon-play"></i> Resume'); 
+            } else {
+                status = 'Running'
+                $('#nzb_pause_button').html('<i class="icon-pause"></i> Pause')
+                queueToggleStatusAction = 'pause';
+            }
 
             $('#queue_speed').text(prettySize(response.DownloadRate) + '/s')
+            $('#queue_state').text(status);
         }
     });
 }
+
+var queueToggleStatusAction = '';
 
 function loadQueue(once) {
     $.ajax({
@@ -112,6 +155,7 @@ function loadQueue(once) {
         dataType: 'json',
         success: function (object) {
             data = object;
+            
 
             $('#active_table_body').html('');
 
@@ -159,6 +203,7 @@ function loadQueue(once) {
                 }
 
                 var row = $('<tr>');
+                row.attr('data-id', job.LastID)
                 // Job status
                 row.append($('<td>').append(nzbgetStatusLabel(status)));
 
@@ -176,17 +221,31 @@ function loadQueue(once) {
                 } else {
                     var eta = '';
                 }
-                var nzbname = 'Remove ' + job.NZBName
-                var deleteImage = $('<a>');
-                deleteImage.html('&times;');
-                deleteImage.attr('alt', nzbname);
-                deleteImage.addClass('close');
-                deleteImage.attr('href', '#');
-                deleteImage.click(function () {
-                    //removeQueueItem(job.nzo_id);
-                });
+                // buttons
+                buttons = $('<div>').addClass('btn-group pull-right');
+                // Sets name and action based on job.Status
+                actionButton = generateNzbActionButton(job)
+                buttons.append(actionButton);
+                
+                 // Remove button
+                removeButton = $('<a class="nzbget_removenzb nzb_action" data-action="remove" data-id="" data-name="">').
+                addClass('btn btn-mini').
+                html('<i class="icon-remove"></i>').
+                attr('data-id', job.LastID).
+                attr('data-name', job.Name).
+                attr('title', 'Remove NZB');
+                //buttons.append(removeButton);
+
+                deleteButton = $('<a class="nzbget_deleteenzb nzb_action" data-action="delete" data-id="" data-name="">').
+                addClass('btn btn-mini').
+                html('<i class="icon-remove"></i>').
+                attr('data-hash', job.LastID).
+                attr('data-name', job.NZBName).
+                attr('title', 'Delete NZB');
+                buttons.append(deleteButton);
+           
                 row.append($('<td>').html(eta + prettySize(queuedSize)).addClass('span3'));
-                row.append($('<td>').html(deleteImage));
+                row.append($('<td>').html(buttons));
 
                 $('#active_table_body').append(row);
             });
@@ -199,7 +258,6 @@ function loadWarnings() {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            //alert(data)
             if (!data) {
                 var row = $('<tr>')
                 row.append($('<td>').html('No warnings'));
@@ -270,13 +328,6 @@ function nzbgetStatusIcon(iconText, white){
   return '';
 }
 
-/*
-function getconfig() {
-    $.getJSON(WEBDIR + 'nzbget/GetConfig', function(data) {
-        
-}
-*/
-
 function getconfig(selector, select) {
     $.ajax({
         url: WEBDIR + 'nzbget/GetConfig',
@@ -284,22 +335,21 @@ function getconfig(selector, select) {
         dataType: 'json',
         success: function (data) {
             console.log(data);
+            var defaultoption = $('<option>'); 
+            defaultoption.attr('value', '');
+            defaultoption.html('*');
+            $(selector).append(defaultoption);
             $.each(data, function (i, cat) {
-                //alert(cat.Name)
-                var re = new RegExp('(Category\d.Name)');
-                //var something = data.match('Category\d')
-                //cat2 = cat
-                //alert(cat);
-                if (cat.Name.match(re)) {
-                    alert(cat)
-
+                var re = /(Category\d+\.Name)/; 
+                tname = cat.Name
+                if (re.test(tname)) {
 
                     var option = $('<option>');
-                    if (select == cat) {
+                    if (select == cat.Name) {
                         option.attr('selected', true);
                     }
                     option.attr('value', cat.Value);
-                    option.html(cat);
+                    option.html(cat.Value);
                     $(selector).append(option);
                 } else {
                     //alert('didnt find shit');
@@ -308,3 +358,54 @@ function getconfig(selector, select) {
         }
     });
 }
+
+function generateNzbActionButton(nzb) {
+    button = $('<a>').addClass('btn btn-mini nzb_action');
+    // Resume button if nzb is paused
+    var status = nzb.Status;
+    var icon = cmd = title = "";
+
+    if (status == "PAUSED") {
+        icon = "icon-play";
+        title = "Resume NZB";
+        cmd = "resume";
+    } else {
+        icon = "icon-pause";
+        title = "Pause NZB";
+        cmd = "pause";
+    }
+
+    // Set icon, command and title to button
+    button.html('<i class="' + icon + '"></i>');
+    button.attr('title', title);
+    button.attr('data-id', nzb.LastID);
+    button.attr('data-name', nzb.NZBName);
+    button.attr('data-action', cmd);
+    return button;
+}
+
+
+$(document).on('click', '.nzb_action', function(){
+    //var i = $('#cmdinput').val();
+    //$(this).data('action')
+    var a = $(this).data('action');
+    var n = $(this).data('name');
+    param = {'id': $(this).data('id'),
+            'action': $(this).data('action'),
+            'name': $(this).data('name')
+        };
+    if (confirm('Are you sure you want to "'+ a + ' '+ n +'" to nzbget?')) {
+    $.getJSON(WEBDIR + "nzbget/IndividualAction/",param, function (response) {
+         /*
+         $.pnotify({
+             title: 'Response',
+             text: response.msg,
+             type: 'success',
+             width: '500px',
+             min_height: '400px'
+         });
+        */
+
+    });
+}
+});
