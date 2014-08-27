@@ -81,7 +81,6 @@ function search(query, catid) {
                 toGetIcon.attr('title', 'Send to NzbGet')
                 toGetIcon.attr('alt', 'Send to NzbGet')
                 toGetIcon.click(function() {
-                    alert('click')
                     sendToGet(item)
                 });
                 row.append($('<td>').append(toGetIcon));
