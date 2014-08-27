@@ -36,8 +36,8 @@ $(document).ready(function () {
             }
         }
     });
-    // Used to choose the nzb categorys
-    getconfig('#nzb_category', 'Default');
+
+    getconfig('#nzb_category', '*');
 
     $('#nzb_set_speed').click(function() {
         var speed = ($('#nzb_get_speed').val());
@@ -88,20 +88,21 @@ function loadHistory() {
                     $(name).append('&nbsp;').append(failMessage);
                 }
 
-                var deleteImage = $('<a>');
-                deleteImage.html('&times;');
-                deleteImage.attr('alt', 'Remove');
-                deleteImage.addClass('close');
-                deleteImage.attr('href', '#');
-                deleteImage.click(function () {
-                    //removeQueueItem(job.nzo_id);
-                });
+                buttons = $('<div>').addClass('btn-group pull-right');
+
+                removeButton = $('<a class="nzbget_removenzbhistory nzb_action" data-action="" data-id="" data-name="">').
+                addClass('btn btn-mini').
+                html('<i class="icon-remove"></i>').
+                attr('data-id', slot.NZBID).
+                attr('data-action', 'hidehistory').
+                attr('data-name', slot.Name).
+                attr('title', 'Remove NZB');
+                buttons.append(removeButton);
 
                 row.append(name);
                 row.append($('<td>').append(nzbgetStatusLabel(slot.MoveStatus)));
                 row.append($('<td style="text-align:right;">').html(prettySize(slot.FileSizeMB*1048576)));
-                row.append($('<td>').append(deleteImage));
-                //row.append($('<td>').append(retryImage));
+                row.append($('<td>').append(buttons));
 
                 $('#history_table_body').append(row);
             });
@@ -128,9 +129,12 @@ function getStatus(initial) {
             var status;
             // write download speed to global var
             downloadSpeed = response.DownloadRate;
+            downloadLimit = prettySize(response.DownloadLimit) + '/s'
+            //DownloadLimit
+            $('#nzb_get_speed').attr('placeholder', downloadLimit)
             $('#nzb_pause_button').button('reset');
             if (response.ServerPaused) {
-                // if true
+                // if server is paused
                 status = 'Paused'
                 queueToggleStatusAction = 'resume';
                 $('#nzb_pause_button').html('<i class="icon-play"></i> Resume'); 
@@ -227,19 +231,10 @@ function loadQueue(once) {
                 actionButton = generateNzbActionButton(job)
                 buttons.append(actionButton);
                 
-                 // Remove button
-                removeButton = $('<a class="nzbget_removenzb nzb_action" data-action="remove" data-id="" data-name="">').
-                addClass('btn btn-mini').
-                html('<i class="icon-remove"></i>').
-                attr('data-id', job.LastID).
-                attr('data-name', job.Name).
-                attr('title', 'Remove NZB');
-                //buttons.append(removeButton);
-
                 deleteButton = $('<a class="nzbget_deleteenzb nzb_action" data-action="delete" data-id="" data-name="">').
                 addClass('btn btn-mini').
                 html('<i class="icon-remove"></i>').
-                attr('data-hash', job.LastID).
+                attr('data-id', job.NZBID).
                 attr('data-name', job.NZBName).
                 attr('title', 'Delete NZB');
                 buttons.append(deleteButton);
@@ -351,8 +346,7 @@ function getconfig(selector, select) {
                     option.attr('value', cat.Value);
                     option.html(cat.Value);
                     $(selector).append(option);
-                } else {
-                    //alert('didnt find shit');
+                
                 }
             });
         }
@@ -378,7 +372,7 @@ function generateNzbActionButton(nzb) {
     // Set icon, command and title to button
     button.html('<i class="' + icon + '"></i>');
     button.attr('title', title);
-    button.attr('data-id', nzb.LastID);
+    button.attr('data-id', nzb.NZBID);
     button.attr('data-name', nzb.NZBName);
     button.attr('data-action', cmd);
     return button;
