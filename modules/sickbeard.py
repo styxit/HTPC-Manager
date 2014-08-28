@@ -151,6 +151,13 @@ class Sickbeard:
     def RescanFiles(self, tvdbid):
         self.logger.debug("Rescan all local files for tvdbid " + tvdbid)
         return self.fetch("show.refresh&tvdbid=" + tvdbid)
+        
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def RemoveShow(self, tvdbid):
+        self.logger.debug("Removing Show tvdbid " + tvdbid)
+        return self.fetch("show.delete&tvdbid=" + tvdbid)
 
     @cherrypy.expose()
     @require()
