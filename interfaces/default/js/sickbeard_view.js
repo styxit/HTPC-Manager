@@ -274,7 +274,7 @@ function rescanFiles(tvdbid, name) {
 }
 
 function removeShow(tvdbid, name) {
-  if (confirm('Are you sure?')) {
+  if (confirm('Are you sure you want to remove' + name +'?')) {
     var modalcontent = $('<div>');
     modalcontent.append($('<p>').html('Removing &quot;' + name +' &quot; from list'));
     modalcontent.append($('<div>').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'));
