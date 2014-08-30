@@ -329,7 +329,6 @@ function getconfig(selector, select) {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            console.log(data);
             var defaultoption = $('<option>'); 
             defaultoption.attr('value', '');
             defaultoption.html('*');
