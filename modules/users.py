@@ -15,6 +15,8 @@ class Users:
         Manageusers.createTable(ifNotExists=True)
         htpc.MODULES.append({
             'name': 'Manage users',
+            'description': 'Add more users to HTPC-Manager. Make sure you enable authentication and have provided a master username and password in General settings, otherwise authentication will not be used.',
+            'isThirdParty': False,
             'id': 'users',
             'action': htpc.WEBDIR + 'users/setusers',
             'fields': [
@@ -33,6 +35,7 @@ class Users:
                 {'type':'select',
                  'label':'Role',
                  'name': 'users_user_role',
+                 'desc': 'Admin users can change settings while normal users can only view pages.',
                  'options': [
                     {'name': 'user', 'value':'user'},
                     {'name':'admin', 'value': 'admin'}
@@ -40,12 +43,12 @@ class Users:
         ]})
 
     @cherrypy.expose()
-    @require(member_of("admin")) 
+    @require(member_of("admin"))
     def index(self):
         return htpc.LOOKUP.get_template('manageusers.html').render(scriptname='manageusers')
 
     @cherrypy.expose()
-    @require(member_of("admin")) 
+    @require(member_of("admin"))
     def setusers(self, users_user_id, users_user_username, users_user_password, users_user_role):
         if users_user_id == "0":
             self.logger.debug('Creating Manage users in db')
@@ -69,7 +72,7 @@ class Users:
                 return
 
     @cherrypy.expose()
-    @require(member_of("admin")) 
+    @require(member_of("admin"))
     @cherrypy.tools.json_out()
     def getuser(self, id=None):
         if id:
@@ -90,7 +93,7 @@ class Users:
 
 
     @cherrypy.expose()
-    @require(member_of("admin")) 
+    @require(member_of("admin"))
     def delusers(self, id):
         """ Delete a user """
         self.logger.debug("Deleting user " + str(id))

@@ -2,7 +2,7 @@
 import htpc
 settings = htpc.settings
 webdir = htpc.WEBDIR
-  %>
+%>
 <% s = self.attr.settings %>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,7 +20,7 @@ webdir = htpc.WEBDIR
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
     <link href="${self.attr.webdir}css/${scriptname}.css" rel="stylesheet">
-    <script type="text/javascript">var WEBDIR="${htpc.WEBDIR}";</script>   
+    <script type="text/javascript">var WEBDIR="${htpc.WEBDIR}";</script>
 </head>
 
     <body>
@@ -36,7 +36,7 @@ webdir = htpc.WEBDIR
                        <input type="text" id="username" class="span4" name="username" placeholder="Username">
                        <input type="password" id="password" class="span4" name="password" placeholder="Password">
                        <button class="btn btn-info btn-block">Sign in</button>
-                    </form>    
+                    </form>
                 </div>
             </div>
         </div>

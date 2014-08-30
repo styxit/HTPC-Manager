@@ -6,21 +6,24 @@
         <h1 class="page-header page-title">Settings</h1>
 
         <div class="tabbable tabs-left">
-            
+
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#general" data-toggle="tab">General</a></li>
                 <li><a href="#dashboard" data-toggle="tab">Dashboard</a></li>
                 <li><a href="#style" data-toggle="tab">Style</a></li>
                 <li><a href="#other" data-toggle="tab">Other apps</a></li>
+                <li><a href="#users" data-toggle="tab">User management</a></li>
                 <li class="divider-tab"></li>
                 % for m in sorted(htpc.MODULES, key=lambda d: d['name']):
-                <li><a href="#${m.get('id')}" data-toggle="tab">${m.get('name')}</a></li>
+                  % if m.get('isThirdParty') != False:
+                  <li><a href="#${m.get('id')}" data-toggle="tab">${m.get('name')}</a></li>
+                  % endif
                 % endfor
-                
+
             </ul>
 
             <div class="tab-content">
-            ${form.buildForm(id='general', classes='form-horizontal tab-pane active', legend='General',  fields=[
+            ${form.buildForm(id='general', classes='form-horizontal tab-pane active', description='Most of these settings require a HTPC-Manager restart after saving.', legend='General',  fields=[
                 {'type':'text', 'label':'IP / Host *', 'name':'app_host', 'value':settings.get('app_host', '0.0.0.0')},
                 {'type':'text', 'label':'Port *', 'name':'app_port', 'value':settings.get('app_port', 8085)},
                 {'type':'text', 'label':'Webdir *', 'name':'app_webdir', 'value':settings.get('app_webdir', '/')},
@@ -38,13 +41,13 @@
 
             % for m in htpc.MODULES:
                 % if m.get('test'):
-                    ${form.buildForm(action=m.get('action'), id=m.get('id'), classes='form-horizontal tab-pane', legend=m.get('name'),
+                    ${form.buildForm(action=m.get('action'), id=m.get('id'), description=m.get('description'), classes='form-horizontal tab-pane', legend=m.get('name'),
                                      fields=m.get('fields'), buttons=[
                                          {'name':'Save changes', 'type':'submit', 'classes':'btn-primary'},
                                          {'name':'Clear', 'type':'reset'},
                                          {'name':'Test', 'type':'button', 'classes':'btn-test', 'test':m.get('test')}])}
                 % else:
-                    ${form.buildForm(action=m.get('action'), id=m.get('id'), classes='form-horizontal tab-pane', legend=m.get('name'),
+                    ${form.buildForm(action=m.get('action'), id=m.get('id'), description=m.get('description'), classes='form-horizontal tab-pane', legend=m.get('name'),
                                      fields=m.get('fields'))}
                 % endif
             % endfor
