@@ -8,6 +8,7 @@ from cherrypy.lib.auth2 import require
 import urllib2
 import logging
 from json import loads
+import datetime
 
 
 class NzbDrone:
@@ -89,7 +90,11 @@ class NzbDrone:
     @require()
     @cherrypy.tools.json_out()
     def Calendar(self, param=None):
-        return self.fetch('Calendar')
+        current_date = datetime.datetime.utcnow().strftime("%Y-%m-%d")
+        start_date = (datetime.datetime.strptime(current_date, '%Y-%m-%d') - datetime.timedelta(days=7)).strftime('%Y-%m-%d')
+        end_date = (datetime.datetime.strptime(current_date, '%Y-%m-%d') + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
+        p = 'Calendar?start=' + current_date + '&end=' + end_date
+        return self.fetch(p)
 
     @cherrypy.expose()
     @require()
@@ -109,4 +114,9 @@ class NzbDrone:
         print self.fetch(params)
         return self.fetch(params)
 
-
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def Profile(self):
+        print self.fetch('profile')
+        return self.fetch('profile')

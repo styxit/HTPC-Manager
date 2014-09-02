@@ -4,6 +4,16 @@
     <div class="content maincontent">
         <h1 class="page-header page-title">
             <a href="http://${settings.get('nzbdrone_host')}:${settings.get('nzbdrone_port') + settings.get('nzbdrone_basepath')}" target="_blank" title="Open original NzbDrone interface">${settings.get('nzbdrone_name', 'NzbDrone')}</a>
+            <div class="btn-group pull-right">
+                    <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-off"></i>
+                    <i class="caret"></i></a>
+                    <ul class="dropdown-menu pull-right"> <!-- Skeleton -->
+                        <li><a href="Wake" class="ajax-link" title="Send WakeOnLan"><i class="icon-off"></i> Wake</a></li>
+                        <li><a href="System?action=Suspend" class="ajax-confirm" title="Suspend XBMC"><i class="icon-eye-close"></i> Suspend</a></li>
+                        <li><a href="System?action=Reboot" class="ajax-confirm" title="Restart XBMC"><i class="icon-refresh"></i> Restart</a></li>
+                        <li><a href="System?action=Shutdown" class="ajax-confirm" title="Shutdown XBMC"><i class="icon-off"></i> Shutdown</a></li>
+                    </ul>
+                </div>
         </h1>
         <div class="well form-inline">
             <input class="span6" id="add_show_name" name="add_show_name" type="text" />
@@ -14,9 +24,9 @@
         </div>
         <ul class="nav nav-tabs">
             <li class="active"><a href="#tvshows" data-toggle="tab">TV Shows</a></li>
-            <li><a href="#nextaired" data-toggle="tab">Next aired</a></li>
+            <li><a href="#calendar" data-toggle="tab">Calendar</a></li>
             <li><a href="#history" data-toggle="tab">History</a></li>
-            <li><a href="#log" data-toggle="tab">Log</a></li>
+            <!--<li><a href="#log" data-toggle="tab">Log</a></li>-->
         </ul>
         <div class="tab-content">
             <div id="tvshows" class="tab-pane active">
@@ -33,7 +43,7 @@
                     <tbody id="tvshows_table_body"></tbody>
                 </table>
             </div>
-            <div id="nextaired" class="tab-pane">
+            <div id="calendar" class="tab-pane">
                 <table class="table table-striped table-sortable">
                     <thead>
                         <tr>
@@ -42,7 +52,7 @@
                             <th>Airdate</th>
                         </tr>
                     </thead>
-                    <tbody id="nextaired_table_body"></tbody>
+                    <tbody id="calendar_table_body"></tbody>
                 </table>
             </div>
             <div id="history" class="tab-pane">
