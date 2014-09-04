@@ -77,8 +77,12 @@ class NzbDrone:
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def Season(self, id):
-        return self.fetch('Series/%s' % id)
+    def Show(self, id):
+        # params = '/api/Series/lookup/?term=tvdbid:'+tvdbid
+        print self.fetch('Series/lookup/?term=tvdbid:%s' % id)
+        #return self.fetch('Series/lookup/?term=tvdbid:%s' % id)
+        return self.fetch('Series')
+        #return self.fetch('Series/%s' % id)
 
     @cherrypy.expose()
     @require()
@@ -104,7 +108,7 @@ class NzbDrone:
             self.logger.error("Invalid show ID was supplied: " + str(tvdbid))
             return False
 
-        return htpc.LOOKUP.get_template('nzbdrone_view.html').render(scriptname='nzbdroneview', tvdbid=tvdbid)
+        return htpc.LOOKUP.get_template('nzbdrone_view.html').render(scriptname='nzbdrone_view', tvdbid=tvdbid)
 
     @cherrypy.expose()
     @require()
@@ -117,6 +121,26 @@ class NzbDrone:
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
+    def Episodes(self, id):
+        params = 'episode?seriesId=%s' % id #episode
+        return self.fetch(params)
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def Episodesqly(self, id):
+        print 'Episodesqly ', id
+        params = 'episodefile?seriesId=%s' % id #episode
+        print self.fetch(params)
+        return self.fetch(params)
+        '''
+        Request URL:http://localhost:9000/api/episodefile?seriesId=397
+
+        '''
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
     def Profile(self):
-        print self.fetch('profile')
+        #print self.fetch('profile')
         return self.fetch('profile')
