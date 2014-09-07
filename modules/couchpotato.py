@@ -101,10 +101,10 @@ class Couchpotato:
     def GetMovieList(self, status='', limit=''):
         if status == 'done':
             status += '&type=movie&release_status=done&status_or=1'
-            return self.fetch('movie.list/?status=' + status)
+            return self.fetch('media.list/?status=' + status)
 
         self.logger.debug("Fetching Movies")
-        return self.fetch('movie.list/?status=' + status + '&limit_offset=' + limit)
+        return self.fetch('media.list/?status=' + status + '&limit_offset=' + limit)
 
     @cherrypy.expose()
     @require()
