@@ -111,7 +111,6 @@ class Couchpotato:
     def GetNotificationList(self, limit='20'):
         self.logger.debug("Fetching Notification")
         data = self.fetch('notification.list/?limit_offset=' + limit)
-        print data
         #self.fetch('notification.markread')
         return data
 
