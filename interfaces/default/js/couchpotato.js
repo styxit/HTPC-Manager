@@ -273,7 +273,7 @@ function showMovie(movie) {
     modalInfo.append(titles, profiles);
     if (movie.releases && movie.releases.length > 0 && movie.releases.status !== 'done') {
         var strTable = $("<table>").addClass("table table-striped table-hover").append(
-        $("<tr>").append("<th>Action</th>").append("<th>Name</th>").append("<th>Score</th>").append("<th>Size</th>"));
+        $("<tr>").append("<th>Action</th>").append("<th>Name</th>").append("<th>Age</th>").append("<th>Score</th>").append("<th>Size</th>"));
 
             $.each(movie.releases, function (nIndex, pRelease) {
                 if (pRelease.info === undefined || pRelease.info.id === undefined) {
@@ -300,6 +300,7 @@ function showMovie(movie) {
                     pEvent.preventDefault();
                     window.open(pRelease.info.detail_url);
                 })),
+                $("<td>").append(pRelease.info.age),
                 $("<td>").append(pRelease.info.score),
                 $("<td>").html(bytesToSize(pRelease.info.size * 1000000))).toggleClass("ignore", pRelease.status_id == 3));
 
