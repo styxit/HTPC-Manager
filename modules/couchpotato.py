@@ -22,7 +22,7 @@ class Couchpotato:
                 {'type': 'bool', 'label': 'Enable', 'name': 'couchpotato_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'couchpotato_name'},
                 {'type': 'text', 'label': 'Username', 'name': 'couchpotato_username'},
-                {'type': 'text', 'label': 'Password', 'name': 'couchpotato_password'},
+                {'type': 'password', 'label': 'Password', 'name': 'couchpotato_password'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'couchpotato_host'},
                 {'type': 'text', 'label': 'Port', 'placeholder':'5050', 'name': 'couchpotato_port'},
                 {'type': 'text', 'label': 'Basepath', 'placeholder':'/couchpotato', 'name': 'couchpotato_basepath'},
