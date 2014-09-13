@@ -3,7 +3,7 @@
 
 """ Class for handling settings and generating settings page """
 import os
-from json import loads
+from json import loads, dumps
 import cherrypy
 import htpc
 import logging
@@ -78,6 +78,18 @@ class Settings:
             themes.append({'name': theme, 'value': theme, 'selected': current})
         return themes
 
+    def cleanme(self, text):
+        clean_table = {
+            "&": "",
+            ">": "",
+            "<": "",
+            ")": "",
+            "(": "",
+            "=": ""
+            }
+
+        return "".join(clean_table.get(c, c) for c in text)
+
     """ Save json with custom urls """
     @cherrypy.expose()
     @require(member_of("admin"))
@@ -85,9 +97,19 @@ class Settings:
     def urls(self, **kwargs):
         if kwargs:
             for key, val in kwargs.items():
+                key = key.strip()
+                key = self.cleanme(key)
                 self.set('custom_urls', key)
 
     """ Get custom defined urls from database in json format """
     def getUrls(self):
-        links = self.get('custom_urls', '{}')
-        return loads(links)
+        try:
+            links = self.get('custom_urls', '{}')
+            l = loads(links)
+            ll = []
+            for i in l:
+                if 'url' and 'name' in i:
+                    ll.append(i)
+            return ll
+        except Exception as e:
+            return [{'name': '', 'url': ''}]
