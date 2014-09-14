@@ -48,7 +48,7 @@ function loadShows() {
             }
             $.each(result, function (showname, tvshow) {
                 //console.log(result)
-                var name = $('<a>').attr('href', WEBDIR + 'nzbdrone/View/' + tvshow.tvdbId).text(tvshow.title);
+                var name = $('<a>').attr('href', WEBDIR + 'nzbdrone/View/' + tvshow.tvdbId + '/' + tvshow.id).text(tvshow.title);
                 var row = $('<tr>');
                 // Check the global var as nzbdrone dont have quality name only a id.
                 $.each(qlty, function (i, q) {

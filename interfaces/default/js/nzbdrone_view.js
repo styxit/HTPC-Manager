@@ -1,38 +1,40 @@
 $(document).ready(function () {
     moment().format();
     var showid = $('h1.page-title').attr('data-showid');
-    //alert('showid');
-    //alert(showid);
-    loadShowData(showid);
-    //$('#banner').css('background-image', 'url(' + WEBDIR + 'sickbeard/GetBanner/' + showid + ')');
+    var idz = $('h1.page-title').attr('data-id');
+    loadShowData(showid, idz);
 });
 
-function loadShowData(showid) {
+function loadShowData(showid, idz) {
     $.ajax({
-        url: WEBDIR + 'nzbdrone/Series',
+        url: WEBDIR + 'nzbdrone/Show/' + showid + '/' + idz,
         type: 'get',
         dataType: 'json',
-        success: function (result) {
-            if (!result) {
+        success: function (tvshow) {
+            if (!tvshow) {
                 notify('Error', 'Show not found.', 'error');
                 return;
             }
-            // Nzbdrone dont have a query from one show and what settings it has.
-            $.each(result, function (showname, tvshow) {
               // If the show is the one clicked on
                 if (tvshow.tvdbId == showid) {
                   $('h1.page-title').attr('data-tvdbid')
                   // If there is a airdate format it, else leave it blank
                     if (tvshow.nextAiring) {
-                        //alert(tvshow.nextAiring);
                         nextair = moment(tvshow.nextAiring).calendar();
                     } else {
-                        nextair = '';
+                        nextair = 'NA';
                     }
-                    // checks this tvshow has a banner and call cache image function
-                    if (tvshow.images.coverTyes === 'banner') {
-                      // placeholder
+                    //console.log(tvshow.images.coverType);
+                    if (tvshow.images.length > 0) {
+                      $.each(tvshow.images, function(i, cover) {
+                        if (cover.coverType === "banner") {
+                          console.log(cover.url);
+                          // Fetch the banner
+                          $('#banner').css('background-image', 'url(' + WEBDIR + 'nzbdrone/GetBanner/?url=' + cover.url + ')');
+                        }
+                      })
                     }
+                 
                     $('.nzbdrone_showname').text(tvshow.title);
                     $('.nzbdrone_status').append(nzbdroneStatusLabel(tvshow.status));
                     $('.nzbdrone_network').text(tvshow.network);
@@ -42,21 +44,35 @@ function loadShowData(showid) {
                 
 
                     var menu = $('.show-options-menu');
-                    $('.rescan-files', menu).click(function (evt) {
-                        evt.preventDefault();
-                        //rescanFiles(showid, data.show_name);
-                    });
-
-                    $('.full-update', menu).click(function (evt) {
-                        evt.preventDefault();
-                        //forceFullUpdate(showid, data.show_name);
-                    });
+                    $('.rescan-files')//.addClass('dostuff')
+                    //$('.rescan-files dostuff', menu)
+                    .attr('data-method', 'RefreshSeries')
+                    .attr('data-param', 'seriesId')
+                    .attr('data-id', tvshow.id)
+                    .attr('data-name', tvshow.title)
+                    .text('Refresh Series');
+                    //.click(function (evt) {
+                        //evt.preventDefault();
+                        //rescanFiles(tvshow.id, tvshow.title);
+                    //});
+                    
+                    $('.full-update')
+                    //$('.full-update', menu)
+                    .attr('data-desc', 'Rescan Serie')
+                    .attr('data-method', 'RescanSeries')
+                    .attr('data-param', 'seriesId')
+                    .attr('data-id', tvshow.id)
+                    //.attr('title', 'Search new download').attr('data-id', value.id)
+                    .attr('data-name', tvshow.title)
+                    //.click(function (evt) {
+                    //    evt.preventDefault();
+                    //    forceFullUpdate(tvshow.id, tvshow.title);
+                    //});
 
                     //renderSeasonTabs(showid, tvshow.id, tvshow.seasons) // org
                     renderSeasonTabs(showid, tvshow.id, tvshow)
 
                 }
-            });
          
     },
     error: function () {
@@ -101,32 +117,36 @@ function renderSeasonTabs(showid, id, tvshow) {
     list.find('li:first-child a').trigger('click');
 }
 
-function showEpisodeInfo(nShowID, nSeason, nEpisode) {
-	$.getJSON(WEBDIR + "sickbeard/GetEpisode/" + nShowID + "/" + nSeason + "/" + nEpisode, function(pResult) {
+function showEpisodeInfo(episodeid, value) {
+  var ep = value
+	$.getJSON(WEBDIR + "nzbdrone/Episodeqly/" + episodeid + "/", function(pResult) {
+    console.log('dipshit')
+    console.log(pResult);
+    console.log(ep);
 		var strHTML = $("<table>").attr("class", "episodeinfo")
 			.append($("<tr>")
 				.append($("<td>").html("<b>Name</b>"))
-				.append($("<td>").text(pResult.data.name)))
+				.append($("<td>").text(ep.title)))
 			.append($("<tr>")
 				.append($("<td>").html("<b>Description</b>"))
-				.append($("<td>").text(pResult.data.description)));
+				.append($("<td>").text(ep.overview)));
 				
-				if (pResult.data.status == "Downloaded") {
+				if (ep.hasFile) {
 					strHTML.append($("<tr>")
 						.append($("<td>").html("<b>Air date</b>"))
-						.append($("<td>").text(pResult.data.airdate)))
+						.append($("<td>").text(pResult.airDateUtc)))
 					.append($("<tr>")
 						.append($("<td>").html("<b>Quality</b>"))
-						.append($("<td>").text(pResult.data.quality)))						
+						.append($("<td>").text(pResult.quality.quality.name)))						
 					.append($("<tr>")
 						.append($("<td>").html("<b>File size</b>"))
-						.append($("<td>").text(pResult.data.file_size_human)))
+						.append($("<td>").text(pResult.size)))
 					.append($("<tr>")
 						.append($("<td>").html("<b>Location</b>"))
-						.append($("<td>").text(pResult.data.location)));
+						.append($("<td>").text(pResult.path)));
 				}
 	
-		showModal(pResult.data.name, strHTML, []);
+		showModal(pResult.title, strHTML, []);
 	});
 }
 
@@ -140,9 +160,12 @@ function find_d_q(id) {
 }
 
 function rendseason(sID, id, seasonnumber) {
+
+    var qqq = find_d_q(id);
+    console.log(qqq);
     // Used to get quality of ep in a season to global var to reduce calls // Not in use atm
-    //find_d_q(id)
     $.getJSON(WEBDIR + 'nzbdrone/Episodes/' + id, function (result) {
+      console.log(result);
         //if (result.seasonNumber == seasonnumber) {
         $('#season-list li').removeClass('active');
         $(this).parent().addClass("active");
@@ -150,51 +173,53 @@ function rendseason(sID, id, seasonnumber) {
         var seasonContent = $('#season-content');
         // Clear table contents before inserting new row
         seasonContent.html('');
+        
 
         // Loop through data
         $.each(result, function (index, value) {
             // check if the seasonnumber are correct so it validates the correct season
+            console.log('value')
+            console.log(value);
             if (value.seasonNumber == seasonnumber) {
-                console.log(value);
                 if (value.hasFile) {
                     hasfile = 'Downloaded';
                 } else {
                     hasfile = '';
                 }
-                console.log(hasfile);
 
                 var row = $('<tr>');
 
-                var search_link = $('<a>').addClass('btn btn-mini').attr('title', 'Search new download').append($('<i>').addClass('icon-search')).on('click', function () {
-                    //searchEpisode(showid, season, index, value.name);
+                var search_link = $('<a>').addClass('btn btn-mini dostuff')
+                .attr('data-method', 'episodeSearch')
+                .attr('data-param', 'episodeIds')
+                .attr('title', 'Search new download').attr('data-id', value.id)
+                .attr('data-name', value.title)
+                .append($('<i>').addClass('icon-search')).on('click', function () {
+                    //searchEpisode(value.id);
                 });
-                // Not in use atm // TODO
+                console.log('something');
+                console.log(value);
+                // Not in use atm // TODO 
                 /*
-                $.each(qltyfiles, function (i, q) {
-                    //console.log('q')
-                  //console.log(q)
-
-                  if (value.seasonNumber == q.seasonNumber) {
-                    console.log('sumthing')
-                    console.log(value.seasonNumber, q.seasonNumber)
-                    //alert('sumthing');
-                    $('.quality').text(q.quality.quality.name);
-
-                  } else {
-                    $('.quality').text('NA');
-                  }
-
-                }) // end quality loop
-                */
+                  $.each(qqq, function (i, q) {
+                    console.log(q);
+                    if (value.seasonNumber == q.seasonNumber) {
+                      $('.quality').text(q.quality.quality.name);
+                    } else {
+                      $('.quality').text('NA');
+                    }
+                  }); // getfile quality
+                 */ 
+                
                 row.append(
                 $('<td>').text(value.episodeNumber),
                 $('<td>').append($("<a>").text(value.title).click(function (pEvent) {
                     pEvent.preventDefault();
-                    //showEpisodeInfo(showid, season, index);
+                    showEpisodeInfo(value.id, value);
                 })),
                 $('<td>').text(value.airDate),
                 $('<td>').html(nzbdroneStatusLabel(hasfile)), // is the file is downloaded or not
-                //$('<td>').addClass('quality').text(''), //needs to use episodefile=SeriesId=1337 ? // not in use atm
+                $('<td>').addClass('quality').text(''), //needs to use episodefile=SeriesId=1337 ? // not in use atm
                 $('<td>').append(search_link));
                 seasonContent.append(row);
             }
@@ -271,18 +296,21 @@ function rescanFiles(tvdbid, name) {
   });
 }
 
-function searchEpisode(tvdbid, season, episode, name) {
+function searchEpisode(episodeid) {
+  var season = ''
+  var episode= ''
   var modalcontent = $('<div>');
   modalcontent.append($('<p>').html('Looking for episode &quot;'+ name +'&quot;.'));
   modalcontent.append($('<div>').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'));
   showModal('Searching episode '+season + 'x'+episode, modalcontent, {});
 
   $.ajax({
-    url: WEBDIR + 'sickbeard/SearchEpisodeDownload?tvdbid=' + tvdbid +'&season=' + season +'&episode='+episode,
+    url: WEBDIR + 'nzbdrone/Command?name=' + 'episodeSearch' +'&' +'episodeIds='+ episodeid,
     type: 'get',
     dataType: 'json',
     timeout: 40000,
     success: function (data) {
+      console.log(data)
       // If result is not 'succes' it must be a failure
       if (data.result != 'success') {
         notify('Error', data.message, 'error');
@@ -358,8 +386,6 @@ function nzbdroneStatusLabel(text){
   if (icon != '') {
     label.prepend(' ').prepend(icon);
   }
-  //console.log('label')
-  //console.log(label)
   return label;
 }
 
@@ -371,6 +397,17 @@ function profile(qualityProfileId) {
 
 }
 
+function getbanner(bannerurl) {
+  data = {
+    url: bannerurl
+  }
+  $.get(WEBDIR + 'nzbdrone/GetBanner', data, function(result){
+    console.log('getbanner');
+    $('#banner').css('background-image', 'url(' + result + ')');
+
+  })
+}
+
 /*
 $(document).on('click', '#season-list a', function () {
     id = $(this).attr('data-id');
@@ -379,3 +416,20 @@ $(document).on('click', '#season-list a', function () {
     //alert('click');
 });
 */
+
+function SeriesSearch(seriesid) {
+  $.getJSON(WEBDIR + 'nzbdrone/?name=SeriesSearch&seriesId='+ seriesid)
+}
+
+$(document).on('click', '.dostuff', function () {
+    var method = $(this).attr('data-method');
+    params = {
+        method: $(this).attr('data-method'),
+        par: $(this).attr('data-param'),
+        id: $(this).attr('data-id'),
+        name: $(this).attr('data-name')
+    };
+    $.getJSON(WEBDIR + "nzbdrone/Command", params, function (result) {
+
+    });
+});
