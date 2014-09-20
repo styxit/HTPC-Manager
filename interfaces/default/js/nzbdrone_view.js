@@ -1,5 +1,6 @@
 $(document).ready(function () {
     moment().format();
+    var qlty = profile()
     var showid = $('h1.page-title').attr('data-showid');
     var idz = $('h1.page-title').attr('data-id');
     loadShowData(showid, idz);
@@ -68,6 +69,18 @@ function loadShowData(showid, idz) {
                     //    evt.preventDefault();
                     //    forceFullUpdate(tvshow.id, tvshow.title);
                     //});
+                    $('.search_all_ep_in_show')
+                    .attr('data-desc', 'Search for all episodes')
+                    .attr('data-method', 'SeriesSearch')
+                    .attr('data-param', 'seriesId')
+                    .attr('data-id', tvshow.id)
+                    .attr('data-name', tvshow.title)
+
+                    $('.edit_show')
+                    .click(function (evt) {
+                        evt.preventDefault();
+                        loadShow2(tvshow)//forceFullUpdate(tvshow.id, tvshow.title);
+                    });
 
                     //renderSeasonTabs(showid, tvshow.id, tvshow.seasons) // org
                     renderSeasonTabs(showid, tvshow.id, tvshow)
@@ -423,6 +436,7 @@ function SeriesSearch(seriesid) {
 
 $(document).on('click', '.dostuff', function () {
     var method = $(this).attr('data-method');
+    var name = $(this).attr('data-name')
     params = {
         method: $(this).attr('data-method'),
         par: $(this).attr('data-param'),
@@ -430,6 +444,262 @@ $(document).on('click', '.dostuff', function () {
         name: $(this).attr('data-name')
     };
     $.getJSON(WEBDIR + "nzbdrone/Command", params, function (result) {
+        if (result.state) {
+          notify(method, name, 'success')
+        } else {
+          notify(method, name, 'error')
+        }
 
     });
 });
+
+
+function loadShow(tvshow) {
+          console.log('modalinfo')
+          console.log(tvshow)
+          var bannerurl;
+ 
+
+            var table = $('<table>');
+            table.addClass('table table-bordered table-striped table-condensed');
+
+            row = $('<tr>');
+            row.append('<th>Status</th><td>' + tvshow.status + '</td>');
+            table.append(row);
+
+            if (tvshow.nextAiring) {
+                nextair = moment(tvshow.nextAiring).calendar();
+            } else {
+                nextair = 'N/A';
+            }
+
+            row = $('<tr>');
+            row.append('<th>Airs</th><td>' + nextair + '</td>');
+            table.append(row);
+
+            row = $('<tr>');
+            row.append('<th>Monitored</th><td>' + tvshow.monitored + '</td>');
+            table.append(row);
+
+            row = $('<tr>');
+            row.append('<th>Location</th><td>' + tvshow.path + '</td>');
+            table.append(row);
+
+            $.each(qlty, function (i, q) {
+                    if (tvshow.qualityProfileId == q.id) {
+                        qname = q.name;
+                        row = $('<tr>');
+                        row.append('<th>Quality</th><td>' + q.name + '</td>');
+                        table.append(row);
+                    }
+            });
+
+            // $('#test').css('textTransform', 'capitalize'); to cap first letter in every word
+
+            row = $('<tr>');
+            row.append('<th>Network</th><td>' + tvshow.network + '</td>');
+            table.append(row);
+
+            if (tvshow.images.length > 0) {
+              $.each(tvshow.images, function(i, cover) {
+                if (cover.coverType === "banner") {
+                  bannerurl = cover.url
+
+                  //console.log(cover.url);
+                  // Fetch the banner
+                  //$('#banner').css('background-image', 'url(' + WEBDIR + 'nzbdrone/GetBanner/?url=' + cover.url + ')');
+                }
+              })
+            }
+
+            modalContent = $('<div>');
+            modalContent.append(
+              $('<img>').attr('src', WEBDIR + 'nzbdrone/GetBanner/?url=' + bannerurl).addClass('img-rounded'),
+              $('<hr>'),
+              table
+             );
+
+            var modalButtons = {
+              'Show' : function() {
+                window.location = WEBDIR + 'nzbdrone/View/' + tvdbid;
+              }
+            }
+
+            showModal(tvshow.title, modalContent, modalButtons);
+       
+}
+
+function profile(qualityProfileId) {
+    $.get(WEBDIR + 'nzbdrone/Profile', function(result) {
+      //console.log(result)
+      qlty = result
+      /*
+        $.each(result, function(i, q) {
+            if (qualityProfileId === q.id) {
+              //console.log('its a match')
+                return q.name;
+            }
+        });
+    */
+    });
+
+}
+
+
+function loadShow2(tvshow) {
+          console.log('modalinfo')
+          console.log(tvshow)
+          var bannerurl;
+ 
+            var table = $('<table>')
+            var form = $('<form>').addClass('form-horizontal')
+            var div = $('<div>')
+            var controls = $('div').addClass('controls')
+            var controlgrp = $('div').addClass('control-group')
+            //table.addClass('table table-bordered table-striped table-condensed');
+
+
+            form.append('<label for="quality">Quality</label>')
+            var qualityselect = $('<select id="quality">'); 
+                  //defaultoption.attr('value', '');
+                  //defaultoption.html('*');
+                  //$(selector).append(defaultoption);
+                  // [{"cutoff": {"id": 1, "name": "SDTV"}, "name": "SD", "grabDelay": 0, "items": [{"quality": {"id": 1, "name": "SDTV"}, "allowed": true}, {"quality": {"id": 8, "name": "WEBDL-480p"}, "allowed": true}, {"quality": {"id": 2, "name": "DVD"}, "allowed": true}, {"quality": {"id": 4, "name": "HDTV-720p"}, "allowed": false}, {"quality": {"id": 9, "name": "HDTV-1080p"}, "allowed": false}, {"quality": {"id": 10, "name": "Raw-HD"}, "allowed": false}, {"quality": {"id": 5, "name": "WEBDL-720p"}, "allowed": false}, {"quality": {"id": 6, "name": "Bluray-720p"}, "allowed": false}, {"quality": {"id": 3, "name": "WEBDL-1080p"}, "allowed": false}, {"quality": {"id": 7, "name": "Bluray-1080p"}, "allowed": false}], "language": "english", "grabDelayMode": "first", "id": 1}, {"cutoff": {"id": 4, "name": "HDTV-720p"}, "name": "HD-720p", "grabDelay": 0, "items": [{"quality": {"id": 1, "name": "SDTV"}, "allowed": false}, {"quality": {"id": 8, "name": "WEBDL-480p"}, "allowed": false}, {"quality": {"id": 2, "name": "DVD"}, "allowed": false}, {"quality": {"id": 4, "name": "HDTV-720p"}, "allowed": true}, {"quality": {"id": 9, "name": "HDTV-1080p"}, "allowed": false}, {"quality": {"id": 10, "name": "Raw-HD"}, "allowed": false}, {"quality": {"id": 5, "name": "WEBDL-720p"}, "allowed": true}, {"quality": {"id": 6, "name": "Bluray-720p"}, "allowed": true}, {"quality": {"id": 3, "name": "WEBDL-1080p"}, "allowed": false}, {"quality": {"id": 7, "name": "Bluray-1080p"}, "allowed": false}], "language": "english", "grabDelayMode": "first", "id": 2}, {"cutoff": {"id": 9, "name": "HDTV-1080p"}, "name": "HD-1080p", "grabDelay": 0, "items": [{"quality": {"id": 1, "name": "SDTV"}, "allowed": false}, {"quality": {"id": 8, "name": "WEBDL-480p"}, "allowed": false}, {"quality": {"id": 2, "name": "DVD"}, "allowed": false}, {"quality": {"id": 4, "name": "HDTV-720p"}, "allowed": false}, {"quality": {"id": 9, "name": "HDTV-1080p"}, "allowed": true}, {"quality": {"id": 10, "name": "Raw-HD"}, "allowed": false}, {"quality": {"id": 5, "name": "WEBDL-720p"}, "allowed": false}, {"quality": {"id": 6, "name": "Bluray-720p"}, "allowed": false}, {"quality": {"id": 3, "name": "WEBDL-1080p"}, "allowed": true}, {"quality": {"id": 7, "name": "Bluray-1080p"}, "allowed": true}], "language": "english", "grabDelayMode": "first", "id": 3}, {"cutoff": {"id": 4, "name": "HDTV-720p"}, "name": "HD - All", "grabDelay": 0, "items": [{"quality": {"id": 1, "name": "SDTV"}, "allowed": false}, {"quality": {"id": 8, "name": "WEBDL-480p"}, "allowed": false}, {"quality": {"id": 2, "name": "DVD"}, "allowed": false}, {"quality": {"id": 4, "name": "HDTV-720p"}, "allowed": true}, {"quality": {"id": 9, "name": "HDTV-1080p"}, "allowed": true}, {"quality": {"id": 10, "name": "Raw-HD"}, "allowed": false}, {"quality": {"id": 5, "name": "WEBDL-720p"}, "allowed": true}, {"quality": {"id": 6, "name": "Bluray-720p"}, "allowed": true}, {"quality": {"id": 3, "name": "WEBDL-1080p"}, "allowed": true}, {"quality": {"id": 7, "name": "Bluray-1080p"}, "allowed": true}], "language": "english", "grabDelayMode": "first", "id": 4}]
+                  $.each(qlty, function (i, q) {
+                      //var re = /(Category\d\.Name)/; 
+                      //tname = cat.Name
+                      //if (re.test(tname)) {
+
+                          var option = $('<option>');
+                          if (tvshow.qualityProfileId == q.id) {
+                              option.attr('selected', true);
+                          }
+                          option.attr('value', q.id);
+                          option.html(q.name);
+                          qualityselect.append(option);
+                      
+                      //}
+                  })
+              form.append(qualityselect)
+              //controls.append(con)
+
+              var monitoredselect = $('<select>');
+              var option = $('<option>');
+              var option2 = $('<option>');
+                          if (tvshow.monitored) {
+                              option.attr('selected', true);
+                              //option.attr('value', tvshow.monitored);
+                              //option.html(tvshow.monitored);
+                              //monitoredselect.append(option); 
+                          }
+                          option.attr('value', true);
+                          option.html('true');
+                          monitoredselect.append(option);
+                          option2.attr('value', false);
+                          option2.html('false');
+                          monitoredselect.append(option2);
+              form.append(monitoredselect);
+
+              var seasonfolderselect = $('<select>');
+              var option = $('<option>');
+              var option2 = $('<option>');
+                          if (tvshow.seasonFolder) {
+                              option.attr('selected', true); 
+                          }
+                          option.attr('value', true);
+                          option.html('true');
+                          seasonfolderselect.append(option);
+                          option2.attr('value', false);
+                          option2.html('false');
+                          seasonfolderselect.append(option2);
+              form.append(seasonfolderselect);
+
+
+              var seriestypeselect = $('<select>');
+              var option = $('<option>');
+              var option2 = $('<option>');
+              var option3 = $('<option>')
+                          if (tvshow.seriesType) {
+                              option.attr('selected', true); 
+                          }
+                          option.attr('value', "standard");
+                          option.html('standard');
+                          seriestypeselect.append(option);
+                          option2.attr('value', "daily");
+                          option2.html('daily');
+                          seriestypeselect.append(option2);
+                          option3.attr('value', "anime");
+                          option3.html('anime');
+                          seriestypeselect.append(option3);
+              form.append(seriestypeselect);
+
+              var paths = $('<input type=text placeholder="path/to/seasonname">')
+              form.append(paths);
+
+
+
+
+            
+
+            if (tvshow.nextAiring) {
+                nextair = moment(tvshow.nextAiring).calendar();
+            } else {
+                nextair = 'N/A';
+            }
+
+            row = $('<tr>');
+            row.append('<th>Airs</th><td>' + nextair + '</td>');
+            table.append(row);
+
+            row = $('<tr>');
+            row.append('<th>Monitored</th><td>' + tvshow.monitored + '</td>');
+            table.append(row);
+
+            row = $('<tr>');
+            row.append('<th>Location</th><td>' + tvshow.path + '</td>');
+            table.append(row);
+
+            $.each(qlty, function (i, q) {
+                    if (tvshow.qualityProfileId == q.id) {
+                        qname = q.name;
+                        row = $('<tr>');
+                        row.append('<th>Quality</th><td>' + q.name + '</td>');
+                        table.append(row);
+                    }
+            });
+
+            // $('#test').css('textTransform', 'capitalize'); to cap first letter in every word
+
+            row = $('<tr>');
+            row.append('<th>Network</th><td>' + tvshow.network + '</td>');
+            table.append(row);
+
+            if (tvshow.images.length > 0) {
+              $.each(tvshow.images, function(i, cover) {
+                if (cover.coverType === "banner") {
+                  bannerurl = cover.url
+
+                  //console.log(cover.url);
+                  // Fetch the banner
+                  //$('#banner').css('background-image', 'url(' + WEBDIR + 'nzbdrone/GetBanner/?url=' + cover.url + ')');
+                }
+              })
+            }
+
+            modalContent = $('<div>');
+            modalContent.append(
+              $('<img>').attr('src', WEBDIR + 'nzbdrone/GetBanner/?url=' + bannerurl).addClass('img-rounded'),
+              $('<hr>'),
+              form,
+              table
+             );
+
+            var modalButtons = {
+              'Show' : function() {
+                window.location = WEBDIR + 'nzbdrone/View/' + tvdbid;
+              }
+            }
+
+            showModal(tvshow.title, modalContent, modalButtons);
+       
+}

@@ -38,7 +38,7 @@ class NzbDrone:
     def index(self):
         return htpc.LOOKUP.get_template('nzbdrone.html').render(scriptname='nzbdrone')
 
-    def fetch(self, path, banner=None, type=None, data=None):
+    def fetch2(self, path, banner=None, type=None, data=None):
         try:
             host = htpc.settings.get('nzbdrone_host', '')
             port = str(htpc.settings.get('nzbdrone_port', ''))
@@ -83,6 +83,46 @@ class NzbDrone:
             #print banner
             return
 
+    def fetch(self, path, banner=None, type=None, data=None):
+        try:
+            host = htpc.settings.get('nzbdrone_host', '')
+            port = str(htpc.settings.get('nzbdrone_port', ''))
+            nzbdrone_basepath = htpc.settings.get('nzbdrone_basepath', '/')
+            ssl = 's' if htpc.settings.get('nzbdrone_ssl', True) else ''
+
+            if(nzbdrone_basepath == ""):
+                nzbdrone_basepath = "/"
+            if not(nzbdrone_basepath.endswith('/')):
+                nzbdrone_basepath += "/"
+
+            headers = {'X-Api-Key': htpc.settings.get('nzbdrone_apikey', '')}
+
+            url = 'http%s://%s:%s%sapi/%s' % (ssl, host, port, nzbdrone_basepath, path)
+            #print url
+
+            if banner:
+                url = 'http%s://%s:%s%s%s' % (ssl, host, port, nzbdrone_basepath, path[1:])
+                r = requests.get(url, headers=headers)
+                return r.content
+
+            if type == 'post':
+                print data
+                r = requests.post(url, data=dumps(data), headers=headers)
+                return r.content
+            elif type == 'put':
+                r = requests.post(url, data=dumps(data), headers=headers)
+                return r.content
+            elif type == 'delete':
+                r = requests.delete(url, data=dumps(data), headers=headers)
+                return r.content
+            else:
+                r = requests.get(url, headers=headers)
+                #return loads(r.content)
+                return loads(r.text)
+        except Exception as e:
+            print 'error in path %s' % path
+            print e
+
     def posty(self, path, data):
         
         print path
@@ -121,7 +161,12 @@ class NzbDrone:
     @require()
     @cherrypy.tools.json_out()
     def Rootfolder(self):
-        return self.fetch('Rootfolder')
+        print 'rootfolder'
+        path = self.fetch('Rootfolder')
+        for p in path:
+            print p
+            return p["path"]
+        #return self.fetch('Rootfolder')
 
     @cherrypy.expose()
     @require()
@@ -265,10 +310,11 @@ class NzbDrone:
 
     @cherrypy.expose()
     @require()
-    @cherrypy.tools.json_out()
+    #@cherrypy.tools.json_out()
     def Command(self, **kwargs):
         k = kwargs
         print k
+        cherrypy.response.headers['Content-Type'] = "application/json"
         for key, value in kwargs.iteritems():
             print key, value
         try:
@@ -292,3 +338,56 @@ class NzbDrone:
         path = 'command/%s' % path
         #print path
         return self.fetch(path)
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def Lookup(self, q):
+        print q
+        #print self.fetch('Series/lookup?term=%s' % urllib.quote(q))
+        return self.fetch('Series/lookup?term=%s' % urllib.quote(q))
+
+    @cherrypy.expose()
+    @require()
+    #@cherrypy.tools.json_out()
+    def AddShow(self, tvdbid, quality):
+        data = []
+        d = {}
+        try:
+            tvshow = self.fetch('Series/lookup?term=tvdbid:%s' % tvdbid) #Series/lookup/?term=tvdbid:'+tvdbid
+            rootfolder = self.Rootfolder()
+            seasoncount = 1
+            season = []
+            for i in tvshow:
+                #print i
+                seasoncount += i['seasonCount']
+                
+                d["title"] = i['title']
+                d["tvdbId"] = int(i['tvdbId'])
+                d["qualityProfileId"] = int(quality)
+                d["titleSlug"] = i['titleSlug']
+                d["RootFolderPath"] = rootfolder
+                #print rootfolder
+                #d['seasons'] = i['seasons']
+
+                for x in xrange(1, int(seasoncount)):
+                    s = {"seasonNumber": x, "monitored": True}
+                    season.append(s)
+
+                d["seasons"] = season
+                
+            
+            #print self.fetch('Series', data=d, type='post')
+            addshow =  self.fetch('Series', data=d, type='post')
+            print 'type is'
+            # Manually add correct headers since @cherrypy.tools.json_out() renders its wrong
+            cherrypy.response.headers['Content-Type'] = "application/json"
+            #print type(addshow)
+            return addshow
+        except Exception, e:
+            print 'addshow error ', e
+
+
+"""
+tvdbId (int) title (string) qualityProfileId (int) titleSlug (string) seasons (array)
+"""

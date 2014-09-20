@@ -19,15 +19,15 @@ $(document).ready(function () {
 
     $('#add_show_button').click(function () {
         $(this).attr('disabled', true);
-        //searchTvDb($('#add_show_name').val())
+        searchTvDb($('#add_show_name').val())
     });
 
     $('#add_tvdbid_button').click(function () {
-        addShow($('#add_show_select').val());
+        addShow($('#add_show_select').val(), $('#add_show_quality').val() );
     });
 
     $('#cancel_show_button').click(function () {
-        //cancelAddShow();
+        cancelAddShow();
     });
 
 });
@@ -197,4 +197,76 @@ function calendar() {
         });
 
     });
+}
+
+function searchTvDb(query) {
+    $.ajax({
+        url: WEBDIR + 'nzbdrone/Lookup/' + encodeURIComponent(query),
+        type: 'get',
+        //dataType: 'xml',
+        success: function (result) {
+          console.log('search for tvshow')
+          console.log(result);
+            if (result.length == 0) {
+                $('#add_show_button').attr('disabled', false);
+                $('#add_show_quality').attr('disabled', false);
+                return;
+            }
+            $('#add_show_select').html('');
+            $('#add_show_quality').html('');
+            $.each(result, function(i, item) {
+                var tvdbid = item.tvdbId;
+                var showname = item.title;
+                var year = item.year;
+                var option = $('<option>');
+                option.attr('data-info', $.makeArray(item));
+                option.attr('value', tvdbid);
+                option.html(showname + ' (' + year + ')');
+                $('#add_show_select').append(option);
+            });
+            $.each(qlty, function(i, quality) {
+              var option2 = $('<option>');
+              option2.attr('value', quality.id);
+              option2.html(quality.name);
+              $('#add_show_quality').append(option2);
+            });
+            $('#add_show_name').hide();
+            $('#cancel_show_button').show();
+            $('#add_show_select').fadeIn();
+            $('#add_show_button').attr('disabled', false).hide();
+            $('#add_tvdbid_button').show();
+            $('#add_show_quality').show();
+        }
+    });
+}
+
+function addShow(tvdbid, quality) {
+
+    $.ajax({
+        url: WEBDIR + 'nzbdrone/AddShow/' + tvdbid + '/' + quality,
+        type: 'get',
+        dataType: 'json',
+        success: function (data) {
+            $.each(data, function (i, res) {
+                console.log(res);
+            if (!res.errorMessage) {
+                notify('Add TV show', data.title,'success');
+            } else {
+                notify('Failed to add show', res.errorMessage, 'error')
+            }
+            });
+            cancelAddShow();
+        }
+    });
+}
+
+function cancelAddShow() {
+    $('#add_show_name').val('');
+    $('#add_show_quality').val('');
+    $('#add_show_select').hide();
+    $('#cancel_show_button').hide();
+    $('#add_show_name').fadeIn();
+    $('#add_tvdbid_button').hide();
+    $('#add_show_button').show();
+    $('#add_show_quality').hide();
 }
