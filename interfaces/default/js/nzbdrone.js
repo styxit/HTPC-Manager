@@ -47,7 +47,6 @@ function loadShows() {
                 $('#tvshows_table_body').append(row);
             }
             $.each(result, function (showname, tvshow) {
-                //console.log(result)
                 var name = $('<a>').attr('href', WEBDIR + 'nzbdrone/View/' + tvshow.tvdbId + '/' + tvshow.id).text(tvshow.title);
                 var row = $('<tr>');
                 // Check the global var as nzbdrone dont have quality name only a id.
@@ -113,7 +112,6 @@ function nzbdroneStatusLabel(text){
   var statusInfo = ['snatched', 'SD'];
   var statusError = ['ended'];
   var statusWarning = ['skipped'];
-  //console.log(text);
 
   var label = $('<span>').addClass('label').text(text);
 
@@ -134,30 +132,17 @@ function nzbdroneStatusLabel(text){
   if (icon != '') {
     label.prepend(' ').prepend(icon);
   }
-  //console.log('label')
-  //console.log(label)
   return label;
 }
 
 function profile(qualityProfileId) {
     $.get(WEBDIR + 'nzbdrone/Profile', function(result) {
-      //console.log(result)
       qlty = result
-      /*
-        $.each(result, function(i, q) {
-            if (qualityProfileId === q.id) {
-              //console.log('its a match')
-                return q.name;
-            }
-        });
-    */
     });
-
 }
 
 function history() {
     $.getJSON(WEBDIR + 'nzbdrone/History', function (result) {
-        console.log(result);
         $.each(result.records, function (i, log) {
             var row = $('<tr>');
             row.append(
@@ -177,9 +162,7 @@ function history() {
 
 function calendar() {
     $.getJSON(WEBDIR + 'nzbdrone/Calendar', function (result) {
-        console.log(result);
         $.each(result, function (i, cal) {
-          console.log(cal)
             var row = $('<tr>'); 
             row.append(
             $('<td>').text(cal.series.title),
@@ -203,10 +186,7 @@ function searchTvDb(query) {
     $.ajax({
         url: WEBDIR + 'nzbdrone/Lookup/' + encodeURIComponent(query),
         type: 'get',
-        //dataType: 'xml',
         success: function (result) {
-          console.log('search for tvshow')
-          console.log(result);
             if (result.length == 0) {
                 $('#add_show_button').attr('disabled', false);
                 $('#add_show_quality').attr('disabled', false);
@@ -248,7 +228,6 @@ function addShow(tvdbid, quality) {
         dataType: 'json',
         success: function (data) {
             $.each(data, function (i, res) {
-                console.log(res);
             if (!res.errorMessage) {
                 notify('Add TV show', data.title,'success');
             } else {
