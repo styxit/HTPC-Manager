@@ -8,7 +8,7 @@ import requests
 import urllib
 import logging
 from json import loads, dumps
-import datetime
+import datetime as DT
 
 
 class NzbDrone:
@@ -111,10 +111,7 @@ class NzbDrone:
     @require()
     @cherrypy.tools.json_out()
     def Calendar(self, param=None):
-        current_date = datetime.datetime.utcnow().strftime("%Y-%m-%d")
-        end_date = (datetime.datetime.strptime(current_date, '%Y-%m-%d') + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
-        p = 'Calendar?start=' + current_date + '&end=' + end_date
-        return self.fetch(p)
+        return self.fetch('Calendar?end=%s' % (DT.date.today() + DT.timedelta(days=7)))
 
     @cherrypy.expose()
     @require()

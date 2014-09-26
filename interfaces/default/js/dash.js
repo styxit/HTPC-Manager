@@ -266,24 +266,16 @@ function loadNextAired(options) {
 function loadNZBDroneCalendar(options) {
     if (!$('#calendar_table_body').length) return
     $.getJSON(WEBDIR + 'nzbdrone/Calendar', function (result) {
-        console.log(result);
         $.each(result, function (i, cal) {
           if (i >= 5) return
-          console.log(cal)
-            var name = $('<a>').attr('href', 'nzbdrone/View/' + cal.series.tvdbId + '/' + cal.seriesId + '#' + cal.seasonNumber).html(cal.series.title)
+            var name = $('<a>').attr('href', 'nzbdrone/View/' + cal.seriesId + '/' + cal.series.tvdbId + '#' + cal.seasonNumber).html(cal.series.title)
             var row = $('<tr>'); 
             row.append(
             $('<td>').append(name),
             $('<td>').text(cal.title),
             $('<td>').text(moment(cal.airDateUtc).fromNow())
             )
-            
-            // cal.airDateUtc // airdate
-            // cal.overview // summary
-            // cal.series.title // show title
-            // cal.title // episode title
-            // cal.profile.value.name // Quality name
-            
+     
             $('#calendar_table_body').append(row);
         });
 
