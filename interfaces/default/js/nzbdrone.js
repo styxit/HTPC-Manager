@@ -1,29 +1,18 @@
 $(document).ready(function () {
-    moment.locale('no', {
-        calendar : {
-            lastDay : '[Yesterday at] LT',
-            sameDay : '[Today at] LT',
-            nextDay : '[Tomorrow at] LT',
-            lastWeek : '[last] dddd [at] LT',
-            nextWeek : 'dddd [at] LT',
-            sameElse : 'L'
-        }
-    });
     moment().format();
-    $(window).trigger('hashchange')
+    $(window).trigger('hashchange');
     profile();
     loadShows();
     history();
     calendar();
-    //loadLogs();
-
+    
     $('#add_show_button').click(function () {
         $(this).attr('disabled', true);
-        searchTvDb($('#add_show_name').val())
+        searchTvDb($('#add_show_name').val());
     });
 
     $('#add_tvdbid_button').click(function () {
-        addShow($('#add_show_select').val(), $('#add_show_quality').val() );
+        addShow($('#add_show_select').val(), $('#add_show_quality').val());
     });
 
     $('#cancel_show_button').click(function () {
@@ -32,8 +21,8 @@ $(document).ready(function () {
 
 });
 
-// Global for quality profiles
-var qlty; 
+//
+var qlty = profile();
 
 function loadShows() {
     $.ajax({
@@ -46,8 +35,8 @@ function loadShows() {
                 row.append($('<td>').html('No shows found'));
                 $('#tvshows_table_body').append(row);
             }
-            $.each(result, function (showname, tvshow) {
-                var name = $('<a>').attr('href', WEBDIR + 'nzbdrone/View/' + tvshow.tvdbId + '/' + tvshow.id).text(tvshow.title);
+            $.each(result, function (showname, tvshow) { // tvshow.tvdbId 
+                var name = $('<a>').attr('href', WEBDIR + 'nzbdrone/View/' + tvshow.id + '/' + tvshow.tvdbId).text(tvshow.title);
                 var row = $('<tr>');
                 // Check the global var as nzbdrone dont have quality name only a id.
                 $.each(qlty, function (i, q) {
@@ -56,17 +45,16 @@ function loadShows() {
                     }
                 });
                 if (tvshow.nextAiring) {
-                  nextair = moment(tvshow.nextAiring).calendar();
+                    nextair = moment(tvshow.nextAiring).calendar();
                 } else {
-                  nextair = ''
+                    nextair = 'N/A';
                 }
                 row.append(
                 $('<td>').html(name),
                 $('<td>').html(nzbdroneStatusLabel(tvshow.status)),
                 $('<td>').html(nextair),
                 $('<td>').html(tvshow.network),
-                $('<td>').html(nzbdroneStatusLabel(qname))
-                );
+                $('<td>').html(nzbdroneStatusLabel(qname)));
                 $('#tvshows_table_body').append(row);
             });
             $('#tvshows_table_body').parent().trigger('update');
@@ -79,65 +67,60 @@ function loadShows() {
     });
 }
 
-function nzbdroneStatusIcon(iconText, white){
-  var text =[
-    'downloaded',
-    'continuing',
-    'snatched',
-    'unaired',
-    'archived',
-    'skipped'
-  ];
-  var icons = [
-    'icon-download-alt',
-    'icon-repeat',
-    'icon-share-alt',
-    'icon-time',
-    'icon-lock',
-    'icon-fast-forward'
-  ];
+function nzbdroneStatusIcon(iconText, white) {
+    var text = [
+        'downloaded',
+        'continuing',
+        'snatched',
+        'unaired',
+        'archived',
+        'skipped'];
+    var icons = [
+        'icon-download-alt',
+        'icon-repeat',
+        'icon-share-alt',
+        'icon-time',
+        'icon-lock',
+        'icon-fast-forward'];
 
-  if (text.indexOf(iconText) != -1) {
-    var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
-    if (white == true) {
-      icon.addClass('icon-white');
+    if (text.indexOf(iconText) != -1) {
+        var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
+        if (white === true) {
+            icon.addClass('icon-white');
+        }
+        return icon;
     }
-    return icon;
-  }
-  return '';
+    return '';
 }
 
-function nzbdroneStatusLabel(text){
-  var statusOK = ['continuing', 'downloaded', 'HD', 'HD-720p', 'HD-1080p', 'WEBDL-1080p'];
-  var statusInfo = ['snatched', 'SD'];
-  var statusError = ['ended'];
-  var statusWarning = ['skipped'];
+function nzbdroneStatusLabel(text) {
+    var statusOK = ['continuing', 'downloaded', 'HD', 'HD-720p', 'HD-1080p', 'WEBDL-1080p'];
+    var statusInfo = ['snatched', 'SD'];
+    var statusError = ['ended'];
+    var statusWarning = ['skipped'];
 
-  var label = $('<span>').addClass('label').text(text);
+    var label = $('<span>').addClass('label').text(text);
 
-  if (statusOK.indexOf(text) != -1) {
-    label.addClass('label-success');
-  }
-  else if (statusInfo.indexOf(text) != -1) {
-    label.addClass('label-info');
-  }
-  else if (statusError.indexOf(text) != -1) {
-    label.addClass('label-important');
-  }
-  else if (statusWarning.indexOf(text) != -1) {
-    label.addClass('label-warning');
-  }
+    if (statusOK.indexOf(text) != -1) {
+        label.addClass('label-success');
+    } else if (statusInfo.indexOf(text) != -1) {
+        label.addClass('label-info');
+    } else if (statusError.indexOf(text) != -1) {
+        label.addClass('label-important');
+    } else if (statusWarning.indexOf(text) != -1) {
+        label.addClass('label-warning');
+    }
 
-  var icon = nzbdroneStatusIcon(text, true);
-  if (icon != '') {
-    label.prepend(' ').prepend(icon);
-  }
-  return label;
+    var icon = nzbdroneStatusIcon(text, true);
+    if (icon !== '') {
+        label.prepend(' ').prepend(icon);
+    }
+    return label;
 }
 
 function profile(qualityProfileId) {
-    $.get(WEBDIR + 'nzbdrone/Profile', function(result) {
-      qlty = result
+    $.get(WEBDIR + 'nzbdrone/Profile', function (result) {
+        qlty = result
     });
 }
 
@@ -147,13 +130,12 @@ function history() {
             var row = $('<tr>');
             row.append(
             $('<td>').text(moment(log.date).calendar()),
-            //$('<td>').text(log.eventType), // descibes the action
-            //$('<td>').text(log.sourceTitle),
-            $('<td>').text(log.series.title),
+            $('<td>').text(log.eventType),
+            $('<td>').text(log.sourceTitle),
+            //$('<td>').text(log.series.title), // Clean title
             $('<td>').text(log.episode.title),
             $('<td>').html(nzbdroneStatusLabel(log.series.status)),
-            $('<td>').html(nzbdroneStatusLabel(log.quality.quality.name))
-            );
+            $('<td>').html(nzbdroneStatusLabel(log.quality.quality.name)));
 
             $('#history_table_body').append(row);
         });
@@ -163,19 +145,16 @@ function history() {
 function calendar() {
     $.getJSON(WEBDIR + 'nzbdrone/Calendar', function (result) {
         $.each(result, function (i, cal) {
-            var row = $('<tr>'); 
+            var row = $('<tr>');
+            var name = $('<a>').attr('href', '#').html(cal.series.title).click(function (e) {
+                e.preventDefault();
+                loadShow(cal.seriesId);
+            });
+            var img = makeIcon('icon-info-sign', cal.overview);
             row.append(
-            $('<td>').text(cal.series.title),
-            $('<td>').text(cal.title),
-            $('<td>').text(moment(cal.airDateUtc).calendar())
-            )
-            
-            // cal.airDateUtc // airdate
-            // cal.overview // summary
-            // cal.series.title // show title
-            // cal.title // episode title
-            // cal.profile.value.name // Quality name
-            
+            $('<td>').append(name),
+            $('<td>').html(cal.title + '&nbsp').append(img),
+            $('<td>').text(moment(cal.airDateUtc).calendar()));
             $('#calendar_table_body').append(row);
         });
 
@@ -187,14 +166,14 @@ function searchTvDb(query) {
         url: WEBDIR + 'nzbdrone/Lookup/' + encodeURIComponent(query),
         type: 'get',
         success: function (result) {
-            if (result.length == 0) {
+            if (result.length === 0) {
                 $('#add_show_button').attr('disabled', false);
                 $('#add_show_quality').attr('disabled', false);
                 return;
             }
             $('#add_show_select').html('');
             $('#add_show_quality').html('');
-            $.each(result, function(i, item) {
+            $.each(result, function (i, item) {
                 var tvdbid = item.tvdbId;
                 var showname = item.title;
                 var year = item.year;
@@ -204,11 +183,11 @@ function searchTvDb(query) {
                 option.html(showname + ' (' + year + ')');
                 $('#add_show_select').append(option);
             });
-            $.each(qlty, function(i, quality) {
-              var option2 = $('<option>');
-              option2.attr('value', quality.id);
-              option2.html(quality.name);
-              $('#add_show_quality').append(option2);
+            $.each(qlty, function (i, quality) {
+                var option2 = $('<option>');
+                option2.attr('value', quality.id);
+                option2.html(quality.name);
+                $('#add_show_quality').append(option2);
             });
             $('#add_show_name').hide();
             $('#cancel_show_button').show();
@@ -221,18 +200,17 @@ function searchTvDb(query) {
 }
 
 function addShow(tvdbid, quality) {
-
     $.ajax({
         url: WEBDIR + 'nzbdrone/AddShow/' + tvdbid + '/' + quality,
         type: 'get',
         dataType: 'json',
         success: function (data) {
             $.each(data, function (i, res) {
-            if (!res.errorMessage) {
-                notify('Add TV show', data.title,'success');
-            } else {
-                notify('Failed to add show', res.errorMessage, 'error')
-            }
+                if (!res.errorMessage) {
+                    notify('Add TV show', data.title, 'success');
+                } else {
+                    notify('Failed to add show', res.errorMessage, 'error');
+                }
             });
             cancelAddShow();
         }
@@ -248,4 +226,75 @@ function cancelAddShow() {
     $('#add_tvdbid_button').hide();
     $('#add_show_button').show();
     $('#add_show_quality').hide();
+}
+
+
+function loadShow(seriesID) {
+    $.getJSON(WEBDIR + 'nzbdrone/Show/id=' + seriesID, function (tvshow) {
+        var bannerurl;
+        var table = $('<table>');
+        table.addClass('table table-bordered table-striped table-condensed');
+
+        row = $('<tr>');
+        row.append('<th>Status</th><td>' + tvshow.status + '</td>');
+        table.append(row);
+
+        if (tvshow.nextAiring) {
+            nextair = moment(tvshow.nextAiring).calendar();
+        } else {
+            nextair = 'N/A';
+        }
+
+        row = $('<tr>');
+        row.append('<th>Airs</th><td>' + nextair + '</td>');
+        table.append(row);
+
+        row = $('<tr>');
+        row.append('<th>Monitored</th><td>' + tvshow.monitored + '</td>');
+        table.append(row);
+
+        row = $('<tr>');
+        row.append('<th>Location</th><td>' + tvshow.path + '</td>');
+        table.append(row);
+
+        $.each(qlty, function (i, q) {
+            if (tvshow.qualityProfileId == q.id) {
+                qname = q.name;
+                row = $('<tr>');
+                row.append('<th>Quality</th><td>' + q.name + '</td>');
+                table.append(row);
+            }
+        });
+
+        row = $('<tr>');
+        row.append('<th>Network</th><td>' + tvshow.network + '</td>');
+        table.append(row);
+
+        if (tvshow.images.length > 0) {
+            $.each(tvshow.images, function (i, cover) {
+                if (cover.coverType === "banner") {
+                    bannerurl = cover.url;
+                }
+            });
+        }
+
+        modalContent = $('<div>');
+        modalContent.append(
+        $('<img>').attr('src', WEBDIR + 'nzbdrone/GetBanner/?url=' + bannerurl).addClass('img-rounded'),
+        $('<hr>'),
+        table);
+
+        // Disabled for now
+        /*
+        var modalButtons = {
+            'Show': function () {
+            data = {'id': tvshow.seriesID}
+            window.location = WEBDIR + 'nzbdrone/View/' + tvshow.tvdbid + '/' + tvshow.seriesID ;
+            }
+        };
+        */
+
+        showModal(tvshow.title, modalContent, []);
+    });
+
 }
