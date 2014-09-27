@@ -19,6 +19,12 @@ $(document).ready(function () {
         cancelAddShow();
     });
 
+    $('#scanfolder').click(function (e) {
+        e.preventDefault();
+        Scanfolder()
+    });
+
+
 });
 
 function loadShows() {
@@ -297,4 +303,31 @@ function loadShow(seriesID) {
         showModal(tvshow.title, modalContent, []);
     });
 
+}
+
+function Scanfolder() {
+    var path = "Default folder";
+    data = {
+        "method": "DownloadedEpisodesScan"
+    };
+    p = prompt('Write path to processfolder or leave blank for default path');
+    if (p !== null && p.length > 0) {
+        data.par = "path";
+        data.id = p;
+        path = p;
+    }
+
+    $.getJSON(WEBDIR + 'nzbdrone/Command', data, function (r) {
+        if (r.state) {
+            state = 'success';
+        } else {
+            state = 'error';
+        }
+
+        // Stop the notify from firing on cancel
+        if (p !== null) {
+         notify('NzbDrone', 'Postprocess ' + path, state);   
+        }
+        
+    });
 }
