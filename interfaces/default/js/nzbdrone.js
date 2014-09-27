@@ -1,7 +1,7 @@
 $(document).ready(function () {
     moment().format();
     $(window).trigger('hashchange');
-    profile();
+    var qlty = profile();
     loadShows();
     history();
     calendar();
@@ -20,9 +20,6 @@ $(document).ready(function () {
     });
 
 });
-
-//
-var qlty = profile();
 
 function loadShows() {
     $.ajax({
@@ -139,6 +136,8 @@ function history() {
 
             $('#history_table_body').append(row);
         });
+
+        $('#history_table_body').parent().trigger("update");
     });
 }
 
@@ -158,6 +157,7 @@ function calendar() {
             $('#calendar_table_body').append(row);
         });
 
+        $('#calendar_table_body').parent().trigger("update");
     });
 }
 

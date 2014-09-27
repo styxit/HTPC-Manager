@@ -156,7 +156,7 @@ class NzbDrone:
     @require()
     @cherrypy.tools.json_out()
     def Episodesqly(self, id):
-        self.debug('Fetching file info for all episodes')
+        self.logger.debug('Fetching fileinfo for all episodes in a show')
         return self.fetch('episodefile?seriesId=%s' % id)
 
     #Return one episode with file info

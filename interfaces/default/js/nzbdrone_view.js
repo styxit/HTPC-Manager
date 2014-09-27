@@ -3,7 +3,7 @@ $(document).ready(function () {
     var qlty = profile();
     var showid = $('h1.page-title').attr('data-showid');
     var idz = $('h1.page-title').attr('data-id');
-    //var qltyfiles = find_d_q(showid) //TODO
+    var qqq = find_d_q(showid)
     loadShowData(showid, idz);
 });
 
@@ -17,14 +17,22 @@ function loadShowData(seriesId, tvdbId) {
                 notify('Error', 'Show not found.', 'error');
                 return;
             }
+            
+            // Convert id to a Quality name
+            $.each(qlty, function (i, q) {
+                if (tvshow.qualityProfileId == q.id) {
+                    qname = q.name;
+                }
+            });
+
             // If the show is the one clicked on
             if (tvshow.tvdbId == tvdbId) {
                 var showid = $('h1.page-title').attr('data-tvdbid');
-                // If there is a airdate format it, else leave set NA
+                // If there is a airdate format it, else leave set N/A
                 if (tvshow.nextAiring) {
                     nextair = moment(tvshow.nextAiring).calendar();
                 } else {
-                    nextair = 'NA';
+                    nextair = 'N/A';
                 }
                 if (tvshow.images.length > 0) {
                     $.each(tvshow.images, function (i, cover) {
@@ -37,13 +45,13 @@ function loadShowData(seriesId, tvdbId) {
                     });
                 }
 
+                $('.nzbdrone_want_quality').text(qname);
                 $('.nzbdrone_showname').text(tvshow.title);
                 $('.nzbdrone_status').append(nzbdroneStatusLabel(tvshow.status));
                 $('.nzbdrone_network').text(tvshow.network);
                 $('.nzbdrone_location').text(tvshow.path);
                 $('.nzbdrone_airs').text(tvshow.airTime);
                 $('.nzbdrone_next_air').text(nextair);
-
 
                 var menu = $('.show-options-menu');
                 $('.rescan-files')
@@ -52,7 +60,6 @@ function loadShowData(seriesId, tvdbId) {
                     .attr('data-id', tvshow.id)
                     .attr('data-name', tvshow.title)
                     .text('Refresh Series');
-
 
                 $('.full-update')
                     .attr('data-desc', 'Rescan Serie')
@@ -79,7 +86,6 @@ function loadShowData(seriesId, tvdbId) {
                 });
 
                 renderSeasonTabs(tvdbId, tvshow.id, tvshow);
-
             }
 
         },
@@ -112,7 +118,7 @@ function renderSeasonTabs(showid, id, tvshow) {
     });
 
     list.find('a').on('click', function () {
-        var sn = $(this).attr('data-season'); // test
+        var sn = $(this).attr('data-season');
         var sid = $(this).attr('data-id');
         rendseason(sid, id, sn);
     });
@@ -153,16 +159,14 @@ function showEpisodeInfo(episodeid, value) {
     });
 }
 
-
+//Graps info about all the files in the show.
 function find_d_q(id) {
     $.getJSON(WEBDIR + 'nzbdrone/Episodesqly/' + id, function (result) {
-        return result;
+        qqq = result;
     });
-
 }
 
 function rendseason(sID, id, seasonnumber) {
-    //var qqq = find_d_q(id); //TODO
     $.getJSON(WEBDIR + 'nzbdrone/Episodes/' + id, function (result) {
         $('#season-list li').removeClass('active');
         $(this).parent().addClass("active");
@@ -176,7 +180,7 @@ function rendseason(sID, id, seasonnumber) {
                 if (value.hasFile) {
                     hasfile = 'Downloaded';
                 } else {
-                    hasfile = '';
+                    hasfile = 'Missing';
                 }
 
                 var img = makeIcon('icon-search', 'Search for ' + value.title);
@@ -188,18 +192,6 @@ function rendseason(sID, id, seasonnumber) {
                     .attr('data-name', value.title)
                     .append(img);
 
-                // Not in use atm // TODO the the api is updated
-                /*
-                  $.each(qqq, function (i, q) {
-                    console.log(q);
-                    if (value.seasonNumber == q.seasonNumber) {
-                      $('.quality').text(q.quality.quality.name);
-                    } else {
-                      $('.quality').text('NA');
-                    }
-                  }); // getfile quality
-                 */
-
                 row.append(
                 $('<td>').text(value.episodeNumber),
                 $('<td>').append($("<a>").text(value.title).click(function (pEvent) {
@@ -208,9 +200,16 @@ function rendseason(sID, id, seasonnumber) {
                 })),
                 $('<td>').text(value.airDate),
                 $('<td>').html(nzbdroneStatusLabel(hasfile)),
-                //$('<td>').addClass('quality').text(''), // TODO when/if they change api
+                $('<td>').addClass('quality').text(''), // TODO when/if they change api
                 $('<td>').append(search_link));
                 seasonContent.append(row);
+                
+                $.each(qqq, function (i, q) {
+                    if (value.hasFile && value.episodeFileId === q.id) {
+                      $('.quality').text(q.quality.quality.name);
+                    }
+                });
+                
             }
 
         }); // end loop
