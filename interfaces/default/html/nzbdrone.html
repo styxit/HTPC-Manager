@@ -1,0 +1,85 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+<div class="container">
+    <div class="content maincontent">
+        <h1 class="page-header page-title">
+            <a href="http://${settings.get('nzbdrone_host')}:${settings.get('nzbdrone_port') + settings.get('nzbdrone_basepath')}" target="_blank" title="Open original NzbDrone interface">${settings.get('nzbdrone_name', 'NzbDrone')}</a>
+            <div class="btn-group pull-right">
+                    <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-off"></i>
+                    <i class="caret"></i></a>
+                    <ul class="dropdown-menu pull-right"> <!-- Skeleton -->
+                        <li><a href="Command?method=restart" class="ajax-confirm" title="Restart Nzbdrone"><i class="icon-refresh"></i> Restart</a></li>
+                        <li><a href="Command/?method=shutdown" class="ajax-confirm" title="Shutdown nzbdrone"><i class="icon-off"></i> Shutdown</a></li>
+                        <li><a id="scanfolder" href="#" title="Scan DroneFactoryFolder"><i class="icon-refresh"></i> Scan DroneFactoryFolder</a></li>
+                    </ul>
+                </div>
+        </h1>
+        <div class="well form-inline">
+            <input class="span6" id="add_show_name" name="add_show_name" type="text" />
+            <select class="span6" style="display:none;" id="add_show_select" name="add_show_select"></select>
+            <select class="span2" style="display:none;" id="add_show_quality" name="add_show_quality"></select>
+            <button class="btn btn-success" type="button" id="add_show_button"><i class="icon-plus icon-white"></i> Add show</button>
+            <button class="btn btn-success hide" type="button" id="add_tvdbid_button"><i class="icon-ok icon-white"></i> Add show</button>
+            <button class="btn hide" type="button" id="cancel_show_button"> Cancel</button>
+        </div>
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#tvshows" data-toggle="tab">TV Shows</a></li>
+            <li><a href="#calendar" data-toggle="tab">Calendar</a></li>
+            <li><a href="#history" data-toggle="tab">History</a></li>
+            <!--<li><a href="#log" data-toggle="tab">Log</a></li>-->
+        </ul>
+        <div class="tab-content">
+            <div id="tvshows" class="tab-pane active">
+                <table class="table table-striped table-sortable">
+                    <thead>
+                        <tr>
+                            <th>Showname</th>
+                            <th>Status</th>
+                            <th>Next ep</th>
+                            <th>Network</th>
+                            <th>Quality</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tvshows_table_body"></tbody>
+                </table>
+            </div>
+            <div id="calendar" class="tab-pane">
+                <table class="table table-striped table-sortable">
+                    <thead>
+                        <tr>
+                            <th>Showname</th>
+                            <th>Episode</th>
+                            <th>Airdate</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calendar_table_body"></tbody>
+                </table>
+            </div>
+            <div id="history" class="tab-pane">
+                <table class="table table-striped table-sortable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Action</th>
+                            <th>Showname</th>
+                            <th>Episode</th>
+                            <th>Status</th>
+                            <th>Quality</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history_table_body"></tbody>
+                </table>
+            </div>
+            <div id="log" class="tab-pane">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Logitem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log_table_body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

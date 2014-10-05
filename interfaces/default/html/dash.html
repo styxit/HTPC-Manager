@@ -116,6 +116,21 @@ settings = self.attr.settings
                 </table>
             </div>
             %endif
+            %if settings.get('dash_nzbdrone', 0):
+            <div class="span4">
+                <h3><a href="nzbdrone/#calendar">Next Aired</a></h3>
+                <table class="table table-striped table-main">
+                    <thead>
+                        <tr>
+                            <th>Showname</th>
+                            <th>Episode</th>
+                            <th>Airdate</th>
+                        </tr>
+                    </thead>
+                    <tbody id="calendar_table_body"></tbody>
+                </table>
+            </div>
+            %endif
         </div>
         <%
         dashcount = settings.get('dash_sickbeard', 0);
