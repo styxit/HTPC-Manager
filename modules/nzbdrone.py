@@ -22,11 +22,9 @@ class NzbDrone:
                 {'type': 'bool', 'label': 'Enable', 'name': 'nzbdrone_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'nzbdrone_name'},
                 {'type': 'text', 'label': 'IP / Host', 'placeholder': 'localhost', 'name': 'nzbdrone_host'},
-                {'type': 'text', 'label': 'Port', 'placeholder': '6789', 'name': 'nzbdrone_port'},
-                {'type': 'text', 'label': 'Basepath', 'placeholder': '/nzbget', 'name': 'nzbdrone_basepath'},
-                {'type': 'text', 'label': 'User', 'name': 'nzbdrone_username'},
+                {'type': 'text', 'label': 'Port', 'placeholder': '8989', 'name': 'nzbdrone_port'},
+                {'type': 'text', 'label': 'Basepath', 'placeholder': '/nzbdrone', 'name': 'nzbdrone_basepath'},
                 {'type': 'text', 'label': 'API', 'name': 'nzbdrone_apikey'},
-                {'type': 'password', 'label': 'Password', 'name': 'nzbdrone_password'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'nzbdrone_ssl'}
             ]
         })
