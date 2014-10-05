@@ -17,7 +17,7 @@ class NzbDrone:
         htpc.MODULES.append({
             'name': 'NzbDrone',
             'id': 'nzbdrone',
-            'test': htpc.WEBDIR + 'nzbdrone/version',
+            'test': htpc.WEBDIR + 'nzbdrone/Version',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'nzbdrone_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'nzbdrone_name'},
@@ -69,6 +69,24 @@ class NzbDrone:
                 return loads(r.text)
         except Exception as e:
             self.logger.error('Failed to fetch path=%s error %s' % (path, e))
+
+    @cherrypy.expose()
+    @require()
+    def Version(self, nzbdrone_host, nzbdrone_port, nzbdrone_basepath, nzbdrone_apikey, nzbdrone_ssl = False, **kwargs):
+        try:
+            ssl = 's' if nzbdrone_ssl else ''
+            if(nzbdrone_basepath == ""):
+                nzbdrone_basepath = "/"
+            if not(nzbdrone_basepath.endswith('/')):
+                nzbdrone_basepath += "/"
+
+            headers = {'X-Api-Key': str(nzbdrone_apikey)}
+            url = 'http%s://%s:%s%sapi/system/status' % (ssl, nzbdrone_host, nzbdrone_port, nzbdrone_basepath)
+            result = requests.get(url, headers=headers)
+
+            return result.json()
+        except:
+            return
 
     @cherrypy.expose()
     @require()
