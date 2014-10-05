@@ -154,6 +154,13 @@ class Sickbeard:
 
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
+    def RemoveShow(self, tvdbid):
+        self.logger.debug("Removing Show tvdbid " + tvdbid)
+        return self.fetch("show.delete&tvdbid=" + tvdbid)
+
+    @cherrypy.expose()
+    @require()
     def SearchShow(self, query):
         try:
             url = 'http://www.thetvdb.com/api/GetSeries.php?seriesname=' + quote(query)
