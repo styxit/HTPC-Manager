@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    get_branches()
     $('#other button.save').on('click', function(event){
         event.preventDefault();
 
@@ -208,5 +209,20 @@ function users_update_user(id) {
             if (id == item.id) option.attr('selected', 'selected');
             users.append(option);
         });
+    }, 'json');
+}
+
+function get_branches() {
+    $.get(WEBDIR + 'update/branches', function (data) {
+        var branches = $('#branch').empty();
+        $.each(data.branches, function (i, item) {
+            var option = $('<option>').text(item).val(item);
+            if (data.branch == item) option.attr('selected', 'selected');
+            branches.append(option);
+        });
+        if (data.branches.length >= 0) {
+            branches.append($('<option>').text(data.branch).val(data.branch).attr('selected', 'selected'));
+        }
+
     }, 'json');
 }

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 Update HTPC-Manager from Github. Either through git command or tarball.
 
@@ -26,9 +29,9 @@ import shutil
 from htpc.root import do_restart
 
 # configure git repo
-gitUser =  'styxit'
+gitUser = 'styxit'
 gitRepo = 'HTPC-Manager'
-gitBranch = 'master'
+
 
 class Updater:
     """ Main class """
@@ -40,18 +43,18 @@ class Updater:
         self.updateEngine = self.getEngine()
 
     """ Determine the update method """
-    def getEngine (self):
+    def getEngine(self):
         self.logger.debug("Selecting Update engine.")
         gitDir = os.path.join(htpc.RUNDIR, '.git')
         validGitDir = os.path.isdir(gitDir)
-        validGitCommand = GitUpdater().git_exec('branch') # do simple command to test git functionality
+        validGitCommand = GitUpdater().git_exec('branch')  # do simple command to test git functionality
 
         # If valid Git dir and git command succeeded, use Git updater
         if (validGitDir and validGitCommand):
             self.logger.info('Using GitUpdater engine')
             self.updateEngineName = 'Git'
             return GitUpdater()
-        else: # Otherwise update from Sourece
+        else:  # Otherwise update from Sourece
             self.logger.info('Using SourceUpdater engine')
             self.updateEngineName = 'Source'
             return SourceUpdater()
@@ -72,7 +75,6 @@ class Updater:
         """ method to determine if HTPC Manager is currently updating """
         return self.updateEngine.UPDATING
 
-
     def check_update(self):
         """
         Check for updates
@@ -92,18 +94,18 @@ class Updater:
         current = self.updateEngine.current()
         latest = self.latest()
 
-        if (latest == False) :
+        if not latest:
             self.logger.error("Failed to determine the latest version for HTPC Manager.")
         else:
             output['latestVersion'] = latest
 
-        if (current == False) :
+        if not current:
             self.logger.error("Failed to determine the current version for HTPC Manager.")
-        else :
+        else:
             output['currentVersion'] = current
 
         # If current or latest failed, updating is not possible
-        if (current == False or latest == False) :
+        if not current or not latest:
             self.logger.debug("Cancel update.")
             output['updateNeeded'] = False
             return output
@@ -124,7 +126,7 @@ class Updater:
         """ Get hash of latest commit on github """
         self.logger.debug('Getting latest version from github.')
         try:
-            url = 'https://api.github.com/repos/%s/%s/commits/%s' % (gitUser, gitRepo, gitBranch)
+            url = 'https://api.github.com/repos/%s/%s/commits/%s' % (gitUser, gitRepo, htpc.settings.get('branch', 'master'))
             result = loads(urllib2.urlopen(url).read())
             latest = result['sha'].strip()
             self.logger.debug('Latest version: ' + latest)
@@ -147,6 +149,27 @@ class Updater:
             self.logger.error('Could not determine how far behind')
             return 'Unknown'
 
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def branches(self):
+        """ Returns the all the branches to gitUser """
+        d = {"branch": htpc.settings.get('branch'),
+             "branches": []
+            }
+        try:
+            url = "https://api.github.com/repos/%s/%s/branches" % (gitUser, gitRepo)
+            branchlist = []
+            branches = loads(urllib2.urlopen(url).read())
+            for branch in branches:
+                branchlist.append(branch["name"])
+            d["branches"] = branchlist
+            return d
+
+        except Exception, e:
+            self.logger.error(str(e))
+            self.logger.error('Could not find any branches, setting default master')
+            return [d]
+
 
 """ Class to update HTPC Manager using git commands. """
 class GitUpdater():
@@ -164,20 +187,19 @@ class GitUpdater():
         output = self.git_exec('rev-parse HEAD')
         self.logger.debug('Current version: ' + output)
 
-        if (output == '') :
+        if not output:
             self.logger.error('Got no response for current Git version.')
             return False
 
         if re.match('^[a-z0-9]+$', output):
             return output
 
-
     def update(self):
         """ Do update through git """
         self.logger.info("Attempting update through Git.")
         self.UPDATING = 1
 
-        output = self.git_exec('pull origin %s' % gitBranch)
+        output = self.git_exec('pull origin %s' % htpc.settings.get('branch'))
         if not output:
             self.logger.error("Unable to update through git. Make sure that Git is located in your path and can be accessed by this application.")
         elif 'Aborting.' in output:
@@ -188,7 +210,6 @@ class GitUpdater():
             do_restart()
 
         self.UPDATING = 0
-
 
     def git_exec(self, args):
         """ Tool for running git program on system """
@@ -212,7 +233,6 @@ class GitUpdater():
 
 """ Class to update HTPC Manager using Source code from Github. Requires a full download on every update."""
 class SourceUpdater():
-
     """ Main class """
     def __init__(self):
         self.UPDATING = 0
@@ -249,14 +269,13 @@ class SourceUpdater():
 
         self.logger.debug('Current version: ' + currentVersion)
 
-        if (currentVersion == '') :
+        if not currentVersion:
             self.logger.error('No commit hash found in version file.')
             return True
 
         if re.match('^[a-z0-9]+$', currentVersion):
             self.currentHash = currentVersion
             return currentVersion
-
 
     """ Do update from source """
     def update(self):
@@ -265,7 +284,7 @@ class SourceUpdater():
         self.UPDATING = 1
         cherrypy.engine.exit()
 
-        tarUrl = 'https://github.com/%s/%s/tarball/%s' % (gitUser, gitRepo, gitBranch)
+        tarUrl = 'https://github.com/%s/%s/tarball/%s' % (gitUser, gitRepo, htpc.settings.get('branch'))
 
         # Download tar
         downloaded = self.__downloadTar(tarUrl, self.updateFile)
@@ -299,7 +318,7 @@ class SourceUpdater():
         try:
             self.logger.debug('Downloading update file to %s' % destination)
             downloadedFile = urllib2.urlopen(url)
-            f = open(destination,'wb')
+            f = open(destination, 'wb')
             f.write(downloadedFile.read())
             f.close()
             self.logger.info('Downloading update complete')
@@ -378,4 +397,3 @@ class SourceUpdater():
                 shutil.rmtree(self.updateDir)
             except:
                 pass
-
