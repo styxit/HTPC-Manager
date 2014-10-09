@@ -153,7 +153,7 @@ class Updater:
     @cherrypy.tools.json_out()
     def branches(self):
         """ Returns the all the branches to gitUser """
-        d = {"branch": htpc.settings.get('branch'),
+        d = {"branch": htpc.settings.get('branch', 'master'),
              "branches": []
             }
         try:

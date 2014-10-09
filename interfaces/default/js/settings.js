@@ -220,7 +220,7 @@ function get_branches() {
             if (data.branch == item) option.attr('selected', 'selected');
             branches.append(option);
         });
-        if (data.branches.length >= 0) {
+        if (!data.branches.length) {
             branches.append($('<option>').text(data.branch).val(data.branch).attr('selected', 'selected'));
         }
 
