@@ -202,8 +202,9 @@ function loadDownloadHistory() {
 }
 function loadNZBGetDownloadHistory() {
     if (!$('#nzbgetdownloads_table_body').length) return
-    $.getJSON(WEBDIR + 'nzbget/GetHistory?limit=5', function (data) {
-        $.each(data.result, function (i, slot) {
+    $.getJSON(WEBDIR + 'nzbget/GetHistory', function (data) {
+        $.each(data, function (i, slot) {
+            if (i >= 5) return
             var status = $('<i>').addClass('icon-ok')
             if (slot.ParStatus == 'FAILURE') {
                 status.removeClass().addClass('icon-remove').attr('title', slot.fail_message)
