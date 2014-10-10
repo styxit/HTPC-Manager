@@ -41,7 +41,6 @@ def parse_arguments():
                         help='Set a loglevel. Allowed values: debug, info, warning, error, critical')
     return parser.parse_args()
 
-
 def load_modules():
     """ Import the system modules """
     from htpc.root import Root
@@ -174,7 +173,6 @@ def main():
             browser_host = htpc.settings.get('app_host', 'localhost')
         openbrowser = 'http%s://%s:%s%s' % (browser_ssl, str(browser_host), htpc.PORT, htpc.WEBDIR[:-1])
         webbrowser.open(openbrowser, new=2, autoraise=True)
-
 
     #Select if you want to controll processes and popen from HTPC-Manager
     htpc.SHELL = args.shell
