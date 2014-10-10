@@ -306,28 +306,21 @@ function loadShow(seriesID) {
 }
 
 function Scanfolder() {
-    var path = "Default folder";
     data = {
         "method": "DownloadedEpisodesScan"
     };
     p = prompt('Write path to processfolder or leave blank for default path');
-    if (p !== null && p.length > 0) {
+    if (p || p.length >= 0) {
         data.par = "path";
         data.id = p;
-        path = p;
+
+        $.getJSON(WEBDIR + 'nzbdrone/Command', data, function (r) {
+            state = (r.state) ? 'success' : 'error';
+            // Stop the notify from firing on cancel
+            if (p !== null) {
+                path = (p.length === 0) ? 'Default folder' : p;
+                notify('NzbDrone', 'Postprocess ' + path, state);
+            }
+        });
     }
-
-    $.getJSON(WEBDIR + 'nzbdrone/Command', data, function (r) {
-        if (r.state) {
-            state = 'success';
-        } else {
-            state = 'error';
-        }
-
-        // Stop the notify from firing on cancel
-        if (p !== null) {
-         notify('NzbDrone', 'Postprocess ' + path, state);   
-        }
-        
-    });
 }
