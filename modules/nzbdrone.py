@@ -51,22 +51,27 @@ class NzbDrone:
             url = 'http%s://%s:%s%sapi/%s' % (ssl, host, port, nzbdrone_basepath, path)
 
             if banner:
-                url = 'http%s://%s:%s%s%s' % (ssl, host, port, nzbdrone_basepath, path[1:])
+                #  the path includes the basepath automaticly
+                url = 'http%s://%s:%s%s' % (ssl, host, port, path)
                 r = requests.get(url, headers=headers)
                 return r.content
 
             if type == 'post':
                 r = requests.post(url, data=dumps(data), headers=headers)
                 return r.content
+    
             elif type == 'put':
                 r = requests.post(url, data=dumps(data), headers=headers)
                 return r.content
+    
             elif type == 'delete':
                 r = requests.delete(url, data=dumps(data), headers=headers)
                 return r.content
+    
             else:
                 r = requests.get(url, headers=headers)
                 return loads(r.text)
+    
         except Exception as e:
             self.logger.error('Failed to fetch path=%s error %s' % (path, e))
 
@@ -86,6 +91,24 @@ class NzbDrone:
             url = 'http%s://%s:%s%sapi/system/status' % (ssl, nzbdrone_host, nzbdrone_port, nzbdrone_basepath)
 
             result = requests.get(url, headers=headers)
+            return result.json()
+        except:
+            return
+
+    @cherrypy.expose()
+    @require()
+    def Version(self, nzbdrone_host, nzbdrone_port, nzbdrone_basepath, nzbdrone_apikey, nzbdrone_ssl = False, **kwargs):
+        try:
+            ssl = 's' if nzbdrone_ssl else ''
+            if(nzbdrone_basepath == ""):
+                nzbdrone_basepath = "/"
+            if not(nzbdrone_basepath.endswith('/')):
+                nzbdrone_basepath += "/"
+
+            headers = {'X-Api-Key': str(nzbdrone_apikey)}
+            url = 'http%s://%s:%s%sapi/system/status' % (ssl, nzbdrone_host, nzbdrone_port, nzbdrone_basepath)
+            result = requests.get(url, headers=headers)
+
             return result.json()
         except:
             return
@@ -140,14 +163,6 @@ class NzbDrone:
             return False
 
         return htpc.LOOKUP.get_template('nzbdrone_view.html').render(scriptname='nzbdrone_view', tvdbid=tvdbid, id=id)
-
-    @cherrypy.expose()
-    @require()
-    @cherrypy.tools.json_out()
-    def Search(self, query):
-        self.logger.debug('Searching for %s' % query)
-        params = 'Series/lookup?term=%s' % (urllib.quote(query))
-        return self.fetch(params)
 
     @cherrypy.expose()
     @require()
