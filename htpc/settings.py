@@ -90,8 +90,12 @@ class Settings:
 
     """ Get custom defined urls from database in json format """
     def getUrls(self):
-        links = self.get('custom_urls', '{}')
-        return loads(links)
+        try:
+            links = self.get('custom_urls', '{}')
+            return loads(links)
+        except:
+            # Stop cherrypy from barfing is the user has entered invalid name/urls
+            return loads('{}')
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()

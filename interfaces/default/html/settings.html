@@ -99,8 +99,8 @@
                       <tbody>
                         % for link in self.attr.settings.getUrls():
                         <tr>
-                          <td><input type="text" value="${link['name']}"name="name"></td>
-                          <td><input type="text" value="${link['url']}"name="url"></td>
+                          <td><input type="text" value="${link['name']|h, entity}"name="name"></td>
+                          <td><input type="text" value="${link['url']|h, entity}"name="url"></td>
                           <td><button class="btn btn-mini delete">Delete</button></td>
                         </tr>
                         % endfor

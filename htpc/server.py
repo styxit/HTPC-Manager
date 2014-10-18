@@ -9,9 +9,14 @@ import htpc
 import logging
 from sqlobject import SQLObjectNotFound
 from htpc.manageusers import Manageusers
-from cherrypy.lib.auth2 import AuthController, require, member_of
 from cherrypy.process.plugins import Daemonizer, PIDFile
-from cherrypy.lib.auth_digest import get_ha1_dict_plain
+
+
+def secureheaders():
+    headers = cherrypy.response.headers
+    headers['X-Frame-Options'] = 'DENY'
+    headers['X-XSS-Protection'] = '1; mode=block'
+    headers['Content-Security-Policy'] = "default-src='self'"
 
 
 def start():
@@ -28,6 +33,10 @@ def start():
         'server.socket_queue_size': 10
     })
 
+    # Wrap htpc manager in secure headers.
+    # http://cherrypy.readthedocs.org/en/latest/advanced.html#securing-your-server
+    cherrypy.tools.secureheaders = cherrypy.Tool('before_finalize', secureheaders, priority=60)
+
     # Enable auth if username and pass is set, add to db as admin
     if htpc.USERNAME and htpc.PASSWORD:
         """ Lets see if the that username and password is already in the db"""
@@ -40,7 +49,9 @@ def start():
         cherrypy.config.update({
             'tools.sessions.on': True,
             'tools.auth.on': True,
-            'tools.sessions.timeout':60
+            'tools.sessions.timeout': 60,
+            'tools.sessions.httponly': True
+            #'tools.sessions.secure': True #  Auth does not work with this on #TODO
         })
 
     # Set server environment to production unless when debugging
@@ -78,15 +89,18 @@ def start():
             'tools.encode.on': True,
             'tools.encode.encoding': 'utf-8',
             'tools.gzip.on': True,
-            'tools.gzip.mime_types': ['text/html', 'text/plain', 'text/css', 'text/javascript', 'application/json', 'application/javascript']
+            'tools.gzip.mime_types': ['text/html', 'text/plain', 'text/css', 'text/javascript', 'application/json', 'application/javascript'],
+            'tools.secureheaders.on': True
         },
         '/js': {
             'tools.caching.on': True,
             'tools.caching.force': True,
             'tools.caching.delay': 0,
             'tools.expires.on': True,
-            'tools.expires.secs': 60 * 60 * 6,
+            'tools.expires.secs': 60 * 60 * 24 * 7,
             'tools.staticdir.on': True,
+            'tools.auth.on': False,
+            'tools.sessions.on': False,
             'tools.staticdir.dir': 'js'
         },
         '/css': {
@@ -94,8 +108,10 @@ def start():
             'tools.caching.force': True,
             'tools.caching.delay': 0,
             'tools.expires.on': True,
-            'tools.expires.secs': 60 * 60 * 6,
+            'tools.expires.secs': 60 * 60 * 24 * 7,
             'tools.staticdir.on': True,
+            'tools.auth.on': False,
+            'tools.sessions.on': False,
             'tools.staticdir.dir': 'css'
         },
         '/img': {
@@ -103,8 +119,10 @@ def start():
             'tools.caching.force': True,
             'tools.caching.delay': 0,
             'tools.expires.on': True,
-            'tools.expires.secs': 60 * 60 * 6,
+            'tools.expires.secs': 60 * 60 * 24 * 7,
             'tools.staticdir.on': True,
+            'tools.auth.on': False,
+            'tools.sessions.on': False,
             'tools.staticdir.dir': 'img'
         },
         '/favicon.ico': {
@@ -112,8 +130,10 @@ def start():
             'tools.caching.force': True,
             'tools.caching.delay': 0,
             'tools.expires.on': True,
-            'tools.expires.secs': 60 * 60 * 6,
+            'tools.expires.secs': 60 * 60 * 24 * 7,
             'tools.staticfile.on': True,
+            'tools.auth.on': False,
+            'tools.sessions.on': False,
             'tools.staticfile.filename': favicon
         },
     }
