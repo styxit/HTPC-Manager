@@ -9,6 +9,7 @@ from sqlobject.col import StringCol
 
 SESSION_KEY = '_cp_username'
 
+
 def check_credentials(username, password):
     """Verifies credentials for username and password.
     Returns None on success or a string describing the error on failure"""
@@ -76,7 +77,6 @@ def member_of(groupname):
 def name_is(reqd_username):
     return lambda: reqd_username == cherrypy.request.login
 
-# These might be handy
 
 def any_of(*conditions):
     """Returns True if any of the conditions match"""
@@ -86,6 +86,7 @@ def any_of(*conditions):
                 return True
         return False
     return check
+
 
 # By default all conditions are required, but this might still be
 # needed if you want to use it inside of an any_of(...) condition
@@ -101,7 +102,6 @@ def all_of(*conditions):
 
 # Controller to provide login and logout actions
 class AuthController(object):
-
 
     def get_loginform(self, username, msg="Enter login information", from_page="/"):
         return htpc.LOOKUP.get_template('loginform.html').render(scriptname='formlogin', from_page=htpc.WEBDIR, msg=msg)

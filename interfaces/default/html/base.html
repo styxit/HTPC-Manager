@@ -37,7 +37,7 @@ webdir = htpc.WEBDIR
                 <ul class="nav">
                     % for m in htpc.MODULES:
                     % if s.get(m.get('id')+'_enable') and m.get('id') != 'nzbsearch':
-                    <li id="nav-${m.get('id')}"><a href="${htpc.WEBDIR}${m.get('id')}/">${s.get(m.get('id')+'_name')}</a></li>
+                    <li id="nav-${m.get('id')|h, entity}"><a href="${htpc.WEBDIR}${m.get('id')|h, entity}/">${s.get(m.get('id')+'_name')|h, entity}</a></li>
                     %endif
                     % endfor
                     <% customurls = s.getUrls() %>
@@ -46,12 +46,12 @@ webdir = htpc.WEBDIR
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         % for link in customurls:
-                            <li><a href="${link['url']}" target="_blank">${link['name']}</a></li>
+                            <li><a href="${link['url']|h, entity}" target="_blank">${link['name']|h, entity}</a></li>
                         % endfor
                         </ul>
                     </li>
                     % elif len(customurls) > 0:
-                      <li><a href="${customurls[0]['url']}" target="_blank">${customurls[0]['name']}</a></li>
+                      <li><a href="${customurls[0]['url']|h, entity}" target="_blank">${customurls[0]['name']|h, entity}</a></li>
                     % endif
 
                     <li class="hidden-desktop visible-phone visible-tablet">
