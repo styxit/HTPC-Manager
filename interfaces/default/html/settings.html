@@ -32,7 +32,8 @@
                 {'type':'text', 'label':'SSL Cert', 'name':'app_ssl_cert', 'value':settings.get('app_ssl_cert')},
                 {'type':'text', 'label':'SSL Key', 'name':'app_ssl_key', 'value':settings.get('app_ssl_key')},
                 {'type':'text', 'label':'Git Path', 'name':'git_path', 'value':settings.get('git_path', 'git')},
-                {'type':'bool', 'label':'Open Browser', 'name':'openbrowser', 'desc':'Automatically open brower on server start', 'value':settings.get('openbrowser')}
+                {'type':'bool', 'label':'Open Browser', 'name':'openbrowser', 'desc':'Automatically open brower on server start', 'value':settings.get('openbrowser')},
+                {'type':'bool', 'label':'Use robots.txt', 'name':'robots', 'desc':'Stop bots from indexing your site', 'value':settings.get('robots')}
             ])}
             % for m in htpc.MODULES:
                 % if m.get('test'):

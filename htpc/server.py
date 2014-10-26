@@ -11,7 +11,6 @@ from sqlobject import SQLObjectNotFound
 from htpc.manageusers import Manageusers
 from cherrypy.lib.auth2 import AuthController, require, member_of
 from cherrypy.process.plugins import Daemonizer, PIDFile
-from cherrypy.lib.auth_digest import get_ha1_dict_plain
 
 
 def start():
@@ -38,7 +37,7 @@ def start():
         cherrypy.config.update({
             'tools.sessions.on': True,
             'tools.auth.on': True,
-            'tools.sessions.timeout':60
+            'tools.sessions.timeout': 60
         })
 
     # Set server environment to production unless when debugging

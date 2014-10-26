@@ -23,12 +23,14 @@ def do_restart():
     cherrypy.engine.exit()
     os.execv(sys.executable, arguments)
 
+
 class RestrictedArea:
     # all methods in this controller (and subcontrollers) is
     # open only to members of the admin group
     _cp_config = {
         'auth.require': [member_of('admin')]
     }
+
 
 class Root:
     """ Root class """
@@ -58,6 +60,14 @@ class Root:
         self.logger.info("Shutting down htpc-manager.")
         cherrypy.engine.exit()
         return "HTPC Manager has shut down"
+
+    @cherrypy.expose(alias='robots.txt')
+    def robots(self):
+        if htpc.settings.get('robots'):
+            r = "User-agent: *\nDisallow: /\n"
+        else:
+            r = "User-agent: *\nDisallow: /logout/\nDisallow: /restart/\nDisallow: /shutdown/\nDisallow: /update/\n"
+        return cherrypy.lib.static.serve_fileobj(r, content_type='text/plain', disposition=None, name='robots.txt', debug=False)
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
