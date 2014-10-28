@@ -153,6 +153,7 @@ class Updater:
             self.logger.error('Could not determine how far behind')
             return 'Unknown'
 
+    # Unlikely that a user has more the 100 branches, if they do use change this so it uses the link in the header
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def branches(self):
@@ -161,7 +162,7 @@ class Updater:
              "branches": []
             }
         try:
-            url = "https://api.github.com/repos/%s/%s/branches" % (gitUser, gitRepo)
+            url = "https://api.github.com/repos/%s/%s/branches?per_page=100" % (gitUser, gitRepo)
             branchlist = []
             branches = loads(urllib2.urlopen(url).read())
             for branch in branches:
