@@ -242,3 +242,18 @@ $(document).on('click', '.delete_cache', function(e){
         }
     });
 });
+
+$(document).on('click', '.force_update', function(e){
+    $.ajax({
+        'url': WEBDIR + 'update/?force=True',
+        'dataType': 'json',
+        'success': function(response) {
+            if (response.success) {
+                $('.force_update').addClass('btn-success').removeClass('btn-danger');
+
+            } else {
+                $('.force_update').addClass('btn-danger').removeClass('btn-success');
+            }
+        }
+    });
+});

@@ -61,9 +61,13 @@ class Updater:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def index(self):
+    def index(self, force=False):
         """ Update on POST. Check for new updates on GET. """
         if cherrypy.request.method.upper() == 'POST':
+            Thread(target=self.updateEngine.update).start()
+            return 1
+        if cherrypy.request.method.upper() == 'POST' and force:
+            self.check_update()
             Thread(target=self.updateEngine.update).start()
             return 1
         else:
