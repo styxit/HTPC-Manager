@@ -3,7 +3,16 @@
 <div class="container">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="http://${settings.get('sickbeard_host')}:${settings.get('sickbeard_port') + settings.get('sickbeard_basepath')}" target="_blank" title="Open original Sickbeard interface">${settings.get('sickbeard_name', 'Sickbeard')}</a>
+            <a href="http://${settings.get('sickrage_host')}:${settings.get('sickrage_port') + settings.get('sickrage_basepath')}" target="_blank" title="Open original sickrage interface">${settings.get('sickrage_name', 'sickrage')}</a>
+            <div class="btn-group pull-right">
+                 <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-off"></i><i class="caret"></i></a>
+                    <ul class="dropdown-menu pull-right"> <!-- Skeleton -->
+                        <li><a href="Restart" class="ajax-confirm" title="Restart Sickrage"><i class="icon-refresh"></i> Restart</a></li>
+                        <li><a href="Shutown" class="ajax-confirm" title="Shutdown Sickrage"><i class="icon-off"></i> Shutdown</a></li>
+                        <!--<li><a id="update_sb" href="#" title="Update sickbeard"><i class="icon-refresh"></i> Update</a></li>-->
+                        <li><a id="postprocess" href="#" title="Postprocess"><i class="icon-hdd"></i> Postprocess</a></li>
+                    </ul>
+            </div>
         </h1>
         <div class="well form-inline">
             <input class="span6" id="add_show_name" name="add_show_name" type="text" />

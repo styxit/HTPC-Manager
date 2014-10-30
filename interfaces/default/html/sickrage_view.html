@@ -1,9 +1,9 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
 <div class="container">
-    <div class="content maincontent sickbeard_show">
+    <div class="content maincontent sickrage_show">
         <h1 class="page-header page-title" data-showid="${tvdbid}">
-            <span class="sickbeard_showname">Show details</span>
+            <span class="sickrage_showname">Show details</span>
             <div class="btn-group show-options-menu pull-right">
                 <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
                     <i class="icon-wrench"></i>&nbsp;<span class="caret"></span>
@@ -15,14 +15,17 @@
                     <li>
                         <a href="#" class="rescan-files">Rescan files</a>
                     </li>
+                    <li>
+                        <a href="#" class="delete-show">Delete show</a>
+                    </li>
                 </ul>
             </div>
         </h1>
 
         <ul class="breadcrumb">
             <li><a href="${self.attr.webdir}">Home</a> <span class="divider">/</span></li>
-            <li><a href="${self.attr.webdir}sickbeard">${settings.get('sickbeard_name', 'Sickbeard')}</a> <span class="divider">/</span></li>
-            <li class="active sickbeard_showname">Show details</li>
+            <li><a href="${self.attr.webdir}sickrage">${settings.get('sickrage_name', 'sickrage')}</a> <span class="divider">/</span></li>
+            <li class="active sickrage_showname">Show details</li>
         </ul>
 
         <div id="banner" class="row-fluid banner">
@@ -32,19 +35,19 @@
                 <strong>Show details</strong>
                 <table class="table table-condensed">
                     <tr>
-                        <td>Next episode</td><td class="sickbeard_next_air"/>
+                        <td>Next episode</td><td class="sickrage_next_air"/>
                     </tr>
                     <tr>
-                        <td>Airs</td><td class="sickbeard_airs"/>
+                        <td>Airs</td><td class="sickrage_airs"/>
                     </tr>
                     <tr>
-                        <td>Status</td><td class="sickbeard_status"/>
+                        <td>Status</td><td class="sickrage_status"/>
                     </tr>
                     <tr>
-                        <td>Network</td><td class="sickbeard_network"/>
+                        <td>Network</td><td class="sickrage_network"/>
                     </tr>
                     <tr>
-                        <td>Location</td><td class="sickbeard_location"/>
+                        <td>Location</td><td class="sickrage_location"/>
                     </tr>
                 </table>
                 <div id="show_details_bottom" class="span4"></div>
@@ -66,6 +69,7 @@
                     <th>status</th>
                     <th>Quality</th>
                     <th class="span1">Search</th>
+                    <th class="span1">Search subtitle</th>
                 </tr>
             </thead>
             <tbody id="season-content"></tbody>

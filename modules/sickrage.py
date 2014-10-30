@@ -46,7 +46,7 @@ class Sickrage:
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def ping(self, sickrage_host, sickrage_port, sickrage_apikey, sickrage_basepath, sickrage_ssl = False, **kwargs):
+    def ping(self, sickrage_host, sickrage_port, sickrage_apikey, sickrage_basepath, sickrage_ssl=False, **kwargs):
         ssl = 's' if sickrage_ssl else ''
         self.logger.debug("Testing connectivity")
         try:
@@ -68,7 +68,7 @@ class Sickrage:
     @cherrypy.tools.json_out()
     def GetShowList(self):
         self.logger.debug("Fetching Show list")
-        return self.fetch('shows&sort=name', False, 200)
+        return self.fetch('shows&sort=name', img=False, timeout=200)
 
     @cherrypy.expose()
     @require()
@@ -135,9 +135,37 @@ class Sickrage:
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
+    def Postprocess(self, path=False, force_replace=False, return_data=False, is_priority=False, type=False):
+        self.logger.debug("Postprocess")
+        return self.fetch('postprocess', False, 120)
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def Restart(self):
+        self.logger.debug("Restart sb")
+        return self.fetch('sb.restart', False, 15)
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
     def SearchEpisodeDownload(self, tvdbid, season, episode):
         self.logger.debug("Fetching Episode Downloads")
         return self.fetch('episode.search&tvdbid=' + tvdbid + '&season=' + season + '&episode=' + episode, False, 45)
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def SearchSubtitle(self, tvdbid, season, episode):
+        self.logger.debug("Fetching subtitle")
+        return self.fetch('episode.subtitlesearch&tvdbid=' + tvdbid + '&season=' + season + '&episode=' + episode, False, 45)
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def Shutdown(self):
+        self.logger.debug("Shutdown sickrage")
+        return self.fetch('sb.shutdown', False, 20)
 
     @cherrypy.expose()
     @require()
@@ -154,15 +182,21 @@ class Sickrage:
         return self.fetch("show.refresh&tvdbid=" + tvdbid)
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def RemoveShow(self, indexerid, name=None):
+        return self.fetch("show.delete&indexerid=%s" % indexerid)
+
+    @cherrypy.expose()
     @require()
     def SearchShow(self, query):
         try:
             url = 'http://www.thetvdb.com/api/GetSeries.php?seriesname=' + quote(query)
-            return urlopen(url, timeout=10).read()
+            return urlopen(url, timeout=20).read()
         except:
             return
 
-    def fetch(self, cmd, img=False, timeout=10):
+    def fetch(self, cmd, img=False, timeout=200):
+        print cmd, img, timeout
         try:
             host = htpc.settings.get('sickrage_host', '')
             port = str(htpc.settings.get('sickrage_port', ''))
