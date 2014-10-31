@@ -1,4 +1,7 @@
 $(document).ready(function () {
+    $.ajaxSetup({
+        timeout: 1200000
+    });
     $(window).trigger('hashchange');
     loadNextAired();
     loadsickrageHistory(25);
@@ -30,7 +33,7 @@ function loadShows() {
         url: WEBDIR + 'sickrage/GetShowList',
         type: 'get',
         dataType: 'json',
-        timeout: 120000,
+        //timeout: 12000,
         success: function (result) {
             if (result.data.length === 0) {
                 var row = $('<tr>')
@@ -118,7 +121,7 @@ function loadNextAired(options) {
 
     $.ajax({
         url: WEBDIR + 'sickrage/GetNextAired',
-        type: 'get',
+        type: 'GET',
         dataType: 'json',
         success: function (result) {
             // If sickrage not configured, return false (Dashboard)
@@ -180,11 +183,11 @@ function loadNextAired(options) {
 function loadsickrageHistory(limit) {
     $.ajax({
         url: WEBDIR + 'sickrage/GetHistory?limit=' + limit,
-        type: 'get',
+        type: 'GET',
         dataType: 'json',
-        timeout: 60,
         success: function (result) {
-            if (result.data.length === 0) {
+            console.log(result);
+            if (result.data.length == 0) {
                 var row = $('<tr>');
                 row.append($('<td>').html('History is empty'));
                 $('#history_table_body').append(row);
@@ -211,7 +214,6 @@ function loadLogs() {
         url: WEBDIR + 'sickrage/GetLogs',
         type: 'get',
         dataType: 'json',
-        timeout: 60,
         success: function (result) {
             if (result.data.length === 0) {
                 var row = $('<tr>');
@@ -233,6 +235,7 @@ function searchTvDb(query) {
         type: 'get',
         dataType: 'xml',
         success: function (result) {
+            console.log(result);
             series = $(result).find('Series');
             if (series.length === 0) {
                 $('#add_show_button').attr('disabled', false);
@@ -330,28 +333,12 @@ function sickrageStatusIcon(iconText, white) {
 }
 
 function Postprocess() {
-    data = {};
+    var data = {};
     p = prompt('Write path to processfolder or leave blank for default path');
     if (p || p.length >= 0) {
         data.path = p;
-        /*
-        $.ajax({
-            dataType: "json",
-            url: WEBDIR + 'sickrage/Postprocess',
-            data: data,
-            timeout: 6000000,
-            ,function (r) {
-                state = (r.length) ? 'success' : 'error';
-                if (p !== null) {
-                    path = (p.length === 0) ? 'Default folder' : p;
-                    notify('sickrage', 'Postprocess ' + path, state);
-                }
 
-            }
-        });
-        */
-
-        $.getJSON(WEBDIR + 'sickrage/Postprocess', data, function (r) {
+        $.get(WEBDIR + 'sickrage/Postprocess', data, function (r) {
             state = (r.length) ? 'success' : 'error';
             // Stop the notify from firing on cancel
             if (p !== null) {

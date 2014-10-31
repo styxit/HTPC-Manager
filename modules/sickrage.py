@@ -68,7 +68,7 @@ class Sickrage:
     @cherrypy.tools.json_out()
     def GetShowList(self):
         self.logger.debug("Fetching Show list")
-        return self.fetch('shows&sort=name', img=False, timeout=200)
+        return self.fetch('shows&sort=name', False, 200)
 
     @cherrypy.expose()
     @require()
@@ -195,7 +195,16 @@ class Sickrage:
         except:
             return
 
-    def fetch(self, cmd, img=False, timeout=200):
+    @cherrypy.expose()
+    @require()
+    def SearchShow2(self, query):
+        try:
+            url = 'http://www.thetvdb.com/api/GetSeries.php?seriesname=' + quote(query)
+            return urlopen(url, timeout=20).read()
+        except:
+            return
+
+    def fetch(self, cmd, img=False, timeout=20):
         print cmd, img, timeout
         try:
             host = htpc.settings.get('sickrage_host', '')
@@ -214,6 +223,8 @@ class Sickrage:
                 return urlopen(url, timeout=timeout).read()
 
             return loads(urlopen(url, timeout=timeout).read())
-        except:
+        except Exception as e:
             self.logger.error("Unable to fetch information")
+            self.logger.error(url)
+            self.logger.error(e)
             return
