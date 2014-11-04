@@ -13,40 +13,46 @@ from cherrypy.lib.auth2 import require
 class Qbittorrent:
 
     def __init__(self):
-        self.logger = logging.getLogger('modules.qbittorrent')
+        self.logger = logging.getLogger("modules.qbittorrent")
         htpc.MODULES.append({
-            'name': 'qBittorrent',
-            'id': 'qbittorrent',
-            'test': htpc.WEBDIR + 'qbittorrent/ping',
-            'fields': [
-                {'type': 'bool', 'label': 'Enable', 'name': 'qbittorrent_enable'},
-                {'type': 'text', 'label': 'Menu name', 'name': 'qbittorrent_name'},
-                {'type': 'text', 'label': 'IP / Host', 'placeholder':'localhost', 'name': 'qbittorrent_host'},
-                {'type': 'text', 'label': 'Port', 'placeholder':'8080', 'name': 'qbittorrent_port'},
-                {'type': 'text', 'label': 'Username', 'name': 'qbittorrent_username'},
-                {'type': 'password', 'label': 'Password', 'name': 'qbittorrent_password'},
-                {'type': 'bool', 'label': 'Use SSL', 'name': 'qbittorrent_ssl'}
+            "name": "qBittorrent",
+            "id": "qbittorrent",
+            "test": htpc.WEBDIR + "qbittorrent/ping",
+            "fields": [
+                {"type": "bool", "label": "Enable", "name": "qbittorrent_enable"},
+                {"type": "text", "label": "Menu name", "name": "qbittorrent_name"},
+                {"type": "text", "label": "IP / Host", "placeholder": "localhost", "name": "qbittorrent_host"},
+                {"type": "text", "label": "Port", "placeholder": "8080", "name": "qbittorrent_port"},
+                {"type": "text", "label": "Username", "name": "qbittorrent_username"},
+                {"type": "password", "label": "Password", "name": "qbittorrent_password"},
+                {"type": "bool", "label": "Use SSL", "name": "qbittorrent_ssl"}
             ]
         })
 
     @cherrypy.expose()
     @require()
     def index(self):
-        return htpc.LOOKUP.get_template('qbittorrent.html').render(scriptname='qbittorrent')
+        return htpc.LOOKUP.get_template("qbittorrent.html").render(scriptname="qbittorrent", webinterface=self.webinterface())
+
+    def webinterface(self):
+        host = htpc.settings.get("qbittorrent_host", "")
+        port = htpc.settings.get("qbittorrent_port", "")
+        ssl = "s" if htpc.settings.get("qbittorret_ssl", 0) else ""
+        url = "http%s://%s:%s/" % (ssl, host, port)
+        return url
 
     #Get url from settings and handles auth
     @cherrypy.expose()
     @require()
     def qbturl(self):
-        host = htpc.settings.get('qbittorrent_host', '')
-        port = htpc.settings.get('qbittorrent_port',  '')
-        username = htpc.settings.get('qbittorrent_username', '')
-        password = htpc.settings.get('qbittorrent_password', '')
-        ssl = 's' if htpc.settings.get('qbittorret_ssl', 0) else ''
+        host = htpc.settings.get("qbittorrent_host", "")
+        port = htpc.settings.get("qbittorrent_port", "")
+        username = htpc.settings.get("qbittorrent_username", "")
+        password = htpc.settings.get("qbittorrent_password", "")
+        ssl = "s" if htpc.settings.get("qbittorret_ssl", 0) else ""
+        url = "http%s://%s:%s/" % (ssl, host, port)
 
-        url = 'http' + ssl + '://' + host + ':' + port + '/'
-
-        realm = 'Web UI Access'
+        realm = "Web UI Access"
         authhandler = urllib2.HTTPDigestAuthHandler()
         authhandler.add_password(realm, url, username, password)
         opener = urllib2.build_opener(authhandler)
@@ -62,7 +68,7 @@ class Qbittorrent:
 
         try:
             url = self.qbturl()
-            result = urllib2.urlopen(url + 'json/torrents/').read()
+            result = urllib2.urlopen(url + "json/torrents/").read()
 
         except Exception as e:
             self.logger.error("Couldn't get torrents %s" % e)
@@ -75,11 +81,11 @@ class Qbittorrent:
     def get_speed(self):
         try:
             url = self.qbturl()
-            result = urllib2.urlopen(url + 'json/transferInfo/').read()
-            result = json.JSONDecoder('UTF-8').decode(result)
+            result = urllib2.urlopen(url + "json/transferInfo/").read()
+            result = json.JSONDecoder("UTF-8").decode(result)
 
-            speeddown = result['dl_info']
-            speedup = result['up_info']
+            speeddown = result["dl_info"]
+            speedup = result["up_info"]
 
             list_of_down = speeddown.split()
             list_of_up = speedup.split()
@@ -135,19 +141,21 @@ class Qbittorrent:
         try:
             self.logger.debug("%s %s" % (cmd, name))
             url = self.qbturl()
-            url += 'command/%s/' % cmd
+            url += "command/%s/" % cmd
             data = {}
 
-            if cmd == 'delete':
-                data['hashes'] = hash
+            if cmd == "delete":
+                data["hashes"] = hash
             #Not in use atm, prob will be used for torrent search later
             elif cmd == 'download':
                 data['urls'] = dlurl
             elif cmd == 'resumeall' or 'pauseall':
                 return urllib2.urlopen(url + cmd)
             else:
-                data['hash'] = hash
+                data["hash"] = hash
 
+            if cmd == "resumeall" or "pauseall":
+                urllib2.urlopen(url + cmd)
             data = urllib.urlencode(data)
 
             return urllib2.urlopen(url, data).read()
@@ -165,16 +173,18 @@ class Qbittorrent:
 
             if speed == 0:
                 speed = 0
-
             else:
                 speed = speed * 1024
 
             url = self.qbturl()
-            url += 'command/' + type + '/'
+            url += "command/" + type + "/"
 
             data = {}
-            data['limit'] = speed
+            data["limit"] = speed
             data = urllib.urlencode(data)
+
+            urllib2.urlopen(url, data)
+
 
             result = urllib2.urlopen(url, data)
 

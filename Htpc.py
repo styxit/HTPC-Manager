@@ -11,6 +11,7 @@ import sys
 import htpc
 import webbrowser
 
+
 def parse_arguments():
     """ Get variables from commandline """
     import argparse
@@ -40,6 +41,7 @@ def parse_arguments():
     parser.add_argument('--loglevel', default='info',
                         help='Set a loglevel. Allowed values: debug, info, warning, error, critical')
     return parser.parse_args()
+
 
 def load_modules():
     """ Import the system modules """
@@ -85,6 +87,7 @@ def load_modules():
     htpc.ROOT.users = Users()
     from modules.nzbdrone import NzbDrone
     htpc.ROOT.nzbdrone = NzbDrone()
+
 
 def main():
     """
