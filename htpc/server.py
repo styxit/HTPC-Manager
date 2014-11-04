@@ -11,7 +11,6 @@ from sqlobject import SQLObjectNotFound
 from htpc.manageusers import Manageusers
 from cherrypy.process.plugins import Daemonizer, PIDFile
 
-
 def secureheaders():
     headers = cherrypy.response.headers
     headers['X-Frame-Options'] = 'DENY'

@@ -33,7 +33,8 @@
                 {'type':'text', 'label':'SSL Key', 'name':'app_ssl_key', 'value':settings.get('app_ssl_key')},
                 {'type':'text', 'label':'Git Path', 'name':'git_path', 'value':settings.get('git_path', 'git')},
                 {'type': 'select', 'label': 'Branch', 'name': 'branch', 'options':''},
-                {'type':'bool', 'label':'Open Browser', 'name':'openbrowser', 'desc':'Automatically open brower on server start', 'value':settings.get('openbrowser')}
+                {'type':'bool', 'label':'Open Browser', 'name':'openbrowser', 'desc':'Automatically open brower on server start', 'value':settings.get('openbrowser')},
+                {'type':'bool', 'label':'Use robots.txt', 'name':'robots', 'desc':'Stop bots from indexing your site', 'value':settings.get('robots')}
                 ], buttons=[
                         {'name':'Save', 'type':'submit', 'classes':'btn-primary'},
                         {'name':'Clear', 'type':'reset'},
