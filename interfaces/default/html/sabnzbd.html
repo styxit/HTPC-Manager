@@ -1,9 +1,10 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
+
 <div class="container">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="http://${settings.get('sabnzbd_host')}:${settings.get('sabnzbd_port') + settings.get('sabnzbd_basepath')}" target="_blank" title="Open original Sabnzbd interface">${settings.get('sabnzbd_name', 'SABnzbd')}</a>
+            <a href="${webinterface}" target="_blank" title="Open original Sabnzbd interface">${settings.get('sabnzbd_name', 'SABnzbd')}</a>
             <small>
                 <strong>Speed:</strong> <span id="queue_speed"></span>
                 <strong>Status:</strong> <span id="queue_state"></span>

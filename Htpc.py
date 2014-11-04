@@ -11,6 +11,7 @@ import sys
 import htpc
 import webbrowser
 
+
 def parse_arguments():
     """ Get variables from commandline """
     import argparse
@@ -40,6 +41,7 @@ def parse_arguments():
     parser.add_argument('--loglevel', default='info',
                         help='Set a loglevel. Allowed values: debug, info, warning, error, critical')
     return parser.parse_args()
+
 
 def load_modules():
     """ Import the system modules """
@@ -73,8 +75,8 @@ def load_modules():
     htpc.ROOT.utorrent = UTorrent()
     from modules.nzbget import NZBGet
     htpc.ROOT.nzbget = NZBGet()
-    from modules.qbittorrent import qbittorrent
-    htpc.ROOT.qbittorrent = qbittorrent()
+    from modules.qbittorrent import Qbittorrent
+    htpc.ROOT.qbittorrent = Qbittorrent()
     from modules.stats import Stats
     htpc.ROOT.stats = Stats()
     from modules.tvheadend import TVHeadend
@@ -83,6 +85,7 @@ def load_modules():
     htpc.ROOT.plex = Plex()
     from modules.users import Users
     htpc.ROOT.users = Users()
+
 
 def main():
     """
