@@ -1,6 +1,6 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
+<div class="container-fluid">
     <div class="content maincontent">
         <h1 class="page-header page-title">
             <a href="http://${settings.get('nzbdrone_host')}:${settings.get('nzbdrone_port') + settings.get('nzbdrone_basepath')}" target="_blank" title="Open original NzbDrone interface">${settings.get('nzbdrone_name', 'NzbDrone')}</a>

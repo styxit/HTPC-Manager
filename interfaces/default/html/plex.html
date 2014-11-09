@@ -1,6 +1,6 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
+<div class="container-fluid">
     <div class="content">
             <h1 class="page-header page-title">
             <a href="webinterface" target="_blank">${settings.get('plex_name', 'Plex')}</a>
@@ -30,7 +30,7 @@
         </h1>
             <div class="well hide" id="nowplaying">
             </div>
-        
+
 
         <ul class="nav nav-tabs">
             <li><a href="#movies" data-toggle="tab">Movies</a></li>
