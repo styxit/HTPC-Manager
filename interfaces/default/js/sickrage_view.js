@@ -122,6 +122,7 @@ function renderSeason() {
             // Loop through data
             $.each(data.data, function (index, value) {
                 var row = $('<tr>');
+                buttons = $('<div>').addClass('btn-group');
 
                 var search_link = $('<a>').addClass('btn btn-mini').attr('title', 'Search new download').append($('<i>').addClass('icon-search')).on('click', function () {
                     searchEpisode(showid, season, index, value.name);
@@ -130,6 +131,11 @@ function renderSeason() {
                 var search_subs = $('<a>').addClass('btn btn-mini').attr('title', 'Search subtitle').append($('<i>').addClass('icon-comment')).on('click', function () {
                     searchsub(showid, season, index, value.name);
                 });
+
+                buttons.append(
+                    search_link,
+                    search_subs
+                )
 
                 row.append(
                 $('<td>').text(index),
@@ -140,8 +146,7 @@ function renderSeason() {
                 $('<td>').text(value.airdate),
                 $('<td>').append(sickrageStatusLabel(value.status)),
                 $('<td>').text(value.quality),
-                $('<td>').append(search_link),
-                $('<td>').text(search_subs) // just add it here for now... should be a check if its sb or sbrage
+                $('<td>').append(buttons)
 
                 );
                 seasonContent.append(row);
@@ -151,7 +156,7 @@ function renderSeason() {
             seasonContent.parent().trigger("update");
             seasonContent.parent().trigger("sorton", [
                 [
-                    [0, 1]
+                    [0, 0]
                 ]
             ]);
         },
@@ -162,7 +167,7 @@ function renderSeason() {
 }
 
 function sickrageStatusLabel(text) {
-    var statusOK = ['Continuing', 'Downloaded', 'HD'];
+    var statusOK = ['Continuing', 'Downloaded', 'HD', 'HD TV', '720p WEB-DL', '1080p WEB-DL'];
     var statusInfo = ['Snatched'];
     var statusError = ['Ended'];
     var statusWarning = ['Skipped'];
