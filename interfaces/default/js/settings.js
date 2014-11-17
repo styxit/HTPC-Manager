@@ -99,7 +99,10 @@ $(document).ready(function () {
                 });
             }
         });
-        window.location.reload(true);
+
+        setTimeout(function() {
+            window.location.reload(true);
+        }, 1000);
     });
     $(":reset").click(function (e) {
         e.preventDefault();
