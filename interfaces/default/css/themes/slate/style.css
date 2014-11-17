@@ -49,6 +49,26 @@ a:hover {
 .ui-pnotify-title{
 	color: white !important;
 }
+input {
+	color: #52575c !important;
+}
+
+select {
+	color: #52575c !important;
+}
+
+*::-webkit-input-placeholder {
+    color: #52575c !important;
+}
+*:-moz-placeholder {
+    color: #52575c !important;
+}
+*::-moz-placeholder {
+    color: #52575c !important;
+}
+*:-ms-input-placeholder {
+    color: #52575c !important;
+}
 
 .content {
 	background: #272b30;
