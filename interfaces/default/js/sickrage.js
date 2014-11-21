@@ -54,7 +54,7 @@ function loadShows() {
             $('#tvshows_table_body').parent().trigger('update');
             $('#tvshows_table_body').parent().trigger("sorton", [
                 [
-                    [0, 0]
+                    [0, 1]
                 ]
             ]);
         }
