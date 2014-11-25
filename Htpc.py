@@ -87,6 +87,8 @@ def load_modules():
     htpc.ROOT.users = Users()
     from modules.nzbdrone import NzbDrone
     htpc.ROOT.nzbdrone = NzbDrone()
+    from modules.sickrage import Sickrage
+    htpc.ROOT.sickrage = Sickrage()
 
 
 def main():
