@@ -3,7 +3,7 @@
 
 import cherrypy
 import htpc
-from urllib import quote
+from urllib import quote, urlencode
 from urllib2 import urlopen
 from json import loads
 import logging
@@ -14,7 +14,7 @@ class Sickrage:
     def __init__(self):
         self.logger = logging.getLogger('modules.sickrage')
         htpc.MODULES.append({
-            'name': 'sickrage',
+            'name': 'Sickrage',
             'id': 'sickrage',
             'test': htpc.WEBDIR + 'sickrage/ping',
             'fields': [
@@ -108,9 +108,10 @@ class Sickrage:
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def AddShow(self, tvdbid):
+    def AddShow(self, indexername='', indexerid='', **kwargs):
+        # indexername=tvrageid or tvdbid
         self.logger.debug("Adding a Show")
-        return self.fetch('show.addnew&tvdbid=' + tvdbid)
+        return self.fetch('show.addnew&' + urlencode(kwargs))
 
     @cherrypy.expose()
     @require()
@@ -135,9 +136,11 @@ class Sickrage:
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def Postprocess(self, path=False, force_replace=False, return_data=False, is_priority=False, type=False):
+    def Postprocess(self, path='', force_replace=False, return_data=False, is_priority=False, type=False):
         self.logger.debug("Postprocess")
-        return self.fetch('postprocess', False, 120)
+        if path:
+            path = '&%s' % path
+        return self.fetch('postprocess' + path, False, 120)
 
     @cherrypy.expose()
     @require()
@@ -183,29 +186,18 @@ class Sickrage:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def RemoveShow(self, indexerid, name=None):
+    def RemoveShow(self, indexerid, show_name=''):
+        self.logger.debug("Delete %s from Sickrage indexerid %s" % (show_name, indexerid))
         return self.fetch("show.delete&indexerid=%s" % indexerid)
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
     @require()
     def SearchShow(self, query):
-        try:
-            url = 'http://www.thetvdb.com/api/GetSeries.php?seriesname=' + quote(query)
-            return urlopen(url, timeout=20).read()
-        except:
-            return
-
-    @cherrypy.expose()
-    @require()
-    def SearchShow2(self, query):
-        try:
-            url = 'http://www.thetvdb.com/api/GetSeries.php?seriesname=' + quote(query)
-            return urlopen(url, timeout=20).read()
-        except:
-            return
+        self.logger.debug("Searching tvdb and tvrage for %s query")
+        return self.fetch("sb.searchindexers&indexer=0&name=%s" % quote(query), False, 60)
 
     def fetch(self, cmd, img=False, timeout=20):
-        print cmd, img, timeout
         try:
             host = htpc.settings.get('sickrage_host', '')
             port = str(htpc.settings.get('sickrage_port', ''))

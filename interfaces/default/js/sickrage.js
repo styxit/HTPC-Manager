@@ -1,27 +1,30 @@
-$(document).ready(function () {
+$(document).ready(function() {
     $.ajaxSetup({
         timeout: 1200000
     });
+    $('.spinner').show();
     $(window).trigger('hashchange');
     loadNextAired();
     loadsickrageHistory(25);
     loadLogs();
     loadShows();
 
-    $('#add_show_button').click(function () {
+
+    $('#add_show_button').click(function() {
         $(this).attr('disabled', true);
         searchTvDb($('#add_show_name').val());
     });
 
-    $('#add_tvdbid_button').click(function () {
-        addShow($('#add_show_select').val());
+    $('#add_tvdbid_button').click(function() {
+        addShow($('#add_show_select').val(), $('#add_show_select').find('option:selected').attr(
+            'data-indexer'));
     });
 
-    $('#cancel_show_button').click(function () {
+    $('#cancel_show_button').click(function() {
         cancelAddShow();
     });
 
-    $('#postprocess').click(function (e) {
+    $('#postprocess').click(function(e) {
         e.preventDefault();
         Postprocess();
     });
@@ -33,22 +36,23 @@ function loadShows() {
         url: WEBDIR + 'sickrage/GetShowList',
         type: 'get',
         dataType: 'json',
-        //timeout: 12000,
-        success: function (result) {
+        success: function(result) {
+            $('.spinner').show();
             if (result.data.length === 0) {
                 var row = $('<tr>')
                 row.append($('<td>').html('No shows found'));
                 $('#tvshows_table_body').append(row);
             }
-            $.each(result.data, function (showname, tvshow) {
-                var name = $('<a>').attr('href', WEBDIR + 'sickrage/view/' + tvshow.tvdbid).text(showname);
+            $.each(result.data, function(showname, tvshow) {
+                var name = $('<a>').attr('href', WEBDIR + 'sickrage/view/' + tvshow.tvdbid).text(
+                    showname);
                 var row = $('<tr>');
                 row.append(
-                $('<td>').html(name),
-                $('<td>').html(sickrageStatusLabel(tvshow.status)),
-                $('<td>').html(tvshow.next_ep_airdate),
-                $('<td>').html(tvshow.network),
-                $('<td>').html(sickrageStatusLabel(tvshow.quality)));
+                    $('<td>').html(name),
+                    $('<td>').html(sickrageStatusLabel(tvshow.status)),
+                    $('<td>').html(tvshow.next_ep_airdate),
+                    $('<td>').html(tvshow.network),
+                    $('<td>').html(sickrageStatusLabel(tvshow.quality)));
                 $('#tvshows_table_body').append(row);
             });
             $('#tvshows_table_body').parent().trigger('update');
@@ -57,16 +61,20 @@ function loadShows() {
                     [0, 1]
                 ]
             ]);
+        },
+        complete: function() {
+            $('.spinner').hide();
         }
     });
 }
 
+//modal
 function loadShow(tvdbid) {
     $.ajax({
         url: WEBDIR + 'sickrage/GetShow?tvdbid=' + tvdbid,
         type: 'get',
         dataType: 'json',
-        success: function (data) {
+        success: function(data) {
             data = data.data;
 
             var table = $('<table>');
@@ -98,12 +106,13 @@ function loadShow(tvdbid) {
 
             modalContent = $('<div>');
             modalContent.append(
-            $('<img>').attr('src', WEBDIR + 'sickrage/GetBanner/' + tvdbid).addClass('img-rounded'),
-            $('<hr>'),
-            table);
+                $('<img>').attr('src', WEBDIR + 'sickrage/GetBanner/' + tvdbid).addClass(
+                    'img-rounded'),
+                $('<hr>'),
+                table);
 
             var modalButtons = {
-                'Show': function () {
+                'Show': function() {
                     window.location = WEBDIR + 'sickrage/view/' + tvdbid;
                 }
             };
@@ -123,7 +132,7 @@ function loadNextAired(options) {
         url: WEBDIR + 'sickrage/GetNextAired',
         type: 'GET',
         dataType: 'json',
-        success: function (result) {
+        success: function(result) {
             // If sickrage not configured, return false (Dashboard)
             if (result === null) return false;
 
@@ -140,37 +149,37 @@ function loadNextAired(options) {
             var lateraired = result.data.later;
 
             // Loop next airing episodes
-            $.each(nextaired, function (i, tvshow) {
+            $.each(nextaired, function(i, tvshow) {
                 if (defaults.limit !== 0 && i == defaults.limit) {
                     return false;
                 }
                 var row = $('<tr>');
-                var name = $('<a>').attr('href', '#').html(tvshow.show_name).click(function (e) {
+                var name = $('<a>').attr('href', '#').html(tvshow.show_name).click(function(e) {
                     loadShow(tvshow.tvdbid);
                 });
 
                 row.append(
-                $('<td>').append(name),
-                $('<td>').html(tvshow.ep_name),
-                $('<td>').html(tvshow.airdate));
+                    $('<td>').append(name),
+                    $('<td>').html(tvshow.ep_name),
+                    $('<td>').html(tvshow.airdate));
 
                 $('#nextaired_table_body').append(row);
             });
 
             // Loop later airing episodes
-            $.each(lateraired, function (i, tvshow) {
+            $.each(lateraired, function(i, tvshow) {
                 if (defaults.limit !== 0 && i == defaults.limit) {
                     return false;
                 }
                 var row = $('<tr>');
-                var name = $('<a>').attr('href', '#').html(tvshow.show_name).click(function (e) {
+                var name = $('<a>').attr('href', '#').html(tvshow.show_name).click(function(e) {
                     loadShow(tvshow.tvdbid);
                 });
 
                 row.append(
-                $('<td>').append(name),
-                $('<td>').html(tvshow.ep_name),
-                $('<td>').html(tvshow.airdate));
+                    $('<td>').append(name),
+                    $('<td>').html(tvshow.ep_name),
+                    $('<td>').html(tvshow.airdate));
 
                 $('#nextaired_table_body').append(row);
             });
@@ -185,22 +194,22 @@ function loadsickrageHistory(limit) {
         url: WEBDIR + 'sickrage/GetHistory?limit=' + limit,
         type: 'GET',
         dataType: 'json',
-        success: function (result) {
-            console.log(result);
-            if (result.data.length == 0) {
+        success: function(result) {
+            if (result.data.length === 0) {
                 var row = $('<tr>');
                 row.append($('<td>').html('History is empty'));
                 $('#history_table_body').append(row);
             }
 
-            $.each(result.data, function (tvdbid, tvshow) {
+            $.each(result.data, function(tvdbid, tvshow) {
                 var row = $('<tr>');
                 row.append(
-                $('<td>').html(tvshow.date),
-                $('<td>').append($('<a>').text(tvshow.show_name).attr('href', WEBDIR + 'sickrage/view/' + tvshow.tvdbid)),
-                $('<td>').html(tvshow.season + 'x' + tvshow.episode),
-                $('<td>').append(sickrageStatusLabel(tvshow.status)),
-                $('<td>').html(tvshow.quality));
+                    $('<td>').html(tvshow.date),
+                    $('<td>').append($('<a>').text(tvshow.show_name).attr('href', WEBDIR +
+                        'sickrage/view/' + tvshow.tvdbid)),
+                    $('<td>').html(tvshow.season + 'x' + tvshow.episode),
+                    $('<td>').append(sickrageStatusLabel(tvshow.status)),
+                    $('<td>').html(tvshow.quality));
 
                 $('#history_table_body').append(row);
             });
@@ -214,13 +223,13 @@ function loadLogs() {
         url: WEBDIR + 'sickrage/GetLogs',
         type: 'get',
         dataType: 'json',
-        success: function (result) {
+        success: function(result) {
             if (result.data.length === 0) {
                 var row = $('<tr>');
                 row.append($('<td>').html('Log is empty'));
                 $('#log_table_body').append(row);
             }
-            $.each(result.data, function (i, logitem) {
+            $.each(result.data, function(i, logitem) {
                 var row = $('<tr>');
                 row.append($('<td>').html(logitem));
                 $('#log_table_body').append(row);
@@ -233,22 +242,23 @@ function searchTvDb(query) {
     $.ajax({
         url: WEBDIR + 'sickrage/SearchShow?query=' + query,
         type: 'get',
-        dataType: 'xml',
-        success: function (result) {
-            console.log(result);
-            series = $(result).find('Series');
-            if (series.length === 0) {
+        success: function(tvshow) {
+            if (tvshow.result != "success") {
                 $('#add_show_button').attr('disabled', false);
                 return;
             }
             $('#add_show_select').html('');
-            series.each(function () {
-                var tvdbid = $(this).find('seriesid').text();
-                var showname = $(this).find('SeriesName').text();
-                var language = $(this).find('language').text();
+            $.each(tvshow.data.results, function(i, opt) {
+                var indexername = (opt.tvdbid) ? 'TVDB' : 'TVRAGE';
+                var indexerkwarg = (opt.tvdbid) ? 'tvdbid' : 'tvrageid';
                 var option = $('<option>');
-                option.attr('value', tvdbid);
-                option.html(showname + ' (' + language + ')');
+                if (opt.tvrageid) {
+                    option.attr('value', opt.tvrageid).attr('data-indexer', indexerkwarg);
+                } else {
+                    option.attr('value', opt.tvdbid).attr('data-indexer', indexerkwarg);
+                }
+
+                option.html(opt.name + ' (' + opt.first_aired + ') ' + indexername);
                 $('#add_show_select').append(option);
             });
             $('#add_show_name').hide();
@@ -260,12 +270,12 @@ function searchTvDb(query) {
     });
 }
 
-function addShow(tvdbid) {
+function addShow(indexerid, indexername) {
     $.ajax({
-        url: WEBDIR + 'sickrage/AddShow?tvdbid=' + tvdbid,
+        url: WEBDIR + 'sickrage/AddShow?' + indexername + '=' + indexerid,
         type: 'get',
         dataType: 'json',
-        success: function (data) {
+        success: function(data) {
             notify('Add TV show', data.message, 'success');
             cancelAddShow();
         }
@@ -338,7 +348,7 @@ function Postprocess() {
     if (p || p.length >= 0) {
         data.path = p;
 
-        $.get(WEBDIR + 'sickrage/Postprocess', data, function (r) {
+        $.get(WEBDIR + 'sickrage/Postprocess', data, function(r) {
             state = (r.length) ? 'success' : 'error';
             // Stop the notify from firing on cancel
             if (p !== null) {

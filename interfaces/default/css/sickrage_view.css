@@ -34,6 +34,21 @@
   border-radius: 0px 0px 6px 6px;
 }
 
+/*
+.qltyselector {
+  height: 25px;
+  width: 100px;
+}
+
+.qltybtn {
+  height: 25px;
+}
+
+.editshowform .control-group {
+  margin-bottom: 0px !important;
+}
+*/
+
 .sickrage_show .banner .show_details td{
   padding: 2px 5px;
 }

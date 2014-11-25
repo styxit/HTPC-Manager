@@ -10,21 +10,26 @@
                 </a>
                 <ul class="dropdown-menu">
                     <li>
-                        <a href="#" class="full-update">Force full update</a>
+                        <a href="#" title="" class="ajax-confirm full-update">Force full update</a>
                     </li>
                     <li>
-                        <a href="#" class="rescan-files">Rescan files</a>
+                        <a href="#" title="" class="ajax-confirm rescan-files">Rescan files</a>
                     </li>
                     <li>
-                        <a href="#" class="delete-show">Delete show</a>
+                        <a href="#" title="" class="delete-show">Delete show</a>
                     </li>
+                    <!-- Gonna disable this until since the api isnt there yet
+                    <li>
+                        <a href="#" class="edit-show">Edit show</a>
+                    </li>
+                    -->
                 </ul>
             </div>
         </h1>
 
         <ul class="breadcrumb">
             <li><a href="${self.attr.webdir}">Home</a> <span class="divider">/</span></li>
-            <li><a href="${self.attr.webdir}sickrage">${settings.get('sickrage_name', 'sickrage')}</a> <span class="divider">/</span></li>
+            <li><a href="${self.attr.webdir}sickrage">${settings.get('sickrage_name', 'Sickrage')}</a> <span class="divider">/</span></li>
             <li class="active sickrage_showname">Show details</li>
         </ul>
 
@@ -49,8 +54,14 @@
                     <tr>
                         <td>Location</td><td class="sickrage_location"/>
                     </tr>
+
+                    <tr>
+                        <td>Quality</td><td class="sickrage_quality"></td>
+                    </tr>
+
                 </table>
-                <div id="show_details_bottom" class="span4"></div>
+                <div id="show_details_bottom" class="span4">
+                </div>
             </div>
         </div>
 
@@ -75,5 +86,6 @@
             </thead>
             <tbody id="season-content"></tbody>
         </table>
+        <div class="spinner"></div>
     </div>
 </div>

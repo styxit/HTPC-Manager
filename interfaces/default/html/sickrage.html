@@ -8,14 +8,14 @@
                  <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-off"></i><i class="caret"></i></a>
                     <ul class="dropdown-menu pull-right"> <!-- Skeleton -->
                         <li><a href="Restart" class="ajax-confirm" title="Restart Sickrage"><i class="icon-refresh"></i> Restart</a></li>
-                        <li><a href="Shutown" class="ajax-confirm" title="Shutdown Sickrage"><i class="icon-off"></i> Shutdown</a></li>
+                        <li><a href="Shutdown" class="ajax-confirm" title="Shutdown Sickrage"><i class="icon-off"></i> Shutdown</a></li>
                         <!--<li><a id="update_sb" href="#" title="Update sickbeard"><i class="icon-refresh"></i> Update</a></li>-->
                         <li><a id="postprocess" href="#" title="Postprocess"><i class="icon-hdd"></i> Postprocess</a></li>
                     </ul>
             </div>
         </h1>
         <div class="well form-inline">
-            <input class="span6" id="add_show_name" name="add_show_name" type="text" />
+            <input class="span6" id="add_show_name" name="add_show_name" type="text"/>
             <select class="span6" style="display:none;" id="add_show_select" name="add_show_select"></select>
             <button class="btn btn-success" type="button" id="add_show_button"><i class="icon-plus icon-white"></i> Add show</button>
             <button class="btn btn-success hide" type="button" id="add_tvdbid_button"><i class="icon-ok icon-white"></i> Add show</button>
@@ -78,6 +78,7 @@
                     <tbody id="log_table_body"></tbody>
                 </table>
             </div>
+            <div class="spinner"></div>
         </div>
     </div>
 </div>
