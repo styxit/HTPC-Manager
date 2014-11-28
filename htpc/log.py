@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """
 Logging
 """
@@ -5,6 +8,7 @@ import os
 import cherrypy
 import htpc
 import logging
+import logging.handlers
 
 
 class Log:
@@ -14,7 +18,7 @@ class Log:
         self.logfile = os.path.join(htpc.DATADIR, 'htpcmanager.log')
         htpc.LOGGER = logging.getLogger()
         self.logch = logging.StreamHandler()
-        self.logfh = logging.FileHandler(self.logfile)
+        self.logfh = logging.handlers.RotatingFileHandler(self.logfile, maxBytes=25000000, backupCount=2)
 
         logformatter = logging.Formatter('%(asctime)s :: %(name)s :: %(levelname)s :: %(message)s', "%Y-%m-%d %H:%M:%S")
         self.logch.setFormatter(logformatter)
