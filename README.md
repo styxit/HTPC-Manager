@@ -1,22 +1,22 @@
 This is  Htpc-Manager the way i want it.
 
-Some of the differance is:
+Some of the difference is:
 - Htpc manager is now fluid.
-- Sonaarr/Nzbdrone support
-- Delete cache folder from the settings page
-- Updgraded Nzbget module
+- Sonaarr/Nzbdrone module
+- Sickrage module
+- Delete cache folder from the settingspage
+- Upgraded Nzbget module
 - Upgraded qBittorrent module
 - Added a option for robots.txt
 - Stats module is sortable
 - Xbmc addons tab, where you can search/execute and a volume slider instead of a progressbar
 - Reduced size on static files
 - Set wanted catagory while adding movies in Couchpotato
-- Option on branch you want to use.
+- Option on branch you want to use. (still need some work)
 - Docker support
 - Various fixes
 
 TODO:
-- Sickrage
 - Ipcamera module
 
 See here for full list:
