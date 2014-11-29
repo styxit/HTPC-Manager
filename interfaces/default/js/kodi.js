@@ -2,9 +2,9 @@ var searchString = '';
 var hideWatched = 0;
 var playerLoader = null;
 var position1 = null;
-var sorting = { 
+var sorting = {
     method:'title',
-    order: 'ascending' 
+    order: 'ascending'
 }
 
 $(document).ready(function() {
@@ -20,14 +20,14 @@ $(document).ready(function() {
 
     loadShowFromHash(location.hash);
 
-    // Catch keyboard event and send to XBMC
+    // Catch keyboard event and send to kodi
     $(document).keydown(function(e) {
         if (!$('input').is(":focus")) {
             arrow = {8: 'back', 27: 'back', 13: 'select', 37: 'left', 38: 'up', 39: 'right', 40: 'down',
                      88: 'stop', 32: 'playpause', 67: 'contextmenu', 73: 'info', 77: 'mute'};
             command = arrow[e.which];
             if (command) {
-                $.get(WEBDIR + 'xbmc/ControlPlayer?action='+command);
+                $.get(WEBDIR + 'kodi/ControlPlayer?action='+command);
                 e.preventDefault();
             }
         }
@@ -35,11 +35,11 @@ $(document).ready(function() {
 
     // Load serverlist and send command on change.
     var servers = $('#servers').change(function() {
-         $.get(WEBDIR + 'xbmc/changeserver?id='+$(this).val(), function(data) {
-            notify('XBMC','Server change '+data,'info');
+         $.get(WEBDIR + 'kodi/changeserver?id='+$(this).val(), function(data) {
+            notify('kodi','Server change '+data,'info');
          });
     });
-    $.get(WEBDIR + 'xbmc/getserver', function(data) {
+    $.get(WEBDIR + 'kodi/getserver', function(data) {
         if (data==null) return;
         $.each(data.servers, function(i, item) {
             server = $('<option>').text(item.name).val(item.id);
@@ -51,27 +51,27 @@ $(document).ready(function() {
     // Enable player controls
     $('[data-player-control]').click(function () {
         var action = $(this).attr('data-player-control');
-        $.get(WEBDIR + 'xbmc/ControlPlayer?action='+action);
+        $.get(WEBDIR + 'kodi/ControlPlayer?action='+action);
     });
     $('#nowplaying #player-progressbar').click(function(e) {
         pos = ((e.pageX-this.offsetLeft)/$(this).width()*100).toFixed(2);
-        $.get(WEBDIR + 'xbmc/ControlPlayer?action=seek&value='+pos);
+        $.get(WEBDIR + 'kodi/ControlPlayer?action=seek&value='+pos);
     });
     $('#nowplaying #player-volume-progressbar').click(function(e) {
         vol = ((e.pageX-this.offsetLeft)/$(this).width()*100).toFixed();
-        $.get(WEBDIR + 'xbmc/ControlPlayer?action=volume&value='+vol);
+        $.get(WEBDIR + 'kodi/ControlPlayer?action=volume&value='+vol);
     });
 
     // Slider for volume
     $('#ex1').slider({
         formater: function(value) {
             if (value === 0) {
-                $.get(WEBDIR + 'xbmc/NowPlaying', function(data) {
-                    $('#ex1').slider('setValue', data.app.volume, []); 
+                $.get(WEBDIR + 'kodi/NowPlaying', function(data) {
+                    $('#ex1').slider('setValue', data.app.volume, []);
                 });
             } else {
-                $.get(WEBDIR + 'xbmc/ControlPlayer?action=volume&value='+value);  
-                return 'Volume: ' + value;      
+                $.get(WEBDIR + 'kodi/ControlPlayer?action=volume&value='+value);
+                return 'Volume: ' + value;
             }
         }
     });
@@ -82,10 +82,10 @@ $(document).ready(function() {
         hideWatched = $(this).toggleClass('active').hasClass('active')?1:0;
         $(this).text(hideWatched?' Show Watched':' Hide Watched');
         $(this).prepend('<i class="icon-eye-open"></i>');
-        $.get(WEBDIR + 'settings?xbmc_hide_watched='+hideWatched);
+        $.get(WEBDIR + 'settings?kodi_hide_watched='+hideWatched);
         reloadTab();
     });
-    
+
     // Define sort method
     $('[data-sort-method]').click(function (e) {
         e.preventDefault();
@@ -96,25 +96,25 @@ $(document).ready(function() {
         reloadTab();
     });
 
-    // Send notification to XBMC
-    $('#xbmc-notify').click(function() {
+    // Send notification to kodi
+    $('#kodi-notify').click(function() {
         msg = prompt("Message");
         if (msg) {
-            $.post(WEBDIR + 'xbmc/Notify',{'text': msg}, function(data) {
-                notify('XBMC', 'Notification sent successfully', 'info');
+            $.post(WEBDIR + 'kodi/Notify',{'text': msg}, function(data) {
+                notify('kodi', 'Notification sent successfully', 'info');
             });
         }
     });
 
     // Show subtitle selector if current has a subtitle track
     var subtitles = $('#subtitles').change(function() {
-        $.get(WEBDIR + 'xbmc/Subtitles?subtitle='+$(this).val(), function (data) {
+        $.get(WEBDIR + 'kodi/Subtitles?subtitle='+$(this).val(), function (data) {
             notify('Subtitles','Change successful','info');
         });
     });
     // Show audio selector if current has multiple subtitles tracks
     var audio = $('#audio').change(function() {
-        $.get(WEBDIR + 'xbmc/Audio?audio='+$(this).val(), function (data) {
+        $.get(WEBDIR + 'kodi/Audio?audio='+$(this).val(), function (data) {
             notify('Audio','Change successful','info');
         });
     });
@@ -128,7 +128,7 @@ $(document).ready(function() {
             position1 = ui.item.index()
         },
         stop: function(event, ui) {
-            $.get(WEBDIR + 'xbmc/PlaylistMove',{
+            $.get(WEBDIR + 'kodi/PlaylistMove',{
                 position1: position1,
                 position2: ui.item.index()
             }, function (data) {
@@ -181,7 +181,7 @@ function loadMovies(options) {
 
     $('.spinner').show();
     movieLoad.request = $.ajax({
-        url: WEBDIR + 'xbmc/GetMovies',
+        url: WEBDIR + 'kodi/GetMovies',
         type: 'get',
         data: sendData,
         dataType: 'json',
@@ -205,7 +205,7 @@ function loadMovies(options) {
 
                     var src = 'holder.js/100x150/text:No artwork';
                     if (movie.thumbnail != '') {
-                        src = WEBDIR + 'xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(movie.thumbnail);
+                        src = WEBDIR + 'kodi/GetThumb?w=100&h=150&thumb='+encodeURIComponent(movie.thumbnail);
                     }
                     movieAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
@@ -229,7 +229,7 @@ function loadMovies(options) {
 }
 
 function loadMovie(movie) {
-    var poster = WEBDIR + 'xbmc/GetThumb?w=200&h=300&thumb='+encodeURIComponent(movie.thumbnail)
+    var poster = WEBDIR + 'kodi/GetThumb?w=200&h=300&thumb='+encodeURIComponent(movie.thumbnail)
     var info = $('<div>').addClass('modal-movieinfo');
     if (movie.streamdetails && movie.streamdetails.video[0]) {
         var runtime = parseSec(movie.streamdetails.video[0].duration);
@@ -279,7 +279,7 @@ function loadMovie(movie) {
         info
     ), buttons);
     $('.modal-fanart').css({
-        'background-image' : 'url('+WEBDIR+'xbmc/GetThumb?w=675&h=400&o=10&thumb='+encodeURIComponent(movie.fanart)+')'
+        'background-image' : 'url('+WEBDIR+'kodi/GetThumb?w=675&h=400&o=10&thumb='+encodeURIComponent(movie.fanart)+')'
     });
 }
 
@@ -311,7 +311,7 @@ function loadShows(options) {
 
     $('.spinner').show();
     showLoad.request = $.ajax({
-        url: WEBDIR + 'xbmc/GetShows',
+        url: WEBDIR + 'kodi/GetShows',
         type: 'get',
         data: sendData,
         dataType: 'json',
@@ -335,7 +335,7 @@ function loadShows(options) {
 
                     var src = 'holder.js/100x150/text:No artwork';
                     if (show.thumbnail != '') {
-                        src = WEBDIR + 'xbmc/GetThumb?w=100&h=150&thumb='+encodeURIComponent(show.thumbnail);
+                        src = WEBDIR + 'kodi/GetThumb?w=100&h=150&thumb='+encodeURIComponent(show.thumbnail);
                     }
                     showAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
@@ -386,7 +386,7 @@ function loadEpisodes(options) {
 
     $('.spinner').show();
     episodeLoad.request = $.ajax({
-        url: WEBDIR + 'xbmc/GetEpisodes',
+        url: WEBDIR + 'kodi/GetEpisodes',
         type: 'get',
         data: sendData,
         dataType: 'json',
@@ -410,7 +410,7 @@ function loadEpisodes(options) {
 
                     var src = 'holder.js/150x85/text:No artwork';
                     if (episode.thumbnail != '') {
-                        src = WEBDIR + 'xbmc/GetThumb?w=150&h=85&thumb='+encodeURIComponent(episode.thumbnail);
+                        src = WEBDIR + 'kodi/GetThumb?w=150&h=85&thumb='+encodeURIComponent(episode.thumbnail);
                     }
                     episodeAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
@@ -460,7 +460,7 @@ function loadArtists(options) {
 
     $('.spinner').show();
     artistLoad.request = $.ajax({
-        url: WEBDIR + 'xbmc/GetArtists',
+        url: WEBDIR + 'kodi/GetArtists',
         type: 'get',
         data: sendData,
         dataType: 'json',
@@ -542,7 +542,7 @@ function loadAlbums(options) {
 
     $('.spinner').show();
     albumLoad.request = $.ajax({
-        url: WEBDIR + 'xbmc/GetAlbums',
+        url: WEBDIR + 'kodi/GetAlbums',
         type: 'get',
         data: sendData,
         dataType: 'json',
@@ -563,7 +563,7 @@ function loadAlbums(options) {
 
                     var src = 'holder.js/150x150/text:No artwork';
                     if (album.thumbnail != '') {
-                        src = WEBDIR + 'xbmc/GetThumb?w=150&h=150&thumb='+encodeURIComponent(album.thumbnail);
+                        src = WEBDIR + 'kodi/GetThumb?w=150&h=150&thumb='+encodeURIComponent(album.thumbnail);
                     }
                     albumItem.append($('<img>').attr('src', src).addClass('thumbnail'));
 
@@ -641,7 +641,7 @@ function loadSongs(options) {
 
     $('.spinner').show();
     songsLoad.request = $.ajax({
-        url: WEBDIR + 'xbmc/GetSongs',
+        url: WEBDIR + 'kodi/GetSongs',
         type: 'get',
         data: sendData,
         dataType: 'json',
@@ -698,7 +698,7 @@ function loadChannels(){
     var list = $('#pvr-grid').empty();
     $('.spinner').show();
     $.ajax({
-        url: WEBDIR + 'xbmc/GetChannels',
+        url: WEBDIR + 'kodi/GetChannels',
         type: 'get',
         dataType: 'json',
         success: function(data){
@@ -712,7 +712,7 @@ function loadChannels(){
                 });
                 var src = 'holder.js/75x75/text:'+channel.label;
                 if (channel.thumbnail) {
-                    src = WEBDIR + 'xbmc/GetThumb?w=75&h=75&thumb='+encodeURIComponent(channel.thumbnail);
+                    src = WEBDIR + 'kodi/GetThumb?w=75&h=75&thumb='+encodeURIComponent(channel.thumbnail);
                 }
                 link.append($('<img>').attr('src', src).addClass('thumbnail'));
                 link.append($('<h6>').addClass('title').html(shortenText(channel.label, 21)));
@@ -731,7 +731,7 @@ function loadChannels(){
 var nowPlayingId = false
 function loadNowPlaying() {
     $.ajax({
-        url: WEBDIR + 'xbmc/NowPlaying',
+        url: WEBDIR + 'kodi/NowPlaying',
         type: 'get',
         dataType: 'json',
         success: function(data) {
@@ -750,25 +750,25 @@ function loadNowPlaying() {
                 } else {
                     switch(data.itemInfo.item.type) {
                         case 'episode':
-                            thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=150&h=75&thumb='+nowPlayingThumb);
+                            thumbnail.attr('src', WEBDIR + 'kodi/GetThumb?w=150&h=75&thumb='+nowPlayingThumb);
                             thumbnail.attr('width', '150').attr('height', '75');
                             break;
                         case 'movie':
-                            thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=100&h=150&thumb='+nowPlayingThumb);
+                            thumbnail.attr('src', WEBDIR + 'kodi/GetThumb?w=100&h=150&thumb='+nowPlayingThumb);
                             thumbnail.attr('width', '100').attr('height', '150');
                             break;
                         case 'song':
-                            thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=180&h=180&thumb='+nowPlayingThumb);
+                            thumbnail.attr('src', WEBDIR + 'kodi/GetThumb?w=180&h=180&thumb='+nowPlayingThumb);
                             thumbnail.attr('width', '180').attr('height', '180');
                             break;
                         default:
-                            thumbnail.attr('src', WEBDIR + 'xbmc/GetThumb?w=140&h=140&thumb='+nowPlayingThumb);
+                            thumbnail.attr('src', WEBDIR + 'kodi/GetThumb?w=140&h=140&thumb='+nowPlayingThumb);
                             thumbnail.attr('width', '140').attr('height', '140');
                     }
                 }
                 if (data.itemInfo.item.fanart) {
                     var background = encodeURIComponent(data.itemInfo.item.fanart)
-                    background = WEBDIR + 'xbmc/GetThumb?w=1150&h=640&o=10&thumb='+background;
+                    background = WEBDIR + 'kodi/GetThumb?w=1150&h=640&o=10&thumb='+background;
                     $('#nowplaying').css({'background-image':'url('+background+')'});
                 }
             }
@@ -817,14 +817,14 @@ function loadNowPlaying() {
 
             var progressBar = $('#nowplaying #player-progressbar .bar');
             progressBar.css('width', data.playerInfo.percentage + '%');
-            
+
             //Fake update the slider
             $('.slider-selection').css({
                 "width":data.app.volume+'%',
                 'left':'0%'
             });
             $('.slider-handle').css({
-                'left': data.app.volume+'%', 
+                'left': data.app.volume+'%',
             });
 
             var select = $('#audio').html('')
@@ -867,7 +867,7 @@ function loadNowPlaying() {
 
 function loadPlaylist(type){
     $.ajax({
-        url: WEBDIR + 'xbmc/Playlist/' + type,
+        url: WEBDIR + 'kodi/Playlist/' + type,
         type: 'get',
         dataType: 'json',
         success: function(data) {
@@ -923,27 +923,27 @@ function loadPlaylist(type){
 
 function playItem(item, type) {
     type = typeof type !== 'undefined' ? '&type='+type : '';
-    $.get(WEBDIR + 'xbmc/PlayItem?item='+item+type);
+    $.get(WEBDIR + 'kodi/PlayItem?item='+item+type);
 }
 
 function queueItem(item, type) {
     type = typeof type !== 'undefined' ? '&type='+type : '';
-    $.get(WEBDIR + 'xbmc/QueueItem?item='+item+type);
+    $.get(WEBDIR + 'kodi/QueueItem?item='+item+type);
     nowPlayingId = null;
 }
 
 function removeItem(item) {
-    $.get(WEBDIR + 'xbmc/RemoveItem?item='+item);
+    $.get(WEBDIR + 'kodi/RemoveItem?item='+item);
     nowPlayingId = null;
 }
 
 function playlistJump(position) {
-    $.get(WEBDIR + 'xbmc/ControlPlayer/jump/'+position);
+    $.get(WEBDIR + 'kodi/ControlPlayer/jump/'+position);
 }
 
 function errorHandler() {
     $('.spinner').hide();
-    notify('Error','Error connecting to XBMC','error');
+    notify('Error','Error connecting to kodi','error');
     moviesLoading = false;
     return false;
 }
@@ -963,18 +963,18 @@ function loadShowFromHash(hash) {
 
 function executeAddon(addon, cmd0, cmd1) {
      confirm('Execute: ' + addon + ' with parameter: ' + cmd0 + ' ' + cmd1);
-     $.get(WEBDIR + 'xbmc/ExecuteAddon?addon='+ addon + '&cmd0=' + cmd0 + '&cmd1=' + cmd1);
+     $.get(WEBDIR + 'kodi/ExecuteAddon?addon='+ addon + '&cmd0=' + cmd0 + '&cmd1=' + cmd1);
 }
 
 function Enable_DisableAddon(addonid, enabled) {
-    $.get(WEBDIR + 'xbmc/Enable_DisableAddon/'+ addonid + '/' + enabled, function(i){ 
+    $.get(WEBDIR + 'kodi/Enable_DisableAddon/'+ addonid + '/' + enabled, function(i){
     });
-    
+
 }
 
 function GetAddons() {
     $.ajax({
-        'url': WEBDIR + 'xbmc/GetAddons',
+        'url': WEBDIR + 'kodi/GetAddons',
             'dataType': 'json',
             'success': function (response) {
                 $('#addons-grid').html("");
@@ -987,7 +987,7 @@ function GetAddons() {
                     });
                     var src = 'holder.js/100x150/text:No artwork';
                     if (addon.thumbnail !== '') {
-                        src = WEBDIR + 'xbmc/GetThumb?w=100&h=150&thumb=' + encodeURIComponent(addon.thumbnail);
+                        src = WEBDIR + 'kodi/GetThumb?w=100&h=150&thumb=' + encodeURIComponent(addon.thumbnail);
                     }
                     addonAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
                     addonAnchor.append($('<h6>').addClass('title').html(shortenText(addon.name, 11)));
@@ -1002,7 +1002,7 @@ function GetAddons() {
 
 function loadAddons(addon) {
     var head = addon.name;
-    var poster = WEBDIR + 'xbmc/GetThumb?w=133&h=200&thumb=' + encodeURIComponent(addon.thumbnail);
+    var poster = WEBDIR + 'kodi/GetThumb?w=133&h=200&thumb=' + encodeURIComponent(addon.thumbnail);
     var info = $('<div>')
     var description = $('<p>').html('<b>Description:</b> ' + addon.description);
     var type = $('<p>').html('<b>Type:</b> ' + addon.type);

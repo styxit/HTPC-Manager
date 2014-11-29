@@ -55,8 +55,8 @@ def load_modules():
     htpc.ROOT.update = Updater()
 
     # Import all modules.
-    from modules.xbmc import Xbmc
-    htpc.ROOT.xbmc = Xbmc()
+    from modules.kodi import Kodi
+    htpc.ROOT.kodi = Kodi()
     from modules.sabnzbd import Sabnzbd
     htpc.ROOT.sabnzbd = Sabnzbd()
     from modules.couchpotato import Couchpotato
@@ -85,8 +85,8 @@ def load_modules():
     htpc.ROOT.plex = Plex()
     from modules.users import Users
     htpc.ROOT.users = Users()
-    from modules.nzbdrone import NzbDrone
-    htpc.ROOT.nzbdrone = NzbDrone()
+    from modules.sonarr import Sonarr
+    htpc.ROOT.sonarr = Sonarr()
     from modules.sickrage import Sickrage
     htpc.ROOT.sickrage = Sickrage()
 

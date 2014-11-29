@@ -3,13 +3,13 @@
 <div class="container-fluid">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="http://${settings.get('nzbdrone_host')}:${settings.get('nzbdrone_port') + settings.get('nzbdrone_basepath')}" target="_blank" title="Open original NzbDrone interface">${settings.get('nzbdrone_name', 'NzbDrone')}</a>
+            <a href="http://${settings.get('sonarr_host')}:${settings.get('sonarr_port') + settings.get('sonarr_basepath')}" target="_blank" title="Open original sonarr interface">${settings.get('sonarr_name', 'sonarr')}</a>
             <div class="btn-group pull-right">
                     <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-off"></i>
                     <i class="caret"></i></a>
                     <ul class="dropdown-menu pull-right"> <!-- Skeleton -->
-                        <li><a href="Command?method=restart" class="ajax-confirm" title="Restart Nzbdrone"><i class="icon-refresh"></i> Restart</a></li>
-                        <li><a href="Command/?method=shutdown" class="ajax-confirm" title="Shutdown nzbdrone"><i class="icon-off"></i> Shutdown</a></li>
+                        <li><a href="Command?method=restart" class="ajax-confirm" title="Restart sonarr"><i class="icon-refresh"></i> Restart</a></li>
+                        <li><a href="Command/?method=shutdown" class="ajax-confirm" title="Shutdown sonarr"><i class="icon-off"></i> Shutdown</a></li>
                         <li><a id="scanfolder" href="#" title="Scan DroneFactoryFolder"><i class="icon-refresh"></i> Scan DroneFactoryFolder</a></li>
                     </ul>
                 </div>

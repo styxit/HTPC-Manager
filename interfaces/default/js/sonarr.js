@@ -5,7 +5,7 @@ $(document).ready(function () {
     loadShows();
     history();
     calendar();
-    
+
     $('#add_show_button').click(function () {
         $(this).attr('disabled', true);
         searchTvDb($('#add_show_name').val());
@@ -29,7 +29,7 @@ $(document).ready(function () {
 
 function loadShows() {
     $.ajax({
-        url: WEBDIR + 'nzbdrone/Series',
+        url: WEBDIR + 'sonarr/Series',
         type: 'get',
         dataType: 'json',
         success: function (result) {
@@ -38,10 +38,10 @@ function loadShows() {
                 row.append($('<td>').html('No shows found'));
                 $('#tvshows_table_body').append(row);
             }
-            $.each(result, function (showname, tvshow) { // tvshow.tvdbId 
-                var name = $('<a>').attr('href', WEBDIR + 'nzbdrone/View/' + tvshow.id + '/' + tvshow.tvdbId).text(tvshow.title);
+            $.each(result, function (showname, tvshow) { // tvshow.tvdbId
+                var name = $('<a>').attr('href', WEBDIR + 'sonarr/View/' + tvshow.id + '/' + tvshow.tvdbId).text(tvshow.title);
                 var row = $('<tr>');
-                // Check the global var as nzbdrone dont have quality name only a id.
+                // Check the global var as sonarr dont have quality name only a id.
                 $.each(qlty, function (i, q) {
                     if (tvshow.qualityProfileId == q.id) {
                         qname = q.name;
@@ -54,10 +54,10 @@ function loadShows() {
                 }
                 row.append(
                 $('<td>').html(name),
-                $('<td>').html(nzbdroneStatusLabel(tvshow.status)),
+                $('<td>').html(sonarrStatusLabel(tvshow.status)),
                 $('<td>').html(nextair),
                 $('<td>').html(tvshow.network),
-                $('<td>').html(nzbdroneStatusLabel(qname)));
+                $('<td>').html(sonarrStatusLabel(qname)));
                 $('#tvshows_table_body').append(row);
             });
             $('#tvshows_table_body').parent().trigger('update');
@@ -70,7 +70,7 @@ function loadShows() {
     });
 }
 
-function nzbdroneStatusIcon(iconText, white) {
+function sonarrStatusIcon(iconText, white) {
     var text = [
         'downloaded',
         'continuing',
@@ -96,7 +96,7 @@ function nzbdroneStatusIcon(iconText, white) {
     return '';
 }
 
-function nzbdroneStatusLabel(text) {
+function sonarrStatusLabel(text) {
     var statusOK = ['continuing', 'downloaded', 'HD', 'HD-720p', 'HD-1080p', 'WEBDL-1080p'];
     var statusInfo = ['snatched', 'SD'];
     var statusError = ['ended'];
@@ -114,7 +114,7 @@ function nzbdroneStatusLabel(text) {
         label.addClass('label-warning');
     }
 
-    var icon = nzbdroneStatusIcon(text, true);
+    var icon = sonarrStatusIcon(text, true);
     if (icon !== '') {
         label.prepend(' ').prepend(icon);
     }
@@ -122,13 +122,13 @@ function nzbdroneStatusLabel(text) {
 }
 
 function profile(qualityProfileId) {
-    $.get(WEBDIR + 'nzbdrone/Profile', function (result) {
+    $.get(WEBDIR + 'sonarr/Profile', function (result) {
         qlty = result
     });
 }
 
 function history() {
-    $.getJSON(WEBDIR + 'nzbdrone/History', function (result) {
+    $.getJSON(WEBDIR + 'sonarr/History', function (result) {
         $.each(result.records, function (i, log) {
             var row = $('<tr>');
             row.append(
@@ -137,8 +137,8 @@ function history() {
             $('<td>').text(log.sourceTitle),
             //$('<td>').text(log.series.title), // Clean title
             $('<td>').text(log.episode.title),
-            $('<td>').html(nzbdroneStatusLabel(log.series.status)),
-            $('<td>').html(nzbdroneStatusLabel(log.quality.quality.name)));
+            $('<td>').html(sonarrStatusLabel(log.series.status)),
+            $('<td>').html(sonarrStatusLabel(log.quality.quality.name)));
 
             $('#history_table_body').append(row);
         });
@@ -148,7 +148,7 @@ function history() {
 }
 
 function calendar() {
-    $.getJSON(WEBDIR + 'nzbdrone/Calendar', function (result) {
+    $.getJSON(WEBDIR + 'sonarr/Calendar', function (result) {
         $.each(result, function (i, cal) {
             var row = $('<tr>');
             var name = $('<a>').attr('href', '#').html(cal.series.title).click(function (e) {
@@ -169,7 +169,7 @@ function calendar() {
 
 function searchTvDb(query) {
     $.ajax({
-        url: WEBDIR + 'nzbdrone/Lookup/' + encodeURIComponent(query),
+        url: WEBDIR + 'sonarr/Lookup/' + encodeURIComponent(query),
         type: 'get',
         success: function (result) {
             if (result.length === 0) {
@@ -207,7 +207,7 @@ function searchTvDb(query) {
 
 function addShow(tvdbid, quality) {
     $.ajax({
-        url: WEBDIR + 'nzbdrone/AddShow/' + tvdbid + '/' + quality,
+        url: WEBDIR + 'sonarr/AddShow/' + tvdbid + '/' + quality,
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -236,7 +236,7 @@ function cancelAddShow() {
 
 
 function loadShow(seriesID) {
-    $.getJSON(WEBDIR + 'nzbdrone/Show/id=' + seriesID, function (tvshow) {
+    $.getJSON(WEBDIR + 'sonarr/Show/id=' + seriesID, function (tvshow) {
         var bannerurl;
         var table = $('<table>');
         table.addClass('table table-bordered table-striped table-condensed');
@@ -286,7 +286,7 @@ function loadShow(seriesID) {
 
         modalContent = $('<div>');
         modalContent.append(
-        $('<img>').attr('src', WEBDIR + 'nzbdrone/GetBanner/?url=' + bannerurl).addClass('img-rounded'),
+        $('<img>').attr('src', WEBDIR + 'sonarr/GetBanner/?url=' + bannerurl).addClass('img-rounded'),
         $('<hr>'),
         table);
 
@@ -295,7 +295,7 @@ function loadShow(seriesID) {
         var modalButtons = {
             'Show': function () {
             data = {'id': tvshow.seriesID}
-            window.location = WEBDIR + 'nzbdrone/View/' + tvshow.tvdbid + '/' + tvshow.seriesID ;
+            window.location = WEBDIR + 'sonarr/View/' + tvshow.tvdbid + '/' + tvshow.seriesID ;
             }
         };
         */
@@ -314,12 +314,12 @@ function Scanfolder() {
         data.par = "path";
         data.id = p;
 
-        $.getJSON(WEBDIR + 'nzbdrone/Command', data, function (r) {
+        $.getJSON(WEBDIR + 'sonarr/Command', data, function (r) {
             state = (r.state) ? 'success' : 'error';
             // Stop the notify from firing on cancel
             if (p !== null) {
                 path = (p.length === 0) ? 'Default folder' : p;
-                notify('NzbDrone', 'Postprocess ' + path, state);
+                notify('sonarr', 'Postprocess ' + path, state);
             }
         });
     }

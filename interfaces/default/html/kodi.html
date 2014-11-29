@@ -3,13 +3,13 @@
 <div class="container-fluid">
     <div class="content">
         <h1 class="page-header page-title">
-            <a href="webinterface" target="_blank">${settings.get('xbmc_name', 'XBMC')}</a>
+            <a href="webinterface" target="_blank">${settings.get('kodi_name', 'KODI')}</a>
             <div class="btn-toolbar pull-right">
                 <div class="btn-group">
                     <select id="servers"></select>
                 </div>
                 <div class="btn-group">
-                    <a href="#" id="xbmc-notify" class="btn" title="Send notification"><i class="icon-envelope"></i></a>
+                    <a href="#" id="kodi-notify" class="btn" title="Send notification"><i class="icon-envelope"></i></a>
                 </div>
                 <div class="btn-group">
                     <a href="#" class="btn dropdown-toggle" data-toggle="dropdown" title="Sort by"><i class="icon-sort"></i>
@@ -26,7 +26,7 @@
                     <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-th-list"></i>
                     <i class="caret"></i></a>
                     <ul class="dropdown-menu pull-right">
-                        %if settings.get('xbmc_hide_watched', 0):
+                        %if settings.get('kodi_hide_watched', 0):
                         <li><a href="#" id="hidewatched" class="active"><i class="icon-eye-open"></i> Show Watched</a></li>
                         %else:
                         <li><a href="#" id="hidewatched"><i class="icon-eye-open"></i> Hide Watched</a></li>
@@ -43,9 +43,9 @@
                     <i class="caret"></i></a>
                     <ul class="dropdown-menu pull-right">
                         <li><a href="Wake" class="ajax-link" title="Send WakeOnLan"><i class="icon-off"></i> Wake</a></li>
-                        <li><a href="System?action=Suspend" class="ajax-confirm" title="Suspend XBMC"><i class="icon-eye-close"></i> Suspend</a></li>
-                        <li><a href="System?action=Reboot" class="ajax-confirm" title="Restart XBMC"><i class="icon-refresh"></i> Restart</a></li>
-                        <li><a href="System?action=Shutdown" class="ajax-confirm" title="Shutdown XBMC"><i class="icon-off"></i> Shutdown</a></li>
+                        <li><a href="System?action=Suspend" class="ajax-confirm" title="Suspend kodi"><i class="icon-eye-close"></i> Suspend</a></li>
+                        <li><a href="System?action=Reboot" class="ajax-confirm" title="Restart kodi"><i class="icon-refresh"></i> Restart</a></li>
+                        <li><a href="System?action=Shutdown" class="ajax-confirm" title="Shutdown kodi"><i class="icon-off"></i> Shutdown</a></li>
                     </ul>
                 </div>
             </div>
@@ -104,7 +104,7 @@
                     <li><a href="#songs" data-toggle="tab">Songs</a></li>
                 </ul>
             </li>
-            %if settings.get('xbmc_enable_pvr', 0):
+            %if settings.get('kodi_enable_pvr', 0):
             <li><a href="#pvr" data-toggle="tab">PVR</a></li>
             %endif
             <li class="hide"><a href="#playlist" data-toggle="tab">Playlist</a></li>

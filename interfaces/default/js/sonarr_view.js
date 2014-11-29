@@ -9,7 +9,7 @@ $(document).ready(function () {
 
 function loadShowData(seriesId, tvdbId) {
     $.ajax({
-        url: WEBDIR + 'nzbdrone/Show/' + seriesId + '/' + tvdbId,
+        url: WEBDIR + 'sonarr/Show/' + seriesId + '/' + tvdbId,
         type: 'get',
         dataType: 'json',
         success: function (tvshow) {
@@ -17,7 +17,7 @@ function loadShowData(seriesId, tvdbId) {
                 notify('Error', 'Show not found.', 'error');
                 return;
             }
-            
+
             // Convert id to a Quality name
             $.each(qlty, function (i, q) {
                 if (tvshow.qualityProfileId == q.id) {
@@ -40,18 +40,18 @@ function loadShowData(seriesId, tvdbId) {
                             // set the url to the banner so the modal can access it
                             $('h1.page-title').attr('data-bannerurl', cover.url);
                             // Fetch the banner
-                            $('#banner').css('background-image', 'url(' + WEBDIR + 'nzbdrone/GetBanner/?url=' + cover.url + ')');
+                            $('#banner').css('background-image', 'url(' + WEBDIR + 'sonarr/GetBanner/?url=' + cover.url + ')');
                         }
                     });
                 }
 
-                $('.nzbdrone_want_quality').text(qname);
-                $('.nzbdrone_showname').text(tvshow.title);
-                $('.nzbdrone_status').append(nzbdroneStatusLabel(tvshow.status));
-                $('.nzbdrone_network').text(tvshow.network);
-                $('.nzbdrone_location').text(tvshow.path);
-                $('.nzbdrone_airs').text(tvshow.airTime);
-                $('.nzbdrone_next_air').text(nextair);
+                $('.sonarr_want_quality').text(qname);
+                $('.sonarr_showname').text(tvshow.title);
+                $('.sonarr_status').append(sonarrStatusLabel(tvshow.status));
+                $('.sonarr_network').text(tvshow.network);
+                $('.sonarr_location').text(tvshow.path);
+                $('.sonarr_airs').text(tvshow.airTime);
+                $('.sonarr_next_air').text(nextair);
 
                 var menu = $('.show-options-menu');
                 $('.rescan-files')
@@ -95,7 +95,7 @@ function loadShowData(seriesId, tvdbId) {
     });
 }
 
-// showid= tvdbid, id=nzbdroneid
+// showid= tvdbid, id=sonarrid
 function renderSeasonTabs(showid, id, tvshow) {
     list = $('#season-list');
     list.html('');
@@ -129,7 +129,7 @@ function renderSeasonTabs(showid, id, tvshow) {
 
 function showEpisodeInfo(episodeid, value) {
     var ep = value;
-    $.getJSON(WEBDIR + "nzbdrone/Episodeqly/" + episodeid + "/", function (pResult) {
+    $.getJSON(WEBDIR + "sonarr/Episodeqly/" + episodeid + "/", function (pResult) {
         bannerurl = $('h1.page-title').attr('data-bannerurl');
         var strHTML = $("<table>").attr("class", "episodeinfo")
             .append($("<tr>")
@@ -154,20 +154,20 @@ function showEpisodeInfo(episodeid, value) {
                 .append($("<td>").text(pResult.path)));
         }
 
-        showModal($('<img>').attr('src', WEBDIR + 'nzbdrone/GetBanner/?url=' + bannerurl).addClass('img-rounded'),
+        showModal($('<img>').attr('src', WEBDIR + 'sonarr/GetBanner/?url=' + bannerurl).addClass('img-rounded'),
         strHTML, []);
     });
 }
 
 //Graps info about all the files in the show.
 function find_d_q(id) {
-    $.getJSON(WEBDIR + 'nzbdrone/Episodesqly/' + id, function (result) {
+    $.getJSON(WEBDIR + 'sonarr/Episodesqly/' + id, function (result) {
         qqq = result;
     });
 }
 
 function rendseason(sID, id, seasonnumber) {
-    $.getJSON(WEBDIR + 'nzbdrone/Episodes/' + id, function (result) {
+    $.getJSON(WEBDIR + 'sonarr/Episodes/' + id, function (result) {
         $('#season-list li').removeClass('active');
         $(this).parent().addClass("active");
         var seasonContent = $('#season-content');
@@ -199,17 +199,17 @@ function rendseason(sID, id, seasonnumber) {
                     showEpisodeInfo(value.episodeFileId, value);
                 })),
                 $('<td>').text(value.airDate),
-                $('<td>').html(nzbdroneStatusLabel(hasfile)),
+                $('<td>').html(sonarrStatusLabel(hasfile)),
                 $('<td>').addClass('quality').text(''), // TODO when/if they change api
                 $('<td>').append(search_link));
                 seasonContent.append(row);
-                
+
                 $.each(qqq, function (i, q) {
                     if (value.hasFile && value.episodeFileId === q.id) {
                       $('.quality').text(q.quality.quality.name);
                     }
                 });
-                
+
             }
 
         }); // end loop
@@ -224,7 +224,7 @@ function rendseason(sID, id, seasonnumber) {
     });
 }
 
-function nzbdroneStatusIcon(iconText, white) {
+function sonarrStatusIcon(iconText, white) {
     var text = [
         'downloaded',
         'continuing',
@@ -250,7 +250,7 @@ function nzbdroneStatusIcon(iconText, white) {
     return '';
 }
 
-function nzbdroneStatusLabel(text) {
+function sonarrStatusLabel(text) {
     var statusOK = ['continuing', 'downloaded', 'Downloaded', 'HD', 'HD-720p', 'HD-1080p', 'WEBDL-1080p'];
     var statusInfo = ['snatched', 'SD'];
     var statusError = ['ended'];
@@ -267,7 +267,7 @@ function nzbdroneStatusLabel(text) {
         label.addClass('label-warning');
     }
 
-    var icon = nzbdroneStatusIcon(text, true);
+    var icon = sonarrStatusIcon(text, true);
     if (icon !== '') {
         label.prepend(' ').prepend(icon);
     }
@@ -276,7 +276,7 @@ function nzbdroneStatusLabel(text) {
 
 // Grabs the quality profile
 function profile(qualityProfileId) {
-    $.get(WEBDIR + 'nzbdrone/Profile', function (result) {
+    $.get(WEBDIR + 'sonarr/Profile', function (result) {
         qlty = result;
     });
 
@@ -287,13 +287,13 @@ function getbanner(bannerurl) {
     data = {
         url: bannerurl
     };
-    $.get(WEBDIR + 'nzbdrone/GetBanner', data, function (result) {
+    $.get(WEBDIR + 'sonarr/GetBanner', data, function (result) {
         $('#banner').css('background-image', 'url(' + result + ')');
     });
 }
 
 function SeriesSearch(seriesid) {
-    $.getJSON(WEBDIR + 'nzbdrone/?name=SeriesSearch&seriesId=' + seriesid);
+    $.getJSON(WEBDIR + 'sonarr/?name=SeriesSearch&seriesId=' + seriesid);
 }
 
 $(document).on('click', '.dostuff', function () {
@@ -305,7 +305,7 @@ $(document).on('click', '.dostuff', function () {
         id: $(this).attr('data-id'),
         name: $(this).attr('data-name')
     };
-    $.getJSON(WEBDIR + "nzbdrone/Command", params, function (result) {
+    $.getJSON(WEBDIR + "sonarr/Command", params, function (result) {
         if (result.state) {
             notify(method, name, 'success');
         } else {
@@ -321,14 +321,14 @@ function delete_show(v) {
         "title": v.title
     };
     if (confirm('Are you sure you want to delete ' + v.title + ' ?')) {
-        $.getJSON(WEBDIR + 'nzbdrone/Delete_Show/', data, function (response) {
+        $.getJSON(WEBDIR + 'sonarr/Delete_Show/', data, function (response) {
             if (response == '{}') {
                 status = 'success';
 
             } else {
                 status = 'error';
             }
-            notify('Deleted', v.title + 'from nzbdrone', status);
+            notify('Deleted', v.title + 'from sonarr', status);
         });
     }
 }

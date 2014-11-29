@@ -11,44 +11,44 @@ from json import loads, dumps
 import datetime as DT
 
 
-class NzbDrone:
+class Sonarr:
     def __init__(self):
-        self.logger = logging.getLogger('modules.nzbdrone')
+        self.logger = logging.getLogger('modules.sonarr')
         htpc.MODULES.append({
-            'name': 'NzbDrone',
-            'id': 'nzbdrone',
-            'test': htpc.WEBDIR + 'nzbdrone/Version',
+            'name': 'Sonarr',
+            'id': 'sonarr',
+            'test': htpc.WEBDIR + 'sonarr/Version',
             'fields': [
-                {'type': 'bool', 'label': 'Enable', 'name': 'nzbdrone_enable'},
-                {'type': 'text', 'label': 'Menu name', 'name': 'nzbdrone_name'},
-                {'type': 'text', 'label': 'IP / Host', 'placeholder': 'localhost', 'name': 'nzbdrone_host'},
-                {'type': 'text', 'label': 'Port', 'placeholder': '8989', 'name': 'nzbdrone_port'},
-                {'type': 'text', 'label': 'Basepath', 'placeholder': '/nzbdrone', 'name': 'nzbdrone_basepath'},
-                {'type': 'text', 'label': 'API', 'name': 'nzbdrone_apikey'},
-                {'type': 'bool', 'label': 'Use SSL', 'name': 'nzbdrone_ssl'}
+                {'type': 'bool', 'label': 'Enable', 'name': 'sonarr_enable'},
+                {'type': 'text', 'label': 'Menu name', 'name': 'sonarr_name'},
+                {'type': 'text', 'label': 'IP / Host', 'placeholder': 'localhost', 'name': 'sonarr_host'},
+                {'type': 'text', 'label': 'Port', 'placeholder': '8989', 'name': 'sonarr_port'},
+                {'type': 'text', 'label': 'Basepath', 'placeholder': '/sonarr', 'name': 'sonarr_basepath'},
+                {'type': 'text', 'label': 'API', 'name': 'sonarr_apikey'},
+                {'type': 'bool', 'label': 'Use SSL', 'name': 'sonarr_ssl'}
             ]
         })
 
     @cherrypy.expose()
     @require()
     def index(self):
-        return htpc.LOOKUP.get_template('nzbdrone.html').render(scriptname='nzbdrone')
+        return htpc.LOOKUP.get_template('sonarr.html').render(scriptname='sonarr')
 
     def fetch(self, path, banner=None, type=None, data=None):
         try:
-            host = htpc.settings.get('nzbdrone_host', '')
-            port = str(htpc.settings.get('nzbdrone_port', ''))
-            nzbdrone_basepath = htpc.settings.get('nzbdrone_basepath', '/')
-            ssl = 's' if htpc.settings.get('nzbdrone_ssl', True) else ''
+            host = htpc.settings.get('sonarr_host', '')
+            port = str(htpc.settings.get('sonarr_port', ''))
+            sonarr_basepath = htpc.settings.get('sonarr_basepath', '/')
+            ssl = 's' if htpc.settings.get('sonarr_ssl', True) else ''
 
-            if(nzbdrone_basepath == ""):
-                nzbdrone_basepath = "/"
-            if not(nzbdrone_basepath.endswith('/')):
-                nzbdrone_basepath += "/"
+            if(sonarr_basepath == ""):
+                sonarr_basepath = "/"
+            if not(sonarr_basepath.endswith('/')):
+                sonarr_basepath += "/"
 
-            headers = {'X-Api-Key': htpc.settings.get('nzbdrone_apikey', '')}
+            headers = {'X-Api-Key': htpc.settings.get('sonarr_apikey', '')}
 
-            url = 'http%s://%s:%s%sapi/%s' % (ssl, host, port, nzbdrone_basepath, path)
+            url = 'http%s://%s:%s%sapi/%s' % (ssl, host, port, sonarr_basepath, path)
 
             if banner:
                 #  the path includes the basepath automaticly
@@ -59,56 +59,38 @@ class NzbDrone:
             if type == 'post':
                 r = requests.post(url, data=dumps(data), headers=headers)
                 return r.content
-    
+
             elif type == 'put':
                 r = requests.post(url, data=dumps(data), headers=headers)
                 return r.content
-    
+
             elif type == 'delete':
                 r = requests.delete(url, data=dumps(data), headers=headers)
                 return r.content
-    
+
             else:
                 r = requests.get(url, headers=headers)
                 return loads(r.text)
-    
+
         except Exception as e:
             self.logger.error('Failed to fetch path=%s error %s' % (path, e))
 
     @cherrypy.expose()
     @require()
-    def Version(self, nzbdrone_host, nzbdrone_port, nzbdrone_basepath, nzbdrone_apikey, nzbdrone_ssl = False, **kwargs):
+    def Version(self, sonarr_host, sonarr_port, sonarr_basepath, sonarr_apikey, sonarr_ssl = False, **kwargs):
         try:
-            ssl = 's' if nzbdrone_ssl else ''
+            ssl = 's' if sonarr_ssl else ''
 
-            if(nzbdrone_basepath == ""):
-                nzbdrone_basepath = "/"
-            if not(nzbdrone_basepath.endswith('/')):
-                nzbdrone_basepath += "/"
+            if(sonarr_basepath == ""):
+                sonarr_basepath = "/"
+            if not(sonarr_basepath.endswith('/')):
+                sonarr_basepath += "/"
 
-            headers = {'X-Api-Key': str(nzbdrone_apikey)}
+            headers = {'X-Api-Key': str(sonarr_apikey)}
 
-            url = 'http%s://%s:%s%sapi/system/status' % (ssl, nzbdrone_host, nzbdrone_port, nzbdrone_basepath)
+            url = 'http%s://%s:%s%sapi/system/status' % (ssl, sonarr_host, sonarr_port, sonarr_basepath)
 
             result = requests.get(url, headers=headers)
-            return result.json()
-        except:
-            return
-
-    @cherrypy.expose()
-    @require()
-    def Version(self, nzbdrone_host, nzbdrone_port, nzbdrone_basepath, nzbdrone_apikey, nzbdrone_ssl = False, **kwargs):
-        try:
-            ssl = 's' if nzbdrone_ssl else ''
-            if(nzbdrone_basepath == ""):
-                nzbdrone_basepath = "/"
-            if not(nzbdrone_basepath.endswith('/')):
-                nzbdrone_basepath += "/"
-
-            headers = {'X-Api-Key': str(nzbdrone_apikey)}
-            url = 'http%s://%s:%s%sapi/system/status' % (ssl, nzbdrone_host, nzbdrone_port, nzbdrone_basepath)
-            result = requests.get(url, headers=headers)
-
             return result.json()
         except:
             return
@@ -162,7 +144,7 @@ class NzbDrone:
             self.logger.error("Invalid show ID was supplied: " + str(id))
             return False
 
-        return htpc.LOOKUP.get_template('nzbdrone_view.html').render(scriptname='nzbdrone_view', tvdbid=tvdbid, id=id)
+        return htpc.LOOKUP.get_template('sonarr_view.html').render(scriptname='sonarr_view', tvdbid=tvdbid, id=id)
 
     @cherrypy.expose()
     @require()
