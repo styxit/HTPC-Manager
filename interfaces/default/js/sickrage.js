@@ -122,6 +122,9 @@ function loadShow(tvdbid) {
     });
 }
 
+
+// TODO add i with popover with summary of the episode
+// add add a new th with s03e04 examples in addition to the ep name.
 function loadNextAired(options) {
     var defaults = {
         limit: 0
@@ -148,6 +151,32 @@ function loadNextAired(options) {
             var nextaired = todayaired.concat(soonaired);
             var lateraired = result.data.later;
 
+            $.each(result.data.missed, function(i, tvshow) {
+                if (defaults.limit !== 0 && i == defaults.limit) {
+                    return false;
+                }
+                var row = $('<tr>');
+                var name = $('<a>').attr('href', '#').html(tvshow.show_name).click(function(e) {
+                    loadShow(tvshow.tvdbid);
+                });
+
+                var search_link = $('<a>').addClass('btn btn-mini').attr('title',
+                        'Search new download').append($('<i>').addClass('icon-search')).on(
+                        'click', function() {
+                            searchEpisode(tvshow.indexerid, tvshow.season, tvshow.episode, tvshow.show_name + ' ' + tvshow.ep_name);
+                });
+
+                row.append(
+                    $('<td>').append(name),
+                    $('<td>').html(tvshow.ep_name),
+                    $('<td>').html(tvshow.airdate),
+                    $('<td>').html(search_link));
+
+                $('#nextaired_table_body').append(row);
+            });
+
+
+
             // Loop next airing episodes
             $.each(nextaired, function(i, tvshow) {
                 if (defaults.limit !== 0 && i == defaults.limit) {
@@ -158,10 +187,17 @@ function loadNextAired(options) {
                     loadShow(tvshow.tvdbid);
                 });
 
+                var search_link = $('<a>').addClass('btn btn-mini').attr('title',
+                        'Search new download').append($('<i>').addClass('icon-search')).on(
+                        'click', function() {
+                            searchEpisode(tvshow.indexerid, tvshow.season, tvshow.episode, tvshow.show_name + ' ' + tvshow.ep_name);
+                });
+
                 row.append(
                     $('<td>').append(name),
                     $('<td>').html(tvshow.ep_name),
-                    $('<td>').html(tvshow.airdate));
+                    $('<td>').html(tvshow.airdate),
+                    $('<td>').html(search_link));
 
                 $('#nextaired_table_body').append(row);
             });
@@ -176,10 +212,17 @@ function loadNextAired(options) {
                     loadShow(tvshow.tvdbid);
                 });
 
+                var search_link = $('<a>').addClass('btn btn-mini').attr('title',
+                        'Search new download').append($('<i>').addClass('icon-search')).on(
+                        'click', function() {
+                            searchEpisode(tvshow.indexerid, tvshow.season, tvshow.episode, tvshow.show_name + ' ' + tvshow.ep_name);
+                });
+
                 row.append(
                     $('<td>').append(name),
                     $('<td>').html(tvshow.ep_name),
-                    $('<td>').html(tvshow.airdate));
+                    $('<td>').html(tvshow.airdate),
+                    $('<td>').html(search_link));
 
                 $('#nextaired_table_body').append(row);
             });
@@ -358,4 +401,39 @@ function Postprocess() {
         });
 
     }
+}
+
+// Replace this one, dont like it
+function searchEpisode(tvdbid, season, episode, name) {
+    var modalcontent = $('<div>');
+    modalcontent.append($('<p>').html('Looking for episode &quot;' + name + '&quot;.'));
+    modalcontent.append($('<div>').html(
+        '<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'));
+    showModal('Searching episode ' + season + 'x' + episode, modalcontent, {});
+
+    $.ajax({
+        url: WEBDIR + 'sickrage/SearchEpisodeDownload?tvdbid=' + tvdbid + '&season=' + season + '&episode=' +
+            episode,
+        type: 'get',
+        dataType: 'json',
+        timeout: 40000,
+        success: function(data) {
+            // If result is not 'succes' it must be a failure
+            if (data.result != 'success') {
+                notify('Error', data.message, 'error');
+                return;
+            } else {
+                notify('OK', name + ' ' + season + 'x' + episode + ' found. ' + data.message, 'success');
+                return;
+            }
+        },
+        error: function(data) {
+            notify('Error', 'Episode not found.', 'error', 1);
+        },
+        complete: function(data) {
+            hideModal();
+            // Trigger latest season
+            $('#season-list li.active a').trigger('click');
+        }
+    });
 }
