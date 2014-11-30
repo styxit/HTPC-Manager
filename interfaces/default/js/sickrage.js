@@ -8,6 +8,7 @@ $(document).ready(function() {
     loadsickrageHistory(25);
     loadLogs();
     loadShows();
+    showstats();
 
 
     $('#add_show_button').click(function() {
@@ -139,9 +140,9 @@ function loadNextAired(options) {
             // If sickrage not configured, return false (Dashboard)
             if (result === null) return false;
 
-            if (result.data.soon.length === 0) {
+            if (result.data.soon.length === 0 || result.data.missed.length === 0) {
                 var row = $('<tr>');
-                row.append($('<td>').html('No future episodes found'));
+                row.append($('<td>').html('No future/missing episodes found'));
                 $('#nextaired_table_body').append(row);
                 return false;
             }
@@ -155,9 +156,15 @@ function loadNextAired(options) {
                 if (defaults.limit !== 0 && i == defaults.limit) {
                     return false;
                 }
-                var row = $('<tr>');
+                var row = $('<tr class="error">');
                 var name = $('<a>').attr('href', '#').html(tvshow.show_name).click(function(e) {
                     loadShow(tvshow.tvdbid);
+                });
+
+                var search_subs = $('<a>').addClass('btn btn-mini').attr('title',
+                    'Search subtitle').append($('<i>').addClass('icon-comment')).on('click',
+                    function() {
+                        searchsub(tvshow.indexerid, tvshow.season, tvshow.episode, tvshow.show_name + ' ' + tvshow.ep_name);
                 });
 
                 var search_link = $('<a>').addClass('btn btn-mini').attr('title',
@@ -166,11 +173,18 @@ function loadNextAired(options) {
                             searchEpisode(tvshow.indexerid, tvshow.season, tvshow.episode, tvshow.show_name + ' ' + tvshow.ep_name);
                 });
 
+                buttons = $('<div>').addClass('btn-group');
+
+                buttons.append(
+                    search_link,
+                    search_subs
+                )
+
                 row.append(
                     $('<td>').append(name),
                     $('<td>').html(tvshow.ep_name),
                     $('<td>').html(tvshow.airdate),
-                    $('<td>').html(search_link));
+                    $('<td>').html(buttons));
 
                 $('#nextaired_table_body').append(row);
             });
@@ -187,17 +201,30 @@ function loadNextAired(options) {
                     loadShow(tvshow.tvdbid);
                 });
 
+                var search_subs = $('<a>').addClass('btn btn-mini').attr('title',
+                    'Search subtitle').append($('<i>').addClass('icon-comment')).on('click',
+                    function() {
+                        searchsub(tvshow.indexerid, tvshow.season, tvshow.episode, tvshow.show_name + ' ' + tvshow.ep_name);
+                });
+
                 var search_link = $('<a>').addClass('btn btn-mini').attr('title',
                         'Search new download').append($('<i>').addClass('icon-search')).on(
                         'click', function() {
                             searchEpisode(tvshow.indexerid, tvshow.season, tvshow.episode, tvshow.show_name + ' ' + tvshow.ep_name);
                 });
 
+                buttons = $('<div>').addClass('btn-group');
+
+                buttons.append(
+                    search_link,
+                    search_subs
+                )
+
                 row.append(
                     $('<td>').append(name),
                     $('<td>').html(tvshow.ep_name),
                     $('<td>').html(tvshow.airdate),
-                    $('<td>').html(search_link));
+                    $('<td>').html(buttons));
 
                 $('#nextaired_table_body').append(row);
             });
@@ -212,17 +239,30 @@ function loadNextAired(options) {
                     loadShow(tvshow.tvdbid);
                 });
 
+                var search_subs = $('<a>').addClass('btn btn-mini').attr('title',
+                    'Search subtitle').append($('<i>').addClass('icon-comment')).on('click',
+                    function() {
+                        searchsub(tvshow.indexerid, tvshow.season, tvshow.episode, tvshow.show_name + ' ' + tvshow.ep_name);
+                });
+
                 var search_link = $('<a>').addClass('btn btn-mini').attr('title',
                         'Search new download').append($('<i>').addClass('icon-search')).on(
                         'click', function() {
                             searchEpisode(tvshow.indexerid, tvshow.season, tvshow.episode, tvshow.show_name + ' ' + tvshow.ep_name);
                 });
 
+                buttons = $('<div>').addClass('btn-group');
+
+                buttons.append(
+                    search_link,
+                    search_subs
+                )
+
                 row.append(
                     $('<td>').append(name),
                     $('<td>').html(tvshow.ep_name),
                     $('<td>').html(tvshow.airdate),
-                    $('<td>').html(search_link));
+                    $('<td>').html(buttons));
 
                 $('#nextaired_table_body').append(row);
             });
@@ -432,8 +472,38 @@ function searchEpisode(tvdbid, season, episode, name) {
         },
         complete: function(data) {
             hideModal();
-            // Trigger latest season
-            $('#season-list li.active a').trigger('click');
         }
     });
+}
+
+function showstats() {
+    $.ajax({
+        url: WEBDIR + 'sickrage/ShowsStats',
+        type: 'get',
+        dataType: 'json',
+        success: function (result) {
+            if (result.result == 'success') {
+                $('.sickrage_shows_total').text("Tvshows: " + result.data.shows_total);
+                $('.sickrage_ep_downloaded').text("Downloaded episodes: " + result.data.ep_downloaded);
+                $('.sickrage_ep_total').text("Total episodes: " + result.data.ep_total);
+            }
+
+        }
+    });
+}
+
+function searchsub(tvdbid, season, episode, name) {
+    $.get(WEBDIR + 'sickrage/SearchSubtitle?tvdbid=' + tvdbid + '&season=' + season + '&episode=' + episode,
+        function(data) {
+            if (data.result != 'success') {
+                notify('Error', data.message, 'error');
+                return;
+            } else {
+                notify('OK', name + ' ' + season + 'x' + episode + ' found. ' + data.message, 'success');
+                return;
+            }
+        }
+
+    );
+
 }

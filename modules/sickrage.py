@@ -186,6 +186,7 @@ class Sickrage:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    @require()
     def RemoveShow(self, indexerid, show_name=''):
         self.logger.debug("Delete %s from Sickrage indexerid %s" % (show_name, indexerid))
         return self.fetch("show.delete&indexerid=%s" % indexerid)
@@ -196,6 +197,13 @@ class Sickrage:
     def SearchShow(self, query):
         self.logger.debug("Searching tvdb and tvrage for %s query")
         return self.fetch("sb.searchindexers&indexer=0&name=%s" % quote(query), False, 60)
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def ShowsStats(self):
+        self.logger.debug("Grabbing tvrage statistics")
+        return self.fetch("shows.stats")
 
     def fetch(self, cmd, img=False, timeout=20):
         try:

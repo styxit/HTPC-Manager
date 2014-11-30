@@ -177,7 +177,7 @@ function loadSickbeardHistory(limit) {
         type: 'get',
         dataType: 'json',
         success: function (result) {
-            if (result.data.legth == 0) {
+            if (result.data.length == 0) {
                 var row = $('<tr>')
                 row.append($('<td>').html('History is empty'));
                 $('#history_table_body').append(row);
