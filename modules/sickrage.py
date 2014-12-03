@@ -217,6 +217,7 @@ class Sickrage:
                 sickrage_basepath += "/"
             url = 'http' + ssl + '://' + host + ':' + str(port) + sickrage_basepath + 'api/' + apikey + '/?cmd=' + cmd
 
+            self.logger.info("Fetching information from: " + url)
             self.logger.debug("Fetching information from: " + url)
 
             if img is True:
