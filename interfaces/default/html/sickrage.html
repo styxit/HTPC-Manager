@@ -1,6 +1,6 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
+<div class="container-fluid">
     <div class="content maincontent">
         <h1 class="page-header page-title">
             <a href="http://${settings.get('sickrage_host')}:${settings.get('sickrage_port') + settings.get('sickrage_basepath')}" target="_blank" title="Open original sickrage interface">${settings.get('sickrage_name', 'sickrage')}</a>
