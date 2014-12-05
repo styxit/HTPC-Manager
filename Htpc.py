@@ -89,6 +89,8 @@ def load_modules():
     htpc.ROOT.sonarr = Sonarr()
     from modules.sickrage import Sickrage
     htpc.ROOT.sickrage = Sickrage()
+    from modules.samsungtv import Samsungtv
+    htpc.ROOT.samsungtv = Samsungtv()
 
 
 def main():

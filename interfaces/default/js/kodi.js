@@ -156,7 +156,7 @@ $(document).ready(function() {
 var movieLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 75,
     options: null
 }
 function loadMovies(options) {
@@ -286,7 +286,7 @@ function loadMovie(movie) {
 var showLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 75,
     options: null
 }
 function loadShows(options) {
@@ -361,7 +361,7 @@ function loadShows(options) {
 var episodeLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 75,
     options: null
 }
 var currentShow = null;
@@ -438,7 +438,7 @@ function loadEpisodes(options) {
 var artistLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 75,
     options: null
 }
 function loadArtists(options) {
@@ -506,7 +506,7 @@ function loadArtists(options) {
 var albumLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 75,
     options: null,
     artist: null
 }
@@ -608,7 +608,7 @@ function loadAlbums(options) {
 var songsLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 75,
     options: {},
     filter: ''
 }
