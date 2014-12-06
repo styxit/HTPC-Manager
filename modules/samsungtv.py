@@ -24,7 +24,7 @@ class Samsungtv:
             'id': 'samsungtv',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'samsungtv_enable'},
-                {'type': 'text', 'label': 'Name', 'name': 'samsungtv_name'},
+                {'type': 'text', 'label': 'Menu name', 'name': 'samsungtv_name'},
                 {'type': 'select',
                  'label': 'TVs',
                  'name': 'tvs',

@@ -23,8 +23,10 @@ $(document).ready(function() {
     // Catch keyboard event and send to kodi
     $(document).keydown(function(e) {
         if (!$('input').is(":focus")) {
+
             arrow = {8: 'back', 27: 'back', 13: 'select', 37: 'left', 38: 'up', 39: 'right', 40: 'down',
                      88: 'stop', 32: 'playpause', 67: 'contextmenu', 73: 'info', 77: 'mute'};
+
             command = arrow[e.which];
             if (command) {
                 $.get(WEBDIR + 'kodi/ControlPlayer?action='+command);

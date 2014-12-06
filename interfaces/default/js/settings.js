@@ -1,5 +1,6 @@
 $(document).ready(function () {
     get_branches()
+    samsung_tvs()
     $('#other button.save').on('click', function (event) {
         event.preventDefault();
 
@@ -176,6 +177,20 @@ $(document).ready(function () {
         });
     });
     gdm_plex_servers(0);
+    $('input.enable-module').trigger('change');
+        $('#tvs').change(function () {
+        var item = $(this);
+        var id = item.val();
+        $.get(WEBDIR + 'samsungtv/findtv?id=' + id, function (data) {
+            console.log(data)
+            if (data === null) return;
+            $('#samsungtv_name').val(data.tv_model);
+            $('#samsungtv_host').val(data.host);
+            $('#samsungtv_model').val(data.tv_model);
+            $('#samsung_htpcmac').val(data.mac);
+            $('#samsung_htpchost').val(data.local_ip);
+        });
+    });
 });
 
 function kodi_update_servers(id) {
@@ -254,3 +269,15 @@ $(document).on('click', '.force_update', function(e){
     });
     notify("Updating", "Forced update started", "info");
 });
+
+function samsung_tvs(id) {
+    $.get(WEBDIR + 'samsungtv/findtv', function (data) {
+        if (data === null) return;
+        var tv = $('#tvs').empty().append($('<option>').text('Select').val(0));
+        $.each(data, function (i, item) {
+            var option = $('<option>').text(item.name).val(item.id);
+            if (id == item.id) option.attr('selected', 'selected');
+            tv.append(option);
+        });
+    }, 'json');
+}
