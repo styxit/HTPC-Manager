@@ -9,23 +9,24 @@ $(document).ready(function () {
     loadNZBGetDownloadHistory()
     loadWantedMovies()
     loadNextAired()
-    loadNZBDroneCalendar()
+    loadsonarrCalendar()
+    loadNextAiredSickrage()
 })
 
 function loadRecentMovies () {
     if (!$('#movie-carousel').length) return
-    $.getJSON(WEBDIR + 'xbmc/GetRecentMovies',function (data) {
+    $.getJSON(WEBDIR + 'kodi/GetRecentMovies',function (data) {
         if (data === null || data.movies === null) return
         $.each(data.movies, function (i, movie) {
             var itemDiv = $('<div>').addClass('item carousel-item')
 
             if (i === 0) itemDiv.addClass('active')
 
-            var src = WEBDIR + 'xbmc/GetThumb?h=240&w=430&thumb='+encodeURIComponent(movie.fanart)
+            var src = WEBDIR + 'kodi/GetThumb?h=240&w=430&thumb='+encodeURIComponent(movie.fanart)
             itemDiv.attr('style', 'background-image: url("' + src + '")')
 
             itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
-                location.href = WEBDIR +'xbmc/#movies'
+                location.href = WEBDIR +'kodi/#movies'
             }).hover(function() {
                 var text = $(this).children('p').stop().slideToggle()
             }).append(
@@ -43,18 +44,18 @@ function loadRecentMovies () {
 }
 function loadRecentTVshows () {
     if (!$('#tvshow-carousel').length) return
-    $.getJSON(WEBDIR + 'xbmc/GetRecentShows', function (data) {
+    $.getJSON(WEBDIR + 'kodi/GetRecentShows', function (data) {
         if (data === null) return
         $.each(data.episodes, function (i, episode) {
             var itemDiv = $('<div>').addClass('item carousel-item')
 
             if (i == 0) itemDiv.addClass('active')
 
-            var src = WEBDIR + "xbmc/GetThumb?h=240&w=430&thumb="+encodeURIComponent(episode.fanart)
+            var src = WEBDIR + "kodi/GetThumb?h=240&w=430&thumb="+encodeURIComponent(episode.fanart)
             itemDiv.attr('style', 'background-image: url("' + src + '")')
 
             itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
-                location.href = 'xbmc/#shows'
+                location.href = 'kodi/#shows'
             }).hover(function() {
                 var text = $(this).children('p').stop().slideToggle()
             }).append(
@@ -70,12 +71,12 @@ function loadRecentTVshows () {
 }
 function loadRecentAlbums () {
     if (!$('#albums-content').length) return
-    $.getJSON(WEBDIR + 'xbmc/GetRecentAlbums/4', function (data) {
+    $.getJSON(WEBDIR + 'kodi/GetRecentAlbums/4', function (data) {
         if (data === null) return
         $.each(data.albums, function (i, album) {
             var imageSrc = WEBDIR + 'js/libs/holder.js/45x45/text:No cover'
             if (album.thumbnail != '') {
-                imageSrc = WEBDIR + 'xbmc/GetThumb?h=45&w=45&thumb='+encodeURIComponent(album.thumbnail)
+                imageSrc = WEBDIR + 'kodi/GetThumb?h=45&w=45&thumb='+encodeURIComponent(album.thumbnail)
             }
 
             var label = album.label
@@ -89,7 +90,7 @@ function loadRecentAlbums () {
                         $('<p>').text(album.artist[0])
                     )
                 ).click(function(e) {
-                    location.href = 'xbmc/#albums'
+                    location.href = 'kodi/#albums'
                 })
             )
         })
@@ -263,21 +264,47 @@ function loadNextAired(options) {
     })
 }
 
-function loadNZBDroneCalendar(options) {
+function loadsonarrCalendar(options) {
     if (!$('#calendar_table_body').length) return
-    $.getJSON(WEBDIR + 'nzbdrone/Calendar', function (result) {
+    $.getJSON(WEBDIR + 'sonarr/Calendar', function (result) {
         $.each(result, function (i, cal) {
           if (i >= 5) return
-            var name = $('<a>').attr('href', 'nzbdrone/View/' + cal.seriesId + '/' + cal.series.tvdbId + '#' + cal.seasonNumber).html(cal.series.title)
-            var row = $('<tr>'); 
+            var name = $('<a>').attr('href', 'sonarr/View/' + cal.seriesId + '/' + cal.series.tvdbId + '#' + cal.seasonNumber).html(cal.series.title)
+            var row = $('<tr>');
             row.append(
             $('<td>').append(name),
             $('<td>').text(cal.title),
             $('<td>').text(moment(cal.airDateUtc).fromNow())
             )
-     
+
             $('#calendar_table_body').append(row);
         });
 
     });
+}
+
+function loadNextAiredSickrage(options) {
+    if (!$('#nextaired_table_body').length) return
+    $.getJSON(WEBDIR + 'sickrage/GetNextAired', function (result) {
+        if (result === null || result.data.soon.length === 0) {
+            $('#nextaired_table_body').append(
+                $('<tr>').append($('<td>').html('No future episodes found'))
+            )
+            return
+        }
+        var soonaired = result.data.soon
+        var todayaired = result.data.today
+        var nextaired = todayaired.concat(soonaired)
+        $.each(nextaired, function (i, tvshow) {
+            if (i >= 5) return
+            var name = $('<a>').attr('href', 'sickbeard/view/' + tvshow.tvdbid).html(tvshow.show_name)
+            $('#nextairedsickrage_table_body').append(
+                $('<tr>').append(
+                    $('<td>').append(name),
+                    $('<td>').html(tvshow.ep_name),
+                    $('<td>').html(tvshow.airdate)
+                )
+            )
+        })
+    })
 }
