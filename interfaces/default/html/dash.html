@@ -100,7 +100,9 @@ settings = self.attr.settings
                     <tbody id="wantedmovies_table_body"></tbody>
                 </table>
             </div>
+        </div>
             %endif
+        <div class="row-fluid">
             %if settings.get('dash_sickbeard', 0):
             <div class="span4">
                 <h3><a href="sickbeard/#nextaired">Next Aired</a></h3>
@@ -147,6 +149,7 @@ settings = self.attr.settings
             </div>
             %endif
         </div>
+        </div>
         <%
         dashcount = settings.get('dash_sickbeard', 0);
         dashcount += settings.get('dash_couchpotato', 0);
@@ -156,6 +159,10 @@ settings = self.attr.settings
         dashcount += settings.get('dash_rec_movies', 0);
         dashcount += settings.get('dash_sickrage', 0);
         dashcount += settings.get('dash_sonarr', 0);
+        dashcount += settings.get('dash_rec_movies_plex', 0);
+        dashcount += settings.get('dash_rec_tv_plex', 0);
+        dashcount += settings.get('dash_rec_music_plex', 0);
+        dashcount += settings.get('dash_nzbget', 0);
         %>
         %if dashcount == 0:
         <div class="row-fluid">
