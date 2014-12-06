@@ -161,6 +161,8 @@ function loadNextAired(options) {
                     loadShow(tvshow.tvdbid);
                 });
 
+                var img = makeIcon('icon-info-sign', tvshow.ep_plot);
+
                 var search_subs = $('<a>').addClass('btn btn-mini').attr('title',
                     'Search subtitle').append($('<i>').addClass('icon-comment')).on('click',
                     function() {
@@ -182,7 +184,7 @@ function loadNextAired(options) {
 
                 row.append(
                     $('<td>').append(name),
-                    $('<td>').html(tvshow.ep_name),
+                    $('<td>').html(tvshow.ep_name + '&nbsp').append(img),
                     $('<td>').html(tvshow.airdate),
                     $('<td>').html(buttons));
 
@@ -201,6 +203,8 @@ function loadNextAired(options) {
                     loadShow(tvshow.tvdbid);
                 });
 
+                var img = makeIcon('icon-info-sign', tvshow.ep_plot);
+
                 var search_subs = $('<a>').addClass('btn btn-mini').attr('title',
                     'Search subtitle').append($('<i>').addClass('icon-comment')).on('click',
                     function() {
@@ -222,7 +226,7 @@ function loadNextAired(options) {
 
                 row.append(
                     $('<td>').append(name),
-                    $('<td>').html(tvshow.ep_name),
+                    $('<td>').html(tvshow.ep_name + '&nbsp').append(img),
                     $('<td>').html(tvshow.airdate),
                     $('<td>').html(buttons));
 
@@ -239,6 +243,7 @@ function loadNextAired(options) {
                     loadShow(tvshow.tvdbid);
                 });
 
+                var img = makeIcon('icon-info-sign', tvshow.ep_plot);
                 var search_subs = $('<a>').addClass('btn btn-mini').attr('title',
                     'Search subtitle').append($('<i>').addClass('icon-comment')).on('click',
                     function() {
@@ -260,7 +265,7 @@ function loadNextAired(options) {
 
                 row.append(
                     $('<td>').append(name),
-                    $('<td>').html(tvshow.ep_name),
+                    $('<td>').html(tvshow.ep_name + '&nbsp').append(img),
                     $('<td>').html(tvshow.airdate),
                     $('<td>').html(buttons));
 
