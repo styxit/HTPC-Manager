@@ -17,7 +17,7 @@ class Qbittorrent:
         htpc.MODULES.append({
             "name": "qBittorrent",
             "id": "qbittorrent",
-            "test": htpc.WEBDIR + "qbittorrent/ping",
+            #"test": htpc.WEBDIR + "qbittorrent/ping",
             "fields": [
                 {"type": "bool", "label": "Enable", "name": "qbittorrent_enable"},
                 {"type": "text", "label": "Menu name", "name": "qbittorrent_name"},
@@ -95,11 +95,12 @@ class Qbittorrent:
             us = list_of_up[1] + " " + list_of_up[2]
             ulstat = list_of_down[5] + " " + list_of_down[6]
 
-            d = dict()
-            d["qbittorrent_speed_down"] = ds
-            d["qbittorrent_speed_up"] = us
-            d["qbittorrent_total_dl"] = dlstat
-            d["qbittorrent_total_ul"] = ulstat
+            d = {
+                "qbittorrent_speed_down": ds,
+                "qbittorrent_speed_up": us,
+                "qbittorrent_total_dl": dlstat,
+                "qbittorrent_total_ul": ulstat
+            }
 
             return json.dumps(d)
 
@@ -146,9 +147,10 @@ class Qbittorrent:
 
             if cmd == "delete":
                 data["hashes"] = hash
-            #Not in use atm, prob will be used for torrent search later
+
             elif cmd == 'download':
                 data['urls'] = dlurl
+
             elif cmd == 'resumeall' or 'pauseall':
                 return urllib2.urlopen(url + cmd)
             else:
@@ -156,6 +158,7 @@ class Qbittorrent:
 
             if cmd == "resumeall" or "pauseall":
                 urllib2.urlopen(url + cmd)
+
             data = urllib.urlencode(data)
 
             return urllib2.urlopen(url, data).read()
@@ -185,8 +188,7 @@ class Qbittorrent:
 
             urllib2.urlopen(url, data)
 
-
-            result = urllib2.urlopen(url, data)
+            return urllib2.urlopen(url, data).read()
 
         except Exception as e:
             self.logger.error("Failed to set %s to %s %s" % (type, speed, e))

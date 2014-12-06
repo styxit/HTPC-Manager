@@ -9,14 +9,18 @@
                 <i class="icon-arrow-up"></i> <span id="qbittorrent_speed_up"></span>
             </small>
         </h1>
-        
-        
-        <div id="ss" class="row-fluid text-center">
-            <div class="span4 text-center"><input type="number" id="qbittorrent_set_speeddown" class="span4 qbt_setspeed" title="Download Limit" data-action="setGlobalDlLimit" placeholder="" value=""></div>
-            <div class="span4 text-center"> <i id="qbt_rp_icon" style="" class="btn" title="Pause/Resume all"></i></div>
-            <div class="span4 text-center"><input type="number" id="qbittorrent_set_speedup" class="span4 qbt_setspeed" title="Upload Limit" data-action="setGlobalUpLimit" placeholder="" value=""></div>
+
+        <div id="ss" class="well form-inline">
+        <!--<div id="ss" class="row-fluid text-center">-->
+            <div class="input-append">
+                <input class="span4" id="qbt_url" name="nzb_url" type="text" placeholder="Paste torrent url..">
+                <button id="send_torrent_qbt" class="btn">Add</button>
+            </div>
+            <input type="number" id="qbittorrent_set_speeddown" class="span4 qbt_setspeed" title="Download Limit" data-action="setGlobalDlLimit" placeholder="" value="">
+            <i id="qbt_rp_icon" style="" class="btn" title="Pause/Resume all"></i>
+            <input type="number" id="qbittorrent_set_speedup" class="span4 qbt_setspeed" title="Upload Limit" data-action="setGlobalUpLimit" placeholder="" value="">
         </div>
-        
+
         <div class="ofa">
             <table class="table table-striped table-hover">
                 <thead>

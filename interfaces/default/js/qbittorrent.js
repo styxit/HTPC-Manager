@@ -148,8 +148,8 @@ $(document).on('click', '.qbt_rp', function () {
 });
 
 //sets speed up and down
-$(document).on('focusout', '.container .content #ss input', function () {
-    if ($(this).val() === undefined || ($(this).val().length === 0)) return; 
+$(document).on('focusout', '.qbt_setspeed', function () {
+    if ($(this).val() === undefined || ($(this).val().length === 0)) return;
     if ($(this).attr('data-action') === 'setGlobalDlLimit') {
         var title = 'Set download speed';
     } else {
@@ -184,4 +184,19 @@ $(document).ready(function () {
         get_speed();
         get_global_limit();
     }, 5000);
+
 });
+
+
+$("#send_torrent_qbt").click(function () {
+    var d = {'cmd': 'download',
+            'dlurl': $('#qbt_url').val()
+        };
+
+    $.get(WEBDIR + 'qbittorrent/command/', d, function(e) {
+        //notify()
+        $('#qbt_url').val('')
+
+    });
+});
+
