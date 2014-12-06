@@ -224,7 +224,11 @@ function loadWantedMovies() {
     $.getJSON(WEBDIR + 'couchpotato/GetMovieList/active/5', function (result) {
         if (result === null) {
             $('#wantedmovies_table_body').append(
-                $('<tr>').append($('<td>').html('No wanted movies found').attr('colspan', '2'))
+                $('<tr>').append($('<td>').html('No wanted movies found').attr('colspan', '2')),
+                $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
+                $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
+                $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
+                $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2'))
             )
             return
         }
@@ -243,7 +247,11 @@ function loadNextAired(options) {
     $.getJSON(WEBDIR + 'sickbeard/GetNextAired', function (result) {
         if (result === null || result.data.soon.length === 0) {
             $('#nextaired_table_body').append(
-                $('<tr>').append($('<td>').html('No future episodes found'))
+                $('<tr>').append($('<td>').html('No future episodes found')),
+                $('<tr>').append($('<td>').html('&nbsp;')),
+                $('<tr>').append($('<td>').html('&nbsp;')),
+                $('<tr>').append($('<td>').html('&nbsp;')),
+                $('<tr>').append($('<td>').html('&nbsp;'))
             )
             return
         }
@@ -288,7 +296,11 @@ function loadNextAiredSickrage(options) {
     $.getJSON(WEBDIR + 'sickrage/GetNextAired', function (result) {
         if (result === null || result.data.soon.length === 0) {
             $('#nextaired_table_body').append(
-                $('<tr>').append($('<td>').html('No future episodes found'))
+                $('<tr>').append($('<td>').html('No future episodes found')),
+                $('<tr>').append($('<td>').html('&nbsp;')),
+                $('<tr>').append($('<td>').html('&nbsp;')),
+                $('<tr>').append($('<td>').html('&nbsp;')),
+                $('<tr>').append($('<td>').html('&nbsp;'))
             )
             return
         }
