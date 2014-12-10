@@ -48,7 +48,7 @@ class Settings:
                 return False
             return val
         except SQLObjectNotFound:
-            self.logger.debug("Unable to find the selected object: " + key)
+            #self.logger.debug("Unable to find the selected object: " + key)
             return defval
 
     def set(self, key, val):

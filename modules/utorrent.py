@@ -4,6 +4,7 @@
 import requests
 from cherrypy.lib.auth2 import require
 
+
 __author__ = 'quentingerome'
 import logging
 import htpc
@@ -156,6 +157,16 @@ class UTorrent:
 	@cherrypy.expose()
 	@require()
 	@cherrypy.tools.json_out()
+	def to_client(self, link, torrentname, **kwargs):
+		try:
+			logger.info('Added %s to uTorrent' % torrentname)
+			res = self.do_action('add-url', s=link)
+			return {'result': res.status_code}
+		except Exception as e:
+			logger.error('Failed to sendt %s to uTorrent %s' % (link, torrentname))
+
+	@cherrypy.expose()
+	@cherrypy.tools.json_out()
 	def ping(self, utorrent_host='', utorrent_port='',
 			 utorrent_username='', utorrent_password='', **kwargs):
 		logger.debug("Testing uTorrent connectivity")
@@ -171,16 +182,18 @@ class UTorrent:
 			logger.error("Unable to contact uTorrent via " + self._get_url(utorrent_host, utorrent_port))
 			return
 
-	def do_action(self, action, hash=None, **kwargs):
+	def do_action(self, action, hash=None, s=None, **kwargs):
 		"""
-        :param action:
-        :param hash:
-        :param kwargs:
-        :rtype: requests.Response
-        :return:
-        """
+		:param action:
+		:param hash:
+		:param kwargs:
+		:rtype: requests.Response
+		:return:
+		"""
 		if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove', 'add-url'):
 			raise AttributeError
+		if action == 'add-url':
+			return self.fetch('?action=%s&s=%s' %(action, s))
 		try:
 			params_str = ''.join(["&%s=%s" % (k, v) for k, v in kwargs.items()])
 			return self.fetch('?action=%s%s&hash=%s' % (action, params_str, hash))
@@ -209,6 +222,7 @@ class UTorrent:
         :rtype: requests.Response
         :return:
         """
+
 		if not self._cookies or not self._token:
 			self.auth(host, port, username, pwd)
 		if not args:
@@ -221,11 +235,10 @@ class UTorrent:
 
 	def fetch(self, args):
 		"""
-
-        :param args:
-        :rtype: requests.Response
-        :return:
-        """
+		:param args:
+		:rtype: requests.Response
+		:return:
+		"""
 		password = htpc.settings.get('utorrent_password', '')
 		username = htpc.settings.get('utorrent_username', '')
 		host = htpc.settings.get('utorrent_host')

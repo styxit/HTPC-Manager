@@ -81,6 +81,8 @@ def load_modules():
     htpc.ROOT.stats = Stats()
     from modules.tvheadend import TVHeadend
     htpc.ROOT.tvheadend = TVHeadend()
+    from modules.torrentsearch import Torrentsearch
+    htpc.ROOT.torrentsearch = Torrentsearch()
     from modules.plex import Plex
     htpc.ROOT.plex = Plex()
     from modules.users import Users

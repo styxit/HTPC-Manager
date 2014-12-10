@@ -162,6 +162,16 @@ class Transmission:
             return False
         return self.fetch('torrent-remove', {'ids': torrentId})
 
+    #For torrent search
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def to_client(self, link, torrentname, **kwargs):
+        try:
+            self.logger.info('Added %s to uTorrent' % torrentname)
+            return self.fetch('torrent-add', {'filename': link})
+        except Exception as e:
+            self.logger.debug('Failed to add %s to uTorrent %s %s'(torrentname, link, e))
+
     # Wrapper to access the Transmission Api
     # If the first call fails, there probably is no valid Session ID so we try it again
     def fetch(self, method, arguments=''):
@@ -170,7 +180,7 @@ class Transmission:
 
         host = htpc.settings.get('transmission_host', '')
         port = str(htpc.settings.get('transmission_port', ''))
-
+    
         # Default basepath is transmission
         basepath = htpc.settings.get('transmission_rpcbasepath', '/transmission/')
 

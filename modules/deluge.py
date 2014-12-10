@@ -104,6 +104,21 @@ class Deluge:
         removeDataBool = bool(int(removeData))
         return self.fetch('core.remove_torrent', [torrentId, removeDataBool])
 
+    #Used for torrent search
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def to_client(self, link, torrentname, **kwargs):
+        try:
+            #Fetch download path from settings
+            download_path = self.fetch('core.get_config_value', ['download_location'])
+            #Download the torrent from zhe interwebz
+            get_url = self.fetch('web.download_torrent_from_url', [link])
+            #Load temp torrent in client
+            self.logger.info('Added %s to deluge' % torrentname)
+            return self.fetch('web.add_torrents', [[{'path': get_url['result'], 'options': {'download_location': download_path['result']}}]])
+        except Exception as e:
+            self.logger.debug('Failed adding %s to deluge %s %s' % (torrentname, link, e))
+
     # Wrapper to access the Deluge Api
     # If the first call fails, there probably is no valid Session ID so we try it again
     def fetch(self, method, arguments=[]):

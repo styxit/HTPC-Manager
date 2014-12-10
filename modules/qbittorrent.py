@@ -11,7 +11,6 @@ from cherrypy.lib.auth2 import require
 
 
 class Qbittorrent:
-
     def __init__(self):
         self.logger = logging.getLogger("modules.qbittorrent")
         htpc.MODULES.append({
@@ -136,7 +135,7 @@ class Qbittorrent:
             self.logger.debug("Couldn't get global upload and download limits %s" % e)
 
     # Handles pause, resume, delete singel torrents
-    @cherrypy.expose
+    @cherrypy.expose()
     @require()
     def command(self, cmd=None, hash=None, name=None, dlurl=None):
         try:
@@ -166,8 +165,22 @@ class Qbittorrent:
         except Exception as e:
             self.logger.error("Failed at %s %s %s %s" % (cmd, name, hash, e))
 
+    #Torrent search send to torrent
+    @cherrypy.expose()
+    def to_client(self, link, torrentname, **kwargs):
+        try:
+            url = self.qbturl()
+            url += 'command/download/'
+            data = {}
+            data['urls'] = link
+            params = urllib.urlencode(data)
+            result = urllib2.urlopen(url, params).read()
+            self.logger.info('%s %s is sendt to qBittorrent' % (torrentname, link))
+        except Exception as e:
+            self.logger.error('Failed to send %s %s to qBittorrent %s' % (link, torrentname, e))
+    
     # Sets global upload and download speed
-    @cherrypy.expose
+    @cherrypy.expose()
     @require()
     def set_speedlimit(self, type=None, speed=None):
         try:
