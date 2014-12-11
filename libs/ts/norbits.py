@@ -22,35 +22,30 @@ def search(q, cat):
                     'games': 4,
                     'books': 6
                 }
+
+    payload = {
+                'username': username,
+                'passkey': passkey,
+                'search': str(q),
+                'limit': 3000
+            }
+
     if cat:
-            payload = {
-                'username': username,
-                'passkey': passkey,
-                'search': str(q),
-                'category': category[cat],
-                'limit': 3000
-            }
-    else:
-            payload = {
-                'username': username,
-                'passkey': passkey,
-                'search': str(q),
-                'limit': 3000
-            }
+            payload['category'] = category[cat]
+
     try:
         result = requests.post('https://norbits.net/api2.php?action=torrents', data=json.dumps(payload))
         results = result.json()
-        print results
         if int(results['data']['total']) == 0:
-            #return empty string
-            pass # some error msg
+            return []
+
         elif results['data']['torrents']:
             for rr in results['data']['torrents']:
                 downloadurl = "https://norbits.net/download.php?id=%s&passkey=%s" % (rr['id'], passkey)
                 browserurl = 'https://norbits.net/details.php?id=%s' % (rr['id'])
 
                 r = {
-                    "Provider": "Norbits",
+                    "Provider": "norbits",
                     "BrowseURL": browserurl,
                     "DownloadURL": downloadurl,
                     "ReleaseName": rr["name"],
@@ -66,6 +61,7 @@ def search(q, cat):
 
                 result_list.append(r)
         return result_list
+
     except Exception as e:
-        print e#logger.info('Failed to search norbits %s' % e)
-        return ''
+        logger.info('Failed to search norbits for %s error %s' % (q, e))
+        return []

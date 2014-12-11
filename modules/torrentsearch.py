@@ -3,17 +3,10 @@
 
 import htpc
 import cherrypy
-import urllib2
-import urllib
-import json
 import jsonrpclib
 import logging
-#from ts import btn
 from ts import norbits
 from ts import fenopy
-
-#http://btnapps.net/apigen/class-btnapi.html
-#Only adding btn for now, kat and ptp will be added later.
 
 
 class Torrentsearch:
@@ -39,21 +32,14 @@ class Torrentsearch:
     def index(self, query='', **kwargs):
         return htpc.LOOKUP.get_template('torrentsearch.html').render(query=query, scriptname='torrentsearch')
 
-    @cherrypy.expose()
-    @cherrypy.tools.json_out()
-    def searchorg(self, query=None):
-        #s = self.btn(query)
-        ss = self.search_norbits(query, 'tv')
-        return ss
-
     # Search all, add categorys and providers later
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def search(self, query=None):
         r = []
-        r = r + self.btn(query)
-        r = r + self.search_fenopy(query, 'all')
-        r = r + self.search_norbits(query, 'tv')
+        r += self.btn(query)
+        r += self.search_fenopy(query, 'all')
+        r += self.search_norbits(query, 'tv')
         return r
 
     @cherrypy.expose()
@@ -101,7 +87,6 @@ class Torrentsearch:
             qbt['path'] = 'qbittorrent/to_client/'
             l.append(qbt)
         else:
-            print 'qbittorent is checking if its false even when its true'
             qbt['title'] = 'qBittorrent'
             qbt['active'] = 0
             qbt['path'] = 'qbittorrent/command/'
@@ -137,7 +122,6 @@ class Torrentsearch:
             utor['path'] = 'utorrent/to_client/'
             l.append(utor)
         return l
-
 
     def search_fenopy(self, q, cat):
         results = fenopy.search(q, cat)

@@ -26,7 +26,6 @@ def search(query=None, cat=None):
         url = "http://fenopy.se/module/search/api.php?keyword=%s&sort=peer&format=json&limit=100&category=%s" % (urllib.quote_plus(query), d[cat])
         result = urllib2.urlopen(url).read()
         if 'error: no match found' in result:
-            print "fucking error"
             return []
 
         res = json.JSONDecoder('UTF-8').decode(result)
@@ -56,6 +55,5 @@ def search(query=None, cat=None):
         return result_list
 
     except Exception as e:
-        print e
         logger.error('Fenopy error while searching for %s %s' % (query, e))
         return []
