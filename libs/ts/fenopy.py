@@ -9,7 +9,6 @@ import logging
 
 
 def search(query=None, cat=None):
-    print "running fenopy"
     logger = logging.getLogger('modules.torrents')
     d = {}
     d['all'] = 0
