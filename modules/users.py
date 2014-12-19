@@ -9,6 +9,7 @@ from sqlobject.col import StringCol
 from cherrypy.lib.auth2 import require, member_of
 from htpc.manageusers import Manageusers
 
+
 class Users:
     def __init__(self):
         self.logger = logging.getLogger('modules.users')
@@ -91,10 +92,9 @@ class Users:
             return
         return {'users': users}
 
-
     @cherrypy.expose()
     @require(member_of("admin"))
-    def delusers(self, id):
+    def deluser(self, id):
         """ Delete a user """
         self.logger.debug("Deleting user " + str(id))
         Manageusers.delete(id)

@@ -1,6 +1,10 @@
 $(document).ready(function () {
     get_branches()
-    samsung_tvs()
+
+    // Only look for tvs if its enabled.
+    if ($("#samsungtv_enable").is(':checked')) {
+        samsung_tvs();
+    }
     $('#other button.save').on('click', function (event) {
         event.preventDefault();
 
@@ -74,6 +78,7 @@ $(document).ready(function () {
     $('input, radio, select, button').bind('change input', function (e) {
         $('.btn-test').button('reset').removeClass('btn-success btn-danger');
     });
+
     $('form').submit(function (e) {
         e.preventDefault();
         var action = $(this).attr('action');
@@ -104,16 +109,20 @@ $(document).ready(function () {
         setTimeout(function() {
             window.location.reload(true);
         }, 1000);
+
     });
+
     $(":reset").click(function (e) {
         e.preventDefault();
         $(':input').not(':button, :submit, :reset, :hidden').removeAttr('checked').removeAttr('selected').not(':checkbox, :radio, select').val('');
     });
+
     $('input.enable-module').change(function () {
         var disabled = !$(this).is(':checked');
         $(this).parents('fieldset:first').find('input, radio, select').not(this)
             .attr('readonly', disabled).attr('disabled', disabled);
     });
+
     $('input.enable-module').trigger('change');
     $('#kodi_server_id').change(function () {
         $('button:reset:visible').html('Clear').removeClass('btn-danger').unbind();
@@ -141,6 +150,7 @@ $(document).ready(function () {
         });
     });
     kodi_update_servers(0);
+
     $('input.enable-module').trigger('change');
     $('#users_user_id').change(function () {
         $('button:reset:visible').html('Clear').removeClass('btn-danger').unbind();
@@ -156,7 +166,7 @@ $(document).ready(function () {
                 var name = item.find('option:selected').text();
                 if (!confirm('Delete ' + name)) return;
                 $.get(WEBDIR + 'users/deluser?id=' + id, function (data) {
-                    notify('Settings', data.username + ' deleted', 'info');
+                    notify('Settings', name + ' deleted', 'info');
                     $(this).val(0);
                     item.find('option[value=' + id + ']').remove();
                     $('button:reset:visible').html('Clear').removeClass('btn-danger').unbind();
@@ -165,6 +175,7 @@ $(document).ready(function () {
         });
     });
     users_update_user(0);
+
     $('#gdm_plex_servers').change(function () {
         var item = $(this);
         var id = item.val();
@@ -177,6 +188,7 @@ $(document).ready(function () {
         });
     });
     gdm_plex_servers(0);
+
     $('input.enable-module').trigger('change');
         $('#tvs').change(function () {
         var item = $(this);
@@ -191,6 +203,7 @@ $(document).ready(function () {
             $('#samsung_htpchost').val(data.local_ip);
         });
     });
+
 });
 
 function kodi_update_servers(id) {
