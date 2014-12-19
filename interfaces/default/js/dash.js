@@ -203,21 +203,26 @@ function loadDownloadHistory() {
     })
 }
 function loadNZBGetDownloadHistory() {
-    if (!$('#nzbgetdownloads_table_body').length) return
-    $.getJSON(WEBDIR + 'nzbget/GetHistory?limit=5', function (data) {
-        $.each(data.result, function (i, slot) {
-            var status = $('<i>').addClass('icon-ok')
-            if (slot.ParStatus == 'FAILURE') {
-                status.removeClass().addClass('icon-remove').attr('title', slot.fail_message)
-            }
+    if (!$('#nzbgetdownloads_table_body').length) return;
+    $.getJSON(WEBDIR + 'nzbget/GetHistory', function (data) {
+        if (!data.length) {
             $('#nzbgetdownloads_table_body').append(
-                $('<tr>').append(
-                    $('<td>').html(slot.Name).attr('title', slot.Name),
-                    $('<td>').html(status)
-                )
-            )
-        })
-    })
+            $('<tr>').append($('<td>').html('History is empty')));
+            return;
+        }
+        $.each(data, function (i, slot) {
+            var status = $('<i>').addClass('icon-ok');
+            if (slot.ParStatus == 'FAILURE') {
+                status.removeClass().addClass('icon-remove').attr('title', slot.fail_message);
+            }
+            // Limit the results to 5
+            if (i >= 5) return;
+            $('#nzbgetdownloads_table_body').append(
+            $('<tr>').append(
+            $('<td>').html(slot.Name).attr('title', slot.Name),
+            $('<td>').html(status)));
+        });
+    });
 }
 function loadWantedMovies() {
     if (!$('#wantedmovies_table_body').length) return
