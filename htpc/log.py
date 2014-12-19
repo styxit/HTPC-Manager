@@ -48,6 +48,9 @@ class Log:
         # Disable cherrypy access log
         logging.getLogger('cherrypy.access').propagate = False
 
+        # Disable urllib3 logger, except from criticals
+        logging.getLogger("requests").setLevel(logging.CRITICAL)
+
         htpc.LOGGER.addHandler(self.logch)
         htpc.LOGGER.addHandler(self.logfh)
 
