@@ -81,12 +81,12 @@ class Couchpotato:
             couchpotato_basepath += "/"
 
         ssl = "s" if couchpotato_ssl else ""
-        url = "http" + ssl + "://" + couchpotato_host + ":" + couchpotato_port + couchpotato_basepath + getkey
+        url = "http%s://%s:%s%s%s" % (ssl, couchpotato_host, couchpotato_port, couchpotato_basepath, getkey)
         try:
-            f = requests.get(url, timeout=10)
+            f = requests.get(url, timeout=10, verify=False)
             return f.json()
-        except:
-            self.logger.error("Unable to connect to couchpotato")
+        except Exception as e:
+            self.logger.error("Unable to connect to couchpotato %s" % e)
             self.logger.debug("connection-URL: " + url)
             return
 
@@ -195,10 +195,10 @@ class Couchpotato:
             if not(basepath.endswith("/")):
                 basepath += "/"
 
-            url = "http" + ssl + "://" + host + ":" + port + basepath + "api/" + apikey + "/" + path
+            url = "http%s://%s:%s%sapi/%s/%s" % (ssl, host, port, basepath, apikey, path)
             self.logger.debug("Fetching information from: " + url)
 
-            f = requests.get(url, timeout=60, stream=True)
+            f = requests.get(url, timeout=60, verify=False)
 
             return f.json()
 
@@ -206,3 +206,4 @@ class Couchpotato:
             self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to fetch information")
             return
+
