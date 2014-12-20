@@ -53,23 +53,23 @@ class Sonarr:
             if banner:
                 #  the path includes the basepath automaticly
                 url = 'http%s://%s:%s%s' % (ssl, host, port, path)
-                r = requests.get(url, headers=headers)
+                r = requests.get(url, headers=headers, verify=False)
                 return r.content
 
             if type == 'post':
-                r = requests.post(url, data=dumps(data), headers=headers)
+                r = requests.post(url, data=dumps(data), headers=headers, verify=False)
                 return r.content
 
             elif type == 'put':
-                r = requests.post(url, data=dumps(data), headers=headers)
+                r = requests.post(url, data=dumps(data), headers=headers, verify=False)
                 return r.content
 
             elif type == 'delete':
-                r = requests.delete(url, data=dumps(data), headers=headers)
+                r = requests.delete(url, data=dumps(data), headers=headers, verify=False)
                 return r.content
 
             else:
-                r = requests.get(url, headers=headers)
+                r = requests.get(url, headers=headers, verify=False)
                 return loads(r.text)
 
         except Exception as e:
@@ -90,7 +90,7 @@ class Sonarr:
 
             url = 'http%s://%s:%s%sapi/system/status' % (ssl, sonarr_host, sonarr_port, sonarr_basepath)
 
-            result = requests.get(url, headers=headers)
+            result = requests.get(url, headers=headers, verify=False)
             return result.json()
         except:
             return
