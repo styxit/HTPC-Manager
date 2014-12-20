@@ -38,7 +38,7 @@ class Deluge:
     @cherrypy.expose()
     @require()
     def index(self):
-        return htpc.LOOKUP.get_template('deluge.html').render(scriptname='deluge')
+        return htpc.LOOKUP.get_template('deluge.html').render(scriptname='deluge', webinterface=self.webinterface())
 
     def webinterface(self):
         host = htpc.settings.get('deluge_host', '')
