@@ -78,8 +78,8 @@ def start():
                     'server.ssl_private_key': cert
                 })
                 # Save the new cert and key to settings
-                htpc.SSLKEY = serverkey
-                htpc.SSLCERT = cert
+                htpc.SSLKEY = htpc.settings.set('app_ssl_key', serverkey)
+                htpc.SSLCERT = htpc.settings.set('app_ssl_cert', cert)
 
     # Daemonize cherrypy if specified
     if htpc.DAEMON:
