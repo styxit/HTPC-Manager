@@ -10,6 +10,7 @@ import logging
 from sqlobject import SQLObjectNotFound
 from htpc.manageusers import Manageusers
 from cherrypy.process.plugins import Daemonizer, PIDFile
+from helpers import create_https_certificates
 
 def secureheaders():
     headers = cherrypy.response.headers
@@ -22,6 +23,7 @@ def start():
     """ Main function for starting HTTP server """
     logger = logging.getLogger('htpc.server')
     logger.debug("Setting up to start cherrypy")
+    protocol = ""
 
     # Set server ip, port and root
     cherrypy.config.update({
@@ -59,13 +61,25 @@ def start():
             'environment': 'production'
         })
 
-    # Enable SSL
-    if htpc.SSLCERT and htpc.SSLKEY:
-        cherrypy.config.update({
-            'server.ssl_module': 'builtin',
-            'server.ssl_certificate': htpc.SSLCERT,
-            'server.ssl_private_key': htpc.SSLKEY
-        })
+    # If ssl is enabled but there is not cert og key, try to make self signed.
+    if htpc.USE_SSL:
+        # Check if the cert and  key exists
+        if not (htpc.SSLCERT and os.path.exists(htpc.SSLCERT)) or not (htpc.SSLKEY and os.path.exists(htpc.SSLKEY)):
+            # If doesnt exist, make em!
+            serverkey = os.path.join(htpc.DATADIR, 'server.key')
+            cert = os.path.join(htpc.DATADIR, 'server.cert')
+            protocol = "s"
+
+            if create_https_certificates(serverkey, cert):
+                # Enable ssl
+                cherrypy.config.update({
+                    'server.ssl_module': 'builtin',
+                    'server.ssl_certificate': serverkey,
+                    'server.ssl_private_key': cert
+                })
+                # Save the new cert and key to settings
+                htpc.SSLKEY = serverkey
+                htpc.SSLCERT = cert
 
     # Daemonize cherrypy if specified
     if htpc.DAEMON:
@@ -137,10 +151,10 @@ def start():
         },
     }
 
-    # Start the CherryPy server (remove trailing slash from webdir)
+    # Start the CherryPy server
     logger.info("Starting up webserver")
-    print '******************************************************'
+    print '*******************************************************************'
     print 'Starting HTPC Manager on port ' + str(htpc.PORT) + '.'
-    print 'Start your browser and go to http://localhost:' + str(htpc.PORT) + htpc.WEBDIR[:-1]
-    print '******************************************************'
+    print 'Start your browser and go to http%s://localhost:%s%s' % (protocol, htpc.PORT, htpc.WEBDIR[:-1])
+    print '*******************************************************************'
     cherrypy.quickstart(htpc.ROOT, htpc.WEBDIR[:-1], config=app_config)

@@ -133,6 +133,7 @@ def main():
     htpc.settings = Settings()
 
     # Check for SSL
+    htpc.USE_SSL = htpc.settings.get('app_use_ssl')
     htpc.SSLCERT = htpc.settings.get('app_ssl_cert')
     htpc.SSLKEY = htpc.settings.get('app_ssl_key')
 
