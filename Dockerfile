@@ -1,6 +1,6 @@
 FROM google/python
 
-RUN apt-get -yq install libjpeg8-dev libpng-dev libfreetype6-dev zlib1g-dev libopenjpeg-dev libwebp-dev
+RUN apt-get -yq install libjpeg8-dev libpng-dev libfreetype6-dev zlib1g-dev libopenjpeg-dev libwebp-dev openssl
 
 WORKDIR /app
 RUN virtualenv /env

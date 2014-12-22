@@ -1,3 +1,4 @@
 # Hptc Manager will run fine fine without this ones. However if will miss some features
 Pillow
 psutil
+pyopenssl
