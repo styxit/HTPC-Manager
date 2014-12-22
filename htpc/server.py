@@ -11,6 +11,7 @@ from sqlobject import SQLObjectNotFound
 from htpc.manageusers import Manageusers
 from cherrypy.process.plugins import Daemonizer, PIDFile
 from helpers import create_https_certificates
+from root import do_restart
 
 def secureheaders():
     headers = cherrypy.response.headers
@@ -64,22 +65,32 @@ def start():
     # If ssl is enabled but there is not cert og key, try to make self signed.
     if htpc.USE_SSL:
         # Check if the cert and  key exists
-        if not (htpc.SSLCERT and os.path.exists(htpc.SSLCERT)) or not (htpc.SSLKEY and os.path.exists(htpc.SSLKEY)):
-            # If doesnt exist, make em!
+        if not (htpc.SSLCERT and os.path.exists(htpc.SSLCERT)) and not (htpc.SSLKEY and os.path.exists(htpc.SSLKEY)):
             serverkey = os.path.join(htpc.DATADIR, 'server.key')
-            cert = os.path.join(htpc.DATADIR, 'server.cert')
-            protocol = "s"
+            cert = os.path.join(htpc.DATADIR, 'server.crt')
+            print "There isnt any certs and key, trying to make them"
 
+            # If they dont exist, make them.
             if create_https_certificates(serverkey, cert):
-                # Enable ssl
-                cherrypy.config.update({
-                    'server.ssl_module': 'builtin',
-                    'server.ssl_certificate': serverkey,
-                    'server.ssl_private_key': cert
-                })
-                # Save the new cert and key to settings
+                # Save the new crt and key to settings
                 htpc.SSLKEY = htpc.settings.set('app_ssl_key', serverkey)
                 htpc.SSLCERT = htpc.settings.set('app_ssl_cert', cert)
+                ENABLESSL = True
+                print "Created cert and key successfully"
+                print "Restarting server to active ssl"
+                do_restart()
+
+        if (htpc.SSLCERT and os.path.exists(htpc.SSLCERT)) and (htpc.SSLKEY and os.path.exists(htpc.SSLKEY)):
+            ENABLESSL = True
+
+    if ENABLESSL:
+        protocol = "s"
+        logger.debug("SSL is enabled")
+        cherrypy.config.update({
+                'server.ssl_module': 'builtin',
+                'server.ssl_certificate': htpc.SSLKEY,
+                'server.ssl_private_key': htpc.SSLCERT
+        })
 
     # Daemonize cherrypy if specified
     if htpc.DAEMON:

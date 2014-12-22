@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """ Initiate global variables """
 RUNDIR = None
 DATADIR = None
@@ -20,3 +23,4 @@ SSLKEY = None
 LOGGER = None
 LOGLEVEL = None
 settings = None
+ENABLESSL = False
