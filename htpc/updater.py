@@ -130,7 +130,7 @@ class Updater:
         """ Get hash of latest commit on github """
         self.logger.debug('Getting latest version from github.')
         try:
-            url = 'https://api.github.com/repos/%s/%s/commits/%s' % (gitUser, gitRepo, htpc.settings.get('branch', 'master'))
+            url = 'https://api.github.com/repos/%s/%s/commits/%s' % (gitUser, gitRepo, htpc.settings.get('branch', 'master2'))
             result = loads(urllib2.urlopen(url).read())
             latest = result['sha'].strip()
             self.logger.debug('Latest version: ' + latest)
@@ -211,7 +211,10 @@ class GitUpdater():
             self.logger.error("Update aborted.")
         else:
             # Restart HTPC Manager to make sure all new code is loaded
+            self.logger.debug("Clean up after git")
+            self.git_exec('reset --hard')
             self.logger.warning('Restarting HTPC Manager after update.')
+
             do_restart()
 
         self.UPDATING = 0
