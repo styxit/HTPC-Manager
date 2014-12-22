@@ -75,15 +75,15 @@ def start():
                 # Save the new crt and key to settings
                 htpc.SSLKEY = htpc.settings.set('app_ssl_key', serverkey)
                 htpc.SSLCERT = htpc.settings.set('app_ssl_cert', cert)
-                ENABLESSL = True
+                htpc.ENABLESSL = True
                 print "Created cert and key successfully"
                 print "Restarting server to active ssl"
                 do_restart()
 
         if (htpc.SSLCERT and os.path.exists(htpc.SSLCERT)) and (htpc.SSLKEY and os.path.exists(htpc.SSLKEY)):
-            ENABLESSL = True
+            htpc.ENABLESSL = True
 
-    if ENABLESSL:
+    if htpc.ENABLESSL:
         protocol = "s"
         logger.debug("SSL is enabled")
         cherrypy.config.update({
