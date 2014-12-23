@@ -247,12 +247,10 @@ function get_branches() {
         var branches = $('#branch').empty();
         $.each(data.branches, function (i, item) {
             var option = $('<option>').text(item).val(item);
-            if (data.branch == item) option.attr('selected', 'selected');
+            //if (data.branch == item) option.attr('selected', 'selected');
             branches.append(option);
         });
-        if (!data.branches.length) {
-            branches.append($('<option>').text(data.branch).val(data.branch).attr('selected', 'selected'));
-        }
+        branches.append($('<option>').text(data.branch).val(data.branch).attr('selected', 'selected'));
 
     }, 'json');
 }

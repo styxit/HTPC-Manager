@@ -25,6 +25,7 @@ import htpc
 import logging
 import tarfile
 import shutil
+import platform
 
 from htpc.root import do_restart
 
@@ -45,12 +46,11 @@ class Updater:
     """ Determine the update method """
     def getEngine(self):
         self.logger.debug("Selecting Update engine.")
-        gitDir = os.path.join(htpc.RUNDIR, '.git')
+        gitDir = os.path.normcase(os.path.join(htpc.RUNDIR, '.git'))
         validGitDir = os.path.isdir(gitDir)
-        validGitCommand = GitUpdater().git_exec('branch')  # do simple command to test git functionality
 
         # If valid Git dir and git command succeeded, use Git updater
-        if (validGitDir and validGitCommand):
+        if validGitDir and self.test_git():
             self.logger.info('Using GitUpdater engine')
             self.updateEngineName = 'Git'
             return GitUpdater()
@@ -58,6 +58,42 @@ class Updater:
             self.logger.info('Using SourceUpdater engine')
             self.updateEngineName = 'Source'
             return SourceUpdater()
+
+    def test_git(self):
+        self.logger.debug("Checking if git is installed")
+        self.logger.info("dick")
+        gp = htpc.settings.get('git_path', 'git')
+        alternative_gp = []
+
+        # osx people who start htpc-mamanger from launchd have a broken path, so try a hail-mary attempt for them
+        if platform.system().lower() == 'darwin':
+            alternative_gp.append('/usr/local/git/bin/git')
+        if platform.system().lower() == 'windows':
+            if gp != gp.lower():
+                alternative_gp.append(gp.lower())
+            alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "c:\Program Files (x86)\Git\bin\git.exe"]
+
+        # Returns a empty string if failed
+        output = GitUpdater().git_exec(gp, 'version')
+
+        if output:
+            # Found a working git path.
+            self.logger.debug("Found git path %s" % gp)
+            htpc.settings.set('git_path', gp)
+            return True
+
+        if alternative_gp:
+            self.logger.debug("Checking for alternate git location")
+            for current_gp in alternative_gp:
+                self.logger.debug("Testing git path %s" % current_gp)
+                output = GitUpdater().git_exec(current_gp, 'version')
+                if output:
+                    self.logger.debug("Found git path %s and it works!" % current_gp)
+                    self.logger.debug("Saving git path %s to settings" % current_gp)
+                    htpc.settings.set('git_path', current_gp)
+                    return True
+
+        return False
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -96,7 +132,8 @@ class Updater:
 
         # Get current and latest version
         current = self.updateEngine.current()
-        latest = self.latest()
+        #latest = self.latest()
+        latest = self.updateEngine.latest()
 
         if not latest:
             self.logger.error("Failed to determine the latest version for HTPC Manager.")
@@ -153,6 +190,7 @@ class Updater:
             self.logger.error('Could not determine how far behind')
             return 'Unknown'
 
+    '''
     # Unlikely that a user has more the 100 branches, if they do use change this so it uses the link in the header
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -174,6 +212,11 @@ class Updater:
             self.logger.error(str(e))
             self.logger.error('Could not find any branches, setting default master')
             return [d]
+    '''
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def branches(self):
+        return self.updateEngine.branches()
 
 
 """ Class to update HTPC Manager using git commands. """
@@ -186,10 +229,26 @@ class GitUpdater():
         self.git = htpc.settings.get('git_path', 'git')
         self.logger = logging.getLogger('htpc.updater')
 
+    def current_branch_name(self):
+        output = self.git_exec(self.git, 'rev-parse --abbrev-ref HEAD')
+        if output:
+            return output
+        else:
+            return htpc.settings.get('branch', 'master2')
+
+    # start here again. then source checker
+    def latest(self):
+        output = self.git_exec(self.git, 'rev-parse --verify --quiet "@{upstream}')
+        if output:
+            self.updateEngine.latestHash = latest
+            return output
+        else:
+            return False
+
     def current(self):
         """ Get hash of current Git commit """
         self.logger.debug('Getting current version.')
-        output = self.git_exec('rev-parse HEAD')
+        output = self.git_exec(self.git, 'rev-parse HEAD')
         self.logger.debug('Current version: ' + output)
 
         if not output:
@@ -199,12 +258,27 @@ class GitUpdater():
         if re.match('^[a-z0-9]+$', output):
             return output
 
+    def branches(self):
+        cb = self.current_branch_name()
+
+        d = {
+            "branch": cb,
+            "branches": []
+        }
+
+        branches = self.git_exec(self.git, 'ls-remote --heads https://github.com/Hellowlol/HTPC-Manager.git')
+        if branches:
+            # find all branches except the current branch.
+            d["branches"] = [b for b in re.findall('\S+\Wrefs/heads/(.*)', branches) if b != cb]
+            return d
+        return [d]
+
     def update(self):
         """ Do update through git """
         self.logger.info("Attempting update through Git.")
         self.UPDATING = 1
 
-        output = self.git_exec('pull origin %s' % htpc.settings.get('branch'))
+        output = self.git_exec(self.git, 'pull origin %s' % htpc.settings.get('branch'))
         if not output:
             self.logger.error("Unable to update through git. Make sure that Git is located in your path and can be accessed by this application.")
         elif 'Aborting.' in output:
@@ -212,17 +286,17 @@ class GitUpdater():
         else:
             # Restart HTPC Manager to make sure all new code is loaded
             self.logger.debug("Clean up after git")
-            self.git_exec('reset --hard')
+            self.git_exec(self.git, 'reset --hard')
             self.logger.warning('Restarting HTPC Manager after update.')
 
             do_restart()
 
         self.UPDATING = 0
 
-    def git_exec(self, args):
+    def git_exec(self, gp, args):
         """ Tool for running git program on system """
         try:
-            proc = subprocess.Popen(self.git + " " + args, stdout=subprocess.PIPE,
+            proc = subprocess.Popen(gp + " " + args, stdout=subprocess.PIPE,
                    stderr=subprocess.STDOUT, shell=True, cwd=htpc.RUNDIR)
             output, err = proc.communicate()
         except OSError, e:
@@ -284,6 +358,42 @@ class SourceUpdater():
         if re.match('^[a-z0-9]+$', currentVersion):
             self.currentHash = currentVersion
             return currentVersion
+
+    def latest(self):
+        """ Get hash of latest commit on github """
+        self.logger.debug('Getting latest version from github.')
+        try:
+            url = 'https://api.github.com/repos/%s/%s/commits/%s' % (gitUser, gitRepo, htpc.settings.get('branch', 'master2'))
+            result = loads(urllib2.urlopen(url).read())
+            latest = result['sha'].strip()
+            self.logger.debug('Latest version: ' + latest)
+            self.updateEngine.latestHash = latest
+            return latest
+        except:
+            return False
+
+    def current_branch_name(self):
+        # No way of knowing what branch is used unless saved in setting, using default if missing in db
+        return htpc.settings.get('branch', 'master2')
+
+    def branches(self):
+        """ Returns the all the branches to gitUser """
+        d = {"branch": htpc.settings.get('branch', 'master'),
+             "branches": []
+            }
+        try:
+            url = "https://api.github.com/repos/%s/%s/branches?per_page=100" % (gitUser, gitRepo)
+            branchlist = []
+            branches = loads(urllib2.urlopen(url).read())
+            for branch in branches:
+                branchlist.append(branch["name"])
+            d["branches"] = branchlist
+            return d
+
+        except Exception, e:
+            self.logger.error(str(e))
+            self.logger.error('Could not find any branches, setting default master')
+            return [d]
 
     """ Do update from source """
     def update(self):
