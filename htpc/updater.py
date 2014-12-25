@@ -71,7 +71,8 @@ class Updater:
         if platform.system().lower() == 'windows':
             if gp != gp.lower():
                 alternative_gp.append(gp.lower())
-            alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "c:\Program Files (x86)\Git\bin\git.exe"]
+            # Disbled this so it uses source updater while testing.
+            #alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "c:\Program Files (x86)\Git\bin\git.exe"]
 
         # Returns a empty string if failed
         output = GitUpdater().git_exec(gp, 'version')
@@ -231,17 +232,17 @@ class GitUpdater():
             return output
 
     def branches(self):
-        cb = self.current_branch_name()
+        cbn = self.current_branch_name()
 
         d = {
-            "branch": cb,
+            "branch": cbn,
             "branches": []
         }
 
         branches = self.git_exec(self.git, 'ls-remote --heads https://github.com/Hellowlol/HTPC-Manager.git')
         if branches:
             # find all branches except the current branch.
-            d["branches"] = [b for b in re.findall('\S+\Wrefs/heads/(.*)', branches) if b != cb]
+            d["branches"] = [b for b in re.findall('\S+\Wrefs/heads/(.*)', branches) if b != cbn]
             return d
         return [d]
 
@@ -375,10 +376,7 @@ class SourceUpdater():
             branches = loads(urllib2.urlopen(url).read())
             for branch in branches:
                 branchlist.append(branch["name"])
-            #d["branches"] = branchlist
-            print "branchlist"
-            print branchlist
-            d["branches"] = [b for b in branchlist if b["name"] != cbn]
+            d["branches"] = [b for b in branchlist if b != cbn]
             return d
 
         except Exception, e:
