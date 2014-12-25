@@ -228,6 +228,11 @@ class GitUpdater():
 
         self.git = htpc.settings.get('git_path', 'git')
         self.logger = logging.getLogger('htpc.updater')
+        #self.update_remote_origin()
+
+    def update_remote_origin(self):
+        print "update remote url"
+        print self.git_exec(self.git, 'config remote.origin.url https://github.com/Hellowlol/HTPC-Manager.git')
 
     def current_branch_name(self):
         output = self.git_exec(self.git, 'rev-parse --abbrev-ref HEAD')
@@ -236,14 +241,29 @@ class GitUpdater():
         else:
             return htpc.settings.get('branch', 'master2')
 
+    def latest(self):
+        """ Get hash of latest commit on github """
+        self.logger.debug('Getting latest version from github.')
+        try:
+            url = 'https://api.github.com/repos/%s/%s/commits/%s' % (gitUser, gitRepo, self.current_branch_name())
+            result = loads(urllib2.urlopen(url).read())
+            latest = result['sha'].strip()
+            self.logger.debug('Latest version: ' + latest)
+            self.updateEngine.latestHash = latest
+            return latest
+        except:
+            return False
+    """
     # start here again. then source checker
     def latest(self):
+        self.update_remote_origin()
         output = self.git_exec(self.git, 'rev-parse --verify --quiet "@{upstream}')
         if output:
             self.updateEngine.latestHash = latest
             return output
         else:
             return False
+    """
 
     def current(self):
         """ Get hash of current Git commit """
@@ -278,7 +298,10 @@ class GitUpdater():
         self.logger.info("Attempting update through Git.")
         self.UPDATING = 1
 
-        output = self.git_exec(self.git, 'pull origin %s' % htpc.settings.get('branch'))
+        if htpc.settings.get('branch', 'master2') == self.current_branch_name():
+            output = self.git_exec(self.git, 'pull origin %s' % htpc.settings.get('branch'))
+        else:
+            output = self.git_exec(self.git, 'checkout -f ' + htpc.settings.get('branch', 'master2'))
         if not output:
             self.logger.error("Unable to update through git. Make sure that Git is located in your path and can be accessed by this application.")
         elif 'Aborting.' in output:
@@ -299,6 +322,8 @@ class GitUpdater():
             proc = subprocess.Popen(gp + " " + args, stdout=subprocess.PIPE,
                    stderr=subprocess.STDOUT, shell=True, cwd=htpc.RUNDIR)
             output, err = proc.communicate()
+
+            self.logger.info("Running %s %s" % (gp, args))
         except OSError, e:
             self.logger.warning(str(e))
             return ''
@@ -311,7 +336,6 @@ class GitUpdater():
             return ''
         else:
             return output.strip()
-
 
 """ Class to update HTPC Manager using Source code from Github. Requires a full download on every update."""
 class SourceUpdater():
@@ -373,21 +397,34 @@ class SourceUpdater():
             return False
 
     def current_branch_name(self):
-        # No way of knowing what branch is used unless saved in setting, using default if missing in db
-        return htpc.settings.get('branch', 'master2')
+        """  Tries to find the current branches"""
+        versionfile = self.current()
+        current_branch = htpc.settings.get('branch', 'master2')
+        # should return sha on success not True False
+        if not isinstance(self.current(), bool):
+            url = "https://api.github.com/repos/%s/%s/branches?per_page=100" % (gitUser, gitRepo)
+            branches = loads(urllib2.urlopen(url).read())
+            for branch in branches:
+                if branch["sha"] == versionfile:
+                    current_branch = branch["name"]
+        return current_branch
 
     def branches(self):
-        """ Returns the all the branches to gitUser """
-        d = {"branch": htpc.settings.get('branch', 'master'),
-             "branches": []
-            }
+        """ Returns the all the branches to gitUser and current branch """
+        cbn = self.current_branch_name()
+        d = {
+            "branch": cbn,
+            "branches": []
+        }
+
         try:
             url = "https://api.github.com/repos/%s/%s/branches?per_page=100" % (gitUser, gitRepo)
             branchlist = []
             branches = loads(urllib2.urlopen(url).read())
             for branch in branches:
                 branchlist.append(branch["name"])
-            d["branches"] = branchlist
+            #d["branches"] = branchlist
+            d["branches"] = [b for b in branchlist if b["name"] != cbn]
             return d
 
         except Exception, e:
