@@ -376,12 +376,14 @@ class SourceUpdater():
             for branch in branches:
                 branchlist.append(branch["name"])
             #d["branches"] = branchlist
+            print "branchlist"
+            print branchlist
             d["branches"] = [b for b in branchlist if b["name"] != cbn]
             return d
 
         except Exception, e:
             self.logger.error(str(e))
-            self.logger.error('Could not find any branches, setting default master')
+            self.logger.error('Could not find any branches, setting default master2')
             return [d]
 
     """ Do update from source """
@@ -391,11 +393,11 @@ class SourceUpdater():
         self.UPDATING = 1
         cherrypy.engine.exit()
 
-        tarUrl = 'https://github.com/%s/%s/tarball/%s' % (gitUser, gitRepo, htpc.settings.get('branch'))
+        tarUrl = 'https://github.com/%s/%s/tarball/%s' % (gitUser, gitRepo, htpc.settings.get('branch', 'master2'))
 
         # Download tar
         downloaded = self.__downloadTar(tarUrl, self.updateFile)
-        if (downloaded is False):
+        if downloaded is False:
             return False
 
         # Extract to temp folder
