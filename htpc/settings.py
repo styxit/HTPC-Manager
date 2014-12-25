@@ -53,7 +53,7 @@ class Settings:
 
     def set(self, key, val):
         """ Save a setting to the database """
-        self.logger.debug("Saving settings to the database.")
+        self.logger.debug("Saving settings %s to the database." % key)
         try:
             setting = Setting.selectBy(key=key).getOne()
             setting.val = val
@@ -111,3 +111,10 @@ class Settings:
         except Exception as e:
             self.logger.error('Failed to delete cache folder ', e)
             return {'failed': e}
+
+    @cherrypy.expose()
+    @require(member_of("admin"))
+    def test(self):
+        """ Used for testing stuff """
+        pass
+

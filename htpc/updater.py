@@ -132,7 +132,6 @@ class Updater:
 
         # Get current and latest version
         current = self.updateEngine.current()
-        #latest = self.latest()
         latest = self.updateEngine.latest()
 
         if not latest:
@@ -163,19 +162,6 @@ class Updater:
         self.logger.info("Currently " + str(output['versionsBehind']) + " commits behind.")
         return output
 
-    def latest(self):
-        """ Get hash of latest commit on github """
-        self.logger.debug('Getting latest version from github.')
-        try:
-            url = 'https://api.github.com/repos/%s/%s/commits/%s' % (gitUser, gitRepo, htpc.settings.get('branch', 'master2'))
-            result = loads(urllib2.urlopen(url).read())
-            latest = result['sha'].strip()
-            self.logger.debug('Latest version: ' + latest)
-            self.updateEngine.latestHash = latest
-            return latest
-        except:
-            return False
-
     def behind_by(self, current, latest):
         """ Check how many commits between current and latest """
         self.logger.debug('Checking how far behind latest')
@@ -190,29 +176,6 @@ class Updater:
             self.logger.error('Could not determine how far behind')
             return 'Unknown'
 
-    '''
-    # Unlikely that a user has more the 100 branches, if they do use change this so it uses the link in the header
-    @cherrypy.expose()
-    @cherrypy.tools.json_out()
-    def branches(self):
-        """ Returns the all the branches to gitUser """
-        d = {"branch": htpc.settings.get('branch', 'master'),
-             "branches": []
-            }
-        try:
-            url = "https://api.github.com/repos/%s/%s/branches?per_page=100" % (gitUser, gitRepo)
-            branchlist = []
-            branches = loads(urllib2.urlopen(url).read())
-            for branch in branches:
-                branchlist.append(branch["name"])
-            d["branches"] = branchlist
-            return d
-
-        except Exception, e:
-            self.logger.error(str(e))
-            self.logger.error('Could not find any branches, setting default master')
-            return [d]
-    '''
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def branches(self):
@@ -228,11 +191,10 @@ class GitUpdater():
 
         self.git = htpc.settings.get('git_path', 'git')
         self.logger = logging.getLogger('htpc.updater')
-        #self.update_remote_origin()
+        #self.update_remote_origin() # Disable this since it a fork for now.
 
     def update_remote_origin(self):
-        print "update remote url"
-        print self.git_exec(self.git, 'config remote.origin.url https://github.com/Hellowlol/HTPC-Manager.git')
+        self.git_exec(self.git, 'config remote.origin.url https://github.com/Hellowlol/HTPC-Manager.git')
 
     def current_branch_name(self):
         output = self.git_exec(self.git, 'rev-parse --abbrev-ref HEAD')
@@ -248,22 +210,12 @@ class GitUpdater():
             url = 'https://api.github.com/repos/%s/%s/commits/%s' % (gitUser, gitRepo, self.current_branch_name())
             result = loads(urllib2.urlopen(url).read())
             latest = result['sha'].strip()
-            self.logger.debug('Latest version: ' + latest)
-            self.updateEngine.latestHash = latest
+            self.logger.debug('Branch: %s' % self.current_branch_name())
+            self.logger.debug('Latest sha: %s' % latest)
+            self.latestHash = latest
             return latest
-        except:
+        except Exception as e:
             return False
-    """
-    # start here again. then source checker
-    def latest(self):
-        self.update_remote_origin()
-        output = self.git_exec(self.git, 'rev-parse --verify --quiet "@{upstream}')
-        if output:
-            self.updateEngine.latestHash = latest
-            return output
-        else:
-            return False
-    """
 
     def current(self):
         """ Get hash of current Git commit """
@@ -309,7 +261,7 @@ class GitUpdater():
         else:
             # Restart HTPC Manager to make sure all new code is loaded
             self.logger.debug("Clean up after git")
-            self.git_exec(self.git, 'reset --hard')
+            #self.git_exec(self.git, 'reset --hard') # Disable this so i dont fuck up anything
             self.logger.warning('Restarting HTPC Manager after update.')
 
             do_restart()
@@ -323,7 +275,7 @@ class GitUpdater():
                    stderr=subprocess.STDOUT, shell=True, cwd=htpc.RUNDIR)
             output, err = proc.communicate()
 
-            self.logger.info("Running %s %s" % (gp, args))
+            self.logger.debug("Running %s %s" % (gp, args))
         except OSError, e:
             self.logger.warning(str(e))
             return ''
@@ -391,7 +343,7 @@ class SourceUpdater():
             result = loads(urllib2.urlopen(url).read())
             latest = result['sha'].strip()
             self.logger.debug('Latest version: ' + latest)
-            self.updateEngine.latestHash = latest
+            self.latestHash = latest
             return latest
         except:
             return False
