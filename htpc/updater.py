@@ -226,7 +226,7 @@ class GitUpdater():
         self.logger.debug('Current version: ' + output)
 
         if not output:
-            self.logger.error('Got no response for current Git version.')
+            self.logger.error('Couldnt determine installed branch.')
             return False
 
         if re.match('^[a-z0-9]+$', output):
@@ -237,9 +237,14 @@ class GitUpdater():
 
         d = {
             "branch": cbn,
-            "branches": [],
-            "verified": True
+            "branches": []
         }
+
+        if self.current is not False:
+            d["verified"] = True
+        else:
+            # If its false, default to master branch
+            d["branch"] = htpc.settings.get('branch', 'master2')
 
         branches = self.git_exec(self.git, 'ls-remote --heads https://github.com/Hellowlol/HTPC-Manager.git')
         if branches:
@@ -366,6 +371,7 @@ class SourceUpdater():
                 for branch in branches:
                     if branch["commit"]["sha"] == versionfile:
                         current_branch = branch["name"]
+                        self.verified = True
             except:
                 self.logger.debug("Couldnt figure out what branch your using, using %s"% htpc.settings.get('branch', 'master2'))
         return current_branch
@@ -377,6 +383,9 @@ class SourceUpdater():
             "branch": cbn,
             "branches": []
         }
+
+        if self.verified:
+            d["verified"] = True
 
         try:
             url = "https://api.github.com/repos/%s/%s/branches?per_page=100" % (gitUser, gitRepo)
