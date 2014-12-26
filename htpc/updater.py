@@ -364,6 +364,7 @@ class SourceUpdater():
                     current_branch = branch["name"]
         return current_branch
 
+
     def branches(self):
         """ Returns the all the branches to gitUser and current branch """
         cbn = self.current_branch_name()
