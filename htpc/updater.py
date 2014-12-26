@@ -304,7 +304,7 @@ class SourceUpdater():
         self.UPDATING = 0
 
         self.currentHash = False
-        #self.latestHash = False
+        self.verified = False
 
         self.logger = logging.getLogger('htpc.updater')
 
