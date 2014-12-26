@@ -26,19 +26,20 @@ import logging
 import tarfile
 import shutil
 import platform
+import cgitb
 
 from htpc.root import do_restart
 
 # configure git repo
 gitUser = 'Hellowlol'
 gitRepo = 'HTPC-Manager'
+cgitb.enable(format='text')
 
 
 class Updater:
     """ Main class """
     def __init__(self):
         self.logger = logging.getLogger('htpc.updater')
-
         self.updateEngineName = 'Unknown'
         # Set update engine. Use git updater or update from source.
         self.updateEngine = self.getEngine()
@@ -298,7 +299,7 @@ class SourceUpdater():
         self.UPDATING = 0
 
         self.currentHash = False
-        self.latestHash = False
+        #self.latestHash = False
 
         self.logger = logging.getLogger('htpc.updater')
 
@@ -407,7 +408,7 @@ class SourceUpdater():
 
         # Overwite app source with source from extracted file
         overwritten = self.__updateSourcecode()
-        if (overwritten is False):
+        if overwritten is False:
             return False
 
         # Write new version to file
@@ -453,12 +454,16 @@ class SourceUpdater():
     """ Overwrite HTPC Manager sourcecode with (new) code from update path """
     def __updateSourcecode(self):
         # Determine the path where the updated should be located
-        sourceUpdateFolder = os.path.join(self.updateDir, '%s-%s-%s' % (gitUser, gitRepo, self.latestHash[:7]))
+        try:
+            sourceUpdateFolder = os.path.join(self.updateDir, '%s-%s-%s' % (gitUser, gitRepo, self.latestHash))
+        except:
+            print "silly error"
 
         # Where to extract the update
         targetFolder = os.path.join(htpc.RUNDIR)
 
         self.logger.debug('Overwriting files.')
+
         try:
             # Loop files and folders and place them in the HTPC Manager path
             for src_dir, dirs, files in os.walk(sourceUpdateFolder):
@@ -478,6 +483,7 @@ class SourceUpdater():
 
         self.logger.info('updating files successfull')
         return True
+
 
     """
     Write the latest commit hash to th version file.
