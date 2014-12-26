@@ -352,17 +352,22 @@ class SourceUpdater():
             return False
 
     def current_branch_name(self):
-        """  Tries to find the current branches"""
+        """  Tries to find the current branches by reading version file
+             and matching that against all branches on github """
+
         versionfile = self.current()
         #current_branch = htpc.settings.get('branch', 'master2')
         current_branch = htpc.settings.get('branch', 'Unknown')
         # should return sha on success not True False
         if not isinstance(self.current(), bool):
-            url = "https://api.github.com/repos/%s/%s/branches?per_page=100" % (gitUser, gitRepo)
-            branches = loads(urllib2.urlopen(url).read())
-            for branch in branches:
-                if branch["sha"] == versionfile:
-                    current_branch = branch["name"]
+            try:
+                url = "https://api.github.com/repos/%s/%s/branches?per_page=100" % (gitUser, gitRepo)
+                branches = loads(urllib2.urlopen(url).read())
+                for branch in branches:
+                    if branch["commit"]["sha"] == versionfile:
+                        current_branch = branch["name"]
+            except:
+                self.logger.debug("Couldnt figure out what branch your using, using %s"% htpc.settings.get('branch', 'master2'))
         return current_branch
 
     def branches(self):
@@ -403,7 +408,7 @@ class SourceUpdater():
 
         # Extract to temp folder
         extracted = self.__extractUpdate(self.updateFile, self.updateDir)
-        if (extracted is False):
+        if extracted is False:
             return False
 
         # Overwite app source with source from extracted file
@@ -412,14 +417,15 @@ class SourceUpdater():
             return False
 
         # Write new version to file
-        self.__updateVersionFile(self.latestHash)
+        # Just call it directly in case forced update.
+        self.__updateVersionFile(self.latest())
+
+        # Cleanup after yourself
+        self.__finishUpdate()
 
         # Restart HTPC Manager to make sure all new code is loaded
         self.logger.warning('Restarting HTPC Manager after update.')
         do_restart()
-
-        # Cleanup after yourself
-        self.__finishUpdate()
 
     """ Download source """
     def __downloadTar(self, url, destination):
@@ -454,10 +460,12 @@ class SourceUpdater():
     """ Overwrite HTPC Manager sourcecode with (new) code from update path """
     def __updateSourcecode(self):
         # Determine the path where the updated should be located
-        try:
-            sourceUpdateFolder = os.path.join(self.updateDir, '%s-%s-%s' % (gitUser, gitRepo, self.latestHash))
-        except:
-            print "silly error"
+        sourceUpdateFolder = [x for x in os.listdir(self.updateDir) if
+                                   os.path.isdir(os.path.join(self.updateDir, x))]
+
+        if len(sourceUpdateFolder) != 1:
+            # There can only be one folder in sourceUpdateFolder
+            self.logger.error("Invalid update data, update failed %s" % sourceUpdateFolder)
 
         # Where to extract the update
         targetFolder = os.path.join(htpc.RUNDIR)
@@ -466,7 +474,7 @@ class SourceUpdater():
 
         try:
             # Loop files and folders and place them in the HTPC Manager path
-            for src_dir, dirs, files in os.walk(sourceUpdateFolder):
+            for src_dir, dirs, files in os.walk(sourceUpdateFolder[0]):
                 dst_dir = src_dir.replace(sourceUpdateFolder, targetFolder)
                 if not os.path.exists(dst_dir):
                     os.mkdir(dst_dir)
@@ -486,7 +494,7 @@ class SourceUpdater():
 
 
     """
-    Write the latest commit hash to th version file.
+    Write the latest commit hash to the version file.
 
     Used when checking for update the next time.
     """
