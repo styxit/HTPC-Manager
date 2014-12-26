@@ -116,5 +116,5 @@ class Settings:
     @require(member_of("admin"))
     def test(self):
         """ Used for testing stuff """
-        pass
+        return "testing rollback"
 
