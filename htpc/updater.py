@@ -236,7 +236,8 @@ class GitUpdater():
 
         d = {
             "branch": cbn,
-            "branches": []
+            "branches": [],
+            "verified": True
         }
 
         branches = self.git_exec(self.git, 'ls-remote --heads https://github.com/Hellowlol/HTPC-Manager.git')
@@ -352,7 +353,8 @@ class SourceUpdater():
     def current_branch_name(self):
         """  Tries to find the current branches"""
         versionfile = self.current()
-        current_branch = htpc.settings.get('branch', 'master2')
+        #current_branch = htpc.settings.get('branch', 'master2')
+        current_branch = htpc.settings.get('branch', 'Unknown')
         # should return sha on success not True False
         if not isinstance(self.current(), bool):
             url = "https://api.github.com/repos/%s/%s/branches?per_page=100" % (gitUser, gitRepo)
