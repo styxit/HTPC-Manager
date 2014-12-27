@@ -13,6 +13,7 @@ from cherrypy.process.plugins import Daemonizer, PIDFile
 from helpers import create_https_certificates
 from root import do_restart
 
+
 def secureheaders():
     headers = cherrypy.response.headers
     headers['X-Frame-Options'] = 'DENY'
@@ -68,7 +69,7 @@ def start():
         if not (htpc.SSLCERT and os.path.exists(htpc.SSLCERT)) and not (htpc.SSLKEY and os.path.exists(htpc.SSLKEY)):
             serverkey = os.path.join(htpc.DATADIR, 'server.key')
             cert = os.path.join(htpc.DATADIR, 'server.crt')
-            print "There isnt any certs and key, trying to make them"
+            logger.debug('There isnt any certificate or key, trying to make them')
 
             # If they dont exist, make them.
             if create_https_certificates(serverkey, cert):
@@ -76,8 +77,8 @@ def start():
                 htpc.SSLKEY = htpc.settings.set('app_ssl_key', serverkey)
                 htpc.SSLCERT = htpc.settings.set('app_ssl_cert', cert)
                 htpc.ENABLESSL = True
-                print "Created cert and key successfully"
-                print "Restarting server to active ssl"
+                logger.debug("Created certificate and key successfully")
+                logger.info("Restarting to activate SSL")
                 do_restart()
 
         if (htpc.SSLCERT and os.path.exists(htpc.SSLCERT)) and (htpc.SSLKEY and os.path.exists(htpc.SSLKEY)):

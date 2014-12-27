@@ -26,14 +26,12 @@ import logging
 import tarfile
 import shutil
 import platform
-import cgitb
 
 from htpc.root import do_restart
 
 # configure git repo
 gitUser = 'Hellowlol'
 gitRepo = 'HTPC-Manager'
-cgitb.enable(format='text')
 
 
 class Updater:
@@ -216,6 +214,7 @@ class GitUpdater():
             self.latestHash = latest
             return latest
         except Exception as e:
+            self.logger.error("Failed to get last commit from github")
             return False
 
     def current(self):
@@ -270,7 +269,9 @@ class GitUpdater():
                 pass
                 #self.logger.debug("Clean up after git")
                 #self.git_exec(self.git, 'reset --hard') # Disable this so i dont fuck up anything
-                #self.git_exec(self.git, 'clean -df')
+                # Note to self rtfm before you run git commands, just wiped the data dir...
+                # This command removes all untracked files and files and the files in .gitignore except from the content of htpc.DATADIR
+                #self.git_exec(self.git, 'clean -d -fx -e %s' % htpc.DATADIR)
             self.logger.warning('Restarting HTPC Manager after update.')
             # Restart HTPC Manager to make sure all new code is loaded
             do_restart()
