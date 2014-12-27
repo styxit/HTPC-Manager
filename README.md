@@ -8,6 +8,7 @@ Some of the difference is:
 - Delete cache folder from the settingspage
 - Upgraded NZBGet module
 - Upgraded qBittorrent module
+- The brave and bold can choose what branch they want to use.
 - Torrent search BTN, Fenopy, Norbits (just the one i use myself.)
 - Added a option for robots.txt for bot crawlers
 - Make ssl cert and key automatically if you dont add a path for it
@@ -17,7 +18,6 @@ Some of the difference is:
 - KODI/XBMC addons tab, where you can search/execute and a volume slider instead of a progressbar
 - Reduced size on static files
 - Set wanted category while adding movies in Couchpotato
-- Option on branch you want to use. (still need some work)
 - Docker support
 - Various fixes
 
