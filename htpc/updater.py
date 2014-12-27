@@ -60,7 +60,6 @@ class Updater:
 
     def test_git(self):
         self.logger.debug("Checking if git is installed")
-        self.logger.info("dick")
         gp = htpc.settings.get('git_path', 'git')
         alternative_gp = []
 
@@ -266,12 +265,11 @@ class GitUpdater():
             self.logger.error("Update aborted.")
         else:
             if not htpc.DEBUG:
-                pass
-                #self.logger.debug("Clean up after git")
-                #self.git_exec(self.git, 'reset --hard') # Disable this so i dont fuck up anything
+                self.logger.debug("Clean up after git")
+                self.git_exec(self.git, 'reset --hard')
                 # Note to self rtfm before you run git commands, just wiped the data dir...
                 # This command removes all untracked files and files and the files in .gitignore except from the content of htpc.DATADIR
-                #self.git_exec(self.git, 'clean -d -fx -e %s' % htpc.DATADIR)
+                self.git_exec(self.git, 'clean -d -fx -e %s' % htpc.DATADIR)
             self.logger.warning('Restarting HTPC Manager after update.')
             # Restart HTPC Manager to make sure all new code is loaded
             do_restart()
@@ -282,7 +280,7 @@ class GitUpdater():
         """ Tool for running git program on system """
         try:
             proc = subprocess.Popen(gp + " " + args, stdout=subprocess.PIPE,
-                   stderr=subprocess.STDOUT, shell=True, cwd=htpc.RUNDIR)
+                        stderr=subprocess.STDOUT, shell=True, cwd=htpc.RUNDIR)
             output, err = proc.communicate()
 
             self.logger.debug("Running %s %s" % (gp, args))
