@@ -184,9 +184,8 @@ class Updater:
         return self.updateEngine.branches()
 
 
-""" Class to update HTPC Manager using git commands. """
 class GitUpdater():
-    """ Main class """
+    """ Class to update HTPC Manager using git commands. """
     def __init__(self):
         """ Set GitHub settings on load """
         self.UPDATING = 0
@@ -267,11 +266,13 @@ class GitUpdater():
         elif 'Aborting.' in output:
             self.logger.error("Update aborted.")
         else:
-            # Restart HTPC Manager to make sure all new code is loaded
-            self.logger.debug("Clean up after git")
-            #self.git_exec(self.git, 'reset --hard') # Disable this so i dont fuck up anything
+            if not htpc.DEBUG:
+                pass
+                #self.logger.debug("Clean up after git")
+                #self.git_exec(self.git, 'reset --hard') # Disable this so i dont fuck up anything
+                #self.git_exec(self.git, 'clean -df')
             self.logger.warning('Restarting HTPC Manager after update.')
-
+            # Restart HTPC Manager to make sure all new code is loaded
             do_restart()
 
         self.UPDATING = 0
@@ -297,9 +298,9 @@ class GitUpdater():
         else:
             return output.strip()
 
-""" Class to update HTPC Manager using Source code from Github. Requires a full download on every update."""
+
 class SourceUpdater():
-    """ Main class """
+    """ Class to update HTPC Manager using Source code from Github. Requires a full download on every update."""
     def __init__(self):
         self.UPDATING = 0
 
@@ -312,11 +313,12 @@ class SourceUpdater():
         self.updateFile = os.path.join(htpc.DATADIR, 'htpc-manager-update.tar.gz')
         self.updateDir = os.path.join(htpc.DATADIR, 'update-source')
 
-    """ Get hash of current runnig version """
+
     def current(self):
+        """ Get hash of current runnig version """
         self.logger.debug('Getting current version.')
 
-        """ Check if version file exists """
+        # Check if version file exists
         if not os.path.isfile(self.versionFile):
             self.logger.warning('Version file does not exists. Creating it now.')
             try:
@@ -373,7 +375,7 @@ class SourceUpdater():
                         current_branch = branch["name"]
                         self.verified = True
             except:
-                self.logger.debug("Couldnt figure out what branch your using, using %s"% htpc.settings.get('branch', 'master2'))
+                self.logger.debug("Couldnt figure out what branch your using, using %s" % htpc.settings.get('branch', 'master2'))
         return current_branch
 
     def branches(self):
@@ -436,9 +438,8 @@ class SourceUpdater():
         self.logger.warning('Restarting HTPC Manager after update.')
         do_restart()
 
-    """ Download source """
     def __downloadTar(self, url, destination):
-        # Download tar
+        """ Download source """
         self.logger.info('Downloading update from %s' % url)
         try:
             self.logger.debug('Downloading update file to %s' % destination)
@@ -453,8 +454,8 @@ class SourceUpdater():
             self.__finishUpdate()
             return False
 
-    """ Extract files from downloaded tar file """
     def __extractUpdate(self, filePath, destinationFolder):
+        """ Extract files from downloaded tar file """
         try:
             self.logger.debug('Extracting tar file: %s' % filePath)
             tarArchive = tarfile.open(filePath)
@@ -468,7 +469,7 @@ class SourceUpdater():
 
     """ Overwrite HTPC Manager sourcecode with (new) code from update path """
     def __updateSourcecode(self):
-        # Determine the path where the updated should be located
+        # Find the extracted dir
         sourceUpdateFolder = [x for x in os.listdir(self.updateDir) if
                                    os.path.isdir(os.path.join(self.updateDir, x))]
 
@@ -478,13 +479,15 @@ class SourceUpdater():
 
         # Where to extract the update
         targetFolder = os.path.join(htpc.RUNDIR)
+        # Full path to the extracted dir
+        contentdir = os.path.join(self.updateDir, sourceUpdateFolder[0])
 
         self.logger.debug('Overwriting files.')
 
         try:
             # Loop files and folders and place them in the HTPC Manager path
-            for src_dir, dirs, files in os.walk(sourceUpdateFolder[0]):
-                dst_dir = src_dir.replace(sourceUpdateFolder, targetFolder)
+            for src_dir, dirs, files in os.walk(contentdir):
+                dst_dir = src_dir.replace(contentdir, targetFolder)
                 if not os.path.exists(dst_dir):
                     os.mkdir(dst_dir)
                 for file_ in files:
@@ -498,22 +501,21 @@ class SourceUpdater():
             self.__finishUpdate()
             return False
 
-        self.logger.info('updating files successfull')
+        self.logger.info('Updating files successfull')
         return True
 
-
-    """
-    Write the latest commit hash to the version file.
-
-    Used when checking for update the next time.
-    """
     def __updateVersionFile(self, newVersion):
+        """
+        Write the latest commit hash to the version file.
+
+        Used when checking for update the next time.
+        """
         versionFileHandler = open(self.versionFile, 'wb')
         versionFileHandler.write(newVersion)
         versionFileHandler.close()
 
-    """ Remove leftover files after the update """
     def __finishUpdate(self):
+        """ Remove leftover files after the update """
         self.UPDATING = 0
 
         if os.path.isfile(self.updateFile):
