@@ -3,11 +3,14 @@
 
 import cherrypy
 import htpc
+import logging
 from htpc.manageusers import Manageusers
 from sqlobject import SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol
 
 SESSION_KEY = '_cp_username'
+
+logger = logging.getLogger('authentication')
 
 
 def check_credentials(username, password):
@@ -19,10 +22,13 @@ def check_credentials(username, password):
         userexist = Manageusers.selectBy(username=username).getOne()
 
         if userexist and userexist.password == password:
+            logger.debug("%s %s logged in from %s" % (userexist.role.upper(), userexist.username, cherrypy.request.remote.ip))
             return None
         else:
+            logger.warning("Failed login attempt with username: %s password: %s from ip: %s" % (username, password, cherrypy.request.remote.ip))
             return u"Incorrect username or password."
     except Exception as e:
+        logger.warning("Failed login attempt with username: %s password: %s from IP: %s" % (username, password, cherrypy.request.remote.ip))
         return u"Incorrect username or password."
 
 
@@ -73,6 +79,7 @@ def member_of(groupname):
         if userexist and userexist.role == groupname:
             return cherrypy.request.login == userexist.username and groupname == userexist.role
     return check
+
 
 def name_is(reqd_username):
     return lambda: reqd_username == cherrypy.request.login
