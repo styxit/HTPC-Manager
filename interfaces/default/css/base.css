@@ -54,9 +54,13 @@ table th.tablesorter-header {
     margin: 4px 0px;
     overflow:hidden;
     height: 1px;
-    border-bottom: 1px solid #ddd; 
+    border-bottom: 1px solid #ddd;
 
 }
 .loginform {
     margin-top: 12%;
+}
+
+.gutmarginleft {
+    margin-left: 0px !important;
 }

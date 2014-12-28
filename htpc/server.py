@@ -91,7 +91,23 @@ def start():
                 'server.ssl_module': 'builtin',
                 'server.ssl_certificate': htpc.SSLKEY,
                 'server.ssl_private_key': htpc.SSLCERT
+
         })
+
+    if htpc.settings.get('app_use_proxy_headers'):
+        print "Enabling proxy heaers"
+        cherrypy.config.update({
+                'tools.proxy.on': True
+
+        })
+
+    if htpc.settings.get('app_use_proxy_headers') and htpc.settings.get('app_use_proxy_headers_basepath'):
+        cherrypy.config.update({
+                'tools.proxy.base': str(htpc.settings.get('app_use_proxy_headers_basepath'))
+        })
+
+
+
 
     # Daemonize cherrypy if specified
     if htpc.DAEMON:

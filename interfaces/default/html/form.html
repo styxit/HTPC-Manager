@@ -37,7 +37,7 @@ settings =  htpc.settings
                 </select>
                 % endif
                 % if field.get('desc'):
-                    <span class="help-block">${field.get('desc')}</span>
+                    <span class="help-block"><div class="span3 gutmarginleft">${field.get('desc')}</div></span>
                 % endif
                 % if field.get('fbutton'):
                     <a href="${field.get('fbutton')[0]}" class="btn ajax-confirm" title="${field.get('fbutton')[1]}">${field.get('fbutton')[2]}</a>

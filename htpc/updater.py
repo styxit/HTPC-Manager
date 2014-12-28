@@ -256,7 +256,7 @@ class GitUpdater():
         self.UPDATING = 1
 
         if htpc.settings.get('branch', 'master2') == self.current_branch_name():
-            output = self.git_exec(self.git, 'pull origin %s' % htpc.settings.get('branch'))
+            output = self.git_exec(self.git, 'pull origin %s' % htpc.settings.get('branch', 'master2'))
         else:
             output = self.git_exec(self.git, 'checkout -f ' + htpc.settings.get('branch', 'master2'))
         if not output:
@@ -264,7 +264,7 @@ class GitUpdater():
         elif 'Aborting.' in output:
             self.logger.error("Update aborted.")
         else:
-            if not htpc.DEBUG:
+            if htpc.settings.get('git_cleanup') and not htpc.DEBUG:
                 self.logger.debug("Clean up after git")
                 self.git_exec(self.git, 'reset --hard')
                 # Note to self rtfm before you run git commands, just wiped the data dir...

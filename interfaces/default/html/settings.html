@@ -32,7 +32,10 @@
                 {'type':'bool', 'label':'Use ssl?', 'name':'app_use_ssl', 'value':settings.get('app_use_ssl')},
                 {'type':'text', 'label':'SSL Cert', 'name':'app_ssl_cert', 'value':settings.get('app_ssl_cert')},
                 {'type':'text', 'label':'SSL Key', 'name':'app_ssl_key', 'value':settings.get('app_ssl_key')},
-                {'type':'text', 'label':'Git Path', 'name':'git_path', 'value':settings.get('git_path', 'git')},
+                {'type':'text', 'label':'Git Path', 'name':'git_path', 'desc':'Only needed if OS is unable to locate git', 'value':settings.get('git_path', 'git')},
+                {'type':'bool', 'label':'Git Cleanup?', 'name':'git_cleanup', 'desc':'Removes untracked files and performs a hard reset on git branch automatically to help resolve update issues', 'value':settings.get('git_cleanup')},
+                {'type':'bool', 'label':'Use  rev proxy headers', 'name':'app_use_proxy_headers', 'desc':'','value':settings.get('app_use_proxy_headers')},
+                {'type':'text', 'label':'Rev proxy headers basepath', 'name':'app_use_proxy_headers_basepath', 'desc':'', 'value':settings.get('app_use_proxy_headers_basepath')},
                 {'type': 'select', 'label': 'Branch', 'name': 'branch', 'options':''},
                 {'type':'bool', 'label':'Open Browser', 'name':'openbrowser', 'desc':'Automatically open brower on server start', 'value':settings.get('openbrowser')},
                 {'type':'bool', 'label':'Use robots.txt', 'name':'robots', 'desc':'Stop bots from indexing your site', 'value':settings.get('robots')}
