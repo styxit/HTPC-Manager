@@ -104,12 +104,11 @@ $(document).ready(function () {
                     notify('myPlex', data, 'info');
                 });
             }
-        });
 
-        setTimeout(function() {
-            window.location.reload(true);
-        }, 1000);
-
+        }).done(function () {
+            // Force reload without cache
+                window.location.reload(true);
+            });
     });
 
     $(":reset").click(function (e) {
