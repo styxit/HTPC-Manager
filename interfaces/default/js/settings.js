@@ -97,8 +97,12 @@ $(document).ready(function () {
                     notify('myPlex', data, 'info');
                 });
             }
+
+        })
+            .done(function () {
+            window.location.reload(true);
         });
-        window.location.reload(true);
+
     });
     $(":reset").click(function (e) {
         e.preventDefault();
