@@ -94,7 +94,7 @@ class Users:
 
     @cherrypy.expose()
     @require(member_of("admin"))
-    def delusers(self, id):
+    def deluser(self, id):
         """ Delete a user """
         self.logger.debug("Deleting user " + str(id))
         Manageusers.delete(id)
