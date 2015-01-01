@@ -44,8 +44,8 @@ class Plex:
                 {'type': 'text', 'label': 'Menu name', 'name': 'plex_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'plex_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'plex_port', 'placeholder':'32400'},
-                {'type':'text', 'label':'Username (optional)', 'name':'plex_username'},
-                {'type':'password', 'label':'Password (optional)', 'name':'plex_password'},
+                {'type':'text', 'label':'Username *', 'name':'plex_username'},
+                {'type':'password', 'label':'Password *', 'name':'plex_password'},
                 {'type': 'text', 'label': 'Mac addr.', 'name':'plex_mac'},
                 {'type':'bool', 'label':'Hide watched', 'name':'plex_hide_watched'},
                 {'type':'bool', 'label':'Hide homemovies', 'name':'plex_hide_homemovies'}]})
@@ -254,6 +254,7 @@ class Plex:
             plex_host = htpc.settings.get('plex_host', 'localhost')
             plex_port = htpc.settings.get('plex_port', '32400')
             plex_hide_homemovies = htpc.settings.get('plex_hide_homemovies', False)
+
             movies = []
             limits = {}
 
@@ -325,6 +326,7 @@ class Plex:
         try:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
+
             tvShows = []
             limits = {}
 
@@ -382,6 +384,7 @@ class Plex:
         try:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
+
             artists = []
             limits = {}
 
@@ -625,10 +628,9 @@ class Plex:
                 headers["Authorization"] = "Basic %s" % base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
                 headers["X-Plex-Client-Identifier"] = quote(base64.encodestring(str(uuid.getnode())).replace('\n', ''))
                 headers["X-Plex-Product"] = "HTPC-Manager"
+                headers["X-Plex-Version"] = "1.0"
                 headers["X-Plex-Device"] = "HTPC-Manager"
-                headers["X-Plex-Device-Name"] = socket.gethostname()
                 headers["X-Plex-Platform"] = platform.system()
-                headers["X-Plex-Client-Platform"] = platform.system()
                 headers["X-Plex-Platform-Version"] = platform.version()
                 headers["X-Plex-Provides"] = "controller"
                 r = Request("https://plex.tv/users/sign_in.xml", data="", headers=headers)
@@ -655,6 +657,10 @@ class Plex:
     def getHeaders(self):
         authtoken = htpc.settings.get('plex_authtoken', '')
         username = htpc.settings.get('plex_username', '')
+
+        if authtoken == '':
+            self.myPlexSignin()
+            authtoken = htpc.settings.get('plex_authtoken', '')
 
         headers={"Accept": "application/json"}
         if authtoken != '':
