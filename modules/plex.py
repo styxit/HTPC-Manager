@@ -24,6 +24,7 @@ Based on PlexConect:
 https://github.com/iBaa/PlexConnect/blob/master/PlexAPI.py
 """
 
+
 class Plex:
     def __init__(self):
         self.logger = logging.getLogger('modules.plex')
@@ -35,20 +36,22 @@ class Plex:
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'plex_enable'},
 
-                {'type':'select',
-                 'label':'Existing Servers',
-                 'name':'gdm_plex_servers',
-                 'options':[
-                    {'name':'Select', 'value':0}
-                ]},
+                {'type': 'select',
+                 'label': 'Existing Servers',
+                 'name': 'gdm_plex_servers',
+                 'options': [
+                        {'name': 'Select', 'value': 0}
+                    ]
+                },
                 {'type': 'text', 'label': 'Menu name', 'name': 'plex_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'plex_host'},
-                {'type': 'text', 'label': 'Port *', 'name': 'plex_port', 'placeholder':'32400'},
-                {'type':'text', 'label':'Username (optional)', 'name':'plex_username'},
-                {'type':'password', 'label':'Password (optional)', 'name':'plex_password'},
-                {'type': 'text', 'label': 'Mac addr.', 'name':'plex_mac'},
-                {'type':'bool', 'label':'Hide watched', 'name':'plex_hide_watched'},
-                {'type':'bool', 'label':'Hide homemovies', 'name':'plex_hide_homemovies'}]})
+                {'type': 'text', 'label': 'Port *', 'name': 'plex_port', 'placeholder': '32400'},
+                {'type': 'text', 'label': 'Username (optional)', 'desc': 'Plex Home actived server req username', 'name': 'plex_username'},
+                {'type': 'password', 'label': 'Password (optional)', 'desc': 'Plex Home actived server req password', 'name': 'plex_password'},
+                {'type': 'text', 'label': 'Mac addr.', 'name': 'plex_mac'},
+                {'type': 'bool', 'label': 'Hide watched', 'name': 'plex_hide_watched'},
+                {'type': 'bool', 'label': 'Hide homemovies', 'name': 'plex_hide_homemovies'}]
+        })
 
     @cherrypy.expose()
     @require()
@@ -59,7 +62,7 @@ class Plex:
             self.logger.debug("Testing Plex connectivity")
             url = "http://%s:%s" % (plex_host, plex_port)
             self.logger.debug("Trying to contact Plex via " + url)
-            request =  loads(urlopen(Request(url, headers=self.getHeaders())).read())
+            request = loads(urlopen(Request(url, headers=self.getHeaders())).read())
             self.logger.info("Connected to the Plex Media Server %s at %s" % (request.get('friendlyName'), url))
             return True
         except:
@@ -106,27 +109,26 @@ class Plex:
                             jmovie['id'] = int(movie["ratingKey"])
 
                             if 'thumb'in movie:
-                               jmovie['thumbnail'] = movie["thumb"]
+                                jmovie['thumbnail'] = movie["thumb"]
 
                             if 'year'in movie:
-                               jmovie['year'] = movie["year"]
+                                jmovie['year'] = movie["year"]
 
                             if 'summary'in movie:
-                               jmovie['plot'] = movie["summary"]
+                                jmovie['plot'] = movie["summary"]
 
                             if 'duration'in movie:
-                               jmovie['runtime'] = int(movie['duration']) / 60000
+                                jmovie['runtime'] = int(movie['duration']) / 60000
 
                             if 'art'in movie:
-                               jmovie['fanart'] = movie["art"]
+                                jmovie['fanart'] = movie["art"]
 
                             if 'addedAt'in movie:
-                               jmovie['addedAt'] = movie["addedAt"]
+                                jmovie['addedAt'] = movie["addedAt"]
 
                             for attrib in movie['_children']:
                                 if attrib['_elementType'] == 'Genre':
                                     genre.append(attrib['tag'])
-
 
                             jmovie['genre'] = [genre]
 
@@ -136,7 +138,6 @@ class Plex:
         except Exception, e:
             self.logger.error("Unable to fetch recent movies! Exception: " + str(e))
             return
-
 
     @cherrypy.expose()
     @require()
@@ -169,13 +170,13 @@ class Plex:
                             jepisode['showtitle'] = episode["grandparentTitle"]
 
                         if 'duration'in episode:
-                           jepisode['runtime'] = int(episode['duration']) / 60000
+                            jepisode['runtime'] = int(episode['duration']) / 60000
 
                         if 'thumb'in episode:
                             jepisode['fanart'] = episode["thumb"]
 
                         if 'addedAt'in episode:
-                           jepisode['addedAt'] = episode["addedAt"]
+                            jepisode['addedAt'] = episode["addedAt"]
 
                         episodes.append(jepisode)
 
@@ -213,16 +214,14 @@ class Plex:
                             jalbum['year'] = album["year"]
 
                         if 'addedAt'in album:
-                           jalbum['addedAt'] = album["addedAt"]
+                            jalbum['addedAt'] = album["addedAt"]
 
                         albums.append(jalbum)
-
 
             return {'albums': sorted(albums, key=lambda k: k['addedAt'], reverse=True)[:int(limit)]}
         except Exception, e:
             self.logger.error("Unable to fetch albums! Exception: " + str(e))
             return
-
 
     @cherrypy.expose()
     @require()
@@ -235,8 +234,8 @@ class Plex:
             else:
                 # If o < 100 transcode on Plex server to widen format support
                 url = "http://%s:%s/photo/:/transcode?height=%s&width=%s&url=%s" % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), h, w, urllib.quote_plus("http://%s:%s%s" % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), thumb)))
-                h=None
-                w=None
+                h = None
+                w = None
         else:
             url = "/images/DefaultVideo.png"
 
@@ -258,9 +257,9 @@ class Plex:
             limits = {}
 
             if hidewatched == '1':
-               hidewatched = "unwatched"
+                hidewatched = "unwatched"
             else:
-               hidewatched = "all"
+                hidewatched = "all"
 
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
                 if section['type'] == "movie":
@@ -273,28 +272,28 @@ class Plex:
 
                             jmovie['title'] = movie["title"]
                             if 'thumb'in movie:
-                               jmovie['thumbnail'] = movie["thumb"]
+                                jmovie['thumbnail'] = movie["thumb"]
 
                             if 'year'in movie:
-                               jmovie['year'] = int(movie["year"])
+                                jmovie['year'] = int(movie["year"])
 
                             if 'summary'in movie:
-                               jmovie['plot'] = movie["summary"]
+                                jmovie['plot'] = movie["summary"]
 
                             if 'studio'in movie:
-                               jmovie['studio'] = movie["studio"]
+                                jmovie['studio'] = movie["studio"]
 
                             if 'duration'in movie:
-                               jmovie['runtime'] = int(movie['duration']) / 60000
+                                jmovie['runtime'] = int(movie['duration']) / 60000
 
                             if 'art'in movie:
-                               jmovie['fanart'] = movie["art"]
+                                jmovie['fanart'] = movie["art"]
 
                             if 'rating'in movie:
-                               jmovie['rating'] = movie["rating"]
+                                jmovie['rating'] = movie["rating"]
 
                             if 'viewCount' in movie:
-                               jmovie['playcount'] = int(movie["viewCount"])
+                                jmovie['playcount'] = int(movie["viewCount"])
 
                             for attrib in movie['_children']:
                                 if attrib['_elementType'] == 'Genre':
@@ -329,9 +328,9 @@ class Plex:
             limits = {}
 
             if hidewatched == '1':
-               hidewatched = "unwatched"
+                hidewatched = "unwatched"
             else:
-               hidewatched = "all"
+                hidewatched = "all"
 
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
                 if section['type'] == "show":
@@ -346,19 +345,19 @@ class Plex:
                         jshow['id'] = tvShow["ratingKey"]
 
                         if 'thumb'in tvShow:
-                           jshow['thumbnail'] = tvShow["thumb"]
+                            jshow['thumbnail'] = tvShow["thumb"]
 
                         if 'year'in tvShow:
-                           jshow['year'] = int(tvShow["year"])
+                            jshow['year'] = int(tvShow["year"])
 
                         if 'summary'in tvShow:
-                           jshow['plot'] = tvShow["summary"]
+                            jshow['plot'] = tvShow["summary"]
 
                         if 'viewedLeafCount'in tvShow:
-                           jshow['playcount'] = int(tvShow["viewedLeafCount"])
+                            jshow['playcount'] = int(tvShow["viewedLeafCount"])
 
                         if 'leafCount'in tvShow:
-                           jshow['itemcount'] = int(tvShow["leafCount"])
+                            jshow['itemcount'] = int(tvShow["leafCount"])
 
                         tvShows.append(jshow)
 
@@ -368,7 +367,7 @@ class Plex:
                     if int(end) >= len(tvShows):
                         limits['end'] = len(tvShows)
 
-            return {'limits': limits, 'tvShows': sorted(tvShows, key=lambda k: k['title'])[int(start):int(end)] }
+            return {'limits': limits, 'tvShows': sorted(tvShows, key=lambda k: k['title'])[int(start):int(end)]}
         except Exception, e:
 
             self.logger.error("Unable to fetch all shows! Exception: " + str(e))
@@ -404,7 +403,7 @@ class Plex:
             if int(end) >= len(artists):
                 limits['end'] = len(artists)
 
-            return {'limits': limits, 'artists': sorted(artists, key=lambda k: k['title'])[int(start):int(end)] }
+            return {'limits': limits, 'artists': sorted(artists, key=lambda k: k['title'])[int(start):int(end)]}
         except Exception, e:
             self.logger.error("Unable to fetch all artists! Exception: " + str(e))
             return
@@ -442,7 +441,7 @@ class Plex:
             if int(end) >= len(albums):
                 limits['end'] = len(albums)
 
-            return {'limits': limits, 'albums': sorted(albums, key=lambda k: k['title'])[int(start):int(end)] }
+            return {'limits': limits, 'albums': sorted(albums, key=lambda k: k['title'])[int(start):int(end)]}
         except Exception, e:
             self.logger.error("Unable to fetch all Albums! Exception: " + str(e))
             return
@@ -475,7 +474,8 @@ class Plex:
                     jsong['id'] = song["ratingKey"]
                     try:
                         jsong['duration'] = song["duration"] / 1000
-                    except: pass
+                    except:
+                        pass
 
                     songs.append(jsong)
             else:
@@ -494,7 +494,8 @@ class Plex:
                             jsong['id'] = song["ratingKey"]
                             try:
                                 jsong['duration'] = song["duration"] / 1000
-                            except: pass
+                            except:
+                                pass
 
                             songs.append(jsong)
 
@@ -504,7 +505,7 @@ class Plex:
             if int(end) >= len(songs):
                 limits['end'] = len(songs)
 
-            return {'limits': limits, 'songs': songs[int(start):int(end)] }
+            return {'limits': limits, 'songs': songs[int(start):int(end)]}
         except Exception, e:
             self.logger.error("Unable to fetch all songs! Exception: " + str(e))
             return
@@ -562,11 +563,10 @@ class Plex:
             if int(end) >= len(episodes):
                 limits['end'] = len(episodes)
 
-            return {'limits': limits, 'episodes': episodes[int(start):int(end)] }
+            return {'limits': limits, 'episodes': episodes[int(start):int(end)]}
         except Exception, e:
             self.logger.error("Unable to fetch all episodes! Exception: " + str(e))
             return
-
 
     @cherrypy.expose()
     @require()
@@ -604,28 +604,29 @@ class Plex:
                 unexp = int(re.findall(r'\(char (\d+)\)', str(e))[0])
                 # position of unescaped '"' before that
                 unesc = s.rfind(r'"', 0, unexp)
-                s = s[:unesc] + r'\"' + s[unesc+1:]
+                s = s[:unesc] + r'\"' + s[unesc + 1:]
                 # position of correspondig closing '"' (+2 for inserted '\')
                 closg = s.find(r'"', unesc + 2)
-                s = s[:closg] + r'\"' + s[closg+1:]
+                s = s[:closg] + r'\"' + s[closg + 1:]
         return result
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def myPlexSignin(self, username = '', password = ''):
+    def myPlexSignin(self, username='', password=''):
         try:
 
             username = htpc.settings.get('plex_username', '')
             password = htpc.settings.get('plex_password', '')
 
-            if username != '' and password != '':
+            if username and password:
                 self.logger.debug("Fetching auth token")
-                headers={}
+                headers = {}
                 headers["Authorization"] = "Basic %s" % base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
                 headers["X-Plex-Client-Identifier"] = quote(base64.encodestring(str(uuid.getnode())).replace('\n', ''))
                 headers["X-Plex-Product"] = "HTPC-Manager"
                 headers["X-Plex-Device"] = "HTPC-Manager"
+                headers["X-Plex-Version"] = "1.0"
                 headers["X-Plex-Device-Name"] = socket.gethostname()
                 headers["X-Plex-Platform"] = platform.system()
                 headers["X-Plex-Client-Platform"] = platform.system()
@@ -637,8 +638,7 @@ class Plex:
                 compiled = re.compile("<authentication-token>(.*)<\/authentication-token>", re.DOTALL)
                 authtoken = compiled.search(r.read()).group(1).strip()
 
-
-                if authtoken != None:
+                if authtoken is None:
                     htpc.settings.set('plex_authtoken', authtoken)
                     return "Logged in to myPlex"
                 else:
@@ -656,10 +656,15 @@ class Plex:
         authtoken = htpc.settings.get('plex_authtoken', '')
         username = htpc.settings.get('plex_username', '')
 
-        headers={"Accept": "application/json"}
-        if authtoken != '':
+        if not authtoken:
+            self.myPlexSignin()
+            authtoken = htpc.settings.get('plex_authtoken')
+
+        headers = {"Accept": "application/json"}
+
+        if authtoken:
             headers["X-Plex-Token"] = authtoken
-        if username != '':
+        if username:
             headers["X-Plex-Username"] = username
 
         return headers
@@ -685,7 +690,7 @@ class Plex:
                     jplaying_item['episode'] = int(video['index'])
                 if 'parentThumb' in video:
                     jplaying_item['fanart'] = video['parentThumb']
-                jplaying_item['thumbnail'] =  video['thumb']
+                jplaying_item['thumbnail'] = video['thumb']
                 if 'parentIndex' in video:
                     jplaying_item['season'] = int(video['parentIndex'])
                 jplaying_item['title'] = video['title']
@@ -721,7 +726,6 @@ class Plex:
                 if jplaying_item['viewOffset'] < (int(jplaying_item['duration']) - 10000):
                     playing_items.append(jplaying_item)
 
-
         except Exception, e:
             self.logger.error("Unable to fetch currently playing information! Exception: " + str(e))
             pass
@@ -738,7 +742,7 @@ class Plex:
             plex_port = htpc.settings.get('plex_port', '32400')
 
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())["_children"]:
-                if section_type == None or section_type == section['type']:
+                if section_type is None or section_type == section['type']:
                     self.logger.debug("Updating section %s" % section['key'])
                     try:
                         urllib.urlopen('http://%s:%s/library/sections/%s/refresh' % (plex_host, plex_port, section['key']))
@@ -792,7 +796,8 @@ class Plex:
 
                 try:
                     del player["_elementType"]
-                except: pass
+                except:
+                    pass
 
                 if 'protocolCapabilities' in player:
                     player['protocolCapabilities'] = player['protocolCapabilities'].split(',')
@@ -849,7 +854,7 @@ class Plex:
             PMS_list = []
             if returnData:
                 for response in returnData:
-                    update = { 'ip' : response.get('from')[0] }
+                    update = {'ip': response.get('from')[0]}
 
                     # Check if we had a positive HTTP response
                     if "200 OK" in response.get('data'):
