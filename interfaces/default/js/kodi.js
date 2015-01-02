@@ -998,6 +998,7 @@ function GetAddons() {
 
                 });
                 $('.spinner').hide();
+                Holder.run();
             }
     });
 }
