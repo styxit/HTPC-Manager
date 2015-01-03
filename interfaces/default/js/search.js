@@ -65,21 +65,23 @@ function search(query, catid) {
                 row.append($('<td>').append(cat));
                 row.append($('<td>').addClass('right').html(bytesToSize(item.attr['size'], 2)));
 
-                var toSabIcon = $('<i>');
-                toSabIcon.addClass('icon-download-alt');
-                toSabIcon.attr('title', 'Send to SABnzbd')
-                toSabIcon.attr('alt', 'Send to NzbGet')
-                toSabIcon.css('cursor', 'pointer');
+
+                var toSabIcon = $('<img>')
+                .attr('src', '../img/sabnzbd.png')
+                .attr('title', 'Send to SABnzbd')
+                .attr('alt', 'Send to SABnzbd')
+                .css('cursor', 'pointer');
                 toSabIcon.click(function() {
                     sendToSab(item)
                 });
                 row.append($('<td>').append(toSabIcon));
 
-                var toGetIcon = $('<i>');
-                toGetIcon.addClass('icon-download-alt');
-                toGetIcon.css('cursor', 'pointer');
-                toGetIcon.attr('title', 'Send to NzbGet')
-                toGetIcon.attr('alt', 'Send to NzbGet')
+                var toGetIcon = $('<img>')
+                .css('cursor', 'pointer')
+                .attr('src', '../img/nzbget.png')
+                .attr('title', 'Send to NzbGet')
+                .attr('alt', 'Send to NzbGet')
+                .css('cursor', 'pointer');
                 toGetIcon.click(function() {
                     sendToGet(item)
                 });
