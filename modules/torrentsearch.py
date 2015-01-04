@@ -13,7 +13,7 @@ class Torrentsearch:
     def __init__(self):
         self.logger = logging.getLogger('modules.torrentsearch')
         htpc.MODULES.append({
-            'name': 'torrentsearch',
+            'name': 'Torrentsearch',
             'id': 'torrentsearch',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'torrentsearch_enable'},
