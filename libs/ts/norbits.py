@@ -12,7 +12,9 @@ def search(q, cat):
     username = htpc.settings.get('torrents_norbits_username', '')
     passkey = htpc.settings.get('torrents_norbits_passkey', '')
     result_list = []
-
+    # just a quick hack for cat incase i add categorys
+    # Api was changed
+    cat = 'all'
     category = {
                     'all': '',
                     'movies': 1,
@@ -36,6 +38,7 @@ def search(q, cat):
     try:
         result = requests.post('https://norbits.net/api2.php?action=torrents', data=json.dumps(payload))
         results = result.json()
+        logger.debug("Norbits returned %s" % results)
         if int(results['data']['total']) == 0:
             return []
 

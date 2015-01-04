@@ -37,9 +37,12 @@ class Torrentsearch:
     @cherrypy.tools.json_out()
     def search(self, query=None):
         r = []
-        r += self.btn(query)
-        r += self.search_fenopy(query, 'all')
-        r += self.search_norbits(query, 'tv')
+        if htpc.settings.get('torrents_btn_enabled'):
+            r += self.btn(query)
+        elif htpc.settings.get('torrents_fenopy_enabled'):
+            r += self.search_fenopy(query, 'all')
+        elif htpc.settings.get('torrents_norbits_enabled'):
+            r += self.search_norbits(query, 'tv')
         return r
 
     @cherrypy.expose()
