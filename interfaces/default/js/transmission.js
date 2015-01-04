@@ -5,9 +5,11 @@ $(document).ready(function(){
   $('.spinner').show();
   getTorrents();
   getStatus();
+  session();
   setInterval(function() {
      getTorrents();
      getStatus();
+     session();
   }, 4000);
 
   // Torrent button ajax load
@@ -244,3 +246,40 @@ function torrentStatus(statusNr) {
   states = ['Paused', 'unkown 1', 'unknown 2', 'Queued', 'Downloading', 'unknown 5', 'Seeding']
   return states[statusNr]
 }
+
+function session() {
+    $.ajax({
+        url: WEBDIR + 'transmission/session',
+        success: function (response) {
+            $('#transmission_speed_down').attr('placeholder', response["arguments"]["speed-limit-down"]);
+            $('#transmission_speed_up').attr('placeholder', response["arguments"]["speed-limit-up"]);
+        }
+
+    });
+}
+
+$(document).on('focusout', '#transmission_speed_down', function () {
+    if ($(this).val() === undefined || ($(this).val().length === 0)) return;
+    speed = $(this).val();
+    $.get(WEBDIR + 'transmission/set_downspeed/' + $(this).val(), function () {
+        if (speed == 0) {
+            notify('Transmission', 'Removed speed limit', 'info');
+        } else {
+            notify('Transmission', 'changed to ' + speed + ' kB/s', 'info');
+        }
+
+    });
+});
+
+$(document).on('focusout', '#transmission_speed_up', function () {
+    if ($(this).val() === undefined || ($(this).val().length === 0)) return;
+    speed = $(this).val();
+    $.get(WEBDIR + 'transmission/set_upspeed/' + $(this).val(), function () {
+        if (speed == 0) {
+            notify('Transmission', 'Removed speed limit', 'info');
+        } else {
+            notify('Transmission', 'Changed to ' + speed + ' kB/s', 'info');
+        }
+
+    });
+});

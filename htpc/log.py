@@ -102,7 +102,7 @@ class BlackListFilter(logging.Filter):
             fl = Setting.select().orderBy(Setting.q.key)
             bl = []
             for i in fl:
-                if i.key.endswith("_apikey") or i.key.endswith("_username") or i.key.endswith("_password"):
+                if i.key.endswith("_apikey") or i.key.endswith("_username") or i.key.endswith("_password") or i.key.endswith("_passkey"):
                     if len(i.val) > 1:
                         bl.append(i.val)
 
@@ -113,5 +113,3 @@ class BlackListFilter(logging.Filter):
                     record.args = ras.replace(item, len(item) * '*')
                     record.msg = record.msg.replace(item, len(item) * '*')
             return True
-
-

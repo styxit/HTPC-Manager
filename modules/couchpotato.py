@@ -44,7 +44,7 @@ class Couchpotato:
         if not basepath.endswith("/"):
             basepath += "/"
 
-        url = "http%s://%s::%s%s" % (ssl, host, port, basepath)
+        url = "http%s://%s:%s%s" % (ssl, host, port, basepath)
 
         return url
 

@@ -119,10 +119,25 @@ class Transmission:
         return self.fetch('session-get')
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def set_downspeed(self, speed):
+        print "running", speed
+        if int(speed) == 0:
+            self.fetch('session-set', {'speed-limit-down': False})
+        return self.fetch('session-set', {'speed-limit-down': int(speed), 'speed-limit-down-enabled': True})
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def set_upspeed(self, speed):
+        if int(speed) == 0:
+            self.fetch('session-set', {'speed-limit-up': 'false'})
+        else:
+            return self.fetch('session-set', {'speed-limit-up': int(speed), 'speed-limit-up-enabled': 'true'})
+
+    @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def start(self, torrentId=False):
-
         if torrentId is False:
             return self.fetch('torrent-start-now')
 
@@ -172,7 +187,7 @@ class Transmission:
             self.logger.info('Added %s to uTorrent' % torrentname)
             return self.fetch('torrent-add', {'filename': link})
         except Exception as e:
-            self.logger.debug('Failed to add %s to uTorrent %s %s'(torrentname, link, e))
+            self.logger.debug('Failed to add %s to Transmission %s %s'(torrentname, link, e))
 
     # Wrapper to access the Transmission Api
     # If the first call fails, there probably is no valid Session ID so we try it again
