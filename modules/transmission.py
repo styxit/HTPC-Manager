@@ -136,7 +136,6 @@ class Transmission:
     @require()
     @cherrypy.tools.json_out()
     def stop(self, torrentId=False):
-
         if torrentId is False:
             return self.fetch('torrent-stop')
 
@@ -149,7 +148,10 @@ class Transmission:
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def Add(self, filename):
+    def Add(self, filename=None, metainfo=None):
+        if metainfo:
+            return self.fetch('torrent-add', {'metainfo': metainfo})
+
         return self.fetch('torrent-add', {'filename': filename})
 
     @cherrypy.expose()
@@ -180,7 +182,7 @@ class Transmission:
 
         host = htpc.settings.get('transmission_host', '')
         port = str(htpc.settings.get('transmission_port', ''))
-    
+
         # Default basepath is transmission
         basepath = htpc.settings.get('transmission_rpcbasepath', '/transmission/')
 

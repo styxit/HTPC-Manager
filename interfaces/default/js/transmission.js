@@ -46,19 +46,49 @@ $(document).ready(function(){
     });
   });
 
-	/**
-		Add a torrent
-	*/
-	$("#add_torrent_button").click(function (pEvent) {
-		pEvent.preventDefault();
-		
-		if ($("#add_torrent_filename").val().length == 0) {
-			return;
-		}
-		
-		$.post(WEBDIR + "transmission/Add", { filename: $("#add_torrent_filename").val() });
-	});
+  $("#add_torrent_button").click(function (evt) {
+      evt.preventDefault();
+
+      if ($("#add_torrent_url").val().length === 0 && $("#add_torrent_file").val().length === 0) {
+          return;
+      }
+
+      if ($("#add_torrent_file").val().length > 1) {
+
+          var i, file, reader, metainfo;
+          var fileInput = $('input#add_torrent_file');
+          jQuery.each(fileInput[0].files, function (i, file) {
+              var reader = new FileReader();
+              reader.onload = function (e) {
+                  var contents = e.target.result;
+                  var key = "base64,";
+                  var index = contents.indexOf(key);
+                  if (index > -1) {
+                      metainfo = contents.substring(index + key.length);
+
+                  }
+                  $.post(WEBDIR + "transmission/Add", {
+                      'metainfo': metainfo
+                  });
+
+              };
+              reader.readAsDataURL(file);
+          });
+      } else if ($("#add_torrent_url").val().length > 1) {
+          $.post(WEBDIR + "transmission/Add", {
+              'filename': $("#add_torrent_url").val()
+          });
+
+      }
+      $('#add_torrent_file').val('');
+      $("#add_torrent_url").val('');
+
+
+  });
+
+
 });
+
 
 function getTorrents(){
   $.ajax({

@@ -18,8 +18,14 @@
           </div>
       </h1>
 	  <div class="well form-inline">
-			<input class="span6" id="add_torrent_filename" type="text" />
-			<button class="btn btn-success" type="button" id="add_torrent_button"><i class="icon-plus icon-white"></i> Add torrent</button>
+			<input class="span6" id="add_torrent_url" type="text">
+      <button class="btn btn-success" type="button" id="add_torrent_button"><i class="icon-plus icon-white"></i> Add torrent</button>
+
+
+      <a class="btn btn-info" onclick="$('#add_torrent_file').click();">Browse</a>
+      <input id="add_torrent_file" style="display:none;" type="file">
+
+
 			<br>
 			<i>Both magnet URL's and (server located) .torrent files are accepted.</i>
 	  </div>
