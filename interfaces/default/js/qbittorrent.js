@@ -9,7 +9,7 @@ $("#qbt_rp_icon").click(function () {
         $.get(WEBDIR + 'qbittorrent/command/pauseall');
         notify('Pause', 'all torrents', 'info');
         $('#qbt_rp_icon').removeClass("icon-pause").addClass("icon-play");
-        get_torrets();
+        get_torrents();
     }
 });
 
@@ -128,6 +128,7 @@ $(document).on('click', '.qbt_removetorrent', function () {
     var action = $(this).attr('data-action');
     var name = $(this).attr('data-name');
     $.get(WEBDIR + 'qbittorrent/command/' + $(this).attr('data-action') + '/' + $(this).attr('data-hash') + '/' + $(this).attr('data-name') + '/', function(result) {
+        get_torrents();
         notify(action, name, 'info');
     });
 });
@@ -142,6 +143,7 @@ $(document).on('click', '.qbt_rp', function () {
     var action = $(this).attr('data-action');
     var name = $(this).attr('data-name')
     $.get(WEBDIR + 'qbittorrent/command/' + $(this).attr('data-action') + '/' + $(this).attr('data-hash') + '/' + $(this).attr('data-name') + '/', function() {
+        get_torrents();
         notify(action + ' torrent', name, 'info');
     });
 
@@ -157,7 +159,9 @@ $(document).on('focusout', '.qbt_setspeed', function () {
     }
     speed = $(this).val();
     $.get(WEBDIR + 'qbittorrent/set_speedlimit/' + $(this).attr('data-action') + '/' + $(this).val() + '/', function() {
-    notify(title, speed + ' KiB/s', 'info');
+        get_global_limit();
+        get_speed();
+        notify(title, speed + ' KiB/s', 'info');
     });
 });
 
@@ -183,7 +187,7 @@ $(document).ready(function () {
         get_torrents();
         get_speed();
         get_global_limit();
-    }, 5000);
+    }, 4000);
 
 });
 
@@ -194,7 +198,6 @@ $("#send_torrent_qbt").click(function () {
         };
 
     $.get(WEBDIR + 'qbittorrent/command/', d, function(e) {
-        //notify()
         $('#qbt_url').val('')
 
     });
