@@ -538,7 +538,7 @@ function loadSongs(options) {
                     var row = $('<tr>');
                     row.append(
                         $('<td>').append(
-                            
+
                             $('<a>').attr('href','#').text(' ' + song.label).click(function(e) {
                                 e.preventDefault();
                             })
@@ -585,7 +585,7 @@ function loadNowPlaying() {
                 $.each(data.playing_items, function (i, item) {
                 var playingTitle = '';
                 var playingSubtitle = '';
-                var username = $('<span>').addClass('pull-right muted nowplayinguser').text(item.user);
+                var username = $('<span>').addClass('pull-right muted nowplayinguser').text(item.user + '@' + item.player);
                 var nowPlayingThumb = encodeURIComponent(item.thumbnail);
                 var thumbnail = $('<img>').addClass("img-polaroid img-rounded").attr('alt', item.label);
                 if (nowPlayingThumb == '') {
@@ -640,14 +640,14 @@ function loadNowPlaying() {
                     }
                     btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stepForward').attr('data-player', item.address).append('<i class="icon-forward"></i>'));
                     btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'skipNext').attr('data-player', item.address).append('<i class="icon-fast-forward"></i>'));
-                    
+
                     btn_toolbar.append(btn_group);
                     info.append(btn_toolbar);
-                    
+
                 }
-                
+
                 var row = $('<div>').addClass("row").append(thumb, info);
-                
+
                 $('#nowplaying').append(row);
                 });
                 $('#nowplaying').slideDown();
