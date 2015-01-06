@@ -1,4 +1,6 @@
 $(document).ready(function () {
+    // Open debug by default
+    $('#loglevel').val(5)
     $('#logsize, #loglevel').change(loadLog);
     $('#refreshlog, #deletelog').click(loadLog);
     loadLog();
