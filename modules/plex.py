@@ -227,7 +227,6 @@ class Plex:
     @require()
     def GetThumb(self, thumb=None, h=None, w=None, o=100):
         """ Parse thumb to get the url and send to htpc.proxy.get_image """
-        #url = self.url('/images/DefaultVideo.png')
         if thumb:
             if o > 100:
                 url = "http://%s:%s%s" % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), thumb)
@@ -310,7 +309,7 @@ class Plex:
                         if int(end) >= len(movies):
                             limits['end'] = len(movies)
 
-            return {'limits': limits, 'movies': sorted(movies, key=lambda k: k['title'])[int(start):int(end)] }
+            return {'limits': limits, 'movies': sorted(movies, key=lambda k: k['title'])[int(start):int(end)]}
         except Exception, e:
 
             self.logger.error("Unable to fetch all movies! Exception: " + str(e))
@@ -644,7 +643,7 @@ class Plex:
                 else:
                     return "Failed to loggin to myPlex"
             else:
-                if htpc.settings.get('plex_authtoken', '') != '':
+                if not htpc.settings.get('plex_authtoken', ''):
                     htpc.settings.set('plex_authtoken', '')
                     self.logger.debug("Removed myPlex Token")
                 return
@@ -655,10 +654,12 @@ class Plex:
     def getHeaders(self):
         authtoken = htpc.settings.get('plex_authtoken', '')
         username = htpc.settings.get('plex_username', '')
+        password = htpc.settings.get('plex_password', '')
 
-        if not authtoken:
+        # Dont try fetch token untelss you have u/p
+        if not authtoken and username and password:
             self.myPlexSignin()
-            authtoken = htpc.settings.get('plex_authtoken')
+            authtoken = htpc.settings.get('plex_authtoken', '')
 
         headers = {"Accept": "application/json"}
 
@@ -747,7 +748,7 @@ class Plex:
                     try:
                         urllib.urlopen('http://%s:%s/library/sections/%s/refresh' % (plex_host, plex_port, section['key']))
                     except Exception, e:
-                        self.logger.error('Failed to update section %s on Plex: ' + (section['key'], ex(e)))
+                        self.logger.error('Failed to update section %s on Plex: %s' % (section['key'], e))
             return 'Update command sent to Plex'
         except Exception, e:
             self.logger.error("Failed to update library! Exception: " + str(e))
