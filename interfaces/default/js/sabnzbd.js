@@ -34,8 +34,21 @@ $(document).ready(function () {
         });
     });
     loadQueue(1);
+    var foo = document.getElementById("active_table_body");
+    Sortable.create(foo, {
+                    animation: 150,
+                    onEnd: function(evt){ swap(evt.item["attributes"]["data-nzo-id"]["value"], evt.newIndex);}
+                });
+
+
+
     setInterval(function() {
         loadQueue(0);
+        Sortable.create(foo, {
+                    animation: 150,
+                    onEnd: function(evt){ swap(evt.item["attributes"]["data-nzo-id"]["value"], evt.newIndex);}
+        });
+
     }, 5000);
     loadHistory();
     loadWarnings();
@@ -153,6 +166,15 @@ function changeCategory(id, cat) {
     });
 }
 
+function swap(v1, v2) {
+    console.log(v1, v2);
+    $.ajax({
+        url: WEBDIR + 'sabnzbd/Swap?v1=' + v1 + '&v2=' + v2,
+        type: 'get',
+        dataType: 'json'
+    });
+}
+
 var queueToggleStatusAction = '';
 
 function loadQueue(once) {
@@ -203,7 +225,7 @@ function loadQueue(once) {
                 progress.addClass('progress');
                 progress.append(progressBar);
 
-                var row = $('<tr>')
+                var row = $('<tr>').attr('data-nzo-id', job.nzo_id)
                 row.append($('<td>').html(job.filename));
 
                 var categories = $('<select>');
@@ -310,6 +332,7 @@ function setCategories(selector, select) {
         }
     });
 }
+
 
 function sabnzbdStatusLabel(text){
   var statusOK = ['Completed'];

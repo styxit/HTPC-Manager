@@ -146,6 +146,13 @@ class Sabnzbd:
         self.logger.debug("Setting speed-limit")
         return self.fetch("&mode=config&name=speedlimit&value=" + speed)
 
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def Swap(self, v1, v2):
+        self.logger.debug("Swaping nzb position to %s" % v2)
+        return self.fetch("&mode=switch&value=%s&value2=%s" % (v1, v2))
+
     def fetch(self, path):
         try:
             host = htpc.settings.get("sabnzbd_host", "")
@@ -162,6 +169,6 @@ class Sabnzbd:
             url = "http" + ssl + "://" + host + ":" + port + sabnzbd_basepath + "api?output=json&apikey=" + apikey + path
             self.logger.debug("Fetching information from: " + url)
             return loads(urlopen(url, timeout=10).read())
-        except:
-            self.logger.error("Cannot contact sabnzbd")
+        except Exception as e:
+            self.logger.error("Cannot contact sabnzbd %s" % e)
             return
