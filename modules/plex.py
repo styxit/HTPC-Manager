@@ -637,7 +637,7 @@ class Plex:
                 compiled = re.compile("<authentication-token>(.*)<\/authentication-token>", re.DOTALL)
                 authtoken = compiled.search(r.read()).group(1).strip()
 
-                if authtoken is None:
+                if authtoken is not None:
                     htpc.settings.set('plex_authtoken', authtoken)
                     return "Logged in to myPlex"
                 else:
