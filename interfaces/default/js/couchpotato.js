@@ -1,4 +1,4 @@
-var profiles = $('<select>')
+var profiles = $('<select>');
 var cpcat = '';
 $(document).ready(function() {
     $(window).trigger('hashchange')
@@ -18,11 +18,11 @@ $(document).ready(function() {
     })
     $.get(WEBDIR + 'couchpotato/GetCategories', function(data) {
         if (data.categories.length <= 0) return
-        cpcat = $('<select>')
+        cpcat = $('<select>');
         $.each(data.categories, function(i, item) {
             cpcat.append($('<option>').val(item._id).text(item.label))
         });
-    }); 
+    });
 });
 
 
@@ -56,12 +56,12 @@ function getMovies(strStatus, pHTMLElement) {
             pHTMLElement.append($("<li>").attr("id", pMovie.id).append(strHTML));
         });
     });
-    
+
 }
 
 function getMovieLists() {
     getMovies("done", $("#library-grid"));
-	getMovies("active", $("#wanted-grid"));	
+	getMovies("active", $("#wanted-grid"));
 }
 
 function addMovie(movieid, profile, title, catid) {
@@ -98,7 +98,7 @@ function deleteMovie(id, name) {
         if (result.success) {
             $('#' + id).fadeOut()
             getMovieLists();
-        } else { 
+        } else {
             notify('CouchPotato', 'An error occured.', 'error')
         }
     })
@@ -245,7 +245,13 @@ function showMovie(movie, was_search) {
         // Was called from search
         modalButtons = {
             'Add': function () {
-                addMovie(movie.imdb, profiles.val(), titles.val(), cpcat.val());
+                if (!was_search.length) {
+                    was_search = ''
+
+                } else {
+                    was_search = was_search.val()
+                }
+                addMovie(movie.imdb, profiles.val(), titles.val(), was_search);
                 hideModal();
             }
         };
@@ -258,7 +264,7 @@ function showMovie(movie, was_search) {
         })
     }
 
-    
+
     //Make sure that this isnt a search call...
     if (typeof movie.plot === 'undefined') {
         //Loop all with movies with releases. Dont add button if its done.
@@ -274,7 +280,7 @@ function showMovie(movie, was_search) {
                 });
         }
     }
-    
+
     modalInfo.append(titles, profiles);
 
     // Adds the category id showmovie was run from search
@@ -290,7 +296,7 @@ function showMovie(movie, was_search) {
                 if (pRelease.info === undefined || pRelease.info.id === undefined) {
                     return;
                 }
-                
+
                 strTable.append(
                 $("<tr>").append(
                 $("<td>").append(
@@ -317,7 +323,7 @@ function showMovie(movie, was_search) {
 
             });
     }
-    
+
 
     if (info.images.backdrop && info.images.backdrop.length > 0) {
         var backdrop = WEBDIR + 'couchpotato/GetImage?w=675&h=400&o=10&url=' + encodeURIComponent(info.images.backdrop);
