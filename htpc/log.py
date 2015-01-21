@@ -51,6 +51,9 @@ class Log:
         # Disable urllib3 logger, except from criticals
         logging.getLogger("requests").setLevel(logging.CRITICAL)
 
+        # Only show errors for paramiko
+        logging.getLogger("paramiko").setLevel(logging.CRITICAL)
+
         htpc.LOGGER.addHandler(self.logch)
         htpc.LOGGER.addHandler(self.logfh)
 

@@ -93,6 +93,8 @@ def load_modules():
     htpc.ROOT.sickrage = Sickrage()
     from modules.samsungtv import Samsungtv
     htpc.ROOT.samsungtv = Samsungtv()
+    from modules.vnstat import Vnstat
+    htpc.ROOT.vnstat = Vnstat()
 
 
 def main():
