@@ -1,25 +1,33 @@
 This is  Htpc-Manager the way i want it.
 
 Some of the difference is:
-- Samsung tv remote
-- Htpc manager is now fluid. (Looks much better on high res screens)
+
+[New modules]
 - Sonaarr/Nzbdrone module
+- Samsung tv remote
 - Sickrage module
-- Delete cache folder from the settingspage
+- Torrent search BTN, Fenopy, Norbits (just the one i use myself.)
+- Vnstat
+
+[Improved]
 - Upgraded NZBGet module
 - Upgraded qBittorrent module
+- Stats module is sortable.
+- KODI/XBMC addons tab, where you can search/execute and a volume slider instead of a progressbar
+- Send a nzb from NZB search to NZBGet in addition to SABnzbd.
+- Set wanted category while adding movies in Couchpotato
+
+[Misc]
+- Htpc manager is now fluid. (Looks much better on high res screens)
+- Delete cache folder from the settingspage
 - The brave and bold can choose what branch they want to use.
-- Torrent search BTN, Fenopy, Norbits (just the one i use myself.)
 - Added a option for robots.txt for bot crawlers
 - Make ssl cert and key automatically if you dont add a path for it
 - Mask sensetive stuff from the log (username, apikey, password etc)
-- Stats module is sortable.
-- Send a nzb from NZB search to NZBGet in addition to SABnzbd.
-- KODI/XBMC addons tab, where you can search/execute and a volume slider instead of a progressbar
 - Reduced size on static files
-- Set wanted category while adding movies in Couchpotato
 - Docker support
 - Various fixes
+- Added argsparse (to support python 2.6)
 
 TODO:
 - Ipcamera module
@@ -39,6 +47,6 @@ A python based web application to manage the software on your Htpc. Htpc Manager
 
 ## See full installation instructions at [htpc.io](http://htpc.io/)
 
-Requires Python 2.7 or 2.6 with argeparse installed.
+Requires Python 2.6 or 2.7
 
 Start with ```python Htpc.py```
