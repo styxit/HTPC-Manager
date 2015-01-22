@@ -248,10 +248,10 @@ function loadWantedMovies() {
     })
 }
 function loadNextAired(options) {
-    if (!$('#nextaired_table_body').length) return
+    if (!$('#nextaired_sickebeard_table_body').length) return
     $.getJSON(WEBDIR + 'sickbeard/GetNextAired', function (result) {
         if (result === null || result.data.soon.length === 0) {
-            $('#nextaired_table_body').append(
+            $('#nextaired_sickbeard_table_body').append(
                 $('<tr>').append($('<td>').html('No future episodes found')),
                 $('<tr>').append($('<td>').html('&nbsp;')),
                 $('<tr>').append($('<td>').html('&nbsp;')),
@@ -266,7 +266,7 @@ function loadNextAired(options) {
         $.each(nextaired, function (i, tvshow) {
             if (i >= 5) return
             var name = $('<a>').attr('href', 'sickbeard/view/' + tvshow.tvdbid).html(tvshow.show_name)
-            $('#nextaired_table_body').append(
+            $('#nextaired_sickbeard_table_body').append(
                 $('<tr>').append(
                     $('<td>').append(name),
                     $('<td>').html(tvshow.ep_name),
@@ -297,10 +297,11 @@ function loadsonarrCalendar(options) {
 }
 
 function loadNextAiredSickrage(options) {
-    if (!$('#nextaired_table_body').length) return
+    console.log($('#nextairedsickrage_table_body').length)
+    //if (!$('#nextairedsickrage_table_body').length) return
     $.getJSON(WEBDIR + 'sickrage/GetNextAired', function (result) {
         if (result === null || result.data.soon.length === 0) {
-            $('#nextaired_table_body').append(
+            $('#nextairedsickrage_table_body').append(
                 $('<tr>').append($('<td>').html('No future episodes found')),
                 $('<tr>').append($('<td>').html('&nbsp;')),
                 $('<tr>').append($('<td>').html('&nbsp;')),
