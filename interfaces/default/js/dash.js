@@ -11,6 +11,7 @@ $(document).ready(function () {
     loadNextAired()
     loadsonarrCalendar()
     loadNextAiredSickrage()
+    loadsysinfo()
 })
 
 function loadRecentMovies () {
@@ -72,7 +73,7 @@ function loadRecentTVshows () {
 function loadRecentAlbums () {
     if (!$('#albums-content').length) return
     $.getJSON(WEBDIR + 'kodi/GetRecentAlbums/4', function (data) {
-        if (data === null) return
+        if (data === null || data.limits.total === 0) return
         $.each(data.albums, function (i, album) {
             var imageSrc = WEBDIR + 'js/libs/holder.js/45x45/text:No cover'
             if (album.thumbnail != '') {
@@ -167,7 +168,6 @@ function loadRecentAlbumsPlex () {
 
             var label = album.title
             if (album.year != '0') label += ' (' + album.year + ')'
-            console.log(album.artist)
 
             $('#albums-content-plex').append(
                 $('<li>').addClass('media').append(
@@ -297,8 +297,7 @@ function loadsonarrCalendar(options) {
 }
 
 function loadNextAiredSickrage(options) {
-    console.log($('#nextairedsickrage_table_body').length)
-    //if (!$('#nextairedsickrage_table_body').length) return
+    if (!$('#nextairedsickrage_table_body').length) return
     $.getJSON(WEBDIR + 'sickrage/GetNextAired', function (result) {
         if (result === null || result.data.soon.length === 0) {
             $('#nextairedsickrage_table_body').append(
@@ -325,4 +324,80 @@ function loadNextAiredSickrage(options) {
             )
         })
     })
+}
+
+function loadsysinfo(options) {
+    if (!$('#sysinfo_table_body').length) return
+    var dashspeed;
+    $.getJSON(WEBDIR + 'vnstat/oneline', function(result) {
+        dashspeed = result;
+        var bwtot = (parseFloat(result.download_speed, 10) + parseFloat(result.upload_speed, 10)).toFixed(2);
+        $('.dash_sysinfo_speed_down').text(result.download_speed);
+        $('.dash_sysinfo_speed_up').text(result.upload_speed);
+        $('.dash_sysinfo_speed_total').text(bwtot + ' kbits/s');
+        $('.dash_sysinfo_').text(bwtot + ' kbits/s');
+        $('.dash_sysinfo_download_current_month').text("DL CM: " + result.rx_current_month)
+        $('.dash_sysinfo_download_total').text("DL AT: "+ result.alltime_total_traffic)
+
+        /*
+        $('.sysbw').append(
+            $('<div>').text("DL Month " + result.rx_current_month),
+            $('<div>').text("DL alltime " + result.alltime_total_traffic),
+            $('<div>').text("DL speed " + result.download_speed),
+            $('<div>').text("UL speed  " + result.upload_speed),
+            $('<div>').text("Av DL speed " + result.average_download_today),
+            $('<div>').text("Av UL speed " + result.average_upload_today)
+        )
+        */
+
+
+
+        return dashspeed;
+    });
+    $.getJSON(WEBDIR + 'stats/sysinfodash', function(result) {
+            // feed the bastard
+            $(".dash_sysinfo_cpu_idle").text('I '+ result.cpu.idle + ' %');
+            $(".dash_sysinfo_cpu_system").text('S '+ result.cpu.system + ' %');
+            $(".dash_sysinfo_cpu_user").text('U '+ result.cpu.user + ' %');
+
+            $(".dash_sysinfo_mem_avail").text(bytesToSize(result.vmem.available));
+            $(".dash_sysinfo_mem_percent").text(result.vmem.percent + ' %');
+            $(".dash_sysinfo_mem_total").text(bytesToSize(result.vmem.total));
+
+            $(".dash_sysinfo_localip").text(result.localip);
+            $(".dash_sysinfo_externalip").text(result.externalip);
+
+            /*
+            $(".syscpu").append(
+                $('<div>').text("Idle " + result.cpu.idle + ' %'),
+                $('<div>').text("System " + result.cpu.system + ' %'),
+                $('<div>').text("User " + result.cpu.user + ' %')
+            )
+
+            $(".sysmem").append(
+                $('<div>').text("Avail " + bytesToSize(result.vmem.available)),
+                $('<div>').text("Total " + bytesToSize(result.vmem.total)),
+                $('<div>').text("Used " + result.vmem.percent + ' %')
+            )
+
+            $(".sysip").append(
+                $('<div>').text("Local " + result.localip),
+                $('<div>').text("Total " + result.externalip)
+            )
+            */
+
+        }
+
+    );
+}
+
+//
+function bytestospeed(bytes) {
+    var i = -1;
+    var byteUnits = [' Kb', ' Mb', ' Gb', ' Tb', ' Pb'];
+    do {
+        bytes = bytes / 1024;
+        i++;
+    } while (bytes > 1024);
+    return bytes.toFixed(2) + byteUnits[i]+ '\\s';
 }

@@ -24,7 +24,7 @@ except ImportError:
     importPsutil = False
 
 
-class Stats:
+class Stats(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.stats')
         htpc.MODULES.append({
@@ -44,7 +44,7 @@ class Stats:
     @cherrypy.expose()
     @require()
     def index(self):
-        #Since many linux repos still have psutil version 0.5
+        # Since many linux repos still have psutil version 0.5
         if importPsutil and psutil.version_info >= (0, 7):
             pass
         else:
@@ -54,6 +54,7 @@ class Stats:
 
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
     def uptime(self):
         try:
             if psutil.version_info >= (2, 0, 0):
@@ -65,13 +66,14 @@ class Stats:
             boot = str(boot)
             uptime = boot[:-7]
             d['uptime'] = uptime
-            return json.dumps(d)
+            return d
 
         except Exception as e:
             self.logger.error("Could not get uptime %s" % e)
 
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
     def disk_usage(self):
         rr = None
         l = []
@@ -91,14 +93,14 @@ class Stats:
             # Adds the mointpoints that the user wants to ignore
             user_mountpoint = htpc.settings.get('stats_mountpoint')
 
-            #If user_mountpoint isnt a empty string
+            # If user_mountpoint isnt a empty string
             if user_mountpoint:
                 mntpoint += user_mountpoint.lower().split()
 
-            #Adds the filesystem that the user wants to ignore/require
+            # Adds the filesystem that the user wants to ignore/require
             user_filesystem = htpc.settings.get('stats_filesystem')
 
-            #If user_ignore_filsystem is a empty string
+            # If user_ignore_filsystem is a empty string
             if user_filesystem:
                 fstypes += user_filesystem.lower().split()
 
@@ -113,19 +115,19 @@ class Stats:
                     dusage['mountpoint'] = disk.mountpoint
                     dusage['device'] = disk.device
 
-                    #NTFS driver reports filesystem type as fuseblk on Linux
+                    # NTFS driver reports filesystem type as fuseblk on Linux
                     if disk.fstype == 'fuseblk':
                         dusage['fstype'] = 'NTFS'
                     else:
                         dusage['fstype'] = disk.fstype
 
                     l.append(dusage)
-                    rr = json.dumps(l)
+                    rr = l
 
             except Exception as e:
                 self.logger.error("Could not get disk info %s" % e)
 
-            return rr
+            return l
 
         else:
             # Adds the mointpoints that the user wants to ignore
@@ -153,14 +155,14 @@ class Stats:
                     dusage['mountpoint'] = disk.mountpoint
                     dusage['device'] = disk.device
 
-                    #NTFS driver reports filesystem type as fuseblk on Linux
+                    # NTFS driver reports filesystem type as fuseblk on Linux
                     if disk.fstype == 'fuseblk':
                         dusage['fstype'] = 'NTFS'
                     else:
                         dusage['fstype'] = disk.fstype
 
                     l.append(dusage)
-                    rr = json.dumps(l)
+                    rr = l
 
             except Exception as e:
                 self.logger.error("Could not get disk info %s" % e)
@@ -169,6 +171,33 @@ class Stats:
 
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
+    def sysinfodash(self):
+        """ used for the dash """
+        d = {}
+        # Cpu stuff
+        cpu = psutil.cpu_times_percent(interval=0.1, percpu=False)
+        cpu = cpu._asdict()
+        d["cpu"] = {"user": cpu["user"],
+                    "system": cpu["system"],
+                    "idle": cpu["idle"]
+                    }
+
+        # Virtual memory
+        vmem = psutil.virtual_memory()
+        vmem = vmem._asdict()
+        d["vmem"] = {"total": vmem["total"],
+                     "percent": vmem["percent"],
+                     "available": vmem["available"]
+                     }
+        d["localip"] = self.get_local_ip(dash=True)
+        d["externalip"] = self.get_external_ip(dash=True)
+
+        return d
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
     def processes(self):
         rr = None
         limit = str(htpc.settings.get('stats_limit_processes'))
@@ -194,25 +223,26 @@ class Stats:
         # return processes sorted by CPU percent usage
         processes = sorted(procs, key=lambda p: p['cpu_percent'], reverse=True)
 
-        #Adds the total number of processes running, not in use atm
+        # Adds the total number of processes running, not in use atm
         processes.append(procs_status)
 
-        #if limit is a empty string
+        # If limit is a empty string
         if not limit:
-            rr = json.dumps(processes)
+            rr = processes
         else:
-            rr = json.dumps(processes[:int(limit)])
+            rr = processes[:int(limit)]
 
         return rr
 
-    #Returns cpu usage
+    # Returns cpu usage
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
     def cpu_percent(self):
         try:
             cpu = psutil.cpu_times_percent(interval=0.4, percpu=False)
             cpu = cpu._asdict()
-            return json.dumps(cpu)
+            return cpu
 
         except Exception as e:
             self.logger.error("Error trying to pull cpu percent: %s" % e)
@@ -220,18 +250,20 @@ class Stats:
     # Not in use atm.
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
     def cpu_times(self):
         try:
             cpu = psutil.cpu_times(percpu=False)
             dcpu = cpu._asdict()
-            return json.dumps(dcpu)
+            return dcpu
 
         except Exception as e:
             self.logger.error("Error trying to pull cpu times: %s" % e)
 
-    #Not in use
+    # Not in use
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
     def num_cpu(self):
         try:
             if psutil.version_info >= (2, 0, 0):
@@ -239,15 +271,15 @@ class Stats:
             else:
                 cpu = psutil.NUM_CPUS
             dcpu = cpu._asdict()
-            jcpu = json.dumps(dcpu)
-            return jcpu
+            return dcpu
 
         except Exception as e:
             self.logger.error("Error trying to pull cpu cores %s" % e)
 
-    #Fetches info about the user that is logged in.
+    # Fetches info about the user that is logged in.
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
     def get_user(self):
         try:
             for user in psutil.get_users():
@@ -256,42 +288,52 @@ class Stats:
                 td = str(td)
                 td = td[:-7]
                 duser['started'] = td
-                rr = json.dumps(duser)
-            return rr
+            return duser
 
         except Exception as e:
             self.logger.error("Pulling logged in info %s" % e)
 
     @cherrypy.expose()
     @require()
-    def get_local_ip(self):
+    def get_local_ip(self, dash=False):
         # added a small delay since getting local is faster then network usage (Does not render in the html)
-        time.sleep(0.1)
+        # time.sleep(0.1)
         d = {}
         try:
             ip = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             ip.connect(('8.8.8.8', 80))
             local_ip = (ip.getsockname()[0])
             d['localip'] = local_ip
-            return json.dumps(d)
 
         except Exception as e:
             self.logger.error("Pulling  local ip %s" % e)
 
+        if dash:
+            return local_ip
+        else:
+            cherrypy.response.headers['Content-Type'] = "application/json"
+            return json.dumps(d)
+
     @cherrypy.expose()
     @require()
-    def get_external_ip(self):
+    def get_external_ip(self, dash=False):
         try:
             d = {}
             s = urllib2.urlopen('http://myexternalip.com/raw').read()
             d['externalip'] = s.strip()
-            return json.dumps(d)
 
         except Exception as e:
             self.logger.error("Pulling external ip %s" % e)
 
+        if dash:
+            return s.strip()
+        else:
+            cherrypy.response.headers['Content-Type'] = "application/json"
+            return json.dumps(d)
+
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
     def sys_info(self):
         try:
             d = {}
@@ -302,47 +344,51 @@ class Stats:
             d['version'] = computer[3]
             d['machine'] = computer[4]
             d['processor'] = computer[5]
-            return json.dumps(d)
+            return d
 
         except Exception as e:
             self.logger.error("Pulling system info %s" % e)
 
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
     def network_usage(self):
         try:
             nw_psutil = psutil.net_io_counters()
             dnw_psutil = nw_psutil._asdict()
-            return json.dumps(dnw_psutil)
+            return dnw_psutil
 
         except Exception as e:
             self.logger.error("Pulling network info %s" % e)
 
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
     def virtual_memory(self):
         try:
             mem = psutil.virtual_memory()
             dmem = mem._asdict()
-            return json.dumps(dmem)
+            return dmem
 
         except Exception as e:
             self.logger.error("Pulling physical memory %s" % e)
 
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
     def swap_memory(self):
         try:
             mem = psutil.swap_memory()
             dmem = mem._asdict()
-            return json.dumps(dmem)
+            return dmem
 
         except Exception as e:
             self.logger.error("Pulling swap memory %s" % e)
 
-    #Fetches settings in the db, is used for some styling, like bars or tables.
+    # Fetches settings in the db, is used for some styling, like bars or tables
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
     def return_settings(self):
         d = {}
         try:
@@ -357,13 +403,13 @@ class Stats:
         except Exception as e:
             self.logger.error("Getting stats settings %s" % e)
 
-        return json.dumps(d)
+        return d
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
     @require(member_of("admin"))
     def command(self, cmd=None, pid=None, signal=None):
         dmsg = {}
-        jmsg = None
         try:
             if pid:
                 p = psutil.Process(pid=int(pid))
@@ -391,23 +437,22 @@ class Stats:
                     msg = 'Killed process %s %s' % (name, pid)
 
                 dmsg['msg'] = msg
-                jmsg = json.dumps(dmsg)
                 self.logger.info(msg)
-                return jmsg
+                return dmsg
 
             elif cmd == 'signal':
                 p.send_signal(signal)
                 msg = '%ed pid %s %s successfully with %s' % (cmd, pid, name, signal)
                 dmsg['msg'] = msg
-                jmsg = json.dumps(dmsg)
                 self.logger.info(msg)
-                return jmsg
+                return dmsg
 
         except Exception as e:
             self.logger.error("Error trying to %s" % cmd, e)
 
     @cherrypy.expose()
     @require(member_of("admin"))
+    @cherrypy.tools.json_out()
     def cmdpopen(self, cmd=None):
         d = {}
         cmd = cmd.split(', ')
@@ -417,17 +462,15 @@ class Stats:
                 r = psutil.Popen(cmd, stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
                 msg = r.communicate()
                 d['msg'] = msg
-                jmsg = json.dumps(d)
                 self.logger.info(msg)
-                return jmsg
+                return d
 
             else:
                 msg = 'HTPC-Manager is not started with --shell'
                 self.logger.error(msg)
                 d['msg'] = msg
-                jmsg = json.dumps(d)
                 self.logger.error(msg)
-                return jmsg
+                return d
 
         except Exception as e:
             self.logger.error('Sending command from stat module failed: %s' % e)

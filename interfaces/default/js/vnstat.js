@@ -16,6 +16,7 @@ var usage_current_month = {
     "total": 0
 }
 $(function() {
+    $('.spinner').show();
     ajaxload()
     get_currentspeed()
     setInterval(function() {
@@ -128,9 +129,6 @@ function get_currentspeed() {
         if (data.rx && data.tx) {
             $("#vnstat-rx").text(data.rx);
             $("#vnstat-tx").text(data.tx);
-
-        } else {
-            return;
         }
 
     });
@@ -239,6 +237,9 @@ function loaddb() {
 
             });
 
+        },
+        complete: function() {
+            $('.spinner').hide();
         }
     });
 }

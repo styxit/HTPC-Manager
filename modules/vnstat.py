@@ -9,6 +9,8 @@ import xmltodict
 import platform
 import subprocess
 import re
+import json
+from itertools import chain
 
 try:
     import paramiko
@@ -119,7 +121,26 @@ class Vnstat(object):
     @require()
     @cherrypy.tools.json_out()
     def oneline(self):
-        return self.run('--oneline')
+        speed = self.tr(dash=True)
+        vnstat = self.run('--oneline') # with --xml is returns shit
+        l = vnstat.replace('\n', '').split(';')
+        d = {"rxtoday": l[3],
+            "txtoday": l[4],
+            "totaltoday": l[5],
+            "average_download_today": l[6],
+            "timestamp_current_month": l[7],
+            "rx_current_month": l[8],
+            "tx_current_month": l[9],
+            "total_current_month": l[10],
+            "average_upload_today": l[11],
+            "alltime_total_rx": l[12],
+            "alltime_total_tx": l[13],
+            "alltime_total_traffic": l[14]
+
+        }
+        # combine dicts
+        info = dict(chain(d.items(), speed.items()))
+        return info
 
     @cherrypy.expose()
     @require()
@@ -135,8 +156,7 @@ class Vnstat(object):
 
     @cherrypy.expose()
     @require()
-    @cherrypy.tools.json_out()
-    def tr(self):
+    def tr(self, dash=False):
         piped = self.run('-tr')
         download = re.compile(ur'rx\s+(\d+.\d+)\s+(\w+\/s)')
         upload = re.compile(ur'tx\s+(\d+.\d+)\s+(\w+\/s)')
@@ -147,7 +167,11 @@ class Vnstat(object):
         if tx:
             tx = '%s %s' % (tx.group(1), tx.group(2))
 
-        return {'rx': rx, 'tx': tx}
+        if dash:
+            return {'download_speed': rx, 'upload_speed': tx}
+        else:
+            cherrypy.response.headers['Content-Type'] = "application/json"
+            return json.dumps({'rx': rx, 'tx': tx})
 
     @cherrypy.expose()
     @require()
