@@ -144,7 +144,7 @@ settings = self.attr.settings
                             <th>Airdate</th>
                         </tr>
                     </thead>
-                    <tbody id="nextairedsickrage_table_body"></tbody>
+                    <tbody id="nextaired_sickrage_table_body"></tbody>
                 </table>
             </div>
             %endif
@@ -242,6 +242,7 @@ settings = self.attr.settings
         dashcount += settings.get('dash_rec_tv', 0);
         dashcount += settings.get('dash_rec_movies', 0);
         dashcount += settings.get('dash_sickrage', 0);
+        dashcount += settings.get('dash_sysinfo', 0);
         dashcount += settings.get('dash_sonarr', 0);
         dashcount += settings.get('dash_rec_movies_plex', 0);
         dashcount += settings.get('dash_rec_tv_plex', 0);

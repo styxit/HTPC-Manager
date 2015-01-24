@@ -114,7 +114,7 @@ class Kodi(object):
                 url = kodi_server_username + ':' + kodi_server_password + '@' + url
             kodi = Server('http://' + url + '/jsonrpc')
             self.logger.debug("Trying to contact kodi via %s" % url)
-            return kodi.KODI.GetInfoLabels(labels=["Network.MacAddress"])
+            return kodi.XBMC.GetInfoLabels(labels=["Network.MacAddress"])
         except Exception, e:
             self.logger.exception(e)
             self.logger.error("Unable to contact kodi via %s", url)
