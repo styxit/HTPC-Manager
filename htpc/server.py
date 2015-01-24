@@ -45,8 +45,15 @@ def start():
         """ Lets see if the that username and password is already in the db"""
         try:
             user = Manageusers.selectBy(username=htpc.USERNAME).getOne()
+            # If the user exist
+            if user:
+                # Activate the new password
+                user.password = htpc.PASSWORD
+
         except SQLObjectNotFound:
+            logger.debug("Added htpc.USERNAME and htpc.PASSWORD to Manageusers table")
             Manageusers(username=htpc.USERNAME, password=htpc.PASSWORD, role='admin')
+
         logger.debug('Updating cherrypy config, activating sessions and auth')
 
         cherrypy.config.update({
