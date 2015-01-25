@@ -38,7 +38,9 @@
                 {'type':'text', 'label':'Rev proxy headers basepath', 'name':'app_use_proxy_headers_basepath', 'desc':'', 'value':settings.get('app_use_proxy_headers_basepath')},
                 {'type': 'select', 'label': 'Branch', 'name': 'branch', 'options':''},
                 {'type':'bool', 'label':'Open Browser', 'name':'openbrowser', 'desc':'Automatically open brower on server start', 'value':settings.get('openbrowser')},
-                {'type':'bool', 'label':'Use robots.txt', 'name':'robots', 'desc':'Stop bots from indexing your site', 'value':settings.get('robots')}
+                {'type':'bool', 'label':'Use robots.txt', 'name':'robots', 'desc':'Stop bots from indexing your site', 'value':settings.get('robots')},
+                {'type':'bool', 'label':'Check for updates', 'name':'check_for_updates', 'desc':'', 'value':settings.get('check_for_updates')},
+                {'type':'bool', 'label':'Autoupdate', 'name':'auto_update', 'desc':'', 'value':settings.get('auto_update')}
                 ], buttons=[
                         {'name':'Save', 'type':'submit', 'classes':'btn-primary'},
                         {'name':'Clear', 'type':'reset'},

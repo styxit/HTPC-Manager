@@ -54,6 +54,9 @@ class Log:
         # Only show errors for paramiko
         logging.getLogger("paramiko").setLevel(logging.CRITICAL)
 
+        # apscheduler
+        #logging.getLogger("apscheduler.scheduler").setLevel(logging.CRITICAL)
+
         htpc.LOGGER.addHandler(self.logch)
         htpc.LOGGER.addHandler(self.logfh)
 
@@ -110,9 +113,12 @@ class BlackListFilter(logging.Filter):
                         bl.append(i.val)
 
             for item in bl:
-                if item in record.msg or item in "".join(record.args):
-                    # hack to make logging happy
-                    ras = ", ".join(record.args)
-                    record.args = ras.replace(item, len(item) * '*')
-                    record.msg = record.msg.replace(item, len(item) * '*')
+                try:
+                    if item in record.msg or item in "".join(record.args):
+                        # hack to make logging happy
+                        ras = ", ".join(record.args)
+                        record.args = ras.replace(item, len(item) * '*')
+                        record.msg = record.msg.replace(item, len(item) * '*')
+                except:
+                    pass
             return True

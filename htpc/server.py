@@ -102,7 +102,6 @@ def start():
         })
 
     if htpc.settings.get('app_use_proxy_headers'):
-        print "Enabling proxy heaers"
         cherrypy.config.update({
                 'tools.proxy.on': True
 

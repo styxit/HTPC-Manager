@@ -10,6 +10,7 @@ import os
 import sys
 import htpc
 import webbrowser
+from threading import Thread
 
 
 def parse_arguments():
@@ -97,6 +98,25 @@ def load_modules():
     htpc.ROOT.vnstat = Vnstat()
 
 
+def update_needed():
+    update_avail = htpc.ROOT.update.update_needed()
+    # returns true or false
+    if update_avail:
+        htpc.UPDATE_AVAIL = True
+        if htpc.settings.get("auto_update", True):
+            Thread(target=htpc.ROOT.update.updateEngine.update).start()
+
+
+def init_sched():
+    from apscheduler.schedulers.background import BackgroundScheduler
+    from apscheduler.triggers.interval import IntervalTrigger
+
+    if htpc.settings.get('check_for_update', True):
+        htpc.SCHED = BackgroundScheduler()
+        htpc.SCHED.add_job(update_needed, trigger=IntervalTrigger(hours=12))
+        htpc.SCHED.start()
+
+
 def main():
     """
     Main function is called at startup.
@@ -147,6 +167,8 @@ def main():
 
     # Inititialize root and settings page
     load_modules()
+
+    init_sched()
 
     htpc.TEMPLATE = os.path.join(htpc.RUNDIR, 'interfaces/',
                                  htpc.settings.get('app_template', 'default'))

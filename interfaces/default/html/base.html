@@ -112,10 +112,34 @@ webdir = htpc.WEBDIR
                     </form>
                 </div>
             </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+${self.body()}
+% if s.get('check_for_updates') and htpc.UPDATE_AVAIL:
+    <div class="footer2">
+        <div class="navbar navbar-fixed-bottom footer2">
+            <div class="container">
+                    You're running an unknown version of HTPC-Manager. <a href="do_update">Update</a>
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <div>
         </div>
     </div>
-</div>
-${self.body()}
+
+% elif s.get('check_for_updates') and htpc.CURRENT_HASH != htpc.LATEST_HASH and htpc.COMMITS_BEHIND > 0:
+    <div class="footer2">
+        <div class="navbar navbar-fixed-bottom">
+            <div class="container">
+                A<a href="https://github.com/Hellowlol/HTPC-Manager/compare/${htpc.CURRENT_HASH}...${htpc.LATEST_HASH}"> newer version</a> is available. You're ${htpc.COMMITS_BEHIND} commits behind. <a href="do_update">Update</a>
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+        </div>
+    </div>
+% endif
 <div id="modal_dialog" class="modal fade hide">
     <div class="modal-header">
         <button class="close" data-dismiss="modal">&times;</button>

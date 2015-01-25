@@ -64,3 +64,6 @@ table th.tablesorter-header {
 .gutmarginleft {
     margin-left: 0px !important;
 }
+.footer {
+  height: 30px;
+}

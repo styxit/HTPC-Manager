@@ -41,6 +41,7 @@ class Updater:
         self.updateEngineName = 'Unknown'
         # Set update engine. Use git updater or update from source.
         self.updateEngine = self.getEngine()
+        self.check_update()
 
     """ Determine the update method """
     def getEngine(self):
@@ -110,6 +111,11 @@ class Updater:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    def updatenow(self):
+        Thread(target=self.updateEngine.update).start()
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def status(self):
         """ method to determine if HTPC Manager is currently updating """
         return self.updateEngine.UPDATING
@@ -131,7 +137,9 @@ class Updater:
 
         # Get current and latest version
         current = self.updateEngine.current()
+        htpc.CURRENT_HASH = current
         latest = self.updateEngine.latest()
+        htpc.LATEST_HASH = latest
 
         if not latest:
             self.logger.error("Failed to determine the latest version for HTPC Manager.")
@@ -153,9 +161,11 @@ class Updater:
         if current == latest:
             self.logger.info("HTPC-Manager is Up-To-Date.")
             output['versionsBehind'] = 0
+            htpc.COMMITS_BEHIND = 0
             output['updateNeeded'] = False
         else:
             behind = self.behind_by(current, latest)
+            htpc.COMMITS_BEHIND = behind
             output['versionsBehind'] = behind
 
         self.logger.info("Currently " + str(output['versionsBehind']) + " commits behind.")
@@ -179,6 +189,13 @@ class Updater:
     @cherrypy.tools.json_out()
     def branches(self):
         return self.updateEngine.branches()
+
+    def update_needed(self):
+        r = self.check_update()
+        if r["updateNeeded"]:
+            return True
+        else:
+            return False
 
 
 class GitUpdater():
