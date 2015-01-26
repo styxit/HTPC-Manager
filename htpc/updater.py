@@ -70,8 +70,8 @@ class Updater:
         if platform.system().lower() == 'windows':
             if gp != gp.lower():
                 alternative_gp.append(gp.lower())
-            # Disbled this so it uses source updater while testing.
-            #alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "c:\Program Files (x86)\Git\bin\git.exe"]
+            # Comment out the line beflow to test the source updater
+            alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "c:\Program Files (x86)\Git\bin\git.exe"]
 
         # Returns a empty string if failed
         output = GitUpdater().git_exec(gp, 'version')
@@ -380,8 +380,8 @@ class SourceUpdater():
              and matching that against all branches on github """
 
         versionfile = self.current()
-        #current_branch = htpc.settings.get('branch', 'master2')
-        current_branch = htpc.settings.get('branch', 'Unknown')
+        current_branch = htpc.settings.get('branch', 'master2')
+        #current_branch = htpc.settings.get('branch', 'Unknown')
         # should return sha on success not True False
         if not isinstance(self.current(), bool):
             try:

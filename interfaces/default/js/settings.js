@@ -89,7 +89,6 @@ $(document).ready(function () {
         });
         $.post(action, data, function (data) {
             msg = data ? 'Save successful' : 'Save failed';
-            //Snotify('Settings', msg, 'info');
             if ($('#kodi_server_id').is(":visible")) {
                 kodi_update_servers(0);
                 this.reset();
@@ -106,10 +105,9 @@ $(document).ready(function () {
             }
 
         }).done(function () {
-            // Force reload without cache
                 notify('Settings', msg, 'info');
+                // Force reload without cache
                 setTimeout(function () {
-                    //alert("Hello");
                     window.location.reload(true);
                 }, 800);
 
