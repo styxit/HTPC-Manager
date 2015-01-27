@@ -101,8 +101,8 @@ settings = self.attr.settings
                     <tbody id="wantedmovies_table_body"></tbody>
                 </table>
             </div>
-        </div>
             %endif
+        </div>
         <div class="row-fluid">
             %if settings.get('dash_sickbeard', 0):
             <div class="span4">
@@ -149,6 +149,8 @@ settings = self.attr.settings
                 </table>
             </div>
             %endif
+        </div>
+        <div class="row-fluid">
             %if settings.get('dash_sysinfo', 0):
             <div class="span4">
                 <h3>System info</h3>
@@ -232,6 +234,7 @@ settings = self.attr.settings
                 </div>
             </div>
             %endif
+
         </div>
 
         <%

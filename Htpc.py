@@ -103,7 +103,8 @@ def update_needed():
     # returns true or false
     if update_avail:
         htpc.UPDATE_AVAIL = True
-        if htpc.settings.get("auto_update", False):
+        # Since im stupid, protect me please..
+        if htpc.settings.get("auto_update", False) and not htpc.DEBUG:
             Thread(target=htpc.ROOT.update.updateEngine.update).start()
 
 
@@ -111,7 +112,7 @@ def init_sched():
     from apscheduler.schedulers.background import BackgroundScheduler
     from apscheduler.triggers.interval import IntervalTrigger
 
-    if htpc.settings.get('check_for_update', False):
+    if htpc.settings.get('check_for_updates', False):
         htpc.SCHED = BackgroundScheduler()
         htpc.SCHED.add_job(update_needed, trigger=IntervalTrigger(hours=12))
         htpc.SCHED.start()
