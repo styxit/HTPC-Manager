@@ -67,3 +67,7 @@ table th.tablesorter-header {
 .footer {
   height: 30px;
 }
+
+.nav-collapse.in.collapse {
+    height: auto !important;
+}
