@@ -143,7 +143,7 @@ function bytesToSize(bytes, precision) {
 function parseDate(sec) {
     var date = new Date(sec*1000)
     var year = pad(date.getFullYear(), 2)
-    var month = pad(date.getMonth(), 2)
+    var month = pad((date.getMonth() + 1), 2)
     var day = pad(date.getDate(), 2)
     var hour = pad(date.getHours(), 2)
     var min = pad(date.getMinutes(), 2)
