@@ -9,7 +9,7 @@ from ts import norbits
 from ts import fenopy
 
 
-class Torrentsearch:
+class Torrentsearch(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.torrentsearch')
         htpc.MODULES.append({

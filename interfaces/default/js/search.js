@@ -65,7 +65,10 @@ function search(query, catid) {
                 row.append($('<td>').append(cat));
                 row.append($('<td>').addClass('right').html(bytesToSize(item.attr['size'], 2)));
 
+                // Make a group of nzbclient buttons
+                row.append($('<td>').append(anc(item)));
 
+                /*
                 var toSabIcon = $('<img>')
                 .attr('src', '../img/sabnzbd.png')
                 .attr('title', 'Send to SABnzbd')
@@ -74,7 +77,7 @@ function search(query, catid) {
                 toSabIcon.click(function() {
                     sendToSab(item)
                 });
-                row.append($('<td>').append(toSabIcon));
+                //row.append($('<td>').append(toSabIcon));
 
                 var toGetIcon = $('<img>')
                 .css('cursor', 'pointer')
@@ -85,13 +88,49 @@ function search(query, catid) {
                 toGetIcon.click(function() {
                     sendToGet(item)
                 });
-                row.append($('<td>').append(toGetIcon));
+                //row.append($('<td>').append(toGetIcon));
+                */
 
                 $('#results_table_body').append(row);
                 if (stop) return false;
             });
         }
     });
+}
+
+function get_clients() {
+    $.getJSON(WEBDIR + "search/getclients", function (response) {
+        clients = response
+        return clients
+    });
+}
+
+function anc(nzb) {
+    var b = $('<div>').addClass('btn-group');
+        // Used to check if there is any active clients
+        var n = 0;
+        $.each(clients, function (i, client) {
+            if (client.active === 1) {
+                // If there any active clients add 1 to n
+                n += 1;
+                var button2 = $('<img>').addClass("btn btn-mini").attr('src', client.icon).
+                attr('title', "Send to " + client.client).
+                css("cursor","pointer").click(function(){
+                    sendToclient(nzb, client)
+                });
+
+                b.append(button2);
+            }
+        });
+        // Checks if there is any active clients, if it isnt add a error message.
+        if (n === 0) {
+            b.append('No active clients').removeClass('btn-group');
+            return b;
+        }
+        else if (n === 1) {
+            b.removeClass('btn-group');
+        }
+    return b;
 }
 
 function showDetails(data) {
@@ -214,7 +253,20 @@ function sendToGet(item) {
     });
 }
 
+function sendToclient(item, client) {
+    return $.ajax({
+        url: WEBDIR + client.client + '/AddNzbFromUrl',
+        type: 'post',
+        dataType: 'json',
+        data: {nzb_url: item.link},
+        success: function (result) {
+            notify('', 'Sent ' + item.description+ ' to ' + client.client, 'info');
+        }
+    });
+}
+
 $(document).ready(function () {
+    var clients = get_clients()
     $('#searchform').submit(function() {
         search($('#query').val(), $('#catid').val());
         return false;

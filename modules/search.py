@@ -9,7 +9,7 @@ from json import loads
 import logging
 from cherrypy.lib.auth2 import require
 
-class Search:
+class Search(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.search')
         htpc.MODULES.append({
@@ -45,6 +45,31 @@ class Search:
     def getcategories(self, **kwargs):
         self.logger.debug("Fetching available categories")
         return self.fetch('caps')['categories']
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def getclients(self):
+        l = []
+        nzbget = {"client": "nzbget",
+                  #"cmd":"",
+                  "icon": "../img/nzbget.png",
+                  "active": 0
+        }
+        if htpc.settings.get("nzbget_enable"):
+            nzbget["active"] = 1
+
+        sab = {"client": "sabnzbd",
+               #"cmd":"",
+               "icon": "../img/sabnzbd.png",
+               "active": 0
+        }
+        if htpc.settings.get("sabnzbd_enable"):
+            sab["active"] = 1
+
+        l.append(nzbget)
+        l.append(sab)
+        return l
 
     @cherrypy.expose()
     @require()

@@ -151,7 +151,7 @@ function getHistory() {
         $.each(result.notifications, function(i, item) {
             $('#history-grid').prepend(
                 $('<tr>').append(
-                    $('<td>').text(parseDate(item.added)),
+                    $('<td>').text(parseDate(item.time)),
                     $('<td>').text(item.message)
                 )
             )
