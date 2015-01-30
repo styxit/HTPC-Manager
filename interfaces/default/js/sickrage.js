@@ -153,9 +153,7 @@ function loadNextAired(options) {
             var lateraired = result.data.later;
 
             $.each(result.data.missed, function(i, tvshow) {
-                if (defaults.limit !== 0 && i == defaults.limit) {
-                    return false;
-                }
+                
                 var row = $('<tr class="error">');
                 var name = $('<a>').attr('href', '#').html(tvshow.show_name).click(function(e) {
                     loadShow(tvshow.tvdbid);
@@ -195,9 +193,7 @@ function loadNextAired(options) {
 
             // Loop next airing episodes
             $.each(nextaired, function(i, tvshow) {
-                if (defaults.limit !== 0 && i == defaults.limit) {
-                    return false;
-                }
+                
                 var row = $('<tr>');
                 var name = $('<a>').attr('href', '#').html(tvshow.show_name).click(function(e) {
                     loadShow(tvshow.tvdbid);
@@ -235,9 +231,7 @@ function loadNextAired(options) {
 
             // Loop later airing episodes
             $.each(lateraired, function(i, tvshow) {
-                if (defaults.limit !== 0 && i == defaults.limit) {
-                    return false;
-                }
+                
                 var row = $('<tr>');
                 var name = $('<a>').attr('href', '#').html(tvshow.show_name).click(function(e) {
                     loadShow(tvshow.tvdbid);
