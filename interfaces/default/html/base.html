@@ -120,11 +120,12 @@ webdir = htpc.WEBDIR
 </div>
 
 ${self.body()}
-% if s.get('check_for_updates') and htpc.UPDATE_AVAIL:
+
+% if htpc.CURRENT_HASH is False:
     <div class="footer2">
         <div class="navbar navbar-fixed-bottom footer2">
             <div class="container">
-                    You're running an unknown version of HTPC-Manager. <a href="do_update">Update</a>
+                    You're running an unknown version of HTPC-Manager. Use the updater <a href="do_update">Update</a>
                     <button type="button" class="close" data-dismiss="alert">&times;</button>
             <div>
         </div>

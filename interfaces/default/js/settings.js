@@ -109,7 +109,7 @@ $(document).ready(function () {
                 // Force reload without cache
                 setTimeout(function () {
                     window.location.reload(true);
-                }, 800);
+                }, 1000);
 
             });
     });
