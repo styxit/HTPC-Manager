@@ -140,12 +140,14 @@ function loadNextAired(options) {
             // If sickrage not configured, return false (Dashboard)
             if (result === null) return false;
 
-            if (result.data.soon.length === 0 || result.data.missed.length === 0) {
+            if (result.data.soon.length === 0 && result.data.later.length === 0 && result.data.today.length === 0 && result.data.missed.length === 0) {
                 var row = $('<tr>');
                 row.append($('<td>').html('No future/missing episodes found'));
                 $('#nextaired_table_body').append(row);
                 return false;
             }
+
+
 
             var soonaired = result.data.soon;
             var todayaired = result.data.today;
@@ -153,7 +155,7 @@ function loadNextAired(options) {
             var lateraired = result.data.later;
 
             $.each(result.data.missed, function(i, tvshow) {
-                
+
                 var row = $('<tr class="error">');
                 var name = $('<a>').attr('href', '#').html(tvshow.show_name).click(function(e) {
                     loadShow(tvshow.tvdbid);
@@ -193,7 +195,7 @@ function loadNextAired(options) {
 
             // Loop next airing episodes
             $.each(nextaired, function(i, tvshow) {
-                
+
                 var row = $('<tr>');
                 var name = $('<a>').attr('href', '#').html(tvshow.show_name).click(function(e) {
                     loadShow(tvshow.tvdbid);
@@ -231,7 +233,7 @@ function loadNextAired(options) {
 
             // Loop later airing episodes
             $.each(lateraired, function(i, tvshow) {
-                
+
                 var row = $('<tr>');
                 var name = $('<a>').attr('href', '#').html(tvshow.show_name).click(function(e) {
                     loadShow(tvshow.tvdbid);
