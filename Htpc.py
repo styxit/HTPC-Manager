@@ -96,6 +96,8 @@ def load_modules():
     htpc.ROOT.samsungtv = Samsungtv()
     from modules.vnstat import Vnstat
     htpc.ROOT.vnstat = Vnstat()
+    from modules.headphones import Headphones
+    htpc.ROOT.headphones = Headphones()
 
 
 def update_needed():

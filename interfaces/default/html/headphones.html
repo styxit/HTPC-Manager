@@ -1,0 +1,45 @@
+<%inherit file="base.html"/>
+<div class="container">
+    <div class="content maincontent">
+        <h1 class="page-header page-title">
+            <a href="${url}" target="_blank" title="Open original Headphones interface">${name}</a>
+        </h1>
+        <div class="well form-inline">
+            <input class="span6" id="add_artist_name" name="add_artist_name" type="text" />
+            <select class="span6" style="display:none;" id="add_artist_select" name="add_artist_select"></select>
+            <button class="btn btn-success" type="button" id="add_artist_button"><i class="icon-plus icon-white"></i> Add artist</button>
+            <button class="btn btn-success hide" type="button" id="add_artistid_button"><i class="icon-ok icon-white"></i> Add Artist</button>
+            <button class="btn hide" type="button" id="cancel_artist_button"> Cancel</button>
+        </div>
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#artists" data-toggle="tab">Artists</a></li>
+            <li><a href="#wanteds" data-toggle="tab">Wanted</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="artists" class="tab-pane active">
+                <table class="table table-striped table-sortable">
+                    <thead>
+                        <tr>
+                            <th>Artist</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="artists_table_body"></tbody>
+                </table>
+            </div>
+            <div id="wanteds" class="tab-pane">
+                <table class="table table-striped table-sortable">
+                    <thead>
+                        <tr>
+                            <th>Artist</th>
+                            <th>Album</th>
+                            <th>Release Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="wanteds_table_body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
