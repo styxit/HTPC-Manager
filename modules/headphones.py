@@ -155,6 +155,11 @@ class Headphones(object):
     def AddArtist(self, artistId):
         return self.fetch('addArtist&id=%s' % artistId)
 
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def GetHistoryList(self):
+        return self.fetch('getHistory')
+
     def fetch(self, command, url=None, api_key=None):
         url = Headphones._build_api_url(command, url, api_key)
 

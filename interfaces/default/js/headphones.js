@@ -2,6 +2,7 @@ $(document).ready(function () {
     $(window).trigger('hashchange');
     loadArtists();
     loadWanteds();
+    loadHistory();
 
     $('#add_artist_button').click(function () {
         $(this).attr('disabled', true);
@@ -217,6 +218,32 @@ function loadWanteds() {
             }
         }
     })
+}
+
+function loadHistory() {
+    $.ajax({
+        url: WEBDIR + 'headphones/GetHistoryList',
+        type: 'get',
+        dataType: 'json',
+        success: function(result) {
+            console.log(result)
+            if (result.length === 0) {
+                var row = $('<tr>')
+                row.append($('<td>').html('History is empty'));
+                $('#history_table_body').append(row);
+            }
+            $.each(result, function(i, item) {
+                console.log(item)
+                var row = $('<tr>');
+                row.append(
+                    $('<td>').html(item.DateAdded),
+                    $('<td>').html(item.Title),
+                    $('<td>').html(headphonesStatusLabel(item.Status))
+                );
+                $('#history_table_body').append(row);
+            });
+        }
+    });
 }
 
 function headphonesStatusLabel(text) {
