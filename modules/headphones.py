@@ -9,6 +9,7 @@ import requests
 from urllib import urlencode
 from urllib2 import urlopen
 from json import loads
+from htpc.proxy import get_image
 
 
 class Headphones(object):
@@ -44,6 +45,16 @@ class Headphones(object):
         )
 
     @cherrypy.expose()
+    def GetThumb(self, url, thumb=None, h=None, w=None, o=100):
+        """ Parse thumb to get the url and send to htpc.proxy.get_image """
+        #url = url('/images/DefaultVideo.png')
+
+        self.logger.debug("Trying to fetch image via %s", url)
+        print url
+        return get_image(url, h, w, o)
+
+
+    @cherrypy.expose()
     def viewArtist(self, artist_id):
         response = self.fetch('getArtist&id=%s' % artist_id)
 
@@ -56,6 +67,7 @@ class Headphones(object):
             scriptname='headphones_view_artist',
             artist_id=artist_id,
             artist=response['artist'][0],
+            artistimg=response['artist'][0]['ArtworkURL'],
             albums=response['albums'],
             description=response['description'][0],
             module_name=htpc.settings.get('headphones_name') or 'Headphones',
@@ -76,13 +88,16 @@ class Headphones(object):
 
         template = htpc.LOOKUP.get_template('headphones_view_album.html')
         return template.render(
-            scriptname=None,
+            scriptname='headphones_view_album',
             artist_id=response['album'][0]['ArtistID'],
             album_id=album_id,
-            module_name=htpc.settings.get('headphones_name') or 'Headphones',
+            c_img=response['album'][0]['ArtworkURL'],
+            albumimg=response['album'][0]['ArtworkURL'],
+            #artistimg=response['artist'][0]['ArtworkURL'],
+            module_name=htpc.settings.get('headphones_name', 'Headphones'),
             album=response['album'][0],
             tracks=response['tracks'],
-            description=response['description'][0],
+            description=response['description'][0]
         )
 
     @staticmethod
@@ -115,6 +130,7 @@ class Headphones(object):
             command=command,
         )
 
+
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetArtistList(self):
@@ -127,8 +143,13 @@ class Headphones(object):
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def SearchForArtist(self, name):
-        return self.fetch('findArtist&%s' % urlencode({'name': name}))
+    def SearchForArtist(self, name, searchtype):
+        if searchtype == "artistId":
+            return self.fetch('findArtist&%s' % urlencode({'name': name}))
+        else:
+            return self.fetch('findAlbum&%s' % urlencode({'name': name}))
+
+        #return self.fetch('findArtist&%s' % urlencode({'name': name}))
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -152,24 +173,38 @@ class Headphones(object):
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def AddArtist(self, artistId):
-        return self.fetch('addArtist&id=%s' % artistId)
+    def AddArtist(self, id, searchtype, **kwargs):
+        if searchtype == "artistId":
+            return self.fetch('addArtist&id=%s' % id)
+        else:
+            return self.fetch('addAlbum&id=%s' % id)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def GetHistoryList(self):
         return self.fetch('getHistory')
 
-    def fetch(self, command, url=None, api_key=None):
+    @cherrypy.expose()
+    def GetAlbumArt(self, id):
+        return self.fetch('getAlbumArt&id=%s' % id, img=True)
+
+    @cherrypy.expose()
+    def artwork(self):
+        return self.fetch("artwork/artist/9756f302-28a0-4d4f-b296-e6d7bf7d187d", img=True)
+
+    def fetch(self, command, url=None, api_key=None, img=False):
         url = Headphones._build_api_url(command, url, api_key)
 
         try:
             self.logger.info('calling api @ %s' % url)
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=30) # change timeout as mb is fucking slow
 
             if response.status_code != 200:
                 self.logger.error('failed to contact headphones')
                 return
+
+            if img:
+                return response.content
 
             json_body = response.json()
             self.logger.debug('response body: %s' % json_body)

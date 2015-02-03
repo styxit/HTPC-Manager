@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """ Tool for proxying images and resizing if needed """
 import os
 import hashlib
@@ -38,7 +41,8 @@ def get_image(url, height=None, width=None, opacity=100, auth=None, headers=None
     if not os.path.isfile(image):
         logger.debug("No local image found for " + image + ". Downloading")
         download_image(url, image, auth, headers)
-
+    if os.path.isfile(image):
+        logger.debug("image exist cache works")
     # Check if resize is needed
     if (height and width) or (opacity < 100):
 

@@ -6,11 +6,13 @@ $(document).ready(function () {
 
     $('#add_artist_button').click(function () {
         $(this).attr('disabled', true);
-        searchForArtist($('#add_artist_name').val());
+        alert($('#add_artist_album').find('option:selected').val())
+        searchForArtist($('#add_artist_name').val(), $('#add_artist_album').find('option:selected').val());
     });
 
     $('#add_artistid_button').click(function () {
-        addArtist($('#add_artist_select').val());
+        addArtist($('#add_artist_select').val(), $('#add_artist_album').find('option:selected').val(), $('#add_artist_select').find('option:selected').text())
+
     });
 
     $('#cancel_artist_button').click(function () {
@@ -80,11 +82,12 @@ function refreshArtist(artistId) {
     })
 }
 
-function searchForArtist(name) {
+function searchForArtist(name, type) {
     $.ajax({
         url: WEBDIR + 'headphones/SearchForArtist',
         type: 'get',
-        data: {'name': name},
+        data: {'name': name,
+                'searchtype': type},
         dataType: 'json',
         success: function (result) {
             if (!result || result.length == 0) {
@@ -93,13 +96,28 @@ function searchForArtist(name) {
             }
 
             $('#add_artist_select').html('');
-            $.each(result, function (index, item) {
-                var $option = $('<option>')
+            if (type == 'artistId') {
+                $.each(result, function (index, item) {
+                    var option = $('<option>')
                     .attr('value', item.id)
                     .html(item.uniquename);
 
-                $('#add_artist_select').append($option);
-            });
+                    $('#add_artist_select').append(option);
+                });
+
+            } else {
+                $.each(result, function (index, item) {
+                    var t = item.title + ' (' + item.date + ')'
+                    var option = $('<option>')
+                        .attr('value', item.id)
+                        //.html(t);
+                        .html(item.title + ' ' + '(' + item.date + ')');
+
+                    $('#add_artist_select').append(option);
+                });
+            }
+
+
 
             $('#add_artist_name').hide();
             $('#cancel_artist_button').show();
@@ -110,15 +128,24 @@ function searchForArtist(name) {
     })
 }
 
-function addArtist(artistId) {
+function addArtist(id, searchtype, name) {
+    alert(id)
+    alert(searchtype)
+    alert(name)
+    // val can be artistId or albumId
+    var stype = (searchtype === 'artistId') ? 'Artist' : 'Album';
     $.ajax({
         url: WEBDIR + 'headphones/AddArtist',
-        data: {'artistId': artistId},
+        data: {'id': id,
+               'searchtype': searchtype},
+        //data: {val: id},
         type: 'get',
         dataType: 'json',
         success: function (data) {
+            alert("addArtist")
+            console.log(data)
             $('#add_artist_name').val('');
-            notify('Add Artist', 'Successfully added artist', 'success');
+            notify('Add ' + stype, 'Successfully added  '+ stype + ' ' + name, 'success');
             cancelAddArtist();
         }
     })

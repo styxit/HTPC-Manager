@@ -5,8 +5,12 @@
             <a href="${url}" target="_blank" title="Open original Headphones interface">${name}</a>
         </h1>
         <div class="well form-inline">
-            <input class="span6" id="add_artist_name" name="add_artist_name" type="text" />
-            <select class="span6" style="display:none;" id="add_artist_select" name="add_artist_select"></select>
+            <input class="span4" id="add_artist_name" name="add_artist_name" type="text" />
+            <select class="span4" style="display:none;" id="add_artist_select" name="add_artist_select"></select>
+            <select class="span2" style="" id="add_artist_album" name="add_artist_album_select">
+                <option name="artist" value="artistId" data-id="artistId">Artist</option>
+                <option name="album" value="albumId" data-id="albumId">Album</option>
+            </select>
             <button class="btn btn-success" type="button" id="add_artist_button"><i class="icon-plus icon-white"></i> Add artist</button>
             <button class="btn btn-success hide" type="button" id="add_artistid_button"><i class="icon-ok icon-white"></i> Add Artist</button>
             <button class="btn hide" type="button" id="cancel_artist_button"> Cancel</button>
