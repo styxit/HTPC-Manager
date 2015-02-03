@@ -6,7 +6,6 @@ $(document).ready(function () {
 
     $('#add_artist_button').click(function () {
         $(this).attr('disabled', true);
-        alert($('#add_artist_album').find('option:selected').val())
         searchForArtist($('#add_artist_name').val(), $('#add_artist_album').find('option:selected').val());
     });
 
@@ -89,6 +88,7 @@ function searchForArtist(name, type) {
         data: {'name': name,
                 'searchtype': type},
         dataType: 'json',
+        timeout: 40000,
         success: function (result) {
             if (!result || result.length == 0) {
                 $('#add_artist_button').attr('disabled', false);
@@ -129,20 +129,15 @@ function searchForArtist(name, type) {
 }
 
 function addArtist(id, searchtype, name) {
-    alert(id)
-    alert(searchtype)
-    alert(name)
     // val can be artistId or albumId
     var stype = (searchtype === 'artistId') ? 'Artist' : 'Album';
     $.ajax({
         url: WEBDIR + 'headphones/AddArtist',
         data: {'id': id,
                'searchtype': searchtype},
-        //data: {val: id},
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            alert("addArtist")
             console.log(data)
             $('#add_artist_name').val('');
             notify('Add ' + stype, 'Successfully added  '+ stype + ' ' + name, 'success');
@@ -171,6 +166,9 @@ function loadArtists() {
                 $('#artists_table_body').append(row);
             } else {
                 $.each(result, function (index, artist) {
+                    var image = $('<img>').addClass('img-polaroid img-rounded')
+                    console.log("loadArtists")
+                    console.log(artist)
                     var name = $('<a>')
                         .attr('href',WEBDIR + 'headphones/viewArtist/' + artist.ArtistID)
                         .text(artist.ArtistName);
@@ -190,8 +188,20 @@ function loadArtists() {
                         });
                     }
 
+                    if (artist.ThumbURL) {
+                        image.attr('src', WEBDIR + 'headphones/GetThumb/?w=75&h=75&thumb=' + encodeURIComponent(artist.ThumbURL))
+
+                    } else {
+                        image.attr('src', '../img/no-cover-artist.png').css({'width' : '75px' , 'height' : '75px'}) //TODO
+
+                    }
+
+                    div = $('<div>').append(image)
                     row.append(
+                        $('<td>').append(div),
                         $('<td>').html(name),
+                        $('<td>').append(artist.LatestAlbum),
+                        $('<td>').append(artist.ReleaseDate),
                         $statusRow
                     );
                     $('#artists_table_body').append(row);
@@ -212,11 +222,22 @@ function loadWanteds() {
             if (result.length == 0) {
                 var row = $('<tr>')
                 row.append($('<td>').html('No wanted albums found'));
-                $('#wanteds_table_body').append(row);
+                $('#wanted_table_body').append(row);
             } else {
                 $.each(result, function (index, wanted) {
                     var row = $('<tr>');
+                    var image = $('<img>').addClass('img-polaroid img-rounded')
+                    if (wanted.ThumbURL) {
+                        image.attr('src', WEBDIR + 'headphones/GetThumb/?w=75&h=75&thumb=' + encodeURIComponent(wanted.ThumbURL))
+
+                    } else {
+                        image.attr('src', '../img/no-cover-artist.png').css({'width' : '75px' , 'height' : '75px'}) //TODO
+
+                    }
+
+                    div = $('<div>').append(image)
                     row.append(
+                        $('<td>').append(div),
                         $('<td>').append($('<a>')
                             .attr('href', WEBDIR + 'headphones/viewArtist/' + wanted.ArtistID)
                             .text(wanted.ArtistName)),
@@ -238,7 +259,7 @@ function loadWanteds() {
                                 })
                             })
                     );
-                    $('#wanteds_table_body').append(row);
+                    $('#wanted_table_body').append(row);
                 });
                 $('#wanteds_table_body').parent().trigger('update');
                 $('#wanteds_table_body').parent().trigger("sorton",[[[0,0]]]);
@@ -274,32 +295,35 @@ function loadHistory() {
 }
 
 function headphonesStatusLabel(text) {
+    var statusOK = ['Active', 'Downloaded', 'Processed'];
+    var statusInfo = [];
+    var statusError = ['Paused', 'Unprocessed'];
+    var statusWarning = ['Skipped', 'Custom', 'Snatched'];
+
     var label = $('<span>').addClass('label').text(text);
 
-    switch (text) {
-        case 'Active':
-            label.addClass('label-success');
-            break;
-
-        case 'Loading':
-            label.addClass('label-info');
-            break;
-
-        default:
-            label.addClass('label-warning');
-            break;
+    if (statusOK.indexOf(text) != -1) {
+        label.addClass('label-success');
+    } else if (statusInfo.indexOf(text) != -1) {
+        label.addClass('label-info');
+    } else if (statusError.indexOf(text) != -1) {
+        label.addClass('label-important');
+    } else if (statusWarning.indexOf(text) != -1) {
+        label.addClass('label-warning');
     }
 
     var icon = headphonesStatusIcon(text, true);
-    if (icon != '') {
+    if (icon !== '') {
         label.prepend(' ').prepend(icon);
     }
     return label;
 }
 
+
 var headphonesStatusMap = {
     'Active': 'icon-repeat',
-    'Error': 'icon-bell'
+    'Error': 'icon-bell',
+    'Paused': 'icon-pause'
 }
 function headphonesStatusIcon(iconText, white){
     var iconClass = headphonesStatusMap[iconText];

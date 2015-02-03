@@ -1,5 +1,8 @@
 $(document).ready(function () {
     $(window).trigger('hashchange');
+    var albumid = $('h1.page-title').attr('data-albumid');
+    var artistimg = $('h1.page-title').attr('data-artistimg');
+    $('#banner').css('background-image', 'url(' + WEBDIR + 'headphones/GetThumb/?url=' + artistimg + ')'); // encodeURIComponent should resize img?
     $('#album-tracks .btn-search').click(function () {
         var $parentRow = $(this).parents('tr')
         var albumId = $parentRow.attr('data-albumid');

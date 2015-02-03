@@ -45,14 +45,13 @@ class Headphones(object):
         )
 
     @cherrypy.expose()
-    def GetThumb(self, url, thumb=None, h=None, w=None, o=100):
+    def GetThumb(self, url=None, thumb=None, h=None, w=None, o=100):
         """ Parse thumb to get the url and send to htpc.proxy.get_image """
-        #url = url('/images/DefaultVideo.png')
-
         self.logger.debug("Trying to fetch image via %s", url)
+        if thumb:
+            url = thumb
         print url
         return get_image(url, h, w, o)
-
 
     @cherrypy.expose()
     def viewArtist(self, artist_id):

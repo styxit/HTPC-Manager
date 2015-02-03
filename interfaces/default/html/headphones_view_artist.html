@@ -1,7 +1,11 @@
 <%inherit file="base.html"/>
+<%
+    havetracks = 0 if artist['HaveTracks'] is None else artist["HaveTracks"]
+    totaltracks = 0 if artist['TotalTracks'] is None else artist['TotalTracks']
+%>
 <div class="container">
     <div class="content maincontent headphones_artist">
-        <h1 class="page-header page-title" data-artistid="${artist_id}">
+        <h1 class="page-header page-title" data-artistid="${artist_id}" data-artistimg="${artistimg}">
             <span class="headphones_artistname">${artist['ArtistName']}</span>
             <div class="btn-group show-options-menu pull-right">
                 <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
@@ -26,13 +30,21 @@
                 <div id="show_details_top" class="span4"></div>
                 <strong>Show details</strong>
                 <table class="table table-condensed">
-                    <tr><td>Tracks</td><td class="headphones_total_tracks">${artist['HaveTracks']} / ${artist['TotalTracks']}</td></tr>
+                    <tr><td>Tracks</td><td class="headphones_total_tracks"> ${havetracks} / ${totaltracks}</td></tr>
                     <tr><td>Status</td><td class="headphones_status">${artist['Status']}</td></tr>
-                    <tr><td>Last Album</td><td class="headphones_last_album">
-                        <a href="/headphones/viewAlbum/${artist['AlbumID']}">
-                            ${artist['LatestAlbum']} (${artist['ReleaseDate']})
-                        </a>
-                    </td></tr>
+                    %if artist['AlbumID'] is not None:
+                        <tr>
+                            <td>Last Album</td>
+                            <td class="headphones_last_album"><a href="/headphones/viewAlbum/${artist['AlbumID']}">${artist['LatestAlbum']} (${artist['ReleaseDate']})</a></td>
+                        </tr>
+                    %else:
+                        <tr>
+                            <td>Last Album</td>
+                            <td>N/A</td>
+                        </tr>
+                    %endif
+
+                    <!-- img-polaroid img-rounded -->
                 </table>
                 <div id="show_details_bottom" class="span4"></div>
             </div>
