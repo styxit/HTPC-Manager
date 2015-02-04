@@ -2,6 +2,12 @@ table td{
 	vertical-align: middle !important;
 }
 
+.artist_img {
+
+}
+#banner {
+  margin-bottom: 15px;
+}
 .headphones_artist .banner{
   position: relative;
   border-radius: 6px 0px 0px 6px;

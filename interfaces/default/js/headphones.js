@@ -90,14 +90,17 @@ function searchForArtist(name, type) {
         dataType: 'json',
         timeout: 40000,
         success: function (result) {
-            if (!result || result.length == 0) {
+            if (!result || result.length === 0) {
                 $('#add_artist_button').attr('disabled', false);
                 return;
             }
-
+            // remove any old search
             $('#add_artist_select').html('');
+
             if (type == 'artistId') {
                 $.each(result, function (index, item) {
+                    console.log("artist")
+                    console.log(item)
                     var option = $('<option>')
                     .attr('value', item.id)
                     .html(item.uniquename);
@@ -107,11 +110,24 @@ function searchForArtist(name, type) {
 
             } else {
                 $.each(result, function (index, item) {
+                    console.log("album")
+                    console.log(item)
+                    var tt;
+                    if (item.date.length) {
+                        // release date should be (yyyy) or empty string
+                        tt = ' (' + item.date.substring(0,4) + ') '
+                    } else {
+                        tt = '  '
+                    }
+                    // item.uniquename == Artist name
+                    if (item.uniquename === 'None') {
+                        // to remove None..
+                        item.uniquename = ''
+                    }
                     var t = item.title + ' (' + item.date + ')'
                     var option = $('<option>')
-                        .attr('value', item.id)
-                        //.html(t);
-                        .html(item.title + ' ' + '(' + item.date + ')');
+                        .attr('value', item.albumid)
+                        .html(item.title + tt + item.uniquename);
 
                     $('#add_artist_select').append(option);
                 });
@@ -294,9 +310,35 @@ function loadHistory() {
     });
 }
 
+function loadHistory() {
+    $.ajax({
+        url: WEBDIR + 'headphones/GetHistoryList',
+        type: 'get',
+        dataType: 'json',
+        success: function(result) {
+            console.log(result)
+            if (result.length === 0) {
+                var row = $('<tr>')
+                row.append($('<td>').html('History is empty'));
+                $('#history_table_body').append(row);
+            }
+            $.each(result, function(i, item) {
+                console.log(item)
+                var row = $('<tr>');
+                row.append(
+                    $('<td>').html(item.DateAdded),
+                    $('<td>').html(item.Title),
+                    $('<td>').html(headphonesStatusLabel(item.Status))
+                );
+                $('#history_table_body').append(row);
+            });
+        }
+    });
+}
+
 function headphonesStatusLabel(text) {
     var statusOK = ['Active', 'Downloaded', 'Processed'];
-    var statusInfo = [];
+    var statusInfo = ["Wanted"];
     var statusError = ['Paused', 'Unprocessed'];
     var statusWarning = ['Skipped', 'Custom', 'Snatched'];
 
@@ -323,7 +365,9 @@ function headphonesStatusLabel(text) {
 var headphonesStatusMap = {
     'Active': 'icon-repeat',
     'Error': 'icon-bell',
-    'Paused': 'icon-pause'
+    'Paused': 'icon-pause',
+    'Snatched': 'icon-share-alt',
+    'Skipped': 'icon-fast-forward'
 }
 function headphonesStatusIcon(iconText, white){
     var iconClass = headphonesStatusMap[iconText];

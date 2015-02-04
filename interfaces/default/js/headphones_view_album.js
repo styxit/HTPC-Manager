@@ -4,6 +4,6 @@ $(document).ready(function() {
 	 // sort tracks desc
 	 $('.tracks-table').trigger("sorton",[[[0,0]]]);
 	 // Grab image from cache. if not download then serve from cache.
-    $('#banner').css('background-image', 'url(' + WEBDIR + 'headphones/GetThumb/?url=' + albumimg + ')');
+    //$('#banner').css('background-image', 'url(' + WEBDIR + 'headphones/GetThumb/?url=' + albumimg + ')');
 })
 

@@ -1,5 +1,5 @@
 <%inherit file="base.html"/>
-<div class="container">
+<div class="container-fluid">
     <div class="content maincontent headphones_album">
         <h1 class="page-header page-title" data-artistid="${artist_id}" data-albumid="${album_id}" data-albumimg="${album['ArtworkURL']}">
             <span class="headphones_albumname">${album['AlbumTitle']}</span>
@@ -22,6 +22,7 @@
         </ul>
 
         <div id="banner" class="row-fluid banner">
+            <div class="span8" style="min-height: 0px;"><img class="img-polaroid img-rounded artist_img" src="${album['ArtworkURL']}"></div>
             <div class="album_details span4 pull-right">
                 <div id="album_details_top" class="span4"></div>
                 <strong>Album details</strong>

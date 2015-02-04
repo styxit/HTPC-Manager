@@ -3,7 +3,7 @@
     havetracks = 0 if artist['HaveTracks'] is None else artist["HaveTracks"]
     totaltracks = 0 if artist['TotalTracks'] is None else artist['TotalTracks']
 %>
-<div class="container">
+<div class="container-fluid">
     <div class="content maincontent headphones_artist">
         <h1 class="page-header page-title" data-artistid="${artist_id}" data-artistimg="${artistimg}">
             <span class="headphones_artistname">${artist['ArtistName']}</span>
@@ -25,7 +25,7 @@
         </ul>
 
         <div id="banner" class="row-fluid banner">
-            <div class="span8" style="min-height: 0px;"></div>
+            <div class="span8" style="min-height: 0px;"><img class="img-polaroid img-rounded artist_img"src="${artistimg}"></div>
             <div class="show_details span4 pull-right">
                 <div id="show_details_top" class="span4"></div>
                 <strong>Show details</strong>
