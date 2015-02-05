@@ -367,7 +367,10 @@ var headphonesStatusMap = {
     'Error': 'icon-bell',
     'Paused': 'icon-pause',
     'Snatched': 'icon-share-alt',
-    'Skipped': 'icon-fast-forward'
+    'Skipped': 'icon-fast-forward',
+    'Wanted': 'icon-heart',
+    'Processed': 'icon-ok',
+    'Unprocessed': ''
 }
 function headphonesStatusIcon(iconText, white){
     var iconClass = headphonesStatusMap[iconText];

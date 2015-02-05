@@ -5,6 +5,7 @@ import cherrypy
 import htpc
 import logging
 import requests
+from cherrypy.lib.auth2 import require
 
 from urllib import urlencode
 from urllib2 import urlopen
@@ -31,6 +32,7 @@ class Headphones(object):
         })
 
     @cherrypy.expose()
+    @require()
     def index(self):
         template = htpc.LOOKUP.get_template('headphones.html')
         settings = htpc.settings
@@ -45,6 +47,7 @@ class Headphones(object):
         )
 
     @cherrypy.expose()
+    @require()
     def GetThumb(self, url=None, thumb=None, h=None, w=None, o=100):
         """ Parse thumb to get the url and send to htpc.proxy.get_image """
         self.logger.debug("Trying to fetch image via %s", url)
@@ -54,6 +57,7 @@ class Headphones(object):
         return get_image(url, h, w, o)
 
     @cherrypy.expose()
+    @require()
     def viewArtist(self, artist_id):
         response = self.fetch('getArtist&id=%s' % artist_id)
 
@@ -73,6 +77,7 @@ class Headphones(object):
         )
 
     @cherrypy.expose()
+    @require()
     def viewAlbum(self, album_id):
         response = self.fetch('getAlbum&id=%s' % album_id)
 
@@ -132,46 +137,64 @@ class Headphones(object):
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    @require()
     def GetArtistList(self):
         return self.fetch('getIndex')
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    @require()
     def GetWantedList(self):
         return self.fetch('getWanted')
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    @require()
     def SearchForArtist(self, name, searchtype):
         if searchtype == "artistId":
             return self.fetch('findArtist&%s' % urlencode({'name': name}))
         else:
             return self.fetch('findAlbum&%s' % urlencode({'name': name}))
 
-        #return self.fetch('findArtist&%s' % urlencode({'name': name}))
-
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    @require()
     def RefreshArtist(self, artistId):
         return self.fetch('refreshArtist&id=%s' % artistId)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    @require()
     def DeleteArtist(self, artistId):
         return self.fetch('delArtist&id=%s' % artistId)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    @require()
+    def PauseArtist(self, artistId):
+        return self.fetch('pauseArtist&id=%s' % artistId)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    @require()
+    def ResumeArtist(self, artistId):
+        return self.fetch('resumeArtist&id=%s' % artistId)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    @require()
     def QueueAlbum(self, albumId):
         return self.fetch('queueAlbum&id=%s' % albumId)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    @require()
     def UnqueueAlbum(self, albumId):
         return self.fetch('unqueueAlbum&id=%s' % albumId)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    @require()
     def AddArtist(self, id, searchtype, **kwargs):
         if searchtype == "artistId":
             return self.fetch('addArtist&id=%s' % id)
@@ -180,18 +203,63 @@ class Headphones(object):
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    @require()
     def GetHistoryList(self):
         return self.fetch('getHistory')
 
     @cherrypy.expose()
+    @require()
     def GetAlbumArt(self, id):
         return self.fetch('getAlbumArt&id=%s' % id, img=True)
 
     @cherrypy.expose()
+    @require()
+    def ForceSearch(self):
+        return self.fetch('forceSearch')
+
+    @cherrypy.expose()
+    @require()
+    def ForceProcess(self):
+        return self.fetch('forceProcess')
+
+    @cherrypy.expose()
+    @require()
+    def ForceActiveArtistsUpdate(self):
+        return self.fetch('forceActiveArtistsUpdate')
+
+    @cherrypy.expose()
+    @require()
+    def ShutDown(self):
+        return self.fetch('shutdown')
+
+    @cherrypy.expose()
+    @require()
+    def UpDate(self):
+        return self.fetch('update')
+
+    @cherrypy.expose()
+    @require()
+    def ReStart(self):
+        return self.fetch('restart')
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    @require()
+    def Choose_Specific_Download(self, id):
+        return self.fetch('choose_specific_download&id=%s' % id)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    @require()
+    def Download_Specific_Release(self, id, title, size, url, provider, kind):
+        return self.fetch('download_specific_release&id=%s&title=%s&size=%s&url=%s&provider=%s&kind=%s' %(id, title, size, url, provider, kind))
+
+    @cherrypy.expose()
+    @require()
     def artwork(self):
         return self.fetch("artwork/artist/9756f302-28a0-4d4f-b296-e6d7bf7d187d", img=True)
 
-    def fetch(self, command, url=None, api_key=None, img=False):
+    def fetch(self, command, url=None, api_key=None, img=False, json=True, text=False):
         url = Headphones._build_api_url(command, url, api_key)
 
         try:
@@ -202,18 +270,24 @@ class Headphones(object):
                 self.logger.error('failed to contact headphones')
                 return
 
+            if text:
+                return response.text
+
             if img:
                 return response.content
 
-            json_body = response.json()
-            self.logger.debug('response body: %s' % json_body)
+            if json:
+                json_body = response.json()
+                self.logger.debug('response body: %s' % json_body)
 
-            return json_body
+                return json_body
+
         except Exception as e:
             self.logger.error("Error calling api %s: %s" % (url, e))
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
+    @require()
     def ping(self,
              headphones_enable, headphones_name,
              headphones_host, headphones_port,
@@ -232,12 +306,38 @@ class Headphones(object):
 
 
 def _get_status_icon(status):
+    green = ["Downloaded", "Active", "Processed"]
+    orange = ["Snatched"]
+    blue = ["Wanted"]
+    red = ["Unprocessed"]
+
+    mapsicon = {
+        'Downloaded': 'icon-download-alt',
+        'Active': 'icon-repeat',
+        'Error': 'icon-bell',
+        'Paused': 'icon-pause',
+        'Snatched': 'icon-share-alt',
+        'Skipped': 'icon-fast-forward',
+        'Wanted': 'icon-heart',
+        'Processed': 'icon-ok',
+        'Unprocessed': ''
+    }
+
     if not status:
         return ''
 
-    if status == 'Downloaded':
-        fmt = '<span class="label label-success"><i class="icon-download-alt icon-white"></i> %s</span>'
+    label = ''
+    if status in green:
+        label = 'label-success'
+    elif status in orange:
+        label = 'label-warning'
+    elif status in blue:
+        label = 'label-info'
+    elif status in red:
+        label = 'label-error'
     else:
-        fmt = '<span class="label">%s</span>'
+        pass
 
-    return fmt % status
+    fmt = '<span class="label %s"><i class="%s icon-white"></i> %s</span>'
+
+    return fmt % (label, mapsicon[status], status)
