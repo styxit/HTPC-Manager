@@ -43,7 +43,7 @@ class Headphones(object):
             hello='world',
             settings=settings,
             url=url,
-            name=settings.get('headphones_name') or 'Headphones',
+            name=settings.get('headphones_name', 'Headphones')
         )
 
     @cherrypy.expose()
@@ -51,9 +51,11 @@ class Headphones(object):
     def GetThumb(self, url=None, thumb=None, h=None, w=None, o=100):
         """ Parse thumb to get the url and send to htpc.proxy.get_image """
         self.logger.debug("Trying to fetch image via %s", url)
+        if url is None and thumb is None:
+            # To stop if the image is missing
+            return
         if thumb:
             url = thumb
-        print url
         return get_image(url, h, w, o)
 
     @cherrypy.expose()
@@ -157,40 +159,34 @@ class Headphones(object):
             return self.fetch('findAlbum&%s' % urlencode({'name': name}))
 
     @cherrypy.expose()
-    @cherrypy.tools.json_out()
     @require()
     def RefreshArtist(self, artistId):
-        return self.fetch('refreshArtist&id=%s' % artistId)
+        return self.fetch('refreshArtist&id=%s' % artistId, text=True)
 
     @cherrypy.expose()
-    @cherrypy.tools.json_out()
     @require()
     def DeleteArtist(self, artistId):
-        return self.fetch('delArtist&id=%s' % artistId)
+        return self.fetch('delArtist&id=%s' % artistId, text=True)
 
     @cherrypy.expose()
-    @cherrypy.tools.json_out()
     @require()
     def PauseArtist(self, artistId):
-        return self.fetch('pauseArtist&id=%s' % artistId)
+        return self.fetch('pauseArtist&id=%s' % artistId, text=True)
 
     @cherrypy.expose()
-    @cherrypy.tools.json_out()
     @require()
     def ResumeArtist(self, artistId):
-        return self.fetch('resumeArtist&id=%s' % artistId)
+        return self.fetch('resumeArtist&id=%s' % artistId, text=True)
 
     @cherrypy.expose()
-    @cherrypy.tools.json_out()
     @require()
     def QueueAlbum(self, albumId):
-        return self.fetch('queueAlbum&id=%s' % albumId)
+        return self.fetch('queueAlbum&id=%s' % albumId, text=True)
 
     @cherrypy.expose()
-    @cherrypy.tools.json_out()
     @require()
     def UnqueueAlbum(self, albumId):
-        return self.fetch('unqueueAlbum&id=%s' % albumId)
+        return self.fetch('unqueueAlbum&id=%s' % albumId, text=True)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -215,32 +211,37 @@ class Headphones(object):
     @cherrypy.expose()
     @require()
     def ForceSearch(self):
-        return self.fetch('forceSearch')
+        return self.fetch('forceSearch', text=True)
 
     @cherrypy.expose()
     @require()
-    def ForceProcess(self):
-        return self.fetch('forceProcess')
+    def ForceProcess(self, dir=None):
+        if dir:
+            return self.fetch('forceProcess?dir=%s' % dir, text=True)
+        return self.fetch('forceProcess', text=True)
 
     @cherrypy.expose()
     @require()
     def ForceActiveArtistsUpdate(self):
-        return self.fetch('forceActiveArtistsUpdate')
+        return self.fetch('forceActiveArtistsUpdate', text=True)
 
     @cherrypy.expose()
     @require()
     def ShutDown(self):
-        return self.fetch('shutdown')
+        print "running shutdown"
+        return self.fetch('shutdown', text=True)
 
     @cherrypy.expose()
     @require()
     def UpDate(self):
-        return self.fetch('update')
+        print "running update"
+        return self.fetch('update', text=True)
 
     @cherrypy.expose()
     @require()
     def ReStart(self):
-        return self.fetch('restart')
+        print "running restart"
+        return self.fetch('restart', text=True)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -254,15 +255,14 @@ class Headphones(object):
     def Download_Specific_Release(self, id, title, size, url, provider, kind):
         return self.fetch('download_specific_release&id=%s&title=%s&size=%s&url=%s&provider=%s&kind=%s' %(id, title, size, url, provider, kind))
 
-    @cherrypy.expose()
-    @require()
-    def artwork(self):
-        return self.fetch("artwork/artist/9756f302-28a0-4d4f-b296-e6d7bf7d187d", img=True)
-
     def fetch(self, command, url=None, api_key=None, img=False, json=True, text=False):
         url = Headphones._build_api_url(command, url, api_key)
 
         try:
+            # So shitty api..
+            if img or text:
+                json = False
+            result = ''
             self.logger.info('calling api @ %s' % url)
             response = requests.get(url, timeout=30) # change timeout as mb is fucking slow
 
@@ -271,16 +271,19 @@ class Headphones(object):
                 return
 
             if text:
-                return response.text
+                # check the single command cant be json out
+                print "should be fucking text"
+                print response.text
+                result = response.text
 
             if img:
-                return response.content
+                result = response.content
 
             if json:
-                json_body = response.json()
-                self.logger.debug('response body: %s' % json_body)
+                result = response.json()
 
-                return json_body
+            #self.logger.debug('Response: %s' % result)
+            return result
 
         except Exception as e:
             self.logger.error("Error calling api %s: %s" % (url, e))

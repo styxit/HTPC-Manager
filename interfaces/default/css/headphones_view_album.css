@@ -2,13 +2,17 @@ table td{
 	vertical-align: middle !important;
 }
 
-.artist_img {
+.album_img {
+  max-width: 300px;
+  height: 250px;
+  width: 200px;
 
 }
+
 #banner {
   margin-bottom: 15px;
 }
-.headphones_artist .banner{
+.headphones_album .banner{
   position: relative;
   border-radius: 6px 0px 0px 6px;
   background:  center left no-repeat ;
@@ -19,12 +23,12 @@ table td{
   margin-bottom: 15px;
 }
 
-.headphones_artist .banner .show_details {
+.headphones_album .banner .album_details {
     background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
     color: White;
     overflow:hidden;
 }
-.headphones_artist .banner .show_details #show_details_top{
+.headphones_album .banner .album_details #album_details_top{
   background: Red;
   display: block;
   height: 15px;
@@ -35,7 +39,7 @@ table td{
   border-radius: 6px 6px 0px 0px;
 }
 
-.headphones_artist .banner .show_details #show_details_bottom{
+.headphones_album .banner .album_details #album_details_bottom{
   display: block;
   height: 15px;
   min-height: 10px;
@@ -45,28 +49,31 @@ table td{
   border-radius: 0px 0px 6px 6px;
 }
 
-.headphones_artist .banner .show_details td{
+.headphones_album .banner .album_details td{
   padding: 2px 5px;
 }
 
-.headphones_artist .banner .show_details table,
-.headphones_artist .banner .show_details strong {
+.headphones_album .banner .album_details table,
+.headphones_album .banner .album_details strong {
   margin:10px;
 }
 
 @media all and  (max-width: 767px) {
   /*
-   * On small screens, remove top and bottom round bars on show-detail block
+   * On small screens, remove top and bottom round bars on album-detail block
    */
-  .headphones_artist .banner .show_details #show_details_bottom,
-  .headphones_artist .banner .show_details #show_details_top{
+  .headphones_album .banner .album_details #album_details_bottom,
+  .headphones_album .banner .album_details #album_details_top{
+    display: none;
+  }
+  .album_img {
     display: none;
   }
   /*
    * On small screens, Add rounded corners on all sides on banner and detail-box
    */
-  .headphones_artist .banner .show_details,
-  .headphones_artist .banner{
+  .headphones_album .banner .album_details,
+  .headphones_album .banner{
     border-radius: 6px;
   }
 }

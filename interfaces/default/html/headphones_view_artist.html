@@ -12,8 +12,10 @@
                     <i class="icon-wrench"></i>&nbsp;<span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="full-update headphones_full_update">Force full update</a></li>
-                    <li><a href="#" class="rescan-files headphones_rescan_files">Rescan files</a></li>
+                    <li><a href="/headphones/RefreshArtist/${artist_id}" class="ajax-link"><i class="icon-refresh"></i> Refresh</a></li>
+                    <li><a href="/headphones/DeleteArtist/${artist_id}" class="ajax-link"><i class="icon-trash"></i> Delete</a></li>
+                    <li><a href="/headphones/PauseArtist/${artist_id}" class="ajax-link"><i class="icon-pause"></i> Pause</a></li>
+                    <li><a href="/headphones/ResumeArtist/${artist_id}" class="ajax-link"><i class="icon-play"></i> Resume</a></li>
                 </ul>
             </div>
         </h1>
@@ -25,10 +27,10 @@
         </ul>
 
         <div id="banner" class="row-fluid banner">
-            <div class="span8" style="min-height: 0px;"><img class="img-polaroid img-rounded artist_img"src="${artistimg}"></div>
-            <div class="show_details span4 pull-right">
-                <div id="show_details_top" class="span4"></div>
-                <strong>Show details</strong>
+            <div class="span8" style="min-height: 0px;"><img class="img-polaroid img-rounded artist_img"></div>
+            <div class="artist_details span4 pull-right">
+                <div id="artist_details_top" class="span4"></div>
+                <strong>Artist details</strong>
                 <table class="table table-condensed">
                     <tr><td>Tracks</td><td class="headphones_total_tracks"> ${havetracks} / ${totaltracks}</td></tr>
                     <tr><td>Status</td><td class="headphones_status">${artist['Status']}</td></tr>
@@ -44,9 +46,8 @@
                         </tr>
                     %endif
 
-                    <!-- img-polaroid img-rounded -->
                 </table>
-                <div id="show_details_bottom" class="span4"></div>
+                <div id="artist_details_bottom" class="span4"></div>
             </div>
         </div>
 
@@ -82,11 +83,17 @@
                         <td>${album['ReleaseDate']}</td>
                         <td>${album['StatusText']}</td>
                         <td>
+                            <div class="btn-group">
                             % if album['can_download'] is True:
                             <a class="btn btn-mini btn-search" title="Search for album">
                                 <i class="icon-search"></i>
                             </a>
                             % endif
+                            <a class="btn btn-mini unque-album-hp" title="Search for album">
+                                <i class="icon-trash"></i>
+                            </a>
+
+                            </div>
                         </td>
                     </tr>
                     % endfor
