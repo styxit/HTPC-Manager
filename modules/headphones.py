@@ -261,7 +261,7 @@ class Headphones(object):
                 json = False
             result = ''
             self.logger.info('calling api @ %s' % url)
-            response = requests.get(url, timeout=30) # change timeout as mb is fucking slow
+            response = requests.get(url, timeout=30, verify=False)
 
             if response.status_code != 200:
                 self.logger.error('failed to contact headphones')
