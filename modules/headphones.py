@@ -8,7 +8,6 @@ import requests
 from cherrypy.lib.auth2 import require
 
 from urllib import urlencode
-from urllib2 import urlopen
 from json import loads
 from htpc.proxy import get_image
 
@@ -40,7 +39,6 @@ class Headphones(object):
 
         return template.render(
             scriptname='headphones',
-            hello='world',
             settings=settings,
             url=url,
             name=settings.get('headphones_name', 'Headphones')
@@ -54,6 +52,7 @@ class Headphones(object):
         if url is None and thumb is None:
             # To stop if the image is missing
             return
+        # Should never used thumb, to lazy to remove it
         if thumb:
             url = thumb
         return get_image(url, h, w, o)
@@ -97,9 +96,7 @@ class Headphones(object):
             scriptname='headphones_view_album',
             artist_id=response['album'][0]['ArtistID'],
             album_id=album_id,
-            c_img=response['album'][0]['ArtworkURL'],
             albumimg=response['album'][0]['ArtworkURL'],
-            #artistimg=response['artist'][0]['ArtworkURL'],
             module_name=htpc.settings.get('headphones_name', 'Headphones'),
             album=response['album'][0],
             tracks=response['tracks'],
@@ -154,9 +151,9 @@ class Headphones(object):
     @require()
     def SearchForArtist(self, name, searchtype):
         if searchtype == "artistId":
-            return self.fetch('findArtist&%s' % urlencode({'name': name}))
+            return self.fetch('findArtist&%s' % urlencode({'name': name.encode(encoding='UTF-8',errors='strict')}))
         else:
-            return self.fetch('findAlbum&%s' % urlencode({'name': name}))
+            return self.fetch('findAlbum&%s' % urlencode({'name': name.encode(encoding='UTF-8',errors='strict')}))
 
     @cherrypy.expose()
     @require()
@@ -180,7 +177,10 @@ class Headphones(object):
 
     @cherrypy.expose()
     @require()
-    def QueueAlbum(self, albumId):
+    def QueueAlbum(self, albumId, new=False):
+        # == Force check
+        if new:
+            return self.fetch('queueAlbum&id=%s&new=True' % albumId, text=True)
         return self.fetch('queueAlbum&id=%s' % albumId, text=True)
 
     @cherrypy.expose()
@@ -228,19 +228,16 @@ class Headphones(object):
     @cherrypy.expose()
     @require()
     def ShutDown(self):
-        print "running shutdown"
         return self.fetch('shutdown', text=True)
 
     @cherrypy.expose()
     @require()
     def UpDate(self):
-        print "running update"
         return self.fetch('update', text=True)
 
     @cherrypy.expose()
     @require()
     def ReStart(self):
-        print "running restart"
         return self.fetch('restart', text=True)
 
     @cherrypy.expose()
@@ -271,9 +268,6 @@ class Headphones(object):
                 return
 
             if text:
-                # check the single command cant be json out
-                print "should be fucking text"
-                print response.text
                 result = response.text
 
             if img:
@@ -282,7 +276,7 @@ class Headphones(object):
             if json:
                 result = response.json()
 
-            #self.logger.debug('Response: %s' % result)
+            self.logger.debug('Response: %s' % result)
             return result
 
         except Exception as e:
@@ -323,7 +317,7 @@ def _get_status_icon(status):
         'Skipped': 'icon-fast-forward',
         'Wanted': 'icon-heart',
         'Processed': 'icon-ok',
-        'Unprocessed': ''
+        'Unprocessed': 'icon-exclamation-sign'
     }
 
     if not status:

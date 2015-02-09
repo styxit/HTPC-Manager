@@ -47,7 +47,7 @@ function searchForAlbum(albumId, name) {
             if (data.result != 'success') {
                 notify('Error', data.message, 'error');
             } else {
-                notify('OK', name+ ' ' + season + 'x'+episode+' found. ' + data.message, 'success');
+                notify('OK', name + ' ' + season + 'x'+episode+' found. ' + data.message, 'success');
             }
         },
         error: function (data) {
@@ -60,7 +60,7 @@ function searchForAlbum(albumId, name) {
 }
 
 function beginRefreshArtist(artistId) {
-    var $div = $('div').html('hello world');
+    var $div = $('div').html('Refreshing artist');
     var $buttons = {
         'Refresh': function () {
             beginRefreshArtist(artistId);
@@ -104,8 +104,6 @@ function searchForArtist(name, type) {
 
             if (type == 'artistId') {
                 $.each(result, function (index, item) {
-                    console.log("artist")
-                    console.log(item)
                     var option = $('<option>')
                     .attr('value', item.id)
                     .html(item.uniquename);
@@ -115,8 +113,6 @@ function searchForArtist(name, type) {
 
             } else {
                 $.each(result, function (index, item) {
-                    console.log("album")
-                    console.log(item)
                     var tt;
                     if (item.date.length) {
                         // release date should be (yyyy) or empty string
@@ -129,7 +125,6 @@ function searchForArtist(name, type) {
                         // to remove None..
                         item.uniquename = ''
                     }
-                    var t = item.title + ' (' + item.date + ')'
                     var option = $('<option>')
                         .attr('value', item.albumid)
                         .html(item.title + tt + item.uniquename);
@@ -159,7 +154,6 @@ function addArtist(id, searchtype, name) {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            console.log(data)
             $('#add_artist_name').val('');
             notify('Add ' + stype, 'Successfully added  '+ stype + ' ' + name, 'success');
             cancelAddArtist();
@@ -187,9 +181,7 @@ function loadArtists() {
                 $('#artists_table_body').append(row);
             } else {
                 $.each(result, function (index, artist) {
-                    var image = $('<img>').addClass('img-polaroid img-rounded')
-                    console.log("loadArtists")
-                    console.log(artist)
+                    var image = $('<img>').addClass('img-polaroid img-rounded artistimgtab')
                     var name = $('<a>')
                         .attr('href',WEBDIR + 'headphones/viewArtist/' + artist.ArtistID)
                         .text(artist.ArtistName);
@@ -210,7 +202,7 @@ function loadArtists() {
                     }
 
                     if (artist.ThumbURL) {
-                        image.attr('src', WEBDIR + 'headphones/GetThumb/?w=75&h=75&thumb=' + encodeURIComponent(artist.ThumbURL))
+                        image.attr('src', WEBDIR + 'headphones/GetThumb/?w=150&h=150&thumb=' + artist.ThumbURL)
 
                     } else {
                         image.attr('src', '../img/no-cover-artist.png').css({'width' : '75px' , 'height' : '75px'}) //TODO
@@ -251,47 +243,59 @@ function loadWanteds() {
                     var row = $('<tr>');
                     var image = $('<img>').addClass('img-polaroid img-rounded')
                     if (wanted.ThumbURL) {
-                        image.attr('src', WEBDIR + 'headphones/GetThumb/?w=75&h=75&thumb=' + encodeURIComponent(wanted.ThumbURL))
+                        image.attr('src', WEBDIR + 'headphones/GetThumb/?w=150&h=150&thumb=' + encodeURIComponent(wanted.ThumbURL))
 
                     } else {
-                        image.attr('src', '../img/no-cover-artist.png').css({'width' : '75px' , 'height' : '75px'}) //TODO
+                        image.attr('src', '../img/no-cover-artist.png').css({'width' : '75px' , 'height' : '75px'})
 
                     }
 
-                    var buttons = $('<div>').addClass('btn-group')
-                    var remove = $('<a class="btn btn-mini btn-cancel"><i class="icon-remove-circle"></i></a></td>').click(function () {
+                    //var buttons = $('<div>').addClass('btn-group')
+                    var remove = $('<a class="btn btn-mini btn-cancel" title="Set Skipped"><i class="icon-step-forward"></i></a></td>').click(function () {
                                 $.ajax({
                                     url: WEBDIR + 'headphones/UnqueueAlbum',
                                     data: {'albumId': wanted.AlbumID},
                                     type: 'get',
                                     complete: function (result) {
                                         loadWanteds()
-                                        notify('Unqued', wanted.ArtistName + ' - ' + wanted.AlbumTitle);
+                                        notify('Set Skipped', wanted.ArtistName + ' - ' + wanted.AlbumTitle);
                                     }
                                 })
                             })
-                    var search = $('<a class="btn btn-mini"><i class="icon-search"></i></a></td>').click(function () {
+                    var search = $('<a class="btn btn-mini" title="Set wanted"><i class="icon-heart"></i></a></td>').click(function () {
                                 $.ajax({
                                     url: WEBDIR + 'headphones/QueueAlbum',
                                     data: {'albumId': wanted.AlbumID},
                                     type: 'get',
                                     complete: function (result) {
-                                        notify('Qued', wanted.ArtistName + ' - ' + wanted.AlbumTitle);
+                                        notify('Set wanted', wanted.ArtistName + ' - ' + wanted.AlbumTitle);
+                                    }
+                                })
+                            })
+                    var force = $('<a class="btn btn-mini" title="Force Check"><i class="icon-search"></i></a></td>').click(function () {
+                                $.ajax({
+                                    url: WEBDIR + 'headphones/QueueAlbum&new=True',
+                                    data: {'albumId': wanted.AlbumID},
+                                    type: 'get',
+                                    complete: function (result) {
+                                        notify('Force Check', wanted.ArtistName + ' - ' + wanted.AlbumTitle);
                                     }
                                 })
                             })
 
 
-                    var div = $('<div>').append(search, remove)
+                    var div = $('<div>').addClass('btn-group').append(search, force, remove);
                     row.append(
-                        $('<td>').append($('<a>')
-                            .addClass('headphones_wanted_artistname')
-                            .attr('href', WEBDIR + 'headphones/viewArtist/' + wanted.ArtistID)
-                            .text(wanted.ArtistName)),
-                        $('<td>').append($('<a>')
-                            .addClass('headphones_wanted_artistalbum')
-                            .attr('href', WEBDIR + 'headphones/viewAlbum/' + wanted.AlbumID)
-                            .text(wanted.AlbumTitle)),
+                        $('<td>').append(
+                            $('<a>')
+                                .addClass('headphones_wanted_artistname')
+                                .attr('href', WEBDIR + 'headphones/viewArtist/' + wanted.ArtistID)
+                                .text(wanted.ArtistName)),
+                        $('<td>').append(
+                            $('<a>')
+                                .addClass('headphones_wanted_artistalbum')
+                                .attr('href', WEBDIR + 'headphones/viewAlbum/' + wanted.AlbumID)
+                                .text(wanted.AlbumTitle)),
                         $('<td>').text(wanted.ReleaseDate),
                         $('<td>').append(headphonesStatusLabel(wanted.Status)),
                         $('<td>').append(div)
@@ -325,14 +329,12 @@ function loadHistory() {
         type: 'get',
         dataType: 'json',
         success: function(result) {
-            console.log(result)
-            if (result.length === 0) {
+            if (result.length == 0) {
                 var row = $('<tr>')
                 row.append($('<td>').html('History is empty'));
                 $('#history_table_body').append(row);
             }
             $.each(result, function(i, item) {
-                console.log(item)
                 var row = $('<tr>');
                 row.append(
                     $('<td>').html(item.DateAdded),
@@ -351,14 +353,12 @@ function loadHistory() {
         type: 'get',
         dataType: 'json',
         success: function(result) {
-            console.log(result)
             if (result.length === 0) {
                 var row = $('<tr>')
                 row.append($('<td>').html('History is empty'));
                 $('#history_table_body').append(row);
             }
             $.each(result, function(i, item) {
-                console.log(item)
                 var row = $('<tr>');
                 row.append(
                     $('<td>').html(item.DateAdded),
@@ -405,7 +405,7 @@ var headphonesStatusMap = {
     'Skipped': 'icon-fast-forward',
     'Wanted': 'icon-heart',
     'Processed': 'icon-ok',
-    'Unprocessed': ''
+    'Unprocessed': 'icon-exclamation-sign'
 }
 function headphonesStatusIcon(iconText, white){
     var iconClass = headphonesStatusMap[iconText];

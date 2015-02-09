@@ -52,7 +52,12 @@ def get_image(url, height=None, width=None, opacity=100, auth=None, headers=None
 
             # If there is no local resized copy
             if not os.path.isfile(resized):
-                resize_image(image, height, width, opacity, resized)
+                # try to resize, if we cant return original image
+                try:
+                    resize_image(image, height, width, opacity, resized)
+                except Exception as e:
+                    logger.debug('%s returning orginal image %s' % (e, url))
+                    return serve_file(path=image, content_type='image/png')
 
             # Serve the resized file
             image = resized
@@ -92,6 +97,7 @@ def resize_image(img, height, width, opacity, dest):
     """ Resize image, set opacity and save to disk """
     size = int(width), int(height)
     imagetype = imghdr.what(img)
+
     im = Image.open(img)
     im = im.resize(size, Image.ANTIALIAS)
 

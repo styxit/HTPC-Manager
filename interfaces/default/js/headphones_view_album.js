@@ -9,7 +9,6 @@ $(document).ready(function() {
 	 }
 	 // sort tracks desc
 	 $('.tracks-table').trigger("sorton",[[[0,0]]]);
-	 // Load from htpc manager cache
 
 })
 
