@@ -100,6 +100,7 @@ def resize_image(img, height, width, opacity, dest):
     im = Image.open(img)
     im = im.resize(size, Image.ANTIALIAS)
 
+
     # Apply overlay if opacity is set
     opacity = float(opacity)
     if (opacity < 100):

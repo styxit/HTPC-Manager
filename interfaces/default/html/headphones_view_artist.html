@@ -3,6 +3,7 @@
     havetracks = 0 if artist['HaveTracks'] is None else artist["HaveTracks"]
     totaltracks = 0 if artist['TotalTracks'] is None else artist['TotalTracks']
 %>
+${self.attr.webdir}
 <div class="container-fluid">
     <div class="content maincontent headphones_artist">
         <h1 class="page-header page-title" data-artistid="${artist_id}" data-artistimg="${artistimg}">
@@ -12,17 +13,17 @@
                     <i class="icon-wrench"></i>&nbsp;<span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="/headphones/RefreshArtist/${artist_id}" class="ajax-link"><i class="icon-refresh"></i> Refresh</a></li>
-                    <li><a href="/headphones/DeleteArtist/${artist_id}" class="ajax-link"><i class="icon-trash"></i> Delete</a></li>
-                    <li><a href="/headphones/PauseArtist/${artist_id}" class="ajax-link"><i class="icon-pause"></i> Pause</a></li>
-                    <li><a href="/headphones/ResumeArtist/${artist_id}" class="ajax-link"><i class="icon-play"></i> Resume</a></li>
+                    <li><a href="${self.attr.webdir}headphones/RefreshArtist/${artist_id}" class="ajax-link"><i class="icon-refresh"></i> Refresh</a></li>
+                    <li><a href="${self.attr.webdir}headphones/DeleteArtist/${artist_id}" class="ajax-link"><i class="icon-trash"></i> Delete</a></li>
+                    <li><a href="${self.attr.webdir}headphones/PauseArtist/${artist_id}" class="ajax-link"><i class="icon-pause"></i> Pause</a></li>
+                    <li><a href="${self.attr.webdir}headphones/ResumeArtist/${artist_id}" class="ajax-link"><i class="icon-play"></i> Resume</a></li>
                 </ul>
             </div>
         </h1>
 
         <ul class="breadcrumb">
-            <li><a href="/">Home</a> <span class="divider">/</span></li>
-            <li><a href="/headphones">${module_name}</a> <span class="divider">/</span></li>
+            <li><a href="${self.attr.webdir}">Home</a> <span class="divider">/</span></li>
+            <li><a href="${self.attr.webdir}headphones">${module_name}</a> <span class="divider">/</span></li>
             <li class="active headphones_showname">${artist['ArtistName']}</li>
         </ul>
 
@@ -37,7 +38,7 @@
                     %if artist['AlbumID'] is not None:
                         <tr>
                             <td>Last Album</td>
-                            <td class="headphones_last_album"><a href="/headphones/viewAlbum/${artist['AlbumID']}">${artist['LatestAlbum']} (${artist['ReleaseDate']})</a></td>
+                            <td class="headphones_last_album"><a href="${self.attr.webdir}headphones/viewAlbum/${artist['AlbumID']}">${artist['LatestAlbum']} (${artist['ReleaseDate']})</a></td>
                         </tr>
                     %else:
                         <tr>
@@ -71,13 +72,13 @@
                         <th>Title</th>
                         <th>Release Date</th>
                         <th>Status</th>
-                        <th>Search</th>
+                        <th>Action</th>
                     </tr>
                     </thead>
                     <tbody id="album-tracks">
                     % for album in albums:
                     <tr data-albumid="${album['AlbumID']}">
-                        <td class="artist"><a href="/headphones/viewAlbum/${album['AlbumID']}">
+                        <td class="artist"><a href="${self.attr.webdir}headphones/viewAlbum/${album['AlbumID']}">
                             ${album['AlbumTitle']}
                         </a></td>
                         <td>${album['ReleaseDate']}</td>

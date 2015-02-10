@@ -202,14 +202,14 @@ function loadArtists() {
                     }
 
                     if (artist.ThumbURL) {
-                        image.attr('src', WEBDIR + 'headphones/GetThumb/?w=150&h=150&thumb=' + artist.ThumbURL)
+                        image.attr('src', WEBDIR + 'headphones/GetThumb/?thumb=' + artist.ThumbURL)
 
                     } else {
-                        image.attr('src', '../img/no-cover-artist.png').css({'width' : '75px' , 'height' : '75px'}) //TODO
+                        image.attr('src', '../img/no-cover-artist.png').css({'width' : '64px' , 'height' : '64px'}) //TODO
 
                     }
 
-                    var div = $('<div>').append(image)
+                    var div = $('<div>').addClass("artistthumbdiv").append(image)
                     row.append(
                         $('<td>').append(div),
                         $('<td>').html(name),
