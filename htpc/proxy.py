@@ -98,7 +98,8 @@ def resize_image(img, height, width, opacity, dest):
     imagetype = imghdr.what(img)
 
     im = Image.open(img)
-    im = im.resize(size, Image.ANTIALIAS)
+    # Keeps ratio aspect
+    im = im.thumbnail(size, Image.ANTIALIAS)
 
 
     # Apply overlay if opacity is set
