@@ -32,6 +32,7 @@ class Vnstat(object):
                 {"type": "text", "label": "Menu name", "name": "vnstat_name"},
                 {"type": "bool", "label": "Use SSH?", 'desc': 'Check this if vnstat is running on a different computer', "name": "vnstat_use_ssh"},
                 {"type": "text", "label": "Vnstat DB location", "placeholder": "", "name": "vnstat_db"},
+                {"type": "text", "label": "Interface", "placeholder": "eth0", "desc": "Fetching speed from this interface", "name": "vnstat_interface"},
                 {"type": "text", "label": "IP / Host", "placeholder": "localhost", "name": "vnstat_host"},
                 {"type": "text", "label": "Port", "name": "vnstat_port"},
                 {"type": "text", "label": "Username", "name": "vnstat_username"},
@@ -157,7 +158,11 @@ class Vnstat(object):
     @cherrypy.expose()
     @require()
     def tr(self, dash=False):
-        piped = self.run('-tr')
+        interface = htpc.settings.get('vnstat_interface', '')
+        if interface:
+            piped = self.run('-tr %s' % interface)
+        else:
+            piped = self.run('-tr')
         download = re.compile(ur'rx\s+(\d+.\d+)\s+(\w+\/s)')
         upload = re.compile(ur'tx\s+(\d+.\d+)\s+(\w+\/s)')
         rx = re.search(download, piped)
