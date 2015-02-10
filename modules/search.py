@@ -77,7 +77,8 @@ class Search(object):
     def search(self, q='', cat='', **kwargs):
         if cat:
             cat = '&cat=' + cat
-        result = self.fetch('search&q=' + urllib2.quote(q) + cat + '&extended=1')
+        # js is utf 8
+        result = self.fetch('search&q=' + urllib2.quote(q.encode(encoding="UTF-8")) + cat + '&extended=1')
         try:
             return result['channel']['item']
         except:

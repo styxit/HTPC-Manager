@@ -6,7 +6,6 @@ import cherrypy
 import jsonrpclib
 import logging
 from ts import norbits
-from ts import fenopy
 
 
 class Torrentsearch(object):
@@ -20,8 +19,6 @@ class Torrentsearch(object):
                 {'type': 'text', 'label': 'Menu name', 'name': 'torrentsearch_name'},
                 {'type': 'bool', 'label': 'Enable BTN', 'name': 'torrents_btn_enabled'},
                 {'type': 'text', 'label': 'BTN apikey', 'name': 'torrentsearch_btn_apikey'},
-                {'type': 'bool', 'label': 'Fenopy', 'name': 'torrents_fenopy_enabled'},
-                {'type': 'bool', 'label': 'Fenopy verified torrents only', 'name': 'torrents_fenopy_enabled_verified'},
                 {'type': 'bool', 'label': 'Norbits', 'name': 'torrents_norbits_enabled'},
                 {'type': 'text', 'label': 'Norbits username', 'name': 'torrents_norbits_username'},
                 {'type': 'text', 'label': 'Norbits passkey', 'name': 'torrents_norbits_passkey'}
@@ -36,11 +33,10 @@ class Torrentsearch(object):
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def search(self, query=None):
+        self.logger.debug(query)
         r = []
         if htpc.settings.get('torrents_btn_enabled'):
-            r += self.btn(query)
-        elif htpc.settings.get('torrents_fenopy_enabled'):
-            r += self.search_fenopy(query, 'all')
+            r += self.btn()
         elif htpc.settings.get('torrents_norbits_enabled'):
             r += self.search_norbits(query, 'tv')
         return r
@@ -67,9 +63,6 @@ class Torrentsearch(object):
         torrentproviders = ['ALL']
         if htpc.settings.get('torrents_btnapikey') and htpc.settings.get('torrents_btn_enabled') == 1:
             torrentproviders.append('BTN')
-
-        if htpc.settings.get('torrents_fenopy_enabled') == 1:
-            torrentproviders.append('fenopy')
 
         if htpc.settings.get('torrents_norbits_enabled') == 1 and htpc.settings.get('torrents_norbits_passkey') and htpc.settings.get('torrents_norbits_username'):
             torrentproviders.append('norbits')
@@ -125,10 +118,6 @@ class Torrentsearch(object):
             utor['path'] = 'utorrent/to_client/'
             l.append(utor)
         return l
-
-    def search_fenopy(self, q, cat):
-        results = fenopy.search(q, cat)
-        return results
 
     def search_norbits(self, q, cat):
         results = norbits.search(q, cat)

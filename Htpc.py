@@ -10,6 +10,7 @@ import os
 import sys
 import htpc
 import webbrowser
+import locale
 from threading import Thread
 
 
@@ -131,6 +132,18 @@ def main():
     # Set root and insert bundled libraies into path
     htpc.RUNDIR = os.path.dirname(os.path.abspath(sys.argv[0]))
     sys.path.insert(0, os.path.join(htpc.RUNDIR, 'libs'))
+
+    htpc.SYS_ENCODING = None
+
+    try:
+        locale.setlocale(locale.LC_ALL, "")
+        htpc.SYS_ENCODING = locale.getpreferredencoding()
+    except (locale.Error, IOError):
+        pass
+
+    # for OSes that are poorly configured I'll just force UTF-8
+    if not htpc.SYS_ENCODING or htpc.SYS_ENCODING in ('ANSI_X3.4-1968', 'US-ASCII', 'ASCII'):
+        htpc.SYS_ENCODING = 'UTF-8'
 
     # Set datadir, create if it doesn't exist and exit if it isn't writable.
     htpc.DATADIR = os.path.join(htpc.RUNDIR, 'userdata/')

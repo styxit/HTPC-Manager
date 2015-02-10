@@ -1,12 +1,13 @@
-This is  Htpc-Manager the way i want it.
+This is Htpc-Manager the way i want it.
 
 Some of the difference is:
 
 [New modules]
-- Sonaarr/Nzbdrone module
-- Samsung tv remote
+- Sonaarr
+- Headphones
+- Samsung TV remote
 - Sickrage module
-- Torrent search BTN, Fenopy, Norbits (just the one i use myself.)
+- Torrent search BTN, Norbits (just the one i use myself.)
 - Vnstat
 
 [Improved]
@@ -15,12 +16,12 @@ Some of the difference is:
 - Transmission (add url, upload local torrent)
 - SABnzbd (drag'n drop to edit que)
 - Stats module is sortable.
-- KODI/XBMC addons tab, where you can search/execute and a volume slider instead of a progressbar
+- KODI/XBMC addons tab, where you can search/execute/enable/disable addons and a volume slider instead of a progressbar
 - Send a nzb from NZB search to NZBGet in addition to SABnzbd.
 - Set wanted category while adding movies in Couchpotato
 
 [Misc]
-- Check for update, and autoupdate
+- Notification if a update is available and autoupdate
 - Htpc manager is now fluid. (Looks much better on high res screens)
 - Delete cache folder from the settings page
 - The brave and bold can choose what branch they want to use.
@@ -35,7 +36,7 @@ Some of the difference is:
 TODO:
 - Ipcamera module
 
-If your missing something dont be afaid to make a request :)
+If your missing something dont be afraid to make a request :)
 
 See here for full list:
 https://github.com/Hellowlol/HTPC-Manager/compare/styxit:master...master2
