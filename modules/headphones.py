@@ -210,6 +210,11 @@ class Headphones(object):
 
     @cherrypy.expose()
     @require()
+    def GetAlbum(self, id):
+        return self.fetch('getAlbum&id=%s' % id)
+
+    @cherrypy.expose()
+    @require()
     def ForceSearch(self):
         return self.fetch('forceSearch', text=True)
 

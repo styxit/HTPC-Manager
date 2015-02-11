@@ -208,6 +208,16 @@ settings = self.attr.settings
                 </table>
             </div>
             %endif
+            %if settings.get('dash_wanted_albums', 0):
+            <div class="span4">
+                <h3><a href="headphones/#wanted">Wanted Albums</a></h3>
+                <div id="headphones-carousel" class="carousel slide hide">
+                    <div class="carousel-inner"></div>
+                    <a class="carousel-control left" href="#headphones-carousel" data-slide="prev">&lsaquo;</a>
+                    <a class="carousel-control right" href="#headphones-carousel" data-slide="next">&rsaquo;</a>
+                </div>
+            </div>
+            %endif
         </div>
         <div class="row-fluid">
             %if settings.get('dash_doesnotexist', 0):
@@ -235,6 +245,7 @@ settings = self.attr.settings
             </div>
             %endif
 
+
         </div>
 
         <%
@@ -251,6 +262,7 @@ settings = self.attr.settings
         dashcount += settings.get('dash_rec_tv_plex', 0);
         dashcount += settings.get('dash_rec_music_plex', 0);
         dashcount += settings.get('dash_nzbget', 0);
+        dashcount += settings.get('dash_wanted_albums', 0);
         %>
         %if dashcount == 0:
         <div class="row-fluid">

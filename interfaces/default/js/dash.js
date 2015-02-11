@@ -12,7 +12,56 @@ $(document).ready(function () {
     loadsonarrCalendar()
     loadNextAiredSickrage()
     loadsysinfo()
+    loadWantedAlbums()
+
 })
+
+/*
+Fetch data from album page. Returns the album object, a description object and a tracks object. Tracks contain: AlbumASIN, AlbumTitle, TrackID, Format, TrackDuration (ms), ArtistName, TrackTitle, AlbumID, ArtistID, Location, TrackNumber, CleanName (stripped of punctuation /styling), BitRate)
+*/
+
+
+function loadWantedAlbums () {
+    if (!$('#headphones-carousel').length) return
+    $.get(WEBDIR + 'headphones/GetWantedList', function (data) {
+        if (data === null) return
+        $.each(data, function (i, albums) {
+            console.log(albums)
+            // too small images it looks ugly. replace if pr on hp api
+            //if (albums.ThumbURL === null) return;
+            if (albums.ArtworkURL === null) return;
+            console.log(albums)
+            var itemDiv = $('<div>').addClass('item carousel-item')
+
+            if (i === 0) itemDiv.addClass('active')
+
+            var tt;
+            if (albums.ReleaseDate.length) {
+                // release date should be (yyyy) or empty string
+                tt = ' (' + albums.ReleaseDate.substring(0,4) + ') '
+            } else {
+                    tt = '  '
+            }
+            if (albums.ArtistName === 'None') {
+                // to remove None..
+                albums.ArtistName = ''
+            }
+
+            var src = WEBDIR + 'headphones/GetThumb?h=240&w=430&thumb=' + albums.ArtworkURL
+            itemDiv.attr('style', 'background-image: url("' + src + '")')
+
+            itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
+                location.href = WEBDIR +'headphones/#wanted'
+            }).append(
+                $('<h4>').html(albums.AlbumTitle + tt)
+            ))
+            $('#headphones-carousel .carousel-inner').append(itemDiv)
+
+
+        })
+        $('#headphones-carousel').show()
+    })
+}
 
 function loadRecentMovies () {
     if (!$('#movie-carousel').length) return

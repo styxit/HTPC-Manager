@@ -106,34 +106,39 @@ function get_clients() {
 }
 
 function anc(nzb) {
-    var b = $('<div>').addClass('btn-group');
-        // Used to check if there is any active clients
-        var n = 0;
-        $.each(clients, function (i, client) {
-            if (client.active === 1) {
-                // If there any active clients add 1 to n
-                n += 1;
-                var button2 = $('<img>').addClass("btn btn-mini").attr('src', client.icon).
-                attr('title', "Send to " + client.client).
-                css("cursor","pointer").click(function(){
-                    sendToclient(nzb, client)
-                });
+    var b = $('<div>').addClass('btn-group clearfix');
+    // Used to check if there is any active clients
+    var n = 0;
+    $.each(clients, function (i, client) {
+        if (client.active === 1) {
+            // If there any active clients add 1 to n
+            n += 1;
+            var button = $('<img>').addClass("btn btn-mini").attr('src', client.icon).
+            attr('title', "Send to " + client.client).
+            css("cursor", "pointer").click(function () {
+                sendToclient(nzb, client);
+            });
 
-                b.append(button2);
-            }
-        });
-        // Checks if there is any active clients, if it isnt add a error message.
-        if (n === 0) {
-            b.append('No active clients').removeClass('btn-group');
-            return b;
+            b.append(button);
         }
-        else if (n === 1) {
-            b.removeClass('btn-group');
-        }
+    });
+
+    // Manuel download button
+    var browserdl = $('<button>').addClass("btn btn-mini")
+        .css({
+        "cursor": "pointer",
+        "height": "18px"
+    }).click(function () {
+        downloadnzb(nzb);
+    }).append($('<i>').addClass('icon-download-alt'));
+
+    b.append(browserdl);
+
     return b;
 }
 
 function showDetails(data) {
+    console.log(data)
     var modalTitle = data.description;
     if (data.attr['imdbtitle']) {
         modalTitle = data.attr['imdbtitle'];
@@ -171,9 +176,13 @@ function showDetails(data) {
     modalInfo.append($('<p>').html('<b>Size:</b> ' + bytesToSize(data.attr['size'])));
     modalInfo.append($('<p>').html('<b>Grabs:</b> ' + data.attr['grabs']));
     modalInfo.append($('<p>').html('<b>Files:</b> ' + data.attr['files']));
-    var password = data.attr['password'];
-    if (password == 0) password = 'None';
-    modalInfo.append($('<p>').html('<b>Password:</b> ' + password));
+
+    if (data.attr['password']) {
+        var password = data.attr['password'];
+        if (password == 0) password = 'None';
+        modalInfo.append($('<p>').html('<b>Password:</b> ' + password));
+    }
+
     if(data.attr['imdbscore']) {
         var rating = $('<span>').raty({
             readOnly: true,
@@ -192,16 +201,38 @@ function showDetails(data) {
     modalBody.append(modalImage);
     modalBody.append(modalInfo);
 
-    var modalButtons = {
-        'SABnzbd' : function () {
-            sendToSab(data)
-            hideModal();
-        },
-        'NZBGget': function() {
-            sendToGet(data)
-            hideModal();
+    var modalButtons = {}
+    $.each(clients, function(i, v){
+        console.log(v)
+        if (v.active === 1 && v.client === "nzbget") {
+            console.log("nzbget")
+            $.extend(modalButtons,{
+            'NZBget' : function() {
+                sendToGet(data)
+                hideModal();
+                }
+            });
+
         }
-    }
+        if (v.active === 1 && v.client === "sabnzbd") {
+            $.extend(modalButtons,{
+            'SABnzbd' : function() {
+                sendToSab(data)
+                hideModal();
+                }
+            });
+
+        }
+
+    })
+
+    // manual download to the browser
+    $.extend(modalButtons,{
+            'Download nzb' : function() {
+                downloadnzb(data);
+            }
+    });
+
     if (data.attr['imdb']) {
         var link = 'http://www.imdb.com/title/tt' + data.attr['imdb'] + '/';
         $.extend(modalButtons,{
@@ -263,6 +294,14 @@ function sendToclient(item, client) {
             notify('', 'Sent ' + item.description+ ' to ' + client.client, 'info');
         }
     });
+}
+
+function downloadnzb(data)
+{
+    var l = document.createElement("a");
+    l.download = data.title;
+    l.href = data.link;
+    l.click();
 }
 
 $(document).ready(function () {

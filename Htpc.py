@@ -108,9 +108,9 @@ def update_needed():
         if htpc.settings.get('app_check_for_updates', False):
             # Used for the notification footer
             htpc.UPDATE_AVAIL = True
-        # Since im stupid, protect me please..
-        if htpc.settings.get("app_auto_update", False) and not htpc.DEBUG:
-            Thread(target=htpc.ROOT.update.updateEngine.update).start()
+    # Since im stupid, protect me please..
+    if htpc.settings.get("app_auto_update", False) and not htpc.DEBUG:
+        Thread(target=htpc.ROOT.update.updateEngine.update).start()
 
 
 def init_sched():
