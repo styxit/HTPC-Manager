@@ -16,9 +16,7 @@ $(document).ready(function () {
 
 })
 
-/*
-Fetch data from album page. Returns the album object, a description object and a tracks object. Tracks contain: AlbumASIN, AlbumTitle, TrackID, Format, TrackDuration (ms), ArtistName, TrackTitle, AlbumID, ArtistID, Location, TrackNumber, CleanName (stripped of punctuation /styling), BitRate)
-*/
+
 
 
 function loadWantedAlbums () {
@@ -26,11 +24,7 @@ function loadWantedAlbums () {
     $.get(WEBDIR + 'headphones/GetWantedList', function (data) {
         if (data === null) return
         $.each(data, function (i, albums) {
-            console.log(albums)
-            // too small images it looks ugly. replace if pr on hp api
-            //if (albums.ThumbURL === null) return;
-            if (albums.ArtworkURL === null) return;
-            console.log(albums)
+            var src;
             var itemDiv = $('<div>').addClass('item carousel-item')
 
             if (i === 0) itemDiv.addClass('active')
@@ -46,8 +40,12 @@ function loadWantedAlbums () {
                 // to remove None..
                 albums.ArtistName = ''
             }
+            if (albums.ArtworkURL === null) {
+                src = WEBDIR + 'img/no-cover-art.png'
+            } else {
+               src = WEBDIR + 'headphones/GetThumb?h=240&w=430&thumb=' + albums.ArtworkURL
+            }
 
-            var src = WEBDIR + 'headphones/GetThumb?h=240&w=430&thumb=' + albums.ArtworkURL
             itemDiv.attr('style', 'background-image: url("' + src + '")')
 
             itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
@@ -348,21 +346,30 @@ function loadsonarrCalendar(options) {
 function loadNextAiredSickrage(options) {
     if (!$('#nextaired_sickrage_table_body').length) return
     $.getJSON(WEBDIR + 'sickrage/GetNextAired', function (result) {
-        if (result === null || result.data.soon.length === 0) {
+        if (result === null) {
             $('#nextairedsickrage_table_body').append(
-                $('<tr>').append($('<td>').html('No future episodes found')),
+                $('<tr>').append($('<td>').html('No connection with sickrage')),
                 $('<tr>').append($('<td>').html('&nbsp;')),
                 $('<tr>').append($('<td>').html('&nbsp;')),
                 $('<tr>').append($('<td>').html('&nbsp;')),
                 $('<tr>').append($('<td>').html('&nbsp;'))
             )
-            return
+            return false
+        };
+        if (result.data.soon.length === 0 && result.data.later.length === 0 && result.data.today.length === 0 && result.data.missed.length === 0) {
+            $('#nextairedsickrage_table_body').append(
+                $('<tr>').append($('<td>').html('No future/missing episodes found')),
+                $('<tr>').append($('<td>').html('&nbsp;')),
+                $('<tr>').append($('<td>').html('&nbsp;')),
+                $('<tr>').append($('<td>').html('&nbsp;')),
+                $('<tr>').append($('<td>').html('&nbsp;'))
+            )
+            return false
         }
-        var soonaired = result.data.soon
-        var todayaired = result.data.today
-        var nextaired = todayaired.concat(soonaired)
-        $.each(nextaired, function (i, tvshow) {
-            if (i >= 5) return
+        var missed = result.data.missed;
+        var all = missed.concat(result.data.today, result.data.soon, result.data.later)
+        $.each(all, function(i, tvshow) {
+            if ($('table #nextaired_sickrage_table_body >tr').length >= 5) return false;
             var name = $('<a>').attr('href', 'sickbeard/view/' + tvshow.tvdbid).html(tvshow.show_name)
             $('#nextaired_sickrage_table_body').append(
                 $('<tr>').append(
@@ -371,6 +378,7 @@ function loadNextAiredSickrage(options) {
                     $('<td>').html(tvshow.airdate)
                 )
             )
+
         })
     })
 }
