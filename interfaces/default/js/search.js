@@ -7,7 +7,7 @@ function getCategories() {
             if (data == null) return false;
 
             var select = $('#catid').html('');
-            select.append($('<option>').html('Everything').attr('value','-1'));
+            select.append($('<option>').html('Everything').attr('value',''));
             $.each(data.category, function (c, cat) {
                 var option = $('<option>').html(cat["@attributes"]["name"]);
                 option.attr('value',cat["@attributes"]["id"])
@@ -68,29 +68,6 @@ function search(query, catid) {
                 // Make a group of nzbclient buttons
                 row.append($('<td>').append(anc(item)));
 
-                /*
-                var toSabIcon = $('<img>')
-                .attr('src', '../img/sabnzbd.png')
-                .attr('title', 'Send to SABnzbd')
-                .attr('alt', 'Send to SABnzbd')
-                .css('cursor', 'pointer');
-                toSabIcon.click(function() {
-                    sendToSab(item)
-                });
-                //row.append($('<td>').append(toSabIcon));
-
-                var toGetIcon = $('<img>')
-                .css('cursor', 'pointer')
-                .attr('src', '../img/nzbget.png')
-                .attr('title', 'Send to NzbGet')
-                .attr('alt', 'Send to NzbGet')
-                .css('cursor', 'pointer');
-                toGetIcon.click(function() {
-                    sendToGet(item)
-                });
-                //row.append($('<td>').append(toGetIcon));
-                */
-
                 $('#results_table_body').append(row);
                 if (stop) return false;
             });
@@ -129,7 +106,7 @@ function anc(nzb) {
         "cursor": "pointer",
         "height": "18px"
     }).click(function () {
-        downloadnzb(nzb);
+        downloadFile(nzb.link);
     }).append($('<i>').addClass('icon-download-alt'));
 
     b.append(browserdl);
@@ -138,7 +115,6 @@ function anc(nzb) {
 }
 
 function showDetails(data) {
-    console.log(data)
     var modalTitle = data.description;
     if (data.attr['imdbtitle']) {
         modalTitle = data.attr['imdbtitle'];
@@ -203,9 +179,7 @@ function showDetails(data) {
 
     var modalButtons = {}
     $.each(clients, function(i, v){
-        console.log(v)
         if (v.active === 1 && v.client === "nzbget") {
-            console.log("nzbget")
             $.extend(modalButtons,{
             'NZBget' : function() {
                 sendToGet(data)
@@ -229,7 +203,7 @@ function showDetails(data) {
     // manual download to the browser
     $.extend(modalButtons,{
             'Download nzb' : function() {
-                downloadnzb(data);
+                downloadFile(data);
             }
     });
 
@@ -296,13 +270,6 @@ function sendToclient(item, client) {
     });
 }
 
-function downloadnzb(data)
-{
-    var l = document.createElement("a");
-    l.download = data.title;
-    l.href = data.link;
-    l.click();
-}
 
 $(document).ready(function () {
     var clients = get_clients()

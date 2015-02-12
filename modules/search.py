@@ -99,6 +99,6 @@ class Search(object):
                 return loads(resource.read())
             except urllib2.HTTPError, err:
                 self.logger.error("HTTP Error Code Received: " + str(err.code))
-        except:
-            self.logger.error("Unable to fetch information from: " + url)
+        except Exception as e:
+            self.logger.error("Unable to fetch information from: %s %s" % (url, e))
             return
