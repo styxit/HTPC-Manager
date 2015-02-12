@@ -108,8 +108,10 @@ def update_needed():
         if htpc.settings.get('app_check_for_updates', False):
             # Used for the notification footer
             htpc.UPDATE_AVAIL = True
+    else:
+        htpc.UPDATE_AVAIL = False
     # Since im stupid, protect me please..
-    if htpc.settings.get("app_auto_update", False) and not htpc.DEBUG:
+    if htpc.UPDATE_AVAIL and htpc.settings.get("app_auto_update", False) and not htpc.DEBUG:
         Thread(target=htpc.ROOT.update.updateEngine.update).start()
 
 
@@ -144,6 +146,14 @@ def main():
     # for OSes that are poorly configured I'll just force UTF-8
     if not htpc.SYS_ENCODING or htpc.SYS_ENCODING in ('ANSI_X3.4-1968', 'US-ASCII', 'ASCII'):
         htpc.SYS_ENCODING = 'UTF-8'
+
+    if not hasattr(sys, "setdefaultencoding"):
+            reload(sys)
+
+    # python 2.7.9 verifies certs by default. This disables it
+    if sys.version_info >= (2, 7, 9):
+        import ssl
+        ssl._create_default_https_context = ssl._create_unverified_context
 
     # Set datadir, create if it doesn't exist and exit if it isn't writable.
     htpc.DATADIR = os.path.join(htpc.RUNDIR, 'userdata/')
