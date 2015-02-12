@@ -160,7 +160,7 @@ class Vnstat(object):
     def tr(self, dash=False):
         interface = htpc.settings.get('vnstat_interface', '')
         if interface:
-            piped = self.run('-tr %s' % interface)
+            piped = self.run('-tr -i %s' % interface)
         else:
             piped = self.run('-tr')
         download = re.compile(ur'rx\s+(\d+.\d+)\s+(\w+\/s)')
