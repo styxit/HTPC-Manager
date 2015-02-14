@@ -101,7 +101,7 @@ function anc(nzb) {
     });
 
     // Manuel download button
-    var browserdl = $('<button>').addClass("btn btn-mini")
+    var browserdl = $('<button>').addClass("btn btn-mini").attr('title', 'Download nZB to this browser')
         .css({
         "cursor": "pointer",
         "height": "18px"
@@ -203,7 +203,7 @@ function showDetails(data) {
     // manual download to the browser
     $.extend(modalButtons,{
             'Download nzb' : function() {
-                downloadFile(data);
+                downloadFile(data.link);
             }
     });
 
