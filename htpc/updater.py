@@ -287,7 +287,7 @@ class GitUpdater():
                 # Note to self rtfm before you run git commands, just wiped the data dir...
                 # This command removes all untracked files and files and the files in .gitignore
                 # except from the content of htpc.DATADIR and VERSION.txt
-                self.git_exec(self.git, 'clean -d -fx -e %s -e VERSION.txt - e userdata/' % htpc.DATADIR)
+                self.git_exec(self.git, 'clean -d -fx -e %s -e VERSION.txt -e userdata/' % htpc.DATADIR)
             self.logger.warning('Restarting HTPC Manager after update.')
             # Restart HTPC Manager to make sure all new code is loaded
             do_restart()
