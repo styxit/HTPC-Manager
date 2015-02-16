@@ -49,8 +49,7 @@ $(document).ready(function () {
 
     $('.do_update').click(function (e) {
         e.preventDefault();
-        //notify('Update', 'in process.', 'info');
-        $.post("update/", function (data) {
+        $.post(WEBDIR + "update/", function (data) {
             if (data == 1) {
                 showModal('Installing update', '<div class="progress progress-striped active"><div class="bar" style="width:100%"></div></div>', '');
             } else {
