@@ -41,7 +41,11 @@ class Updater:
         self.updateEngineName = 'Unknown'
         # Set update engine. Use git updater or update from source.
         self.updateEngine = self.getEngine()
-        self.check_update()
+        check = self.check_update()
+        # Update htpc-manager if behind on startup
+        if check.get("updateNeeded"):
+            pass
+            #Thread(target=self.updateEngine.update).start()
 
     """ Determine the update method """
     def getEngine(self):

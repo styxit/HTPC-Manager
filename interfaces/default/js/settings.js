@@ -253,9 +253,9 @@ function get_branches() {
             branches.append(option);
         });
         branches.append($('<option>').text(data.branch).val(data.branch).attr('selected', 'selected'));
-        if (!data.verified) {
-            notify('Warning', 'Couldnt determine branch, select correct and save', 'warning');
-        }
+        //if (!data.verified) {
+            //notify('Warning', 'Couldnt determine branch, select correct and save', 'warning');
+        //}
 
     }, 'json');
 }

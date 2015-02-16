@@ -27,6 +27,8 @@ except ImportError:
 class Stats(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.stats')
+        self.last_check = None
+        self.last_check_ip = None
         htpc.MODULES.append({
             'name': 'Computer stats',
             'id': 'stats',
@@ -314,22 +316,38 @@ class Stats(object):
             cherrypy.response.headers['Content-Type'] = "application/json"
             return json.dumps(d)
 
+    def _get_external_ip(self, dash=False):
+        try:
+            self.logger.debug("Checking external ip")
+            s = urllib2.urlopen('http://myexternalip.com/raw').read()
+            return s.strip()
+        except Exception as e:
+            self.logger.error("Pulling external ip %s" % e)
+            return ""
+
     @cherrypy.expose()
     @require()
     def get_external_ip(self, dash=False):
-        try:
-            d = {}
-            s = urllib2.urlopen('http://myexternalip.com/raw').read()
-            d['externalip'] = s.strip()
+        if self.last_check is None:
+            self.last_check_ip = self._get_external_ip()
+            self.last_check = time.time()
 
-        except Exception as e:
-            self.logger.error("Pulling external ip %s" % e)
+        # only check ip each 30 min as they telling us to fuck off (http 429)
+        # else retuned the cached ip
+        if time.time() - self.last_check >= 3000:
+            self.last_check_ip = self._get_external_ip()
+            self.last_check = time.time()
 
-        if dash:
-            return s.strip()
+            if dash:
+                return self.last_check_ip
+            else:
+                cherrypy.response.headers['Content-Type'] = "application/json"
+                return json.dumps({"externalip": self.last_check_ip})
         else:
+            if dash:
+                return self.last_check_ip
             cherrypy.response.headers['Content-Type'] = "application/json"
-            return json.dumps(d)
+            return json.dumps({"externalip": self.last_check_ip})
 
     @cherrypy.expose()
     @require()
