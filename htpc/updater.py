@@ -26,7 +26,7 @@ import logging
 import tarfile
 import shutil
 import platform
-
+from apscheduler.triggers.interval import IntervalTrigger
 from htpc.root import do_restart
 
 # configure git repo
@@ -41,11 +41,8 @@ class Updater:
         self.updateEngineName = 'Unknown'
         # Set update engine. Use git updater or update from source.
         self.updateEngine = self.getEngine()
-        check = self.check_update()
-        # Update htpc-manager if behind on startup
-        if check.get("updateNeeded"):
-            pass
-            #Thread(target=self.updateEngine.update).start()
+        # Check for updates automatically
+        htpc.SCHED.add_job(self.update_needed, trigger=IntervalTrigger(hours=6))
 
     """ Determine the update method """
     def getEngine(self):
@@ -75,7 +72,7 @@ class Updater:
             if gp != gp.lower():
                 alternative_gp.append(gp.lower())
             # Comment out the line beflow to test the source updater
-            alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "c:\Program Files (x86)\Git\bin\git.exe"]
+            alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "C:\Program Files (x86)\Git\bin\git.exe"]
 
         # Returns a empty string if failed
         output = GitUpdater().git_exec(gp, 'version')
@@ -194,12 +191,20 @@ class Updater:
     def branches(self):
         return self.updateEngine.branches()
 
-    def update_needed(self):
-        r = self.check_update()
-        if r["updateNeeded"]:
-            return True
+    def update_needed():
+        update_avail = self.check_update()
+        # returns true or false
+        if update_avail.get("updateNeeded"):
+            if htpc.settings.get('app_check_for_updates', False):
+                self.logger.debug("Add update footer")
+                # Used for the notification footer
+                htpc.UPDATE_AVAIL = True
         else:
-            return False
+            htpc.UPDATE_AVAIL = False
+        # Since im stupid, protect me please.. srsly its for myself.
+        if htpc.UPDATE_AVAIL and htpc.settings.get("app_auto_update", False) and not htpc.DEBUG:
+            self.logger.debug("Auto updating now!")
+            Thread(target=self.updateEngine.update).start()
 
 
 class GitUpdater():

@@ -102,30 +102,11 @@ def load_modules():
     htpc.ROOT.headphones = Headphones()
 
 
-def update_needed():
-    l = logging.getLogger('htpc.updater')
-    update_avail = htpc.ROOT.update.update_needed()
-    # returns true or false
-    if update_avail:
-        if htpc.settings.get('app_check_for_updates', False):
-            l.debug("Add update footer")
-            # Used for the notification footer
-            htpc.UPDATE_AVAIL = True
-    else:
-        htpc.UPDATE_AVAIL = False
-    # Since im stupid, protect me please.. srsly its for myself.
-    if htpc.UPDATE_AVAIL and htpc.settings.get("app_auto_update", False) and not htpc.DEBUG:
-        l.debug("Auto updating now!")
-        Thread(target=htpc.ROOT.update.updateEngine.update).start()
-
-
 def init_sched():
     from apscheduler.schedulers.background import BackgroundScheduler
     from apscheduler.triggers.interval import IntervalTrigger
     htpc.SCHED = BackgroundScheduler()
-    htpc.SCHED.add_job(update_needed, trigger=IntervalTrigger(hours=6))
     htpc.SCHED.start()
-
 
 
 def main():
@@ -196,10 +177,11 @@ def main():
     if not(htpc.WEBDIR.endswith('/')):
         htpc.WEBDIR += '/'
 
+    # Initialize Scheduler
+    init_sched()
+
     # Inititialize root and settings page
     load_modules()
-
-    init_sched()
 
     htpc.TEMPLATE = os.path.join(htpc.RUNDIR, 'interfaces/',
                                  htpc.settings.get('app_template', 'default'))
