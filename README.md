@@ -3,7 +3,7 @@ This is Htpc-Manager the way i want it.
 Some of the difference is:
 
 [New modules]
-- Sonaarr
+- sonarr
 - Headphones
 - Samsung TV remote
 - Sickrage module
@@ -33,8 +33,7 @@ Some of the difference is:
 - Various fixes
 - Added argsparse (to support python 2.6)
 
-TODO:
-- Ipcamera module
+
 
 If your missing something dont be afraid to make a request :)
 
