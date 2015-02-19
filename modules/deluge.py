@@ -11,9 +11,10 @@ import logging
 import cookielib
 from StringIO import StringIO
 from cherrypy.lib.auth2 import require
+from htpc.helpers import fix_basepath
 
 
-class Deluge:
+class Deluge(object):
 
     cookieJar = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
@@ -144,10 +145,10 @@ class Deluge:
             self.logger.debug("Read data from server")
             host = htpc.settings.get('deluge_host', '')
             port = str(htpc.settings.get('deluge_port', ''))
-            deluge_basepath = str(htpc.settings.get('deluge_basepath', ''))
+            deluge_basepath = fix_basepath(htpc.settings.get('deluge_basepath', '/'))
             ssl = 's' if htpc.settings.get('deluge_ssl') else ''
 
-            url = 'http' + ssl + '://' + host + ':' + str(port) + deluge_basepath + '/json'
+            url = 'http' + ssl + '://' + host + ':' + str(port) + deluge_basepath + 'json'
 
             post_data = dumps(data)
             buf = StringIO(self.opener.open(url, post_data, 1).read())

@@ -8,9 +8,10 @@ from urllib2 import urlopen
 from json import loads
 import logging
 from cherrypy.lib.auth2 import require
+from htpc.helpers import fix_basepath
 
 
-class Sickbeard:
+class Sickbeard(object):
     def __init__(self):
         self.logger = logging.getLogger("modules.sickbeard")
         htpc.MODULES.append({
@@ -38,9 +39,7 @@ class Sickbeard:
         ssl = "s" if htpc.settings.get("sickbeard_ssl", 0) else ""
         host = htpc.settings.get("sickbeard_host", "")
         port = str(htpc.settings.get("sickbeard_port", ""))
-        basepath = htpc.settings.get("sickbeard_basepath", "/")
-        if not basepath.endswith("/"):
-            basepath += "/"
+        basepath = fix_basepath(htpc.settings.get("sickbeard_basepath", "/"))
 
         url = "http%s://%s::%s%s" % (ssl, host, port, basepath)
 
@@ -63,8 +62,8 @@ class Sickbeard:
         ssl = "s" if sickbeard_ssl else ""
         self.logger.debug("Testing connectivity")
         try:
-            if not (sickbeard_basepath.endswith("/")):
-                sickbeard_basepath += "/"
+            if not sickbeard_basepath:
+                sickbeard_basepath = fix_basepath(sickbeard_basepath)
 
             url = "http" + ssl + "://" + sickbeard_host + ":" + sickbeard_port + sickbeard_basepath + "api/" + sickbeard_apikey + "/?cmd=sb.ping"
             self.logger.debug("Trying to contact sickbeard via " + url)
@@ -188,10 +187,7 @@ class Sickbeard:
             port = str(htpc.settings.get("sickbeard_port", ""))
             apikey = htpc.settings.get("sickbeard_apikey", "")
             ssl = "s" if htpc.settings.get("sickbeard_ssl", 0) else ""
-            sickbeard_basepath = htpc.settings.get("sickbeard_basepath", "/")
-
-            if not sickbeard_basepath.endswith("/"):
-                sickbeard_basepath += "/"
+            sickbeard_basepath = fix_basepath(htpc.settings.get("sickbeard_basepath", "/"))
 
             url = "http" + ssl + "://" + host + ":" + str(port) + sickbeard_basepath + "api/" + apikey + "/?cmd=" + cmd
 

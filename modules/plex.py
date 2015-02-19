@@ -25,7 +25,7 @@ https://github.com/iBaa/PlexConnect/blob/master/PlexAPI.py
 """
 
 
-class Plex:
+class Plex(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.plex')
 

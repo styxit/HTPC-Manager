@@ -174,7 +174,10 @@ def main():
     htpc.WEBDIR = htpc.settings.get('app_webdir', '/')
     if args.webdir:
         htpc.WEBDIR = args.webdir
-    if not(htpc.WEBDIR.endswith('/')):
+
+    if not htpc.WEBDIR.startswith('/'):
+        htpc.WEBDIR = '/' + htpc.WEBDIR
+    if not htpc.WEBDIR.endswith('/'):
         htpc.WEBDIR += '/'
 
     # Initialize Scheduler

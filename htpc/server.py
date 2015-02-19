@@ -112,9 +112,6 @@ def start():
                 'tools.proxy.base': str(htpc.settings.get('app_use_proxy_headers_basepath'))
         })
 
-
-
-
     # Daemonize cherrypy if specified
     if htpc.DAEMON:
         if sys.platform == 'win32':

@@ -8,9 +8,10 @@ import base64
 from json import loads, dumps
 import logging
 from cherrypy.lib.auth2 import require
+from htpc.helpers import fix_basepath
 
 
-class Transmission:
+class Transmission(object):
     # Transmission Session ID
     sessionId = ''
 
@@ -61,14 +62,8 @@ class Transmission:
         password = kwargs["transmission_password"]
         basepath = kwargs["transmission_rpcbasepath"]
 
-        if basepath:
-            if not basepath.startswith('/'):
-                basepath = '/%s' % basepath
-            if not basepath.endswith('/'):
-                basepath += '/'
-        else:
-            # Default basepath is transmission
-            basepath = '/transmission/'
+        if not basepath:
+            basepath = fix_basepath("/transmission/")
 
         url = 'http://' + host + ':' + str(port) + basepath + 'rpc/'
 
@@ -92,7 +87,7 @@ class Transmission:
             response = urllib2.urlopen(request).read()
             return loads(response)
         except urllib2.HTTPError, e:
-             # Fetching url failed Maybe Transmission session must be renewed
+            # Fetching url failed Maybe Transmission session must be renewed
             if (e.getcode() == 409 and e.headers['X-Transmission-Session-Id']):
                 self.logger.debug("Setting new session ID provided by Transmission")
 
@@ -199,15 +194,7 @@ class Transmission:
         port = str(htpc.settings.get('transmission_port', ''))
 
         # Default basepath is transmission
-        basepath = htpc.settings.get('transmission_rpcbasepath', '/transmission/')
-
-        if basepath:
-            if not basepath.startswith('/'):
-                basepath = '/%s' % basepath
-            if not basepath.endswith('/'):
-                basepath += '/'
-        else:
-            basepath = '/transmission/'
+        basepath = fix_basepath(htpc.settings.get('transmission_rpcbasepath', '/transmission/'))
 
         url = 'http://' + host + ':' + str(port) + basepath + 'rpc/'
 
@@ -233,7 +220,7 @@ class Transmission:
             response = urllib2.urlopen(request).read()
             return loads(response)
         except urllib2.HTTPError, e:
-             # Fetching url failed Maybe Transmission session must be renewed
+            # Fetching url failed Maybe Transmission session must be renewed
             if (e.getcode() == 409 and e.headers['X-Transmission-Session-Id']):
                 self.logger.debug("Setting new session ID provided by Transmission")
 

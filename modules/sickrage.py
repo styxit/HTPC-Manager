@@ -8,9 +8,10 @@ from urllib2 import urlopen
 from json import loads
 import logging
 from cherrypy.lib.auth2 import require
+from htpc.helpers import fix_basepath
 
 
-class Sickrage:
+class Sickrage(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.sickrage')
         htpc.MODULES.append({
@@ -50,8 +51,8 @@ class Sickrage:
         ssl = 's' if sickrage_ssl else ''
         self.logger.debug("Testing connectivity")
         try:
-            if not (sickrage_basepath.endswith('/')):
-                sickrage_basepath += "/"
+            if not sickrage_basepath:
+                sickrage_basepath = fix_basepath(sickrage_basepath)
 
             url = 'http' + ssl + '://' + sickrage_host + ':' + sickrage_port + sickrage_basepath + 'api/' + sickrage_apikey + '/?cmd=sb.ping'
             self.logger.debug("Trying to contact sickrage via " + url)
@@ -211,10 +212,8 @@ class Sickrage:
             port = str(htpc.settings.get('sickrage_port', ''))
             apikey = htpc.settings.get('sickrage_apikey', '')
             ssl = 's' if htpc.settings.get('sickrage_ssl', 0) else ''
-            sickrage_basepath = htpc.settings.get('sickrage_basepath', '/')
+            sickrage_basepath = fix_basepath(htpc.settings.get('sickrage_basepath', '/'))
 
-            if not (sickrage_basepath.endswith('/')):
-                sickrage_basepath += "/"
             url = 'http' + ssl + '://' + host + ':' + str(port) + sickrage_basepath + 'api/' + apikey + '/?cmd=' + cmd
 
             self.logger.info("Fetching information from: " + url)

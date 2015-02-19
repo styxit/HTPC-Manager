@@ -9,6 +9,7 @@ import urllib
 import logging
 from json import loads, dumps
 import datetime as DT
+from htpc.helpers import fix_basepath
 
 
 class Sonarr:
@@ -41,10 +42,8 @@ class Sonarr:
             sonarr_basepath = htpc.settings.get('sonarr_basepath', '/')
             ssl = 's' if htpc.settings.get('sonarr_ssl', True) else ''
 
-            if(sonarr_basepath == ""):
-                sonarr_basepath = "/"
-            if not(sonarr_basepath.endswith('/')):
-                sonarr_basepath += "/"
+            # Makes sure that the basepath is /whatever/
+            sonarr_basepath = fix_basepath(sonarr_basepath)
 
             headers = {'X-Api-Key': htpc.settings.get('sonarr_apikey', '')}
 
@@ -61,7 +60,7 @@ class Sonarr:
                 return r.content
 
             elif type == 'put':
-                r = requests.post(url, data=dumps(data), headers=headers, verify=False)
+                r = requests.put(url, data=dumps(data), headers=headers, verify=False)
                 return r.content
 
             elif type == 'delete':
@@ -81,10 +80,8 @@ class Sonarr:
         try:
             ssl = 's' if sonarr_ssl else ''
 
-            if(sonarr_basepath == ""):
-                sonarr_basepath = "/"
-            if not(sonarr_basepath.endswith('/')):
-                sonarr_basepath += "/"
+            if not sonarr_basepath:
+                sonarr_basepath = fix_basepath(sonarr_basepath)
 
             headers = {'X-Api-Key': str(sonarr_apikey)}
 

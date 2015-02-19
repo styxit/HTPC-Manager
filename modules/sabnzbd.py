@@ -8,9 +8,10 @@ from urllib2 import urlopen
 from json import loads
 import logging
 from cherrypy.lib.auth2 import require
+from htpc.helpers import fix_basepath
 
 
-class Sabnzbd:
+class Sabnzbd(object):
     def __init__(self):
         self.logger = logging.getLogger("modules.sabnzbd")
         htpc.MODULES.append({
@@ -40,10 +41,10 @@ class Sabnzbd:
         self.logger.debug("Fetching version information from sabnzbd")
         ssl = "s" if sabnzbd_ssl else ""
 
-        if(sabnzbd_basepath == ""):
+        if not sabnzbd_basepath:
             sabnzbd_basepath = "/sabnzbd/"
-        if not(sabnzbd_basepath.endswith("/")):
-            sabnzbd_basepath += "/"
+
+        sabnzbd_basepath = fix_basepath(sabnzbd_basepath)
 
         url = "http" + ssl + "://" + sabnzbd_host + ":" + sabnzbd_port + sabnzbd_basepath + "api?output=json&apikey=" + sabnzbd_apikey
         try:
@@ -57,13 +58,9 @@ class Sabnzbd:
         port = str(htpc.settings.get("sabnzbd_port", ""))
         sabnzbd_basepath = htpc.settings.get("sabnzbd_basepath", "/sabnzbd/")
         ssl = "s" if htpc.settings.get("sabnzbd_ssl", 0) else ""
-        if not sabnzbd_basepath:
-            sabnzbd_basepath = "/sabnzbd/"
-        if not sabnzbd_basepath.endswith("/"):
-            sabnzbd_basepath += "/"
-        # In case a user forgets to add a /
-        if sabnzbd_basepath and not sabnzbd_basepath.startswith("/"):
-            sabnzbd_basepath = "/" + sabnzbd_basepath
+
+        sabnzbd_basepath = fix_basepath(sabnzbd_basepath)
+
         url = "http%s://%s:%s%s" % (ssl, host, port, sabnzbd_basepath)
         return url
 
@@ -158,13 +155,8 @@ class Sabnzbd:
             host = htpc.settings.get("sabnzbd_host", "")
             port = str(htpc.settings.get("sabnzbd_port", ""))
             apikey = htpc.settings.get("sabnzbd_apikey", "")
-            sabnzbd_basepath = htpc.settings.get("sabnzbd_basepath", "/sabnzbd/")
+            sabnzbd_basepath = fix_basepath(htpc.settings.get("sabnzbd_basepath", "/sabnzbd/"))
             ssl = "s" if htpc.settings.get("sabnzbd_ssl", 0) else ""
-
-            if sabnzbd_basepath:
-                sabnzbd_basepath = "/sabnzbd/"
-            if not sabnzbd_basepath.endswith("/"):
-                sabnzbd_basepath += "/"
 
             url = "http" + ssl + "://" + host + ":" + port + sabnzbd_basepath + "api?output=json&apikey=" + apikey + path
             self.logger.debug("Fetching information from: " + url)

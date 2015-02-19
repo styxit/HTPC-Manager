@@ -5,6 +5,17 @@ import logging
 logger = logging.getLogger('helpers')
 
 
+def fix_basepath(s):
+    """ Removes whitespace and adds / on each end """
+    if s:
+        s.strip(" ")
+    if not s.startswith('/'):
+        s = '/' + s
+    if not s.endswith('/'):
+        s += '/'
+    return s
+
+
 def create_https_certificates(ssl_cert, ssl_key):
     """
     Create self-signed HTTPS certificares and store in paths 'ssl_cert' and 'ssl_key'

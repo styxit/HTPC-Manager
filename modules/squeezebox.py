@@ -9,7 +9,7 @@ from json import dumps, loads
 from cherrypy.lib.auth2 import require
 
 
-class Squeezebox:
+class Squeezebox(object):
     def __init__(self):
         htpc.MODULES.append({
             'name': 'Squeezebox',
@@ -21,7 +21,8 @@ class Squeezebox:
                 {'type': 'text', 'label': 'Port *', 'name': 'squeezebox_port'},
                 {'type': 'text', 'label': 'Username', 'name': 'squeezebox_username'},
                 {'type': 'password', 'label': 'Password', 'name': 'squeezebox_password'}
-        ]})
+            ]
+        })
 
     @cherrypy.expose()
     @require()

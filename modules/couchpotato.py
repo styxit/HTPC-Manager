@@ -8,9 +8,10 @@ import requests
 from cherrypy.lib.auth2 import require
 import logging
 import hashlib
+from htpc.helpers import fix_basepath
 
 
-class Couchpotato:
+class Couchpotato(object):
     def __init__(self):
         self.logger = logging.getLogger("modules.couchpotato")
         htpc.MODULES.append({
@@ -40,9 +41,7 @@ class Couchpotato:
         ssl = "s" if htpc.settings.get("couchpotato_ssl", 0) else ""
         host = htpc.settings.get("couchpotato_host", "")
         port = str(htpc.settings.get("couchpotato_port", ""))
-        basepath = htpc.settings.get("couchpotato_basepath", "/")
-        if not basepath.endswith("/"):
-            basepath += "/"
+        basepath = fix_basepath(htpc.settings.get("couchpotato_basepath", "/"))
 
         url = "http%s://%s:%s%s" % (ssl, host, port, basepath)
 
@@ -53,8 +52,8 @@ class Couchpotato:
     @cherrypy.tools.json_out()
     def ping(self, couchpotato_host, couchpotato_port, couchpotato_apikey, couchpotato_basepath, couchpotato_ssl=False, **kwargs):
         self.logger.debug("Testing connectivity to couchpotato")
-        if not(couchpotato_basepath.endswith("/")):
-            couchpotato_basepath += "/"
+
+        couchpotato_basepath = fix_basepath(couchpotato_basepath)
 
         ssl = "s" if couchpotato_ssl else ""
         url = "http" + ssl + "://" + couchpotato_host + ":" + couchpotato_port + couchpotato_basepath + "api/" + couchpotato_apikey
@@ -77,8 +76,7 @@ class Couchpotato:
 
         getkey = "getkey/?p=%s&u=%s" % (couchpotato_password, couchpotato_username)
 
-        if not(couchpotato_basepath.endswith("/")):
-            couchpotato_basepath += "/"
+        couchpotato_basepath = fix_basepath(couchpotato_basepath)
 
         ssl = "s" if couchpotato_ssl else ""
         url = "http%s://%s:%s%s%s" % (ssl, couchpotato_host, couchpotato_port, couchpotato_basepath, getkey)

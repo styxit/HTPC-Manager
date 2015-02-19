@@ -10,7 +10,7 @@ import logging
 from cherrypy.lib.auth2 import require
 
 
-class Qbittorrent:
+class Qbittorrent(object):
     def __init__(self):
         self.logger = logging.getLogger("modules.qbittorrent")
         htpc.MODULES.append({
@@ -178,7 +178,7 @@ class Qbittorrent:
             self.logger.info('%s %s is sendt to qBittorrent' % (torrentname, link))
         except Exception as e:
             self.logger.error('Failed to send %s %s to qBittorrent %s' % (link, torrentname, e))
-    
+
     # Sets global upload and download speed
     @cherrypy.expose()
     @require()
