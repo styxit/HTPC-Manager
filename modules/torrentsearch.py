@@ -43,7 +43,7 @@ class Torrentsearch(object):
 
     @cherrypy.expose()
     def btn(self, query=None):
-        results = None
+        result = None
         try:
             btn = jsonrpclib.Server('http://api.btnapps.net')
             result = btn.getTorrents(htpc.settings.get('torrentsearch_btn_apikey', ''), query, 999)
@@ -54,7 +54,7 @@ class Torrentsearch(object):
         search_results = []
 
         try:
-            if results:
+            if result:
                 if 'torrents' in result:
                     for k, v in result['torrents'].iteritems():
                         v["BrowseURL"] = 'https://broadcasthe.net/torrents.php?id=%s&torrentid=%s' % (v['GroupID'], v['TorrentID'])
