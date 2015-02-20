@@ -12,7 +12,7 @@ class Torrentsearch(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.torrentsearch')
         htpc.MODULES.append({
-            'name': 'Torrentsearch',
+            'name': 'Torrent Search',
             'id': 'torrentsearch',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'torrentsearch_enable'},
@@ -36,28 +36,38 @@ class Torrentsearch(object):
         self.logger.debug(query)
         r = []
         if htpc.settings.get('torrents_btn_enabled'):
-            r += self.btn()
+            r += self.btn(query)
         elif htpc.settings.get('torrents_norbits_enabled'):
-            r += self.search_norbits(query, 'tv')
+            r += self.search_norbits(query, 'all')
         return r
 
     @cherrypy.expose()
     def btn(self, query=None):
-        btn = jsonrpclib.Server('http://api.btnapps.net')
-        result = btn.getTorrents(htpc.settings.get('torrentsearch_btn_apikey', ''), query, 999)
+        results = None
+        try:
+            btn = jsonrpclib.Server('http://api.btnapps.net')
+            result = btn.getTorrents(htpc.settings.get('torrentsearch_btn_apikey', ''), query, 999)
+        except Exception as e:
+            self.logger.error("Failed to fetch search results from BTN %s" % e)
+            return []
+
         search_results = []
 
         try:
-            if 'torrents' in result:
-                for k, v in result['torrents'].iteritems():
-                    v["BrowseURL"] = 'https://broadcasthe.net/torrents.php?id=%s&torrentid=%s' % (v['GroupID'], v['TorrentID'])
-                    v["Provider"] = "btn"
-                    search_results.append(v)
-                return search_results
+            if results:
+                if 'torrents' in result:
+                    for k, v in result['torrents'].iteritems():
+                        v["BrowseURL"] = 'https://broadcasthe.net/torrents.php?id=%s&torrentid=%s' % (v['GroupID'], v['TorrentID'])
+                        v["Provider"] = "btn"
+                        search_results.append(v)
+                    return search_results
+                else:
+                    return search_results
             else:
                 return search_results
         except Exception as e:
             self.logger.error("Failed to fetch search results from BTN %s" % e)
+            return []
 
     def torrentproviders(self):
         torrentproviders = ['ALL']

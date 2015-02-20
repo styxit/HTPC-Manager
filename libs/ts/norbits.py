@@ -14,9 +14,9 @@ def search(q, cat):
     result_list = []
     # just a quick hack for cat incase i add categorys
     # Api was changed
-    #cat = 'all'
+    #cat = '*'
     category = {
-                    'all': '',
+                    'all': 0,
                     'movies': 1,
                     'music': 5,
                     'tv': 2,
