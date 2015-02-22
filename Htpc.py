@@ -28,13 +28,13 @@ def parse_arguments():
     parser.add_argument('--port', type=int,
                         help='Use a specific port')
     parser.add_argument('--shell', action='store_true', default=False,
-                        help='WARNING! DO NOT USE UNLESS YOU KNOW WHAT .POPEN CAN BE USED FOR (LIKE WIPEING YOUR HARDDRIVE).')
+                        help='WARNING! DO NOT USE UNLESS YOU KNOW WHAT .POPEN CAN BE USED FOR (LIKE WIPING YOUR HARDDRIVE).')
     parser.add_argument('--daemon', action='store_true', default=False,
                         help='Daemonize process')
     parser.add_argument('--pid', default=False,
                         help='Generate PID file at location')
     parser.add_argument('--debug', action='store_true', default=False,
-                        help='Print debug text')
+                        help='Used while developing, prints debug messages uncensored and more..')
     parser.add_argument('--openbrowser', action='store_true', default=False,
                         help='Open the browser on server start')
     parser.add_argument('--webdir', default=None,

@@ -6,9 +6,9 @@ import htpc
 import re
 import socket
 import struct
-from json import loads, dumps
+from json import loads
 from urllib2 import Request, urlopen, quote
-from htpc.proxy import get_image
+from htpc.helpers import get_image, striphttp
 import logging
 import urllib
 import base64
@@ -78,7 +78,7 @@ class Plex(object):
     @require()
     def webinterface(self):
         """ Generate page from template """
-        plex_host = htpc.settings.get('plex_host', 'localhost')
+        plex_host = striphttp(htpc.settings.get('plex_host', 'localhost'))
         plex_port = htpc.settings.get('plex_port', '32400')
 
         url = "http://%s:%s/web" % (plex_host, plex_port)
@@ -93,7 +93,7 @@ class Plex(object):
         self.logger.debug("Fetching recent Movies")
 
         try:
-            plex_host = htpc.settings.get('plex_host', 'localhost')
+            plex_host = striphttp(htpc.settings.get('plex_host', 'localhost'))
             plex_port = htpc.settings.get('plex_port', '32400')
             plex_hide_homemovies = htpc.settings.get('plex_hide_homemovies', False)
             movies = []

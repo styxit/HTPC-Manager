@@ -8,7 +8,7 @@ import base64
 from json import loads, dumps
 import logging
 from cherrypy.lib.auth2 import require
-from htpc.helpers import fix_basepath
+from htpc.helpers import fix_basepath, striphttp
 
 
 class Transmission(object):
@@ -64,8 +64,7 @@ class Transmission(object):
 
         if not basepath:
             basepath = fix_basepath("/transmission/")
-
-        url = 'http://' + host + ':' + str(port) + basepath + 'rpc/'
+        url = 'http://%s:%s%srpc/' % (striphttp(host), port, basepath)
 
         # format post data
         data = {'method': 'session-get'}
@@ -190,7 +189,7 @@ class Transmission(object):
         """ Do request to Transmission api """
         self.logger.debug("Request transmission method: " + method)
 
-        host = htpc.settings.get('transmission_host', '')
+        host = striphttp(htpc.settings.get('transmission_host', ''))
         port = str(htpc.settings.get('transmission_port', ''))
 
         # Default basepath is transmission

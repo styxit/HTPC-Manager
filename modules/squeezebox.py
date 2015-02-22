@@ -7,6 +7,7 @@ import base64
 import htpc
 from json import dumps, loads
 from cherrypy.lib.auth2 import require
+from htpc.helpers import striphttp
 
 
 class Squeezebox(object):
@@ -106,7 +107,7 @@ class Squeezebox(object):
 
     def webhost(self, path=''):
         settings = htpc.settings
-        host = settings.get('squeezebox_host', '')
+        host = striphttp(settings.get('squeezebox_host', ''))
         port = str(settings.get('squeezebox_port', ''))
         return 'http://' + host + ':' + str(port) + '/' + path
 

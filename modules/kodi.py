@@ -11,7 +11,7 @@ from urllib2 import quote
 from jsonrpclib import Server
 from sqlobject import SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol, IntCol
-from htpc.proxy import get_image
+from htpc.helpers import get_image
 import logging
 from cherrypy.lib.auth2 import require
 

@@ -9,10 +9,10 @@ import urllib
 import logging
 from json import loads, dumps
 import datetime as DT
-from htpc.helpers import fix_basepath
+from htpc.helpers import fix_basepath, get_image, striphttp
 
 
-class Sonarr:
+class Sonarr(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.sonarr')
         htpc.MODULES.append({
@@ -37,7 +37,7 @@ class Sonarr:
 
     def fetch(self, path, banner=None, type=None, data=None):
         try:
-            host = htpc.settings.get('sonarr_host', '')
+            host = striphttp(htpc.settings.get('sonarr_host', ''))
             port = str(htpc.settings.get('sonarr_port', ''))
             sonarr_basepath = htpc.settings.get('sonarr_basepath', '/')
             ssl = 's' if htpc.settings.get('sonarr_ssl', True) else ''
@@ -52,8 +52,8 @@ class Sonarr:
             if banner:
                 #  the path includes the basepath automaticly
                 url = 'http%s://%s:%s%s' % (ssl, host, port, path)
-                r = requests.get(url, headers=headers, verify=False)
-                return r.content
+                # Cache the image in htpc-manager aswell.
+                return get_image(url, headers=headers)
 
             if type == 'post':
                 r = requests.post(url, data=dumps(data), headers=headers, verify=False)
@@ -85,7 +85,7 @@ class Sonarr:
 
             headers = {'X-Api-Key': str(sonarr_apikey)}
 
-            url = 'http%s://%s:%s%sapi/system/status' % (ssl, sonarr_host, sonarr_port, sonarr_basepath)
+            url = 'http%s://%s:%s%sapi/system/status' % (ssl, striphttp(sonarr_host), sonarr_port, sonarr_basepath)
 
             result = requests.get(url, headers=headers, verify=False)
             return result.json()

@@ -8,7 +8,7 @@ from urllib2 import urlopen
 from json import loads
 import logging
 from cherrypy.lib.auth2 import require
-from htpc.helpers import fix_basepath
+from htpc.helpers import fix_basepath, get_image, striphttp
 
 
 class Sickbeard(object):
@@ -37,7 +37,7 @@ class Sickbeard(object):
     def webinterface(self):
         """ Generate page from template """
         ssl = "s" if htpc.settings.get("sickbeard_ssl", 0) else ""
-        host = htpc.settings.get("sickbeard_host", "")
+        host = striphttp(htpc.settings.get("sickbeard_host", ""))
         port = str(htpc.settings.get("sickbeard_port", ""))
         basepath = fix_basepath(htpc.settings.get("sickbeard_basepath", "/"))
 
@@ -65,7 +65,8 @@ class Sickbeard(object):
             if not sickbeard_basepath:
                 sickbeard_basepath = fix_basepath(sickbeard_basepath)
 
-            url = "http" + ssl + "://" + sickbeard_host + ":" + sickbeard_port + sickbeard_basepath + "api/" + sickbeard_apikey + "/?cmd=sb.ping"
+            url = "http%s://%s:%s%sapi/%s/?cmd=sb.ping" % (ssl, striphttp(sickbeard_host), sickbeard_port, sickbeard_apikey)
+
             self.logger.debug("Trying to contact sickbeard via " + url)
             response = loads(urlopen(url, timeout=10).read())
             if response.get("result") == "success":
@@ -194,7 +195,8 @@ class Sickbeard(object):
             self.logger.debug("Fetching information from: " + url)
 
             if img is True:
-                return urlopen(url, timeout=timeout).read()
+                # Cache image
+                return get_image(url)
 
             return loads(urlopen(url, timeout=timeout).read())
         except:

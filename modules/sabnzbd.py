@@ -8,7 +8,7 @@ from urllib2 import urlopen
 from json import loads
 import logging
 from cherrypy.lib.auth2 import require
-from htpc.helpers import fix_basepath
+from htpc.helpers import fix_basepath, striphttp
 
 
 class Sabnzbd(object):
@@ -45,8 +45,8 @@ class Sabnzbd(object):
             sabnzbd_basepath = "/sabnzbd/"
 
         sabnzbd_basepath = fix_basepath(sabnzbd_basepath)
+        url = "http%s://%s:%s%sapi?output=json&apikey=%s" % (ssl, striphttp(sabnzbd_host), sabnzbd_port, sabnzbd_basepath, sabnzbd_apikey)
 
-        url = "http" + ssl + "://" + sabnzbd_host + ":" + sabnzbd_port + sabnzbd_basepath + "api?output=json&apikey=" + sabnzbd_apikey
         try:
             return loads(urlopen(url + "&mode=version", timeout=10).read())
         except:
@@ -54,7 +54,7 @@ class Sabnzbd(object):
             return
 
     def webinterface(self):
-        host = htpc.settings.get("sabnzbd_host", "")
+        host = striphttp(htpc.settings.get("sabnzbd_host", ""))
         port = str(htpc.settings.get("sabnzbd_port", ""))
         sabnzbd_basepath = htpc.settings.get("sabnzbd_basepath", "/sabnzbd/")
         ssl = "s" if htpc.settings.get("sabnzbd_ssl", 0) else ""
@@ -152,13 +152,14 @@ class Sabnzbd(object):
 
     def fetch(self, path):
         try:
-            host = htpc.settings.get("sabnzbd_host", "")
+            host = striphttp(htpc.settings.get("sabnzbd_host", ""))
             port = str(htpc.settings.get("sabnzbd_port", ""))
             apikey = htpc.settings.get("sabnzbd_apikey", "")
             sabnzbd_basepath = fix_basepath(htpc.settings.get("sabnzbd_basepath", "/sabnzbd/"))
             ssl = "s" if htpc.settings.get("sabnzbd_ssl", 0) else ""
 
-            url = "http" + ssl + "://" + host + ":" + port + sabnzbd_basepath + "api?output=json&apikey=" + apikey + path
+            #url = "http" + ssl + "://" + host + ":" + port + sabnzbd_basepath + "api?output=json&apikey=" + apikey + path
+            url = "http%s://%s:%s%sapi?output=json&apikey=%s%s" % (ssl, host, port, sabnzbd_basepath, apikey, path)
             self.logger.debug("Fetching information from: " + url)
             return loads(urlopen(url, timeout=10).read())
         except Exception as e:

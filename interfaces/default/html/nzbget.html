@@ -3,7 +3,7 @@
 <div class="container-fluid">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="http://${settings.get('nzbget_host')}:${settings.get('nzbget_port') + settings.get('nzbget_basepath')}" target="_blank" title="Open original NZBGet interface">${settings.get('nzbget_name', 'NZBGet')}</a>
+            <a href="${webinterface}" target="_blank" title="Open original NZBGet interface">${settings.get('nzbget_name', 'NZBGet')}</a>
             <small>
                 <strong>Speed:</strong> <span id="queue_speed"></span>
                 <strong>Status:</strong> <span id="queue_state"></span>

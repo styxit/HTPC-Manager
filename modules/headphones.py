@@ -9,7 +9,7 @@ from cherrypy.lib.auth2 import require
 
 from urllib import urlencode
 from json import loads
-from htpc.proxy import get_image
+from htpc.helpers import get_image, striphttp
 
 
 class Headphones(object):
@@ -118,7 +118,7 @@ class Headphones(object):
 
         url = '{protocol}://{host}:{port}{path}'.format(
             protocol='https' if ssl else 'http',
-            host=host,
+            host=striphttp(host),
             port=port,
             path=path,
         )

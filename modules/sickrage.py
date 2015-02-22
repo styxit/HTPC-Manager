@@ -8,7 +8,7 @@ from urllib2 import urlopen
 from json import loads
 import logging
 from cherrypy.lib.auth2 import require
-from htpc.helpers import fix_basepath
+from htpc.helpers import fix_basepath, get_image, striphttp
 
 
 class Sickrage(object):
@@ -54,7 +54,8 @@ class Sickrage(object):
             if not sickrage_basepath:
                 sickrage_basepath = fix_basepath(sickrage_basepath)
 
-            url = 'http' + ssl + '://' + sickrage_host + ':' + sickrage_port + sickrage_basepath + 'api/' + sickrage_apikey + '/?cmd=sb.ping'
+            url = 'http%s://%s:%s%sapi/%s/?cmd=sb.ping' % (ssl, striphttp(sickrage_host), sickrage_port, sickrage_basepath, sickrage_apikey)
+
             self.logger.debug("Trying to contact sickrage via " + url)
             response = loads(urlopen(url, timeout=10).read())
             if response.get('result') == "success":
@@ -208,19 +209,19 @@ class Sickrage(object):
 
     def fetch(self, cmd, img=False, timeout=20):
         try:
-            host = htpc.settings.get('sickrage_host', '')
+            host = striphttp(htpc.settings.get('sickrage_host', ''))
             port = str(htpc.settings.get('sickrage_port', ''))
             apikey = htpc.settings.get('sickrage_apikey', '')
             ssl = 's' if htpc.settings.get('sickrage_ssl', 0) else ''
             sickrage_basepath = fix_basepath(htpc.settings.get('sickrage_basepath', '/'))
 
-            url = 'http' + ssl + '://' + host + ':' + str(port) + sickrage_basepath + 'api/' + apikey + '/?cmd=' + cmd
+            url = 'http%s://%s:%s%sapi/%s/?cmd=%s' % (ssl, host, port, sickrage_basepath, apikey, cmd)
 
-            self.logger.info("Fetching information from: " + url)
-            self.logger.debug("Fetching information from: " + url)
+            self.logger.debug("Fetching information from: %s" % url)
 
             if img is True:
-                return urlopen(url, timeout=timeout).read()
+                # Cache the images
+                return get_image(url)
 
             return loads(urlopen(url, timeout=timeout).read())
         except Exception as e:

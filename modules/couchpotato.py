@@ -3,12 +3,11 @@
 
 import cherrypy
 import htpc
-from htpc.proxy import get_image
 import requests
 from cherrypy.lib.auth2 import require
 import logging
 import hashlib
-from htpc.helpers import fix_basepath
+from htpc.helpers import fix_basepath, get_image, striphttp
 
 
 class Couchpotato(object):
@@ -39,7 +38,7 @@ class Couchpotato(object):
     def webinterface(self):
         """ Generate page from template """
         ssl = "s" if htpc.settings.get("couchpotato_ssl", 0) else ""
-        host = htpc.settings.get("couchpotato_host", "")
+        host = striphttp(htpc.settings.get("couchpotato_host", ""))
         port = str(htpc.settings.get("couchpotato_port", ""))
         basepath = fix_basepath(htpc.settings.get("couchpotato_basepath", "/"))
 
@@ -54,9 +53,10 @@ class Couchpotato(object):
         self.logger.debug("Testing connectivity to couchpotato")
 
         couchpotato_basepath = fix_basepath(couchpotato_basepath)
+        couchpotato_host = striphttp(couchpotato_host)
 
         ssl = "s" if couchpotato_ssl else ""
-        url = "http" + ssl + "://" + couchpotato_host + ":" + couchpotato_port + couchpotato_basepath + "api/" + couchpotato_apikey
+        url = "http%s://%s:%s%sapi/%s" % (ssl, couchpotato_host, couchpotato_port, couchpotato_apikey)
         try:
             f = requests.get(url + '/app.available/', timeout=10)
             return f.json()
@@ -79,7 +79,7 @@ class Couchpotato(object):
         couchpotato_basepath = fix_basepath(couchpotato_basepath)
 
         ssl = "s" if couchpotato_ssl else ""
-        url = "http%s://%s:%s%s%s" % (ssl, couchpotato_host, couchpotato_port, couchpotato_basepath, getkey)
+        url = "http%s://%s:%s%s%s" % (ssl, striphttp(couchpotato_host), couchpotato_port, couchpotato_basepath, getkey)
         try:
             f = requests.get(url, timeout=10, verify=False)
             return f.json()
@@ -184,14 +184,11 @@ class Couchpotato(object):
 
     def fetch(self, path):
         try:
-            host = htpc.settings.get("couchpotato_host", "")
+            host = striphttp(htpc.settings.get("couchpotato_host", ""))
             port = str(htpc.settings.get("couchpotato_port", ""))
             apikey = htpc.settings.get("couchpotato_apikey", "")
-            basepath = htpc.settings.get("couchpotato_basepath", "/")
+            basepath = fix_basepath(htpc.settings.get("couchpotato_basepath", "/"))
             ssl = "s" if htpc.settings.get("couchpotato_ssl", 0) else ""
-
-            if not(basepath.endswith("/")):
-                basepath += "/"
 
             url = "http%s://%s:%s%sapi/%s/%s" % (ssl, host, port, basepath, apikey, path)
             self.logger.debug("Fetching information from: " + url)

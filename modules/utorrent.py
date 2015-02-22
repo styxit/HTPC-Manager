@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import requests
-from cherrypy.lib.auth2 import require
-
 
 __author__ = 'quentingerome'
+
+
+import requests
+from cherrypy.lib.auth2 import require
 import logging
 import htpc
 import cherrypy
 from HTMLParser import HTMLParser
+from htpc.helpers import striphttp
 
 logger = logging.getLogger('modules.utorrent')
 
@@ -92,7 +94,7 @@ class ConnectionError(Exception):
     pass
 
 
-class UTorrent:
+class UTorrent(object):
     _token = None
     _cookies = None
 
@@ -205,7 +207,7 @@ class UTorrent:
         u_host = host or htpc.settings.get('utorrent_host')
         u_port = port or htpc.settings.get('utorrent_port')
 
-        return 'http://{}:{}/gui/'.format(u_host, u_port)
+        return 'http://{}:{}/gui/'.format(striphttp(u_host), u_port)
 
     def auth(self, host, port, username, pwd):
         token_page = requests.get(self._get_url(host, port) + 'token.html', auth=(username, pwd))

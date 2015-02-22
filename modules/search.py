@@ -3,11 +3,12 @@
 
 import cherrypy
 import htpc
-from htpc.proxy import get_image
+from htpc.helpers import get_image
 import urllib2
 from json import loads
 import logging
 from cherrypy.lib.auth2 import require
+
 
 class Search(object):
     def __init__(self):
@@ -16,11 +17,12 @@ class Search(object):
             'name': 'Newznab',
             'id': 'nzbsearch',
             'fields': [
-                {'type':'bool', 'label':'Enable', 'name':'nzbsearch_enable'},
-                {'type':'text', 'label':'Host', 'name':'newznab_host'},
-                {'type':'text', 'label':'Apikey', 'name':'newznab_apikey'},
+                {'type': 'bool', 'label': 'Enable', 'name': 'nzbsearch_enable'},
+                {'type': 'text', 'label': 'Host', 'name': 'newznab_host'},
+                {'type': 'text', 'label': 'Apikey', 'name': 'newznab_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'newznab_ssl'}
-        ]})
+            ]
+        })
 
     @cherrypy.expose()
     @require()

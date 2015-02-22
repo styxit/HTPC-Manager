@@ -40,6 +40,23 @@ If your missing something dont be afraid to make a request :)
 See here for full list:
 https://github.com/Hellowlol/HTPC-Manager/compare/styxit:master...master2
 
+## SO YOU FOUND A BUG? GREAT!
+INCLUDE THIS IN YOUR ISSUE:
+ - Branch
+ - Commit hash
+ - Your operating system and python version
+ - What you did
+ - What happened
+ - What you expected
+ - If its a visual bug, screenshot or it didnt happen
+ - What browser including version
+ - Link to a copy/paste of your logfile with clear debug info of the error on [PASTEBIN](http://www.pastebin.com)
+
+## ENABLING DETAILED DEBUGGING FOR LOGS
+1. Shutdown HTPC-Manager
+2. Start Htpc.py --loglevel debug
+3. Start HTPC-Manager and wait for error to occure again
+
 HTPC Manager
 =====
 

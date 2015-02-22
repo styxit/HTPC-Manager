@@ -8,6 +8,7 @@ import urllib
 import json
 import logging
 from cherrypy.lib.auth2 import require
+from htpc.helpers import striphttp
 
 
 class Qbittorrent(object):
@@ -34,7 +35,7 @@ class Qbittorrent(object):
         return htpc.LOOKUP.get_template("qbittorrent.html").render(scriptname="qbittorrent", webinterface=self.webinterface())
 
     def webinterface(self):
-        host = htpc.settings.get("qbittorrent_host", "")
+        host = striphttp(htpc.settings.get("qbittorrent_host", ""))
         port = htpc.settings.get("qbittorrent_port", "")
         ssl = "s" if htpc.settings.get("qbittorret_ssl", 0) else ""
         url = "http%s://%s:%s/" % (ssl, host, port)
@@ -44,7 +45,7 @@ class Qbittorrent(object):
     @cherrypy.expose()
     @require()
     def qbturl(self):
-        host = htpc.settings.get("qbittorrent_host", "")
+        host = striphttp(htpc.settings.get("qbittorrent_host", ""))
         port = htpc.settings.get("qbittorrent_port", "")
         username = htpc.settings.get("qbittorrent_username", "")
         password = htpc.settings.get("qbittorrent_password", "")
