@@ -72,9 +72,7 @@ class Updater:
             if gp != gp.lower():
                 alternative_gp.append(gp.lower())
             # Comment out the line beflow to test the source updater
-            alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "C:\Program Files (x86)\Git\bin\git.exe",
-                               "C:\Program Files (x86)\Git\cmd\git.exe"]
-
+            alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "C:\Program Files (x86)\Git\bin\git.exe"]
         # Returns a empty string if failed
         output = GitUpdater().git_exec(gp, 'version')
 
@@ -84,7 +82,7 @@ class Updater:
             htpc.settings.set('git_path', gp)
             return True
 
-        if alternative_gp:
+        if alternative_gp and not output:
             self.logger.debug("Checking for alternate git location")
             for current_gp in alternative_gp:
                 self.logger.debug("Testing git path %s" % current_gp)
