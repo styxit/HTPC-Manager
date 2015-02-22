@@ -72,7 +72,7 @@ class Updater:
             if gp != gp.lower():
                 alternative_gp.append(gp.lower())
             # Comment out the line beflow to test the source updater
-            alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "C:\Program Files (x86)\Git\bin\git.exe"]
+            #alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "C:\Program Files (x86)\Git\bin\git.exe"]
         # Returns a empty string if failed
         output = GitUpdater().git_exec(gp, 'version')
 
