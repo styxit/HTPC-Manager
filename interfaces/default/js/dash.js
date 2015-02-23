@@ -1,20 +1,4 @@
-$(document).ready(function () {
-    loadRecentMovies()
-    loadRecentTVshows()
-    loadRecentAlbums()
-    loadRecentMoviesPlex()
-    loadRecentTVshowsPlex()
-    loadRecentAlbumsPlex()
-    loadDownloadHistory()
-    loadNZBGetDownloadHistory()
-    loadWantedMovies()
-    loadNextAired()
-    loadsonarrCalendar()
-    loadNextAiredSickrage()
-    loadsysinfo()
-    loadWantedAlbums()
 
-})
 
 
 
@@ -411,6 +395,7 @@ function loadsysinfo(options) {
 
         return dashspeed;
     });
+
     $.getJSON(WEBDIR + 'stats/sysinfodash', function(result) {
             // feed the bastard
             $(".dash_sysinfo_cpu_idle").text('I '+ result.cpu.idle + ' %');
@@ -448,6 +433,41 @@ function loadsysinfo(options) {
     );
 }
 
+    function loaddiskinfo() {
+        $.ajax({
+            'url': WEBDIR + 'stats/disk_usage',
+                'dataType': 'json' ,
+                'success': function (response) {
+                $('#dash_disks_table_body').html("");
+
+                $.each(response, function (i, disk) {
+                    var row = $('<tr>');
+                    var progress =     "<div class='progress' style=margin-bottom:0px><div class=bar style=width:" + disk.percent + "%><span class=sr-only>"+ getReadableFileSizeStringHDD(disk.used) +"</span></div><div class='bar bar-success' style=width:" + (100 - disk.percent) + "% ><span class=sr-only>" + getReadableFileSizeStringHDD(disk.free) +"</span></div>";
+
+                    row.append(
+                    $('<td>').addClass('stats_disk_mountpoint').text(disk.mountpoint),
+                    $('<td>').addClass('stats_disk_progress span4').html(progress),
+                    $('<td>').addClass('stats_disk_percent').text(disk.percent + '%'));
+                    $('#dash_disks_table_body').append(row);
+            });
+
+            }
+        });
+    }
+
+
+
+// For hdd. Converts bytes to filesize in kb,mb,gb
+ function getReadableFileSizeStringHDD(fileSizeInBytes) {
+    var i = -1;
+    var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB'];
+    do {
+        fileSizeInBytes = fileSizeInBytes / 1000;
+        i++;
+    } while (fileSizeInBytes > 1000);
+    return fileSizeInBytes.toFixed(1) + byteUnits[i];
+};
+
 //
 function bytestospeed(bytes) {
     var i = -1;
@@ -458,3 +478,24 @@ function bytestospeed(bytes) {
     } while (bytes > 1024);
     return bytes.toFixed(2) + byteUnits[i]+ '\\s';
 }
+
+
+$(document).ready(function () {
+    loadRecentMovies()
+    loadRecentTVshows()
+    loadRecentAlbums()
+    loadRecentMoviesPlex()
+    loadRecentTVshowsPlex()
+    loadRecentAlbumsPlex()
+    loadDownloadHistory()
+    loadNZBGetDownloadHistory()
+    loadWantedMovies()
+    loadNextAired()
+    loadsonarrCalendar()
+    loadNextAiredSickrage()
+    loadsysinfo()
+    loadWantedAlbums()
+    loaddiskinfo()
+
+
+})
