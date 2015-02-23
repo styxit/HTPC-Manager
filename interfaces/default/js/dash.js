@@ -354,7 +354,7 @@ function loadNextAiredSickrage(options) {
         var all = missed.concat(result.data.today, result.data.soon, result.data.later)
         $.each(all, function(i, tvshow) {
             if ($('table #nextaired_sickrage_table_body >tr').length >= 5) return false;
-            var name = $('<a>').attr('href', 'sickbeard/view/' + tvshow.tvdbid).html(tvshow.show_name)
+            var name = $('<a>').attr('href', 'sickrage/view/' + tvshow.tvdbid).html(tvshow.show_name)
             $('#nextaired_sickrage_table_body').append(
                 $('<tr>').append(
                     $('<td>').append(name),
