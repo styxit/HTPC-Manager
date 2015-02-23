@@ -144,11 +144,11 @@ class Deluge(object):
         try:
             self.logger.debug("Read data from server")
             host = striphttp(htpc.settings.get('deluge_host', ''))
-            port = str(htpc.settings.get('deluge_port', ''))
+            port = htpc.settings.get('deluge_port', '')
             deluge_basepath = fix_basepath(htpc.settings.get('deluge_basepath', '/'))
             ssl = 's' if htpc.settings.get('deluge_ssl') else ''
 
-            url = 'http%s://%s:%s%sjson' (ssl, host, port, deluge_basepath)
+            url = 'http%s://%s:%s%sjson' % (ssl, host, port, deluge_basepath)
 
             post_data = dumps(data)
             buf = StringIO(self.opener.open(url, post_data, 1).read())
