@@ -308,19 +308,24 @@ class GitUpdater():
             proc = subprocess.Popen(gp + " " + args, stdout=subprocess.PIPE,
                         stderr=subprocess.STDOUT, shell=True, cwd=htpc.RUNDIR)
             output, err = proc.communicate()
+            exitcode = proc.returncode
 
             self.logger.debug("Running %s %s" % (gp, args))
         except OSError, e:
             self.logger.warning(str(e))
             return ''
 
+        if exitcode > 0:
+            self.logger.warning('%s -  %s' % (output, err))
+            return ''
+
         if err:
             self.logger.warning(output + ' - ' + err)
             return ''
-        elif any(s in output for s in ['not found', 'not recognized', 'fatal:']):
+        if any(s in output for s in ['not found', 'not recognized', 'fatal:']):
             self.logger.warning(output)
             return ''
-        else:
+        if output and exitcode == 0:
             return output.strip()
 
 
