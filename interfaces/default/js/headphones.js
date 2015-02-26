@@ -177,7 +177,7 @@ function loadArtists() {
         success: function (result) {
             if (result.length == 0) {
                 var row = $('<tr>')
-                row.append($('<td>').html('No artists found'));
+                row.append($('<td>').attr('colspan', '5').html('No wanted albums found'));
                 $('#artists_table_body').append(row);
             } else {
                 $.each(result, function (index, artist) {
@@ -331,7 +331,7 @@ function loadHistory() {
         success: function(result) {
             if (result.length == 0) {
                 var row = $('<tr>')
-                row.append($('<td>').html('History is empty'));
+                row.append($('<td>').attr('colspan', '5').html('History is empty'));
                 $('#history_table_body').append(row);
             }
             $.each(result, function(i, item) {

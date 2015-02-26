@@ -19,3 +19,8 @@ html, body {
         padding-top: 60px;
     }
 }
+
+.label {
+    min-height: 0px !important;
+    min-width: 0px !important;
+}

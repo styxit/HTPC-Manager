@@ -1,8 +1,4 @@
 
-
-
-
-
 function loadWantedAlbums () {
     if (!$('#headphones-carousel').length) return
     $.get(WEBDIR + 'headphones/GetWantedList', function (data) {
