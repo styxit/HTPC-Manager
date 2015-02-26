@@ -59,10 +59,10 @@ class Sickrage(object):
             self.logger.debug("Trying to contact sickrage via " + url)
             response = loads(urlopen(url, timeout=10).read())
             if response.get('result') == "success":
-                self.logger.debug("Sicbeard connectivity test success")
+                self.logger.debug("Sickrage connectivity test success")
                 return response
         except:
-            self.logger.error("Unable to contact sickrage via " + url)
+            self.logger.error("Unable to contact sickrage via %s" % url)
             return
 
     @cherrypy.expose()
@@ -91,7 +91,7 @@ class Sickrage(object):
     def GetPoster(self, tvdbid):
         self.logger.debug("Fetching Poster")
         cherrypy.response.headers['Content-Type'] = 'image/jpeg'
-        return self.fetch('show.getposter&tvdbid=' + tvdbid, True)
+        return self.fetch('show.getposter&indexerid=' + tvdbid, True)
 
     @cherrypy.expose()
     @require()
@@ -120,20 +120,20 @@ class Sickrage(object):
     @cherrypy.tools.json_out()
     def GetShow(self, tvdbid):
         self.logger.debug("Fetching Show")
-        return self.fetch('show&tvdbid=' + tvdbid)
+        return self.fetch('show&indexerid=' + tvdbid)
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def GetEpisode(self, strShowID, strSeason, strEpisode):
-        return self.fetch("episode&tvdbid=" + strShowID + "&season=" + strSeason + "&episode=" + strEpisode + "&full_path=1")
+        return self.fetch("episode&indexerid=" + strShowID + "&season=" + strSeason + "&episode=" + strEpisode + "&full_path=1")
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def GetSeason(self, tvdbid, season):
         self.logger.debug("Fetching Season")
-        return self.fetch('show.seasons&tvdbid=' + tvdbid + '&season=' + season)
+        return self.fetch('show.seasons&indexerid=' + tvdbid + '&season=' + season)
 
     @cherrypy.expose()
     @require()
@@ -156,14 +156,14 @@ class Sickrage(object):
     @cherrypy.tools.json_out()
     def SearchEpisodeDownload(self, tvdbid, season, episode):
         self.logger.debug("Fetching Episode Downloads")
-        return self.fetch('episode.search&tvdbid=' + tvdbid + '&season=' + season + '&episode=' + episode, False, 45)
+        return self.fetch('episode.search&indexerid=' + tvdbid + '&season=' + season + '&episode=' + episode, False, 45)
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def SearchSubtitle(self, tvdbid, season, episode):
         self.logger.debug("Fetching subtitle")
-        return self.fetch('episode.subtitlesearch&tvdbid=' + tvdbid + '&season=' + season + '&episode=' + episode, False, 45)
+        return self.fetch('episode.subtitlesearch&indexerid=' + tvdbid + '&season=' + season + '&episode=' + episode, False, 45)
 
     @cherrypy.expose()
     @require()
@@ -177,14 +177,14 @@ class Sickrage(object):
     @cherrypy.tools.json_out()
     def ForceFullUpdate(self, tvdbid):
         self.logger.debug("Force full update for tvdbid " + tvdbid)
-        return self.fetch("show.update&tvdbid=" + tvdbid)
+        return self.fetch("show.update&indexerid=" + tvdbid)
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def RescanFiles(self, tvdbid):
         self.logger.debug("Rescan all local files for tvdbid " + tvdbid)
-        return self.fetch("show.refresh&tvdbid=" + tvdbid)
+        return self.fetch("show.refresh&indexerid=" + tvdbid)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
