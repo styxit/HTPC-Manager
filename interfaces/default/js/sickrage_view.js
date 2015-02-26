@@ -7,7 +7,7 @@ $(document).ready(function() {
 
 function loadShowData(showid) {
     $.ajax({
-        url: WEBDIR + 'sickrage/GetShow?tvdbid=' + showid,
+        url: WEBDIR + 'sickrage/GetShow?indexerid=' + showid,
         type: 'get',
         dataType: 'json',
         success: function(data) {
@@ -122,7 +122,7 @@ function renderSeason() {
     season = $(this).attr('data-season');
 
     $.ajax({
-        url: WEBDIR + 'sickrage/GetSeason?tvdbid=' + showid + '&season=' + season,
+        url: WEBDIR + 'sickrage/GetSeason?indexerid=' + showid + '&season=' + season,
         type: 'get',
         dataType: 'json',
         success: function(data) {
@@ -365,7 +365,7 @@ function loadShow(data) {
 
 }
 
-function forceFullUpdate(tvdbid, name) {
+function forceFullUpdate(indexerid, name) {
     var modalcontent = $('<div>');
     modalcontent.append($('<p>').html('Queueing &quot;' + name + ' &quot; for full TVDB information update..'));
     modalcontent.append($('<div>').html(
@@ -373,7 +373,7 @@ function forceFullUpdate(tvdbid, name) {
     showModal('Queueing...', modalcontent, {});
 
     $.ajax({
-        url: WEBDIR + 'sickrage/ForceFullUpdate?tvdbid=' + tvdbid,
+        url: WEBDIR + 'sickrage/ForceFullUpdate?indexerid=' + indexerid,
         type: 'get',
         dataType: 'json',
         timeout: 15000,
@@ -397,7 +397,7 @@ function forceFullUpdate(tvdbid, name) {
 }
 
 // Replace this one, dont like it.
-function rescanFiles(tvdbid, name) {
+function rescanFiles(indexerid, name) {
     var modalcontent = $('<div>');
     modalcontent.append($('<p>').html('Queueing &quot;' + name + ' &quot; for files rescan..'));
     modalcontent.append($('<div>').html(
@@ -405,7 +405,7 @@ function rescanFiles(tvdbid, name) {
     showModal('Queueing...', modalcontent, {});
 
     $.ajax({
-        url: WEBDIR + 'sickrage/RescanFiles?tvdbid=' + tvdbid,
+        url: WEBDIR + 'sickrage/RescanFiles?indexerid=' + indexerid,
         type: 'get',
         dataType: 'json',
         timeout: 15000,
@@ -429,7 +429,7 @@ function rescanFiles(tvdbid, name) {
 }
 
 // Replace this one, dont like it
-function searchEpisode(tvdbid, season, episode, name) {
+function searchEpisode(indexerid, season, episode, name) {
     var modalcontent = $('<div>');
     modalcontent.append($('<p>').html('Looking for episode &quot;' + name + '&quot;.'));
     modalcontent.append($('<div>').html(
@@ -437,7 +437,7 @@ function searchEpisode(tvdbid, season, episode, name) {
     showModal('Searching episode ' + season + 'x' + episode, modalcontent, {});
 
     $.ajax({
-        url: WEBDIR + 'sickrage/SearchEpisodeDownload?tvdbid=' + tvdbid + '&season=' + season + '&episode=' +
+        url: WEBDIR + 'sickrage/SearchEpisodeDownload?indexerid=' + indexerid + '&season=' + season + '&episode=' +
             episode,
         type: 'get',
         dataType: 'json',
@@ -463,8 +463,8 @@ function searchEpisode(tvdbid, season, episode, name) {
     });
 }
 
-function searchsub(tvdbid, season, episode, name) {
-    $.get(WEBDIR + 'sickrage/SearchSubtitle?tvdbid=' + tvdbid + '&season=' + season + '&episode=' + episode,
+function searchsub(indexerid, season, episode, name) {
+    $.get(WEBDIR + 'sickrage/SearchSubtitle?indexerid=' + indexerid + '&season=' + season + '&episode=' + episode,
         function(data) {
             if (data.result != 'success') {
                 notify('Error', data.message, 'error');
