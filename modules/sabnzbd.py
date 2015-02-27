@@ -158,10 +158,9 @@ class Sabnzbd(object):
             sabnzbd_basepath = fix_basepath(htpc.settings.get("sabnzbd_basepath", "/sabnzbd/"))
             ssl = "s" if htpc.settings.get("sabnzbd_ssl", 0) else ""
 
-            #url = "http" + ssl + "://" + host + ":" + port + sabnzbd_basepath + "api?output=json&apikey=" + apikey + path
             url = "http%s://%s:%s%sapi?output=json&apikey=%s%s" % (ssl, host, port, sabnzbd_basepath, apikey, path)
             self.logger.debug("Fetching information from: " + url)
-            return loads(urlopen(url, timeout=10).read())
+            return loads(urlopen(url, timeout=10).read(), strict=False)
         except Exception as e:
             self.logger.error("Cannot contact sabnzbd %s" % e)
             return

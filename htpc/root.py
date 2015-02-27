@@ -20,8 +20,8 @@ def do_restart():
     if sys.platform == 'win32':
         arguments = ['"%s"' % arg for arg in arguments]
     os.chdir(os.getcwd())
-    htpc.SCHED.shutdown(wait=False)
     cherrypy.engine.exit()
+    htpc.SCHED.shutdown(wait=False)
     os.execv(sys.executable, arguments)
 
 
@@ -33,7 +33,7 @@ class RestrictedArea:
     }
 
 
-class Root:
+class Root(object):
     """ Root class """
     def __init__(self):
         """ Do nothing on load """
@@ -59,8 +59,8 @@ class Root:
     def shutdown(self):
         """ Shutdown CherryPy and exit script """
         self.logger.info("Shutting down htpc-manager.")
-        htpc.SCHED.shutdown(wait=False)
         cherrypy.engine.exit()
+        htpc.SCHED.shutdown(wait=False)
         return "HTPC Manager has shut down"
 
     @cherrypy.expose(alias='robots.txt')
