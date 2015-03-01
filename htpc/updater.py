@@ -72,7 +72,7 @@ class Updater:
             if gp != gp.lower():
                 alternative_gp.append(gp.lower())
             # Comment out the line beflow to test the source updater
-            #alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "C:\Program Files (x86)\Git\bin\git.exe"]
+            # alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "C:\Program Files (x86)\Git\bin\git.exe"]
         # Returns a empty string if failed
         output = GitUpdater().git_exec(gp, 'version')
 
@@ -136,29 +136,31 @@ class Updater:
         self.logger.info("Checking for updates from %s." % self.updateEngineName)
 
         # Get current and latest version
+        # current can return True, False, Unknown, and SHA
         current = self.updateEngine.current()
         htpc.CURRENT_HASH = current
+        # Can return True, False
         latest = self.updateEngine.latest()
         htpc.LATEST_HASH = latest
 
-        if not latest:
+        if latest is False:
             self.logger.error("Failed to determine the latest version for HTPC Manager.")
         else:
             output['latestVersion'] = latest
 
-        if not current:
+        if current is False:
             self.logger.error("Failed to determine the current version for HTPC Manager.")
         else:
             output['currentVersion'] = current
 
         # If current or latest failed, updating is not possible
-        if not current or not latest:
+        if current is False or latest is False:
             self.logger.debug("Cancel update.")
             output['updateNeeded'] = False
             return output
 
         # If HTPC Manager is up to date, updating is not needed
-        if current == latest:
+        if current == latest or current != "Unknown":
             self.logger.info("HTPC-Manager is Up-To-Date.")
             output['versionsBehind'] = 0
             htpc.COMMITS_BEHIND = 0
@@ -191,6 +193,7 @@ class Updater:
         return self.updateEngine.branches()
 
     def update_needed(self):
+        self.logger.info("Running update_needed")
         update_avail = self.check_update()
         # returns true or false
         if update_avail.get("updateNeeded"):
@@ -211,7 +214,6 @@ class GitUpdater():
     def __init__(self):
         """ Set GitHub settings on load """
         self.UPDATING = 0
-
         self.git = htpc.settings.get('git_path', 'git')
         self.logger = logging.getLogger('htpc.updater')
         #self.update_remote_origin() # Disable this since it a fork for now.
@@ -333,16 +335,12 @@ class SourceUpdater():
     """ Class to update HTPC Manager using Source code from Github. Requires a full download on every update."""
     def __init__(self):
         self.UPDATING = 0
-
         self.currentHash = False
         self.verified = False
-
         self.logger = logging.getLogger('htpc.updater')
-
         self.versionFile = os.path.join(htpc.RUNDIR, 'VERSION.txt')
         self.updateFile = os.path.join(htpc.DATADIR, 'htpc-manager-update.tar.gz')
         self.updateDir = os.path.join(htpc.DATADIR, 'update-source')
-
 
     def current(self):
         """ Get hash of current runnig version """
@@ -438,7 +436,6 @@ class SourceUpdater():
         self.logger.info("Attempting update from source.")
 
         self.UPDATING = 1
-        cherrypy.engine.exit()
 
         tarUrl = 'https://github.com/%s/%s/tarball/%s' % (gitUser, gitRepo, htpc.settings.get('branch', 'master2'))
 
