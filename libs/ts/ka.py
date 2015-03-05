@@ -3,7 +3,7 @@
 import json
 import requests
 import htpc
-import logger
+import logging
 
 
 def search(what, cat='all'):
@@ -54,7 +54,7 @@ def search(what, cat='all'):
                 pass
         i += 1
 
-    logger.debug(ret)
+    logging.debug(ret)
     if len(ret):
         return sorted(ret, reverse=True, key=lambda k: k['Seeders'])
     else:

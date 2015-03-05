@@ -3,7 +3,7 @@
 
 import requests
 import urllib
-import logger
+import logging
 
 
 class YTS(object):
@@ -48,7 +48,7 @@ class YTS(object):
                         "Snatched": "N/A",
                     }
                     l.append(r)
-            logger.debug(l)
+            logging.debug(l)
             return l
         else:
             return []
