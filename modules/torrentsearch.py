@@ -6,6 +6,8 @@ import cherrypy
 import jsonrpclib
 import logging
 from ts import norbits
+from ts import yts
+from ts import ka
 
 
 class Torrentsearch(object):
@@ -21,7 +23,9 @@ class Torrentsearch(object):
                 {'type': 'text', 'label': 'BTN apikey', 'name': 'torrentsearch_btn_apikey'},
                 {'type': 'bool', 'label': 'Norbits', 'name': 'torrents_norbits_enabled'},
                 {'type': 'text', 'label': 'Norbits username', 'name': 'torrents_norbits_username'},
-                {'type': 'text', 'label': 'Norbits passkey', 'name': 'torrents_norbits_passkey'}
+                {'type': 'text', 'label': 'Norbits passkey', 'name': 'torrents_norbits_passkey'},
+                {'type': 'bool', 'label': 'YTS', 'name': 'torrents_yts_enabled'},
+                {'type': 'bool', 'label': 'KAT', 'name': 'torrents_ka_enabled'},
             ]
         })
 
@@ -37,8 +41,12 @@ class Torrentsearch(object):
         r = []
         if htpc.settings.get('torrents_btn_enabled'):
             r += self.btn(query)
-        elif htpc.settings.get('torrents_norbits_enabled'):
+        if htpc.settings.get('torrents_norbits_enabled'):
             r += self.search_norbits(query, 'all')
+        if htpc.settings.get('torrents_yts_enabled'):
+            r += self.search_yts(query)
+        if htpc.settings.get('torrents_ka_enabled'):
+            r += self.search_ka(query)
         return r
 
     @cherrypy.expose()
@@ -76,6 +84,12 @@ class Torrentsearch(object):
 
         if htpc.settings.get('torrents_norbits_enabled') == 1 and htpc.settings.get('torrents_norbits_passkey') and htpc.settings.get('torrents_norbits_username'):
             torrentproviders.append('norbits')
+
+        if htpc.settings.get('torrents_yts_enabled') == 1:
+            torrentproviders.append('yts')
+
+        if htpc.settings.get('torrents_ka_enabled') == 1:
+            torrentproviders.append('ka')
 
         return torrentproviders
 
@@ -132,3 +146,12 @@ class Torrentsearch(object):
     def search_norbits(self, q, cat):
         results = norbits.search(q, cat)
         return results
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def search_yts(self, q):
+        t = yts.YTS().search(q, "test")
+        return t
+
+    def search_ka(self, q, cat="all"):
+        return ka.search(q, cat)
