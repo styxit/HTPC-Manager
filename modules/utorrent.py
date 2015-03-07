@@ -169,6 +169,7 @@ class UTorrent(object):
             logger.error('Failed to sendt %s to uTorrent %s' % (link, torrentname))
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def ping(self, utorrent_host='', utorrent_port='',
              utorrent_username='', utorrent_password='', **kwargs):

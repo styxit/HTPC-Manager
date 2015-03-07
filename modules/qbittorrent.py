@@ -168,6 +168,7 @@ class Qbittorrent(object):
 
     #Torrent search send to torrent
     @cherrypy.expose()
+    @require()
     def to_client(self, link, torrentname, **kwargs):
         try:
             url = self.qbturl()

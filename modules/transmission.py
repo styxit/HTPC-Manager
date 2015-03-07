@@ -108,11 +108,13 @@ class Transmission(object):
             return
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def session(self):
         return self.fetch('session-get')
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def set_downspeed(self, speed):
         print "running", speed
@@ -121,6 +123,7 @@ class Transmission(object):
         return self.fetch('session-set', {'speed-limit-down': int(speed), 'speed-limit-down-enabled': True})
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def set_upspeed(self, speed):
         if int(speed) == 0:
@@ -175,6 +178,7 @@ class Transmission(object):
 
     #For torrent search
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def to_client(self, link, torrentname, **kwargs):
         try:

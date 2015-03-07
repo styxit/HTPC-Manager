@@ -87,10 +87,10 @@ class Stats(object):
 
             # File systems that should be ignored
             fstypes = ['autofs', 'binfmt_misc', 'configfs', 'debugfs',
-                        'devfs', 'devpts', 'devtmpfs', 'hugetlbfs',
-                        'iso9660', 'linprocfs', 'mqueue', 'none',
-                        'proc', 'procfs', 'pstore', 'rootfs',
-                        'securityfs', 'sysfs', 'usbfs', '']
+                       'devfs', 'devpts', 'devtmpfs', 'hugetlbfs',
+                       'iso9660', 'linprocfs', 'mqueue', 'none',
+                       'proc', 'procfs', 'pstore', 'rootfs',
+                       'securityfs', 'sysfs', 'usbfs', '']
 
             # Adds the mointpoints that the user wants to ignore
             user_mountpoint = htpc.settings.get('stats_mountpoint')
@@ -298,8 +298,6 @@ class Stats(object):
     @cherrypy.expose()
     @require()
     def get_local_ip(self, dash=False):
-        # added a small delay since getting local is faster then network usage (Does not render in the html)
-        # time.sleep(0.1)
         d = {}
         try:
             ip = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -466,7 +464,7 @@ class Stats(object):
                 return dmsg
 
         except Exception as e:
-            self.logger.error("Error trying to %s" % cmd, e)
+            self.logger.error("Error trying to %s %s" % (cmd, e))
 
     @cherrypy.expose()
     @require(member_of("admin"))

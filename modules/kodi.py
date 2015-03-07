@@ -414,12 +414,14 @@ class Kodi(object):
             return kodi.Addons.ExecuteAddon(addonid=addon)
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def Enable_DisableAddon(self, addonid=None, enabled=None):
         kodi = Server(self.url('/jsonrpc', True))
         return kodi.Addons.SetAddonEnabled(addonid=addonid, enabled=bool(int(enabled)))
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetAddons(self):
         kodi = Server(self.url('/jsonrpc', True))
@@ -428,6 +430,7 @@ class Kodi(object):
         return addons
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def PlayItem(self, item=None, type=None):
         """ Play a file in kodi """

@@ -8,6 +8,7 @@ import logging
 from ts import norbits
 from ts import yts
 from ts import ka
+from cherrypy.lib.auth2 import require
 
 
 class Torrentsearch(object):
@@ -30,11 +31,13 @@ class Torrentsearch(object):
         })
 
     @cherrypy.expose()
+    @require()
     def index(self, query='', **kwargs):
         return htpc.LOOKUP.get_template('torrentsearch.html').render(query=query, scriptname='torrentsearch')
 
     # Search all, add categorys and providers later
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def search(self, query=None):
         self.logger.debug(query)
@@ -49,7 +52,6 @@ class Torrentsearch(object):
             r += self.search_ka(query)
         return r
 
-    @cherrypy.expose()
     def btn(self, query=None):
         result = None
         try:
@@ -94,6 +96,7 @@ class Torrentsearch(object):
         return torrentproviders
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def getclients(self):
         l = []
@@ -147,11 +150,8 @@ class Torrentsearch(object):
         results = norbits.search(q, cat)
         return results
 
-    @cherrypy.expose()
-    @cherrypy.tools.json_out()
-    def search_yts(self, q):
-        t = yts.YTS().search(q, "test")
-        return t
+    def search_yts(self, q, cat=None):
+        return yts.YTS().search(q, cat)
 
     def search_ka(self, q, cat="all"):
         return ka.search(q, cat)

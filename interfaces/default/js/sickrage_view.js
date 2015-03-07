@@ -160,7 +160,7 @@ function renderSeason() {
                 var has_sub = ""
                     // value subtitles is a empty string if there isnt a sub, else subs language code "en" etc
                 if (value.subtitles.length > 0) {
-                    has_sub = $('<i>').addClass('icon-comment');
+                    has_sub = makeIcon('icon-comment', value.subtitles);
                 }
 
                 row.append(

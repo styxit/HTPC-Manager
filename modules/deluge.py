@@ -107,6 +107,7 @@ class Deluge(object):
 
     #Used for torrent search
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def to_client(self, link, torrentname, **kwargs):
         try:

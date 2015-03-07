@@ -12,7 +12,7 @@ import urllib2
 import re
 import itertools
 import operator
-from operator import itemgetter
+from cherrypy.lib.auth2 import require
 #from uuid import getnode as get_mac
 
 
@@ -39,10 +39,12 @@ class Samsungtv:
         ]})
 
     @cherrypy.expose()
+    @require()
     def index(self):
         return htpc.LOOKUP.get_template('samsungtv.html').render(scriptname='samsungtv')
 
     @cherrypy.expose()
+    @require()
     def sendkey(self, action):
         try:
             key = action
@@ -84,6 +86,7 @@ class Samsungtv:
             return ''
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def findtv(self, id=None):
         result_list = []

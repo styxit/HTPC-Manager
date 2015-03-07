@@ -9,6 +9,8 @@ import urllib
 import base64
 import json
 import time
+from cherrypy.lib.auth2 import require
+
 
 class TVHeadend(object):
     def __init__(self):
@@ -28,35 +30,42 @@ class TVHeadend(object):
         })
 
     @cherrypy.expose()
+    @require()
     def index(self):
         return htpc.LOOKUP.get_template("tvheadend.html").render(scriptname="tvheadend")
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetEPG(self, strLimit = "300", strChannel = ""):
         return self.fetch("epg", { 'limit': strLimit, 'start': "0", 'channel': strChannel })
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetChannels(self):
         return self.fetch("api/channel/grid", None)
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetChannelTags(self):
         return self.fetch("channeltags", { 'op': 'listTags' })
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def DVRAdd(self, strEventID = ""):
         return self.fetch("dvr", { 'eventId': strEventID, 'op': "recordEvent" })
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def DVRDel(self, strEntryID = ""):
         return self.fetch("dvr", { 'entryId': strEntryID, 'op': "cancelEntry" })
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def DVRList(self, strType = ""):
         return self.fetch("dvrlist_" + strType, None)
@@ -69,7 +78,7 @@ class TVHeadend(object):
         strResponse = None
         strData = None
 
-        if rgpData != None:
+        if rgpData is not None:
             strData = urllib.urlencode(rgpData)
 
         try:
