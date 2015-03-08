@@ -132,6 +132,7 @@ function loadHistory() {
                     $(name).append('&nbsp;').append(failMessage);
                 }
 
+                row.append($('<td>').append(moment(slot.completed * 1000).format("YYYY-MM-DD hh:mm")));
                 row.append(name);
                 row.append($('<td>').append(sabnzbdStatusLabel(slot.status)));
                 row.append($('<td>').html(slot.size));
