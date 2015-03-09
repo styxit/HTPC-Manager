@@ -182,6 +182,28 @@ class Couchpotato(object):
         self.logger.debug("Feching categories")
         return self.fetch('category.list')
 
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def Suggestion(self):
+        self.logger.debug("Fetching suggestion")
+        return self.fetch("suggestion.view")
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def ChartsView(self):
+        self.logger.debug("Fetching charts")
+        return self.fetch("charts.view")
+
+    # http://192.168.1.122:8988/couchpotato/api/39ac2c541aee4a5e8f9a92ee38617379/suggestion.ignore/?t=8gnfX5dR&imdb=tt2713180
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def SuggestionIgnore(self, id=None, seenit=None):
+        u = "suggestion.ignore/?imdb=%s" % id
+        if seenit:
+            u += "&seenit=1" % seenit
+        self.logger.debug("Fetching suggestion")
+        return self.fetch(u)
+
     def fetch(self, path):
         try:
             host = striphttp(htpc.settings.get("couchpotato_host", ""))

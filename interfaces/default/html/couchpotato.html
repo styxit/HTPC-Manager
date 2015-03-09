@@ -9,19 +9,37 @@
             <input type="text" id="moviename" class="span6"  placeholder="Add new movie" />
             <button type="submit" class="btn btn-success"><i class="icon-search"></i> Search</button>
         </form>
-        <ul class="nav nav-tabs">
+        <ul class="cp_nav nav nav-tabs">
 			<li><a href="#library" data-toggle="tab">Library</a></li>
             <li><a href="#wanted" data-toggle="tab">Wanted</a></li>
+            <li><a href="#suggestions" data-toggle="tab">Suggestions</a></li>
+            <!--<li><a href="#charts" data-toggle="tab">Charts</a></li>-->
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Charts
+                <i class="caret"></i></a>
+                <ul class="cp_chart_dropdown dropdown-menu">
+                    <!--<li><a href="#artists" data-toggle="tab">Artists</a></li>-->
+                    <!--<li><a href="#albums" data-toggle="tab">Albums</a></li>-->
+                    <!--<li><a href="#songs" data-toggle="tab">Songs</a></li>-->
+                </ul>
+            </li>
             <li><a href="#history" data-toggle="tab">History</a></li>
             <li class="hidden"><a href="#result" data-toggle="tab">Search</a></li>
         </ul>
-        <div class="tab-content">
+        <div id="cp_tab_content" class="tab-content">
             <div id="library" class="tab-pane">
                 <ul id="library-grid" class="thumbnails"></ul>
             </div>
             <div id="wanted" class="tab-pane">
                 <ul id="wanted-grid" class="thumbnails"></ul>
             </div>
+            <div id="suggestions" class="tab-pane">
+                <ul id="suggestions-grid" class="thumbnails"></ul>
+            </div>
+            <!--
+            <div id="charts" class="tab-pane">
+                <!--<ul id="charts-grid" class="thumbnails"></ul>-->
+            <!--</div>-->
             <div id="history" class="tab-pane">
                 <table class="table table-striped">
                     <thead>
