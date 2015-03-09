@@ -1,4 +1,4 @@
-var profiles = $('<select>');
+var profiles = $('<select id="profiles">');
 var cpcat = '';
 $(document).ready(function() {
     $(window).trigger('hashchange')
@@ -8,14 +8,17 @@ $(document).ready(function() {
     $('#searchform').submit(function(e) {
         e.preventDefault()
         var search = $('#moviename').val()
-        if (search) searchMovie(search)
+        if (search) {
+            searchMovie(search)
+        }
+
     })
     $.get(WEBDIR + 'couchpotato/GetProfiles', function(data) {
         if (data === null) return
         $.each(data.list, function(i, item) {
             if (!item.hide) profiles.append($('<option>').val(item._id).text(item.label))
-        })
-    })
+        });
+    });
     $.get(WEBDIR + 'couchpotato/GetCategories', function(data) {
         if (data.categories.length <= 0) return
         cpcat = $('<select>');
@@ -23,6 +26,7 @@ $(document).ready(function() {
             cpcat.append($('<option>').val(item._id).text(item.label))
         });
     });
+
 });
 
 
@@ -334,5 +338,7 @@ function showMovie(movie, was_search) {
 
     var modalBody = $('<div>').append(modalImg, modalInfo);
     showModal(title, modalBody, modalButtons);
+    // since ff and ie sucks balls
+    $('#profiles option')[0].selected = true
     Holder.run();
 }
