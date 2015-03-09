@@ -15,7 +15,7 @@ class SOIndex1(SQLObject):
     nameIndex3 = DatabaseIndex({'column': name,
                                 'length': 3})
 class SOIndex2(SQLObject):
-    name = StringCol()
+    name = StringCol(length=100)
     nameIndex = DatabaseIndex({'expression': 'lower(name)'})
 
 def test_indexes_1():
@@ -44,8 +44,8 @@ def test_indexes_2():
 
 
 class PersonIndexGet(SQLObject):
-    firstName = StringCol()
-    lastName = StringCol()
+    firstName = StringCol(length=100)
+    lastName = StringCol(length=100)
     age = IntCol(alternateID=True)
     nameIndex = DatabaseIndex(firstName, lastName, unique=True)
 
@@ -90,13 +90,13 @@ def test_index_get_1():
 
 
 class PersonIndexGet2(SQLObject):
-    name        = StringCol(alternateID=True)
+    name        = StringCol(alternateID=True, length=100)
     age         = IntCol()
     addresses   = MultipleJoin('AddressIndexGet2')
 
 class AddressIndexGet2(SQLObject):
     person  = ForeignKey('PersonIndexGet2', notNone=True)
-    type    = StringCol(notNone=True)
+    type    = StringCol(notNone=True, length=100)
     street  = StringCol(notNone=True)
     pk      = DatabaseIndex(person, type, unique=True)
 

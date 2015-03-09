@@ -54,5 +54,5 @@ def test_related_join_transaction():
         assert t1.fightersAsSResult.count() == 1
         assert t1.fightersAsSResult[0]._connection == trans
     finally:
+        trans.commit(True)
         Tourtment._connection.autoCommit = True
-

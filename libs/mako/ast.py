@@ -1,5 +1,5 @@
 # mako/ast.py
-# Copyright (C) 2006-2012 the Mako authors and contributors <see AUTHORS file>
+# Copyright (C) 2006-2015 the Mako authors and contributors <see AUTHORS file>
 #
 # This module is part of Mako and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
@@ -7,7 +7,7 @@
 """utilities for analyzing expressions and blocks of Python
 code, as well as generating Python from AST nodes"""
 
-from mako import exceptions, pyparser, util
+from mako import exceptions, pyparser, compat
 import re
 
 class PythonCode(object):
@@ -33,7 +33,7 @@ class PythonCode(object):
         # - AST is less likely to break with version changes
         # (for example, the behavior of co_names changed a little bit
         # in python version 2.5)
-        if isinstance(code, basestring):
+        if isinstance(code, compat.string_types):
             expr = pyparser.parse(code.lstrip(), "exec", **exception_kwargs)
         else:
             expr = code
@@ -48,7 +48,7 @@ class ArgumentList(object):
         self.args = []
         self.declared_identifiers = set()
         self.undeclared_identifiers = set()
-        if isinstance(code, basestring):
+        if isinstance(code, compat.string_types):
             if re.match(r"\S", code) and not re.match(r",\s*$", code):
                 # if theres text and no trailing comma, insure its parsed
                 # as a tuple by adding a trailing comma
@@ -106,42 +106,69 @@ class FunctionDecl(object):
         f.visit(expr)
         if not hasattr(self, 'funcname'):
             raise exceptions.CompileException(
-                              "Code '%s' is not a function declaration" % code,
-                              **exception_kwargs)
+                            "Code '%s' is not a function declaration" % code,
+                            **exception_kwargs)
         if not allow_kwargs and self.kwargs:
             raise exceptions.CompileException(
                                 "'**%s' keyword argument not allowed here" %
-                                self.argnames[-1], **exception_kwargs)
+                                self.kwargnames[-1], **exception_kwargs)
 
-    def get_argument_expressions(self, include_defaults=True):
-        """return the argument declarations of this FunctionDecl as a printable
-        list."""
+    def get_argument_expressions(self, as_call=False):
+        """Return the argument declarations of this FunctionDecl as a printable
+        list.
+
+        By default the return value is appropriate for writing in a ``def``;
+        set `as_call` to true to build arguments to be passed to the function
+        instead (assuming locals with the same names as the arguments exist).
+        """
 
         namedecls = []
-        defaults = [d for d in self.defaults]
-        kwargs = self.kwargs
-        varargs = self.varargs
-        argnames = [f for f in self.argnames]
-        argnames.reverse()
-        for arg in argnames:
-            default = None
-            if kwargs:
-                arg = "**" + arg
-                kwargs = False
-            elif varargs:
-                arg = "*" + arg
-                varargs = False
+
+        # Build in reverse order, since defaults and slurpy args come last
+        argnames = self.argnames[::-1]
+        kwargnames = self.kwargnames[::-1]
+        defaults = self.defaults[::-1]
+        kwdefaults = self.kwdefaults[::-1]
+
+        # Named arguments
+        if self.kwargs:
+            namedecls.append("**" + kwargnames.pop(0))
+
+        for name in kwargnames:
+            # Keyword-only arguments must always be used by name, so even if
+            # this is a call, print out `foo=foo`
+            if as_call:
+                namedecls.append("%s=%s" % (name, name))
+            elif kwdefaults:
+                default = kwdefaults.pop(0)
+                if default is None:
+                    # The AST always gives kwargs a default, since you can do
+                    # `def foo(*, a=1, b, c=3)`
+                    namedecls.append(name)
+                else:
+                    namedecls.append("%s=%s" % (
+                        name, pyparser.ExpressionGenerator(default).value()))
             else:
-                default = len(defaults) and defaults.pop() or None
-            if include_defaults and default:
-                namedecls.insert(0, "%s=%s" %
-                            (arg,
-                            pyparser.ExpressionGenerator(default).value()
-                            )
-                        )
+                namedecls.append(name)
+
+        # Positional arguments
+        if self.varargs:
+            namedecls.append("*" + argnames.pop(0))
+
+        for name in argnames:
+            if as_call or not defaults:
+                namedecls.append(name)
             else:
-                namedecls.insert(0, arg)
+                default = defaults.pop(0)
+                namedecls.append("%s=%s" % (
+                    name, pyparser.ExpressionGenerator(default).value()))
+
+        namedecls.reverse()
         return namedecls
+
+    @property
+    def allargnames(self):
+        return tuple(self.argnames) + tuple(self.kwargnames)
 
 class FunctionArgs(FunctionDecl):
     """the argument portion of a function declaration"""

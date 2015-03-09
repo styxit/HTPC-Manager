@@ -5,7 +5,7 @@ class TestComparison(SQLObject):
     pass
 
 def test_eq():
-    setupClass(TestComparison)
+    setupClass(TestComparison, force=True)
     t1 = TestComparison()
     t2 = TestComparison()
 

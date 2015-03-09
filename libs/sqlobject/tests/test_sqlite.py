@@ -104,3 +104,29 @@ def test_empty_string():
     test = TestSO1(name=None, passwd='')
     assert test.name is None
     assert test.passwd == ''
+
+def test_memorydb():
+    if not supports("memorydb"):
+        return
+    connection = getConnection()
+    if connection.dbName != "sqlite":
+        return
+    if not connection._memory:
+        return
+    setupClass(TestSO1)
+    connection.close() # create a new connection to an in-memory database
+    TestSO1.setConnection(connection)
+    TestSO1.createTable()
+
+def test_list_databases():
+    connection = getConnection()
+    if connection.dbName != "sqlite":
+        return
+    assert connection.listDatabases() == ['main']
+
+def test_list_tables():
+    connection = getConnection()
+    if connection.dbName != "sqlite":
+        return
+    setupClass(TestSO1)
+    assert TestSO1.sqlmeta.table in connection.listTables()

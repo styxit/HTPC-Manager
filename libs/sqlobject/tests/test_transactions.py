@@ -56,7 +56,10 @@ def test_transaction_delete(close=False):
     if not supports('transactions'):
         return
     setupClass(TestSOTrans)
-    trans = TestSOTrans._connection.transaction()
+    connection = TestSOTrans._connection
+    if (connection.dbName == 'sqlite') and connection._memory:
+        return # The following test requires a different connection
+    trans = connection.transaction()
     try:
         TestSOTrans(name='bob')
         bIn = TestSOTrans.byName('bob', connection=trans)
@@ -71,7 +74,8 @@ def test_transaction_delete(close=False):
         raises(SQLObjectNotFound, "bOutInst.name")
     finally:
         trans.rollback()
-        TestSOTrans._connection.autoCommit = True
+        connection.autoCommit = True
+        connection.close()
 
 def test_transaction_delete_with_close():
     test_transaction_delete(close=True)

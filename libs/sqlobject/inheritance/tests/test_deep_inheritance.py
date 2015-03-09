@@ -8,12 +8,12 @@ from sqlobject.inheritance import InheritableSQLObject
 ########################################
 
 class DIPerson(InheritableSQLObject):
-    firstName = StringCol()
+    firstName = StringCol(length=100)
     lastName = StringCol(alternateID=True, length=255)
     manager = ForeignKey("DIManager", default=None)
 
 class DIEmployee(DIPerson):
-    position = StringCol(unique=True)
+    position = StringCol(unique=True, length=100)
 
 class DIManager(DIEmployee):
     subdudes = MultipleJoin("DIPerson", joinColumn="manager_id")
@@ -72,7 +72,8 @@ def test_deep_inheritance():
     person_id = DIPerson(firstName='Oneof', lastName='Authors',
         manager=manager).id
 
-    cache = getConnection().cache
+    conn = getConnection()
+    cache = conn.cache
     cache.clear()
 
     managers = list(DIManager.select())
@@ -97,3 +98,4 @@ def test_deep_inheritance():
 
     person = DIEmployee.get(manager_id)
     assert isinstance(person, DIManager)
+    conn.close()

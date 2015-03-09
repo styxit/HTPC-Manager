@@ -5,7 +5,7 @@ from dbtest import *
 from dbtest import setSQLiteConnectionFactory
 
 class IterTest(SQLObject):
-    name = StringCol(dbName='name_col')
+    name = StringCol(dbName='name_col', length=200)
 
 names = ('a', 'b', 'c')
 def setupIter():
@@ -113,7 +113,7 @@ def test_selectBy_kwargs():
     assert False, "IterTest(nonexistant='b') should raise TypeError"
 
 class UniqTest(SQLObject):
-    name = StringCol(dbName='name_col', unique=True)
+    name = StringCol(dbName='name_col', unique=True, length=100)
 
 def test_by_uniq():
     setupClass(UniqTest)

@@ -22,7 +22,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public
 License along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301,
 USA.
 """
 
@@ -43,15 +43,14 @@ from sresults import SelectResults
 from util.threadinglocal import local
 
 import sys
-if sys.version_info[:3] < (2, 4, 0):
-    raise ImportError, "SQLObject requires Python 2.4.0 or later"
+if sys.version_info[:3] < (2, 6, 0):
+    raise ImportError, "SQLObject requires Python 2.6 or 2.7"
 
 """
 This thread-local storage is needed for RowCreatedSignals. It gathers
 code-blocks to execute _after_ the whole hierachy of inherited SQLObjects
 is created. See SQLObject._create
 """
-_postponed_local = local()
 
 NoDefault = sqlbuilder.NoDefault
 
@@ -632,22 +631,8 @@ class sqlmeta(object):
 
 sqlhub = dbconnection.ConnectionHub()
 
-class _sqlmeta_attr(object):
 
-    def __init__(self, name, deprecation_level):
-        self.name = name
-        self.deprecation_level = deprecation_level
-
-    def __get__(self, obj, type=None):
-        if self.deprecation_level is not None:
-            deprecated(
-                'Use of this attribute should be replaced with '
-                '.sqlmeta.%s' % self.name, level=self.deprecation_level)
-        return getattr((type or obj).sqlmeta, self.name)
-
-
-# @@: This should become a public interface or documented or
-# something.  Turning it on gives earlier warning about things
+# Turning it on gives earlier warning about things
 # that will be deprecated (having this off we won't flood people
 # with warnings right away).
 warnings_level = 1
@@ -677,12 +662,11 @@ def setDeprecationLevel(warning=1, exception=None):
 
     The levels currently mean:
 
-      1) Deprecated in current version (0.9).  Will be removed in next
-         version (0.10)
+      1) Deprecated in current version.  Will be removed in next version.
 
       2) Planned to deprecate in next version, remove later.
 
-      3) Planned to deprecate sometime, remove sometime much later ;)
+      3) Planned to deprecate sometime, remove sometime much later.
 
     As the SQLObject versions progress, the deprecation level of
     specific features will go down, indicating the advancing nature of
@@ -697,6 +681,22 @@ def setDeprecationLevel(warning=1, exception=None):
     warnings_level = warning
     exception_level = exception
 
+
+class _sqlmeta_attr(object):
+
+    def __init__(self, name, deprecation_level):
+        self.name = name
+        self.deprecation_level = deprecation_level
+
+    def __get__(self, obj, type=None):
+        if self.deprecation_level is not None:
+            deprecated(
+                'Use of this attribute should be replaced with '
+                '.sqlmeta.%s' % self.name, level=self.deprecation_level)
+        return getattr((type or obj).sqlmeta, self.name)
+
+
+_postponed_local = local()
 
 # SQLObject is the superclass for all SQLObject classes, of
 # course.  All the deeper magic is done in MetaSQLObject, and
@@ -985,8 +985,11 @@ class SQLObject(object):
         self._SO_writeLock.acquire()
         try:
             if self.sqlmeta.columns:
-                values = [(self.sqlmeta.columns[v[0]].dbName, v[1])
-                          for v in self._SO_createValues.items()]
+                columns = self.sqlmeta.columns
+                values = [(columns[v[0]].dbName, v[1])
+                          for v in sorted(
+                              self._SO_createValues.items(),
+                              key=lambda c: columns[c[0]].creationOrder)]
                 self._connection._SO_update(self, values)
             self.sqlmeta.dirty = False
             self._SO_createValues = {}
@@ -1136,8 +1139,10 @@ class SQLObject(object):
                     raise AttributeError, '%s (with attribute %r)' % (e, name)
 
             if toUpdate:
+                toUpdate = toUpdate.items()
+                toUpdate.sort(key=lambda c: self.sqlmeta.columns[c[0]].creationOrder)
                 args = [(self.sqlmeta.columns[name].dbName, value)
-                        for name, value in toUpdate.items()]
+                        for name, value in toUpdate]
                 self._connection._SO_update(self, args)
         finally:
             self._SO_writeLock.release()
@@ -1278,6 +1283,7 @@ class SQLObject(object):
         # These are all the column values that were supposed
         # to be set, but were delayed until now:
         setters = self._SO_createValues.items()
+        setters.sort(key=lambda c: self.sqlmeta.columns[c[0]].creationOrder)
         # Here's their database names:
         names = [self.sqlmeta.columns[v[0]].dbName for v in setters]
         values = [v[1] for v in setters]
@@ -1676,21 +1682,27 @@ class SQLObject(object):
         if self.sqlmeta._perConnection:
             from pickle import PicklingError
             raise PicklingError('Cannot pickle an SQLObject instance that has a per-instance connection')
+        if self.sqlmeta.lazyUpdate and self._SO_createValues:
+            self.syncUpdate()
         d = self.__dict__.copy()
         del d['sqlmeta']
+        del d['_SO_validatorState']
         del d['_SO_writeLock']
+        del d['_SO_createValues']
         return d
 
     def __setstate__(self, d):
         self.__init__(_SO_fetch_no_create=1)
+        self._SO_validatorState = sqlbuilder.SQLObjectState(self)
         self._SO_writeLock = threading.Lock()
+        self._SO_createValues = {}
         self.__dict__.update(d)
         cls = self.__class__
         cache = self._connection.cache
         if cache.tryGet(self.id, cls) is not None:
             raise ValueError(
                 "Cannot unpickle %s row with id=%s - a different instance with the id already exists in the cache" % (cls.__name__, self.id))
-        cache.created(id, cls, self)
+        cache.created(self.id, cls, self)
 
 
 def setterName(name):
@@ -1736,7 +1748,7 @@ def getObject(obj, klass):
     else:
         return obj
 
-__all__ = ['NoDefault', 'SQLObject', 'sqlmeta',
-           'getID', 'getObject',
-           'SQLObjectNotFound', 'sqlhub',
-           'setDeprecationLevel']
+__all__ = ['NoDefault', 'SQLObject',
+           'SQLObjectIntegrityError', 'SQLObjectNotFound',
+           'getID', 'getObject', 'sqlhub', 'sqlmeta',
+          ]

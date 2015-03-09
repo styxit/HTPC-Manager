@@ -2,23 +2,17 @@
 The framework for making database tests.
 """
 
-import sys
+import logging
 import os
 import re
+import sys
 from py.test import raises
-import py
 import sqlobject
 import sqlobject.conftest as conftest
 
-try:
-    import logging
-    loggingModuleAvailable = True
-except ImportError:
-    loggingModuleAvailable = False
-
 if sys.platform[:3] == "win":
     def getcwd():
-        return os.getcwd().replace(':', '|')
+        return os.getcwd().replace('\\', '/')
 else:
     getcwd = os.getcwd
 
@@ -40,13 +34,14 @@ and you can use it like::
 supportsMatrix = {
     '+exceptions': 'mysql postgres sqlite',
     '-transactions': 'mysql rdbhost',
-    '-dropTableCascade': 'sybase mssql',
+    '-dropTableCascade': 'sybase mssql mysql',
     '-expressionIndex': 'mysql sqlite firebird mssql',
     '-blobData': 'mssql rdbhost',
     '-decimalColumn': 'mssql',
     '-emptyTable': 'mssql',
     '-limitSelect' : 'mssql',
     '+schema' : 'postgres',
+    '+memorydb': 'sqlite',
     }
 
 
@@ -222,13 +217,6 @@ class Dummy(object):
         for name, value in kw.items():
             setattr(self, name, value)
 
-def d(**kw):
-    """
-    Because ``dict(**kw)`` doesn't work in Python 2.2, this is a
-    replacement.
-    """
-    return kw
-
 def inserts(cls, data, schema=None):
     """
     Creates a bunch of rows.
@@ -314,8 +302,6 @@ def teardown_module(mod=None):
     sqlobject.main.exception_level = 0
 
 def setupLogging():
-    if not loggingModuleAvailable:
-        return
     fmt = '[%(asctime)s] %(name)s %(levelname)s: %(message)s'
     formatter = logging.Formatter(fmt)
     hdlr = logging.StreamHandler(sys.stderr)
@@ -325,5 +311,5 @@ def setupLogging():
     logger.addHandler(hdlr)
 
 __all__ = ['getConnection', 'getConnectionURI', 'setupClass', 'Dummy', 'raises',
-           'd', 'inserts', 'supports', 'deprecated_module',
+           'inserts', 'supports', 'deprecated_module',
            'setup_module', 'teardown_module', 'setupLogging']

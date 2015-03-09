@@ -24,6 +24,8 @@ class TestCyclicReferenceB(SQLObject):
     fkeya = ForeignKey('TestCyclicReferenceA') 
 
 def test_cyclic_reference():
+    if not supports('dropTableCascade'):
+        return
     conn = getConnection()
     TestCyclicReferenceA.setConnection(conn)
     TestCyclicReferenceB.setConnection(conn)

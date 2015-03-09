@@ -21,7 +21,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public
 License along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301,
 USA.
 
 Instructions
@@ -618,12 +618,7 @@ class Select(SQLExpression):
         clause = self.ops['clause']
         if isinstance(clause, basestring):
             clause = SQLConstant('(%s)' % clause)
-
-        if clause == SQLTrueClause:
-            newClause = filter_clause
-        else:
-            newClause = AND(clause, filter_clause)
-        return self.newClause(newClause)
+        return self.newClause(AND(clause, filter_clause))
 
     def __sqlrepr__(self, db):
 
@@ -664,7 +659,7 @@ class Select(SQLExpression):
             t2 = _str_or_sqlrepr(j.table2, db)
             if t2 in tables: tables.remove(t2)
         if tables:
-            select += " FROM %s" % ", ".join(tables)
+            select += " FROM %s" % ", ".join(sorted(tables))
         elif join:
             select += " FROM"
         tablesYet = tables
@@ -727,7 +722,7 @@ class Insert(SQLExpression):
         allowNonDict = True
         template = self.template
         if (template is NoDefault) and isinstance(self.valueList[0], dict):
-            template = self.valueList[0].keys()
+            template = list(sorted(self.valueList[0].keys()))
             allowNonDict = False
         if template is not NoDefault:
             insert += " (%s)" % ", ".join(template)
@@ -773,7 +768,7 @@ class Update(SQLExpression):
                     update += ","
                 update += " %s=%s" % (self.template[i], sqlrepr(self.values[i], db))
         else:
-            for key, value in self.values.items():
+            for key, value in sorted(self.values.items()):
                 if first:
                     first = False
                 else:
@@ -1140,21 +1135,12 @@ def FULLOUTERJOINUsing(table1, table2, using_columns):
 ## Subqueries (subselects)
 ########################################
 
-class OuterField(Field):
+class OuterField(SQLObjectField):
     def tablesUsedImmediate(self):
         return []
 
-class OuterTable(Table):
+class OuterTable(SQLObjectTable):
     FieldClass = OuterField
-
-    def __init__(self, table):
-        if hasattr(table, "sqlmeta"):
-            tableName = table.sqlmeta.table
-        else:
-            tableName = table
-            table = None
-        Table.__init__(self, tableName)
-        self.table = table
 
 class Outer:
     def __init__(self, table):

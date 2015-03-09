@@ -1,12 +1,12 @@
 # mako/parsetree.py
-# Copyright (C) 2006-2012 the Mako authors and contributors <see AUTHORS file>
+# Copyright (C) 2006-2015 the Mako authors and contributors <see AUTHORS file>
 #
 # This module is part of Mako and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 
 """defines the parse tree components for Mako templates."""
 
-from mako import exceptions, ast, util, filters
+from mako import exceptions, ast, util, filters, compat
 import re
 
 class Node(object):
@@ -20,8 +20,8 @@ class Node(object):
 
     @property
     def exception_kwargs(self):
-        return {'source':self.source, 'lineno':self.lineno,
-                'pos':self.pos, 'filename':self.filename}
+        return {'source': self.source, 'lineno': self.lineno,
+                'pos': self.pos, 'filename': self.filename}
 
     def get_children(self):
         return []
@@ -204,9 +204,9 @@ class _TagMeta(type):
     _classmap = {}
 
     def __init__(cls, clsname, bases, dict):
-        if cls.__keyword__ is not None:
+        if getattr(cls, '__keyword__', None) is not None:
             cls._classmap[cls.__keyword__] = cls
-            super(_TagMeta, cls).__init__(clsname, bases, dict)
+        super(_TagMeta, cls).__init__(clsname, bases, dict)
 
     def __call__(cls, keyword, attributes, **kwargs):
         if ":" in keyword:
@@ -226,7 +226,7 @@ class _TagMeta(type):
             )
         return type.__call__(cls, keyword, attributes, **kwargs)
 
-class Tag(Node):
+class Tag(compat.with_metaclass(_TagMeta, Node)):
     """abstract base class for tags.
 
     <%sometag/>
@@ -236,8 +236,6 @@ class Tag(Node):
     </%someothertag>
 
     """
-
-    __metaclass__ = _TagMeta
     __keyword__ = None
 
     def __init__(self, keyword, attributes, expressions,
@@ -393,6 +391,13 @@ class TextTag(Tag):
                                     attributes.get('filter', ''),
                                     **self.exception_kwargs)
 
+    def undeclared_identifiers(self):
+        return self.filter_args.\
+                            undeclared_identifiers.\
+                            difference(filters.DEFAULT_ESCAPES.keys()).union(
+                        self.expression_undeclared_identifiers
+                    )
+
 class DefTag(Tag):
     __keyword__ = 'def'
 
@@ -405,11 +410,11 @@ class DefTag(Tag):
                 keyword,
                 attributes,
                 expressions,
-                ('name','filter', 'decorator'),
+                ('name', 'filter', 'decorator'),
                 ('name',),
                 **kwargs)
         name = attributes['name']
-        if re.match(r'^[\w_]+$',name):
+        if re.match(r'^[\w_]+$', name):
             raise exceptions.CompileException(
                                 "Missing parenthesis in %def",
                                 **self.exception_kwargs)
@@ -432,7 +437,7 @@ class DefTag(Tag):
         return self.function_decl.get_argument_expressions(**kw)
 
     def declared_identifiers(self):
-        return self.function_decl.argnames
+        return self.function_decl.allargnames
 
     def undeclared_identifiers(self):
         res = []
@@ -446,7 +451,7 @@ class DefTag(Tag):
         ).union(
             self.expression_undeclared_identifiers
         ).difference(
-            self.function_decl.argnames
+            self.function_decl.allargnames
         )
 
 class BlockTag(Tag):
@@ -497,7 +502,7 @@ class BlockTag(Tag):
         return self.body_decl.get_argument_expressions(**kw)
 
     def declared_identifiers(self):
-        return self.body_decl.argnames
+        return self.body_decl.allargnames
 
     def undeclared_identifiers(self):
         return (self.filter_args.\
@@ -519,7 +524,7 @@ class CallTag(Tag):
                                             **self.exception_kwargs)
 
     def declared_identifiers(self):
-        return self.code.declared_identifiers.union(self.body_decl.argnames)
+        return self.code.declared_identifiers.union(self.body_decl.allargnames)
 
     def undeclared_identifiers(self):
         return self.code.undeclared_identifiers.\
@@ -540,7 +545,7 @@ class CallNamespaceTag(Tag):
                                 namespace,
                                 defname,
                                 ",".join(["%s=%s" % (k, v) for k, v in
-                                            self.parsed_attributes.iteritems()
+                                            self.parsed_attributes.items()
                                             if k != 'args'])
                             )
         self.code = ast.PythonCode(self.expression, **self.exception_kwargs)
@@ -549,7 +554,7 @@ class CallNamespaceTag(Tag):
                                     **self.exception_kwargs)
 
     def declared_identifiers(self):
-        return self.code.declared_identifiers.union(self.body_decl.argnames)
+        return self.code.declared_identifiers.union(self.body_decl.allargnames)
 
     def undeclared_identifiers(self):
         return self.code.undeclared_identifiers.\
@@ -584,6 +589,6 @@ class PageTag(Tag):
                                 **self.exception_kwargs)
 
     def declared_identifiers(self):
-        return self.body_decl.argnames
+        return self.body_decl.allargnames
 
 

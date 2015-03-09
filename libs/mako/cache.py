@@ -1,10 +1,10 @@
 # mako/cache.py
-# Copyright (C) 2006-2012 the Mako authors and contributors <see AUTHORS file>
+# Copyright (C) 2006-2015 the Mako authors and contributors <see AUTHORS file>
 #
 # This module is part of Mako and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 
-from mako import exceptions, util
+from mako import compat, util
 
 _cache_plugins = util.PluginLoader("mako.cache")
 
@@ -64,7 +64,7 @@ class Cache(object):
     def __init__(self, template, *args):
         # check for a stale template calling the
         # constructor
-        if isinstance(template, basestring) and args:
+        if isinstance(template, compat.string_types) and args:
             return
         self.template = template
         self.id = template.module.__name__
@@ -88,9 +88,10 @@ class Cache(object):
         if not self.template.cache_enabled:
             return creation_function()
 
-        return self.impl.get_or_create(key,
-                        creation_function,
-                        **self._get_cache_kw(kw, context))
+        return self.impl.get_or_create(
+            key,
+            creation_function,
+            **self._get_cache_kw(kw, context))
 
     def set(self, key, value, **kw):
         """Place a value in the cache.
@@ -177,6 +178,7 @@ class Cache(object):
             tmpl_kw = tmpl_kw.copy()
             tmpl_kw.setdefault('context', context)
         return tmpl_kw
+
 
 class CacheImpl(object):
     """Provide a cache implementation for use by :class:`.Cache`."""

@@ -305,3 +305,4 @@ def test_connection_override():
     class TestSO13(SQLObject):
         _connection = connectionForURI('sqlite:///db2')
     assert TestSO13._connection.uri() == 'sqlite:///db2'
+    del sqlhub.processConnection
