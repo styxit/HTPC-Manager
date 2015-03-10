@@ -439,7 +439,12 @@ var modalBody = $('<div>').append(modalImg, modalInfo);
 
 modalButtons = {
     'Add': function () {
-        addMovie(movie.imdb, profiles.val(), titles.val(), was_search.val());
+        if (!was_search.length) {
+            was_search = ''
+        } else {
+            was_search = was_search.val()
+        }
+        addMovie(movie.imdb, profiles.val(), titles.val(), was_search);
         hideModal();
         getMovies("active", $("#wanted-grid"));
     },
