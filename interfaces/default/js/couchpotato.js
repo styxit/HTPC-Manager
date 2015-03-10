@@ -359,13 +359,10 @@ function getSuggestions() {
             return;
         }
 
-        console.log(data);
-
         $.each(data.suggestions, function(i, m) {
             var strHTML = $("<a>").attr("href", "#").click(function(c) {
                 c.preventDefault();
                 load_sc(m, cpcat);
-                //showMovie(m);
             });
 
             if (m.images.poster && m.images.poster_original) {
@@ -444,6 +441,7 @@ modalButtons = {
     'Add': function () {
         addMovie(movie.imdb, profiles.val(), titles.val(), was_search.val());
         hideModal();
+        getMovies("active", $("#wanted-grid"));
     },
     'Ignore': function() {
         $.get(WEBDIR + "/couchpotato/SuggestionIgnore/" + info.imdb, function(data) {
@@ -501,7 +499,6 @@ function ignoresuggestion() {
 }
 
 function getCharts() {
-    //var suggestion = $("#charts-grid").empty()
     $(".spinner").show();
 
     $.getJSON(WEBDIR + "couchpotato/ChartsView/", function (data) {
@@ -509,34 +506,25 @@ function getCharts() {
 
 
         if (data === null || data.total === 0) {
-            //suggestion.append($("<li>").html("No suggestioned movies found"));
             return;
         }
 
-        //console.log(data);
-        // loop each active charts
+        // loop each active charts,
         $.each(data.charts, function(i, chart) {
-            // add to navbar
-            var a = $('<a>').attr('href', '#'+chart.name).attr('data-toggle', 'tab').text(chart.name)
-            var li = $('<li>')//$html('<li><a href="'#+chart.name+" data-toggle="tab">'chart.name</a></li>')
+            // add to navbar have to use a int as href as the tab thing doesnt like space
+            var a = $('<a>').attr('href', '#t'+ i).attr('data-toggle', 'tab').text(chart.name)
+            var li = $('<li>')
             li.append(a)
+            // Add li to charts dropdown
             $(".cp_chart_dropdown").append(li)
-            //<li><a href="#artists" data-toggle="tab">Artists</a></li>
-            //var make_tab = $("<div id= class="tab-pane">")
-            var ul_selector = '#' + chart.name + '-grid'
+            // Add images etc to this one
             var grid = $('<ul>').attr('id', chart.name + '-grid').addClass("thumbnails")
-            var make_tab = $('<div>').attr('id', chart.name).addClass("tab-pane").append($('<ul>').attr('id', chart.name + '-grid').addClass("thumbnails"))
-            // something
+            var make_tab = $('<div>').attr('id', 't' + i ).addClass("tab-pane").append(grid)
             $('#cp_tab_content').append(make_tab);
-            //var suggestion = $("#charts-grid").empty()
             $.each(chart.list, function(i, m) {
-                //console.log(chart.name)
-                console.log("m")
-                console.log(m)
                 var strHTML = $("<a>").attr("href", "#").click(function(c) {
                     c.preventDefault();
-                    //load_sc(m, cpcat);
-                    //showMovie(m);
+                    load_sc(m, cpcat);
                 });
 
                 if (m.images.poster && m.images.poster_original) {
@@ -545,10 +533,7 @@ function getCharts() {
 
 
                 strHTML.append($("<h6>").addClass("movie-title").html(shortenText(m.original_title, 12)));
-                //grid.append("dick")
-                //grid.append($("<li>").attr("id", m.imdb).append(strHTML));
-                $('#' + chart.name + '-grid').append($("<li>").attr("id", m.id).append(strHTML));
-                //console.log($(ul_selector).length)
+                grid.append($("<li>").attr("id", m.imdb).append(strHTML));
             });
         });
     });
