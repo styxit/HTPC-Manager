@@ -81,7 +81,7 @@ class NZBGet(object):
 
         nzbget_basepath = fix_basepath(nzbget_basepath)
 
-        url = 'http%s://%s:%s%s%jsonrpc/version' % (ssl, striphttp(nzbget_host), nzbget_port, nzbget_basepath)
+        url = 'http%s://%s:%s%sjsonrpc/version' % (ssl, striphttp(nzbget_host), nzbget_port, nzbget_basepath)
         try:
             request = Request(url)
             if nzbget_username and nzbget_password:
