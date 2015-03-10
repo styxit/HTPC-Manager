@@ -194,7 +194,6 @@ class Couchpotato(object):
         self.logger.debug("Fetching charts")
         return self.fetch("charts.view")
 
-    # http://192.168.1.122:8988/couchpotato/api/39ac2c541aee4a5e8f9a92ee38617379/suggestion.ignore/?t=8gnfX5dR&imdb=tt2713180
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     def SuggestionIgnore(self, imdb=None, seenit=None):
@@ -202,6 +201,39 @@ class Couchpotato(object):
         if seenit:
             u += "&seenit=1"
         self.logger.debug("Fetching suggestion")
+        return self.fetch(u)
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def DashboardSoon(self):
+        return self.fetch("dashboard.soon")
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def Restart(self):
+        return self.fetch("app.restart")
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def Shutdown(self):
+        return self.fetch("app.shutdown")
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def Update(self):
+        return self.fetch("updater.update")
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def SearchAllWanted(self):
+        return self.fetch("movie.searcher.full_search")
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    def Postprocess(self, path=''):
+        u = "renamer.scan"
+        if path:
+            u += "/?base_folder=%s" % path
         return self.fetch(u)
 
     def fetch(self, path):
@@ -223,4 +255,3 @@ class Couchpotato(object):
             self.logger.debug("Exception: " + str(e))
             self.logger.error("Unable to fetch information")
             return
-

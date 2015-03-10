@@ -7,6 +7,8 @@ $(document).ready(function() {
     getHistory()
     getSuggestions()
     getCharts()
+    getDashboardSoon();
+
     $('#searchform').submit(function(e) {
         e.preventDefault()
         var search = $('#moviename').val()
@@ -15,18 +17,30 @@ $(document).ready(function() {
         }
 
     })
+
     $.get(WEBDIR + 'couchpotato/GetProfiles', function(data) {
         if (data === null) return
         $.each(data.list, function(i, item) {
             if (!item.hide) profiles.append($('<option>').val(item._id).text(item.label))
         });
     });
+
     $.get(WEBDIR + 'couchpotato/GetCategories', function(data) {
         if (data.categories.length <= 0) return
         cpcat = $('<select>');
         $.each(data.categories, function(i, item) {
             cpcat.append($('<option>').val(item._id).text(item.label))
         });
+    });
+
+    $('#postprocess').click(function(e) {
+        e.preventDefault();
+        Postprocess();
+    });
+
+    $('#cp_update').click(function(e) {
+        e.preventDefault();
+        update();
     });
 
 });
@@ -351,7 +365,7 @@ function getSuggestions() {
     $(".spinner").show();
 
     $.getJSON(WEBDIR + "couchpotato/Suggestion/", function (data) {
-        $(".spinner").hide();
+
 
 
         if (data === null || data.total === 0) {
@@ -374,6 +388,36 @@ function getSuggestions() {
             suggestion.append($("<li>").attr("id", m.id).append(strHTML));
         });
     });
+    $(".spinner").hide();
+
+}
+
+function getDashboardSoon() {
+    var suggestion = $("#dashboardsoon-grid").empty()
+    $(".spinner").show();
+    $.getJSON(WEBDIR + "couchpotato/DashboardSoon/", function (data) {
+
+        if (data === null || data.total === 0) {
+            suggestion.append($("<li>").html("No movies available soon"));
+            return;
+        }
+
+        $.each(data.movies, function(i, m) {
+            var strHTML = $("<a>").attr("href", "#").click(function(c) {
+                c.preventDefault();
+                showMovie(m, cpcat)
+            });
+
+            if (m.info.images.poster && m.info.images.poster_original) {
+                strHTML.append($("<img>").attr("src", WEBDIR + "couchpotato/GetImage?w=100&h=150&url=" + m.info.images.poster[0]).attr("width", "100").attr("height", "150").addClass("thumbnail"));
+            }
+
+
+            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(m.info.original_title, 12)));
+            suggestion.append($("<li>").attr("id", m.id).append(strHTML));
+        });
+    });
+    $(".spinner").hide();
 
 }
 
@@ -494,6 +538,33 @@ Holder.run();
 
 }
 
+function Postprocess() {
+    var data = {};
+    p = prompt('Write path to processfolder or leave blank for default path');
+    if (p || p.length >= 0) {
+        data.path = p;
+
+        $.get(WEBDIR + 'couchpotato/Postprocess', data, function(r) {
+            state = (r.success) ? 'success' : 'error';
+            // Stop the notify from firing on cancel
+            if (p !== null) {
+                path = (p.length === 0) ? 'Default folder' : p;
+                notify('sickrage', 'Postprocess ' + path, state);
+            }
+        });
+
+    }
+}
+
+function update() {
+    $.get(WEBDIR + "couchpotato/Update/", function(data){
+        if (data.success) {
+            notify("Couchpotato", "is updating", "success")
+        } else {
+            notify("Couchpotato", "is not updating", "error")
+        }
+    })
+}
 
 function getCharts() {
     $(".spinner").show();
