@@ -20,6 +20,8 @@ def do_restart():
     if sys.platform == 'win32':
         arguments = ['"%s"' % arg for arg in arguments]
     os.chdir(os.getcwd())
+    # Fix for rotation logs on windows
+    logging.shutdown()
     os.execv(sys.executable, arguments)
 
 
@@ -58,6 +60,8 @@ class Root(object):
         """ Shutdown CherryPy and exit script """
         self.logger.info("Shutting down htpc-manager.")
         cherrypy.engine.exit()
+        # Fix for rotation logs on windows
+        logging.shutdown()
         os._exit(0)
         return "HTPC Manager has shut down"
 

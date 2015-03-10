@@ -449,23 +449,27 @@ modalButtons = {
         getMovies("active", $("#wanted-grid"));
     },
     'Ignore': function() {
-        $.get(WEBDIR + "/couchpotato/SuggestionIgnore/" + info.imdb, function(data) {
-            if (data.success) {
-                notify("Marked " + titles.val() + " as ignored", "sucess")
+        $.get(WEBDIR + "couchpotato/SuggestionIgnore/" + info.imdb, function(data) {
+            if (data.result) {
+                notify("Marked",  titles.val() + " as ignored", "sucess")
+                getCharts();
+                getSuggestions();
                 hideModal();
             } else {
-                notify("Failed to mark " + titles.val() + " as ignored", "error")
+                notify("Failed", "to mark " + titles.val() + " as ignored", "error")
                 hideModal();
             }
         })
     },
     'Seen it': function() {
-        $.get(WEBDIR + "/couchpotato/SuggestionIgnore/?imdb="+ info.imdb + "&seenit=1", function(data) {
-            if (data.success) {
-                notify("Marked " + titles.val() + " as seen", "sucess")
+        $.get(WEBDIR + "couchpotato/SuggestionIgnore/?imdb="+ info.imdb + "&seenit=1", function(data) {
+            if (data.result) {
+                notify("Marked ",  titles.val() + " as seen", "sucess")
+                getCharts();
+                getSuggestions();
                 hideModal();
             } else {
-                notify("Failed to mark " + titles.val() + " as seen", "error")
+                notify("Failed ",  "to mark " + titles.val() + " as seen", "error")
                 hideModal();
             }
         })
@@ -490,26 +494,11 @@ Holder.run();
 
 }
 
-function ignoresuggestion() {
-    $.get(WEBDIR + "/couchpotato/SuggestionIgnore/" + info.imdb, function(data) {
-            if (data.success) {
-                notify("Marked " + titles.val() + " as ignored", "sucess")
-                hideModal();
-            } else {
-                notify("Failed to mark " + titles.val() + " as ignored", "error")
-                hideModal();
-            }
-        })
-
-}
 
 function getCharts() {
     $(".spinner").show();
 
     $.getJSON(WEBDIR + "couchpotato/ChartsView/", function (data) {
-        $(".spinner").hide();
-
-
         if (data === null || data.total === 0) {
             return;
         }
@@ -542,5 +531,6 @@ function getCharts() {
             });
         });
     });
+    $(".spinner").hide();
 
 }

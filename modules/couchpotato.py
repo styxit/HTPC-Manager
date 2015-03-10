@@ -197,10 +197,10 @@ class Couchpotato(object):
     # http://192.168.1.122:8988/couchpotato/api/39ac2c541aee4a5e8f9a92ee38617379/suggestion.ignore/?t=8gnfX5dR&imdb=tt2713180
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    def SuggestionIgnore(self, id=None, seenit=None):
-        u = "suggestion.ignore/?imdb=%s" % id
+    def SuggestionIgnore(self, imdb=None, seenit=None):
+        u = "suggestion.ignore/?imdb=%s" % imdb
         if seenit:
-            u += "&seenit=1" % seenit
+            u += "&seenit=1"
         self.logger.debug("Fetching suggestion")
         return self.fetch(u)
 
