@@ -2,6 +2,7 @@ $(document).ready(function () {
     moment().format();
     $(window).trigger('hashchange');
     var qlty = profile();
+    var folders = rootfolder();
     loadShows();
     history();
     calendar();
@@ -12,7 +13,7 @@ $(document).ready(function () {
     });
 
     $('#add_tvdbid_button').click(function () {
-        addShow($('#add_show_select').val(), $('#add_show_quality').val());
+        addShow($('#add_show_select').val(), $('#add_show_quality').val(), $('#add_show_folder').val());
     });
 
     $('#cancel_show_button').click(function () {
@@ -127,6 +128,12 @@ function profile(qualityProfileId) {
     });
 }
 
+function rootfolder() {
+    $.get(WEBDIR + 'sonarr/Rootfolder', function (result) {
+        folders = result;
+    });
+}
+
 function history() {
     $.getJSON(WEBDIR + 'sonarr/History', function (result) {
         $.each(result.records, function (i, log) {
@@ -175,10 +182,12 @@ function searchTvDb(query) {
             if (result.length === 0) {
                 $('#add_show_button').attr('disabled', false);
                 $('#add_show_quality').attr('disabled', false);
+                $('#add_show_folder').attr('disabled', false);
                 return;
             }
             $('#add_show_select').html('');
             $('#add_show_quality').html('');
+            $('#add_show_folder').html('');
             $.each(result, function (i, item) {
                 var tvdbid = item.tvdbId;
                 var showname = item.title;
@@ -195,19 +204,31 @@ function searchTvDb(query) {
                 option2.html(quality.name);
                 $('#add_show_quality').append(option2);
             });
+            $.each(folders, function (i, folder) {
+                var option2 = $('<option>');
+                option2.attr('value', folder);
+                option2.html(folder);
+                $('#add_show_folder').append(option2);
+            });
             $('#add_show_name').hide();
             $('#cancel_show_button').show();
             $('#add_show_select').fadeIn();
             $('#add_show_button').attr('disabled', false).hide();
             $('#add_tvdbid_button').show();
             $('#add_show_quality').show();
+            $('#add_show_folder').show();
         }
     });
 }
 
-function addShow(tvdbid, quality) {
+function addShow(tvdbid, quality, rootfolder) {
+    var data = {
+        rootfolder: rootfolder
+    };
+
     $.ajax({
         url: WEBDIR + 'sonarr/AddShow/' + tvdbid + '/' + quality,
+        data: data,
         type: 'get',
         dataType: 'json',
         success: function (data) {
@@ -226,12 +247,14 @@ function addShow(tvdbid, quality) {
 function cancelAddShow() {
     $('#add_show_name').val('');
     $('#add_show_quality').val('');
+    $('#add_show_folder').val('');
     $('#add_show_select').hide();
     $('#cancel_show_button').hide();
     $('#add_show_name').fadeIn();
     $('#add_tvdbid_button').hide();
     $('#add_show_button').show();
     $('#add_show_quality').hide();
+    $('#add_show_folder').hide();
 }
 
 
