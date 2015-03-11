@@ -9,7 +9,7 @@ _site/
 
 # Ignore system files and folders aswell as some common files #
 .DS_Store*
-*.pyc
+*.py[co]
 .project
 .pydevproject
 .settings/

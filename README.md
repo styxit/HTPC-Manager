@@ -2,25 +2,26 @@ This is Htpc-Manager the way i want it.
 
 Some of the difference is:
 
-[New modules]
+# [New modules]
 - sonarr
 - Headphones
 - Samsung TV remote
 - Sickrage module
-- Torrent search BTN, Norbits (just the one i use myself.)
+- Torrent search (BTN, Norbits, KAT and YTS)
 - Vnstat
 
-[Improved]
+# [Improved]
 - NZBGet module (rewritten)
 - qBittorrent module
 - Transmission (add url, upload local torrent)
 - SABnzbd (drag'n drop to edit que)
 - Stats module is sortable.
+- Couchpotato
 - KODI/XBMC addons tab, where you can search/execute/enable/disable addons and a volume slider instead of a progressbar
 - Send a nzb from NZB search to NZBGet in addition to SABnzbd.
 - Set wanted category while adding movies in Couchpotato
 
-[Misc]
+# [Misc]
 - Notification if a update is available and autoupdate
 - Htpc manager is now fluid. (Looks much better on high res screens)
 - Delete cache folder from the settings page
@@ -40,21 +41,21 @@ If your missing something dont be afraid to make a request :)
 See here for full list:
 https://github.com/Hellowlol/HTPC-Manager/compare/styxit:master...master2
 
-## SO YOU FOUND A BUG? GREAT!
+# SO YOU FOUND A BUG? GREAT!
 INCLUDE THIS IN YOUR ISSUE:
  - Branch
  - Commit hash
  - Your operating system and python version
- - What you did
- - What happened
- - What you expected
- - If its a visual bug, screenshot or it didnt happen
- - What browser including version
+ - What did you do?
+ - What happened?
+ - What did you expect to happen?
+ - If its a visual bug, screenshot or it didnt happen!
+ - What browser, including version
  - Link to a copy/paste of your logfile with clear debug info of the error on [PASTEBIN](http://www.pastebin.com)
 
-## ENABLING DETAILED DEBUGGING FOR LOGS
+# How to enable detailed logs
 1. Shutdown HTPC-Manager
-2. Start Htpc.py --loglevel debug
+2. Start Htpc.py --loglevel debug (Do NOT start with --debug)
 3. Start HTPC-Manager and wait for error to occure again
 
 HTPC Manager

@@ -2,7 +2,7 @@
 # "Needed" for image resize etc
 Pillow
 # "Needed" for stat module
-psutil
+psutil>=0.7
 # "Needed for genereratin ssl cert key"
 pyopenssl
 # "Needed" for the vnstat module
