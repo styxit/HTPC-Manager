@@ -8,8 +8,11 @@ $(document).ready(function () {
     calendar();
 
     $('#add_show_button').click(function () {
-        $(this).attr('disabled', true);
-        searchTvDb($('#add_show_name').val());
+        var query = $('#add_show_name').val();
+        if (query) {
+            $(this).attr('disabled', true);
+            searchTvDb(query);
+        }
     });
 
     $('#add_tvdbid_button').click(function () {
@@ -178,6 +181,9 @@ function searchTvDb(query) {
     $.ajax({
         url: WEBDIR + 'sonarr/Lookup/' + encodeURIComponent(query),
         type: 'get',
+        error: function () {
+            $('#add_show_button').attr('disabled', false);
+        },
         success: function (result) {
             if (result.length === 0) {
                 $('#add_show_button').attr('disabled', false);
