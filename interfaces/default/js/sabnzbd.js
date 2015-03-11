@@ -131,10 +131,25 @@ function loadHistory() {
                 if (slot.status == 'Failed') {
                     $(name).append('&nbsp;').append(failMessage);
                 }
+                if (slot.script && slot.script_line.length) {
+                    $(name).append('&nbsp;').append(makeIcon('icon-list-alt', slot.script_line))
+                }
 
-                row.append($('<td>').append(moment(slot.completed * 1000).format("YYYY-MM-DD HH:MM")));
+                // Use to make a info string regarding speed unpack
+                var inf = ''
+
+                for (i = 0; i < slot.stage_log.length; i++) {
+                    if ($.inArray(slot.stage_log[i].name, ["Download", "Repair", "Unpack"]) !== -1) {
+                        inf = inf.concat(slot.stage_log[i].actions[0] + '<br>')
+                    }
+
+                }
+
+                var info = sabnzbdStatusLabel(slot.status).tooltip({'placement': 'right', 'title': inf, 'html': true})
+
+                row.append($('<td>').append(parseDate(slot.completed)));
                 row.append(name);
-                row.append($('<td>').append(sabnzbdStatusLabel(slot.status)));
+                row.append($('<td>').append(info));
                 row.append($('<td>').html(slot.size));
                 row.append($('<td>').append(deleteImage));
                 row.append($('<td>').append(retryImage));
