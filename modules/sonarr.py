@@ -96,9 +96,7 @@ class Sonarr(object):
     @require()
     @cherrypy.tools.json_out()
     def Rootfolder(self):
-        path = self.fetch('Rootfolder')
-        for p in path:
-            return p["path"]
+        return [folder["path"] for folder in self.fetch('Rootfolder')]
 
     #Returns all shows
     @cherrypy.expose()
@@ -210,11 +208,10 @@ class Sonarr(object):
 
     @cherrypy.expose()
     @require()
-    def AddShow(self, tvdbid, quality):
+    def AddShow(self, tvdbid, quality, rootfolder):
         d = {}
         try:
             tvshow = self.fetch('Series/lookup?term=tvdbid:%s' % tvdbid)
-            rootfolder = self.Rootfolder()
             seasoncount = 1
             season = []
             for i in tvshow:
