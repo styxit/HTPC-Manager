@@ -101,8 +101,9 @@ function sonarrStatusIcon(iconText, white) {
 }
 
 function sonarrStatusLabel(text) {
-    var statusOK = ['continuing', 'downloaded', 'HD', 'HD-720p', 'HD-1080p', 'WEBDL-1080p'];
-    var statusInfo = ['snatched', 'SD'];
+    var statusOK = ['continuing', 'downloaded', 'HD', 'HD-720p', 'HD-1080p', 'HDTV-720p',
+                    'HDTV-1080p', 'WEBDL-720p', 'WEBDL-1080p', 'Bluray', 'Bluray-720p', 'Bluray-1080p'];
+    var statusInfo = ['snatched', 'SD', 'SDTV', 'DVD'];
     var statusError = ['ended'];
     var statusWarning = ['skipped'];
 
@@ -303,6 +304,10 @@ function loadShow(seriesID) {
 
         row = $('<tr>');
         row.append('<th>Network</th><td>' + tvshow.network + '</td>');
+        table.append(row);
+
+        row = $('<tr>');
+        row.append('<th>Summary</th><td>' + tvshow.overview + '</td>');
         table.append(row);
 
         if (tvshow.images.length > 0) {

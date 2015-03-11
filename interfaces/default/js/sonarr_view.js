@@ -136,13 +136,13 @@ function showEpisodeInfo(episodeid, value) {
             .append($("<td>").html("<b>Name</b>"))
             .append($("<td>").text(ep.title)))
             .append($("<tr>")
-            .append($("<td>").html("<b>Description</b>"))
+            .append($("<td>").html("<b>Summary</b>"))
             .append($("<td>").text(ep.overview)));
 
         if (ep.hasFile) {
             strHTML.append($("<tr>")
                 .append($("<td>").html("<b>Air date</b>"))
-                .append($("<td>").text(ep.airDateUtc)))
+                .append($("<td>").text(moment(ep.airDateUtc).calendar())))
                 .append($("<tr>")
                 .append($("<td>").html("<b>Quality</b>"))
                 .append($("<td>").text(pResult.quality.quality.name)))
@@ -251,8 +251,9 @@ function sonarrStatusIcon(iconText, white) {
 }
 
 function sonarrStatusLabel(text) {
-    var statusOK = ['continuing', 'downloaded', 'Downloaded', 'HD', 'HD-720p', 'HD-1080p', 'WEBDL-1080p'];
-    var statusInfo = ['snatched', 'SD'];
+    var statusOK = ['continuing', 'downloaded', 'HD', 'HD-720p', 'HD-1080p', 'HDTV-720p',
+                    'HDTV-1080p', 'WEBDL-720p', 'WEBDL-1080p', 'Bluray', 'Bluray-720p', 'Bluray-1080p'];
+    var statusInfo = ['snatched', 'SD', 'SDTV', 'DVD'];
     var statusError = ['ended'];
     var statusWarning = ['skipped'];
     var label = $('<span>').addClass('label').text(text);
