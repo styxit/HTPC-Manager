@@ -7,13 +7,19 @@ $(document).ready(function () {
     history();
     calendar();
 
-    $('#add_show_button').click(function () {
+    var addShowAction = function () {
         var query = $('#add_show_name').val();
         if (query) {
-            $(this).attr('disabled', true);
+            $('#add_show_button').attr('disabled', true);
             searchTvDb(query);
         }
+    };
+    $('#add_show_name').keyup(function(event){
+        if(event.keyCode == 13){
+            addShowAction();
+        }
     });
+    $('#add_show_button').click(addShowAction);
 
     $('#add_tvdbid_button').click(function () {
         addShow($('#add_show_select').val(), $('#add_show_quality').val(), $('#add_show_folder').val());
@@ -37,9 +43,10 @@ function loadShows() {
         type: 'get',
         dataType: 'json',
         success: function (result) {
+            $('#tvshows_table_body').empty();
             if (result.length === 0) {
                 var row = $('<tr>');
-                row.append($('<td>').html('No shows found'));
+                row.append($('<td>').attr('colspan', '5').html('No shows found'));
                 $('#tvshows_table_body').append(row);
             }
             $.each(result, function (showname, tvshow) { // tvshow.tvdbId
@@ -222,8 +229,8 @@ function searchTvDb(query) {
             $('#add_show_select').fadeIn();
             $('#add_show_button').attr('disabled', false).hide();
             $('#add_tvdbid_button').show();
-            $('#add_show_quality').show();
-            $('#add_show_folder').show();
+            $('#add_show_quality').fadeIn().show();
+            $('#add_show_folder').fadeIn().show();
         }
     });
 }
@@ -242,6 +249,7 @@ function addShow(tvdbid, quality, rootfolder) {
             $.each(data, function (i, res) {
                 if (!res.errorMessage) {
                     notify('Add TV show', data.title, 'success');
+                    loadShows();
                 } else {
                     notify('Failed to add show', res.errorMessage, 'error');
                 }
