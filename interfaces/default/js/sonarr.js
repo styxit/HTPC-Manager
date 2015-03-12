@@ -37,6 +37,7 @@ function loadShows() {
         type: 'get',
         dataType: 'json',
         success: function (result) {
+            $('#tvshows_table_body').empty();
             if (result.length === 0) {
                 var row = $('<tr>');
                 row.append($('<td>').attr('colspan', '5').html('No shows found'));
@@ -242,6 +243,7 @@ function addShow(tvdbid, quality, rootfolder) {
             $.each(data, function (i, res) {
                 if (!res.errorMessage) {
                     notify('Add TV show', data.title, 'success');
+                    loadShows();
                 } else {
                     notify('Failed to add show', res.errorMessage, 'error');
                 }
