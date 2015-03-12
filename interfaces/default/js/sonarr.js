@@ -223,8 +223,8 @@ function searchTvDb(query) {
             $('#add_show_select').fadeIn();
             $('#add_show_button').attr('disabled', false).hide();
             $('#add_tvdbid_button').show();
-            $('#add_show_quality').show();
-            $('#add_show_folder').show();
+            $('#add_show_quality').fadeIn().show();
+            $('#add_show_folder').fadeIn().show();
         }
     });
 }
