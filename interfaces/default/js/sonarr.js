@@ -39,7 +39,7 @@ function loadShows() {
         success: function (result) {
             if (result.length === 0) {
                 var row = $('<tr>');
-                row.append($('<td>').html('No shows found'));
+                row.append($('<td>').attr('colspan', '5').html('No shows found'));
                 $('#tvshows_table_body').append(row);
             }
             $.each(result, function (showname, tvshow) { // tvshow.tvdbId
