@@ -7,13 +7,19 @@ $(document).ready(function () {
     history();
     calendar();
 
-    $('#add_show_button').click(function () {
+    var addShowAction = function () {
         var query = $('#add_show_name').val();
         if (query) {
-            $(this).attr('disabled', true);
+            $('#add_show_button').attr('disabled', true);
             searchTvDb(query);
         }
+    };
+    $('#add_show_name').keyup(function(event){
+        if(event.keyCode == 13){
+            addShowAction();
+        }
     });
+    $('#add_show_button').click(addShowAction);
 
     $('#add_tvdbid_button').click(function () {
         addShow($('#add_show_select').val(), $('#add_show_quality').val(), $('#add_show_folder').val());
