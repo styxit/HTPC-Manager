@@ -30,12 +30,13 @@
       <div class="span3 swpmem text-center"></div>
       <div class="span3 nw text-center"></div>
     </div>
-   
+
     <ul class="nav nav-tabs">
     <li id="diskl" class="active"><a href="#diskt" data-toggle="tab">Disk</a></li>
     <li id="procl"><a href="#proc" data-toggle="tab">Process</a></li>
+    <li id="ohm"><a href="#ohm_" data-toggle="tab">Hardware Info</a></li>
     </ul>
-    
+
     <div class="tab-content">
         <div id="diskt" class="tab-pane active">
             <table class="table disktable table-striped table-hover table-sortable">
@@ -83,9 +84,15 @@
             % endif
             <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
         </div>
+        <div id="ohm_" class="tab-pane">
+            <table class="table table-condensed ohm_three">
+            </table>
+            <div id="sillytest"><div>
+        <div>
+
     </div>
     % endif
-   
+
   </div>
 </div>
 

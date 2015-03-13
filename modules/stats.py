@@ -11,6 +11,7 @@ from subprocess import PIPE
 import cherrypy
 import htpc
 import logging
+import requests
 from cherrypy.lib.auth2 import require, member_of
 
 logger = logging.getLogger('modules.stats')
@@ -39,7 +40,10 @@ class Stats(object):
                 {'type': 'bool', 'label': 'Whitelist', 'name': 'stats_use_whitelist', 'desc': 'By enabling this the filesystem and mountpoints fields will become whitelist instead of blacklist'},
                 {'type': 'text', 'label': 'Filesystem', 'placeholder': 'NTFS FAT32', 'desc': 'Use whitespace as separator', 'name': 'stats_filesystem'},
                 {'type': 'text', 'label': 'Mountpoint', 'placeholder': 'mountpoint1 mountpoint2', 'desc': 'Use whitespace as separator', 'name': 'stats_mountpoint'},
-                {'type': 'text', 'label': 'Limit processes', 'placeholder': '50', 'desc': 'Blank for all processes', 'name': 'stats_limit_processes'}
+                {'type': 'text', 'label': 'Limit processes', 'placeholder': '50', 'desc': 'Blank for all processes', 'name': 'stats_limit_processes'},
+                {'type': 'text', 'label': 'OHM ip', 'placeholder': 'localhost', 'desc': '', 'name': 'stats_ohm_ip'},
+                {'type': 'text', 'label': 'OHM port', 'placeholder': '50', 'desc': '', 'name': 'stats_ohm_port'}
+
             ]
         })
 
@@ -490,3 +494,23 @@ class Stats(object):
 
         except Exception as e:
             self.logger.error('Sending command from stat module failed: %s' % e)
+
+    @cherrypy.expose()
+    @require(member_of("admin"))
+    @cherrypy.tools.json_out()
+    def ohm(self):
+        print "running ohm"
+        ip = htpc.settings.get('stats_ohm_ip', 'localhost')
+        port = htpc.settings.get('stats_ohm_port')
+        print ip, port
+        if ip and port:
+            try:
+                u = 'http://%s:%s/data.json' % (ip, port)
+                print u
+                r = requests.get(u)
+                if r.status_code == requests.codes.ok:
+                    return r.json()
+            except Exception as e:
+                print "error %s" % e
+                self.logger.error('Failed to get info from ohm')
+
