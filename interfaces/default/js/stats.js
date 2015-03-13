@@ -11,7 +11,6 @@ $(document).ready(function () {
         get_external_ip();
         get_local_ip();
         getohm();
-        $('.ohm_three').treegrid()
     }
 });
 
@@ -26,8 +25,11 @@ if (importPsutil) {
         sys_info();
         get_external_ip(); // dont want to spam a external service.
         get_local_ip();
+        getohm();
     }, 10000);
 }
+
+
 
 // For hdd. Converts bytes to filesize in kb,mb,gb
  function getReadableFileSizeStringHDD(fileSizeInBytes) {
@@ -164,7 +166,6 @@ function sys_info() {
     });
 }
 
-
 function virtual_memory_bar() {
     $.getJSON(WEBDIR + "stats/virtual_memory", function (virtual) {
 	$(".virmem").html("<div>Physical memory</div><div class=progress><div class=bar style=width:" + virtual.percent + "%><span class=sr-only>Used: "+ virtual.percent +"%</span></div><div class='bar bar-success' style=width:" + (100 - virtual.percent) + "%><span class=sr-only>Free: " + (100 - virtual.percent) +"%</span></div></div><div class=progress><div class=bar style=width:" + virtual.percent + "%><span class=sr-only>Used: "+ getReadableFileSizeString((virtual.total - virtual.available))+"</span></div><div class='bar bar-success' style=width:" + (100 - virtual.percent) + "% ><span class=sr-only>Free: " + getReadableFileSizeString(virtual.available) +"</span></div>");
@@ -190,7 +191,6 @@ function swap_memory_table() {
     });
 }
 
-
 function cpu_percent_bar() {
     $.getJSON(WEBDIR + "stats/cpu_percent", function (cpu) {
         $(".cpu").html("<div class=text-center>CPU</div><div class=progress><div class=bar style=width:" + (cpu.user + cpu.system).toFixed(1) + "%><span class=sr-only>Used: "+ (cpu.user + cpu.system).toFixed(1) +"%</span></div><div class='bar bar-success' style=width:" + (100 - (cpu.user + cpu.system)).toFixed(1) + "%><span class=sr-only>Idle: "+ cpu.idle.toFixed(1) +"%</span></div></div><div class=progress><div class=bar style=width:" + cpu.user.toFixed(1) + "%><span class=sr-only>User: "+ cpu.user.toFixed(1) +"%</span></div><div class='bar bar-warning' style=width:" + cpu.system.toFixed(1) + "%><span class=sr-only>System: "+ cpu.system.toFixed(1) +"%</span></div><div class='bar bar-success' style=width:" + (100 - (cpu.user + cpu.system)).toFixed(1) + "%><span class=sr-only>Idle: " + cpu.idle.toFixed(1) +"%</span></div></div>");
@@ -203,122 +203,61 @@ function cpu_percent_table() {
     });
 }
 
-// delete this one
-function getohm2() {
-    $.getJSON(WEBDIR + "stats/ohm", function (data) {
-        console.log(data)
-        //tol(data.Children, [])
-        //console.log(data.Children.text)
-        $.each(data.Children, function(i, child){
-            console.log(child)
-            //alert(child.text)
-            var tr = $('<tr>')
-            tr.append($('<td>').text(child.Text))
-            tr.append($('<td>').text(child.Value))
-            if (child.Children) {
-                $.each(child.Children, function(ii, child2) {
-                    tr.append($('<td>').text(child2.Text))
-                    tr.append($('<td>').text(child2.Value))
-                })
-            }
-            $('.ohm_three').append(tr)
-
-        })
-
-
-
-
-
-    });
-}
 
 function getohm() {
     $.getJSON(WEBDIR + "stats/ohm", function (data) {
-        unpack2(data);
+        unpack(data);
 
-        })
-    //$('.ohm_three').treegrid('render')
+    }).done(function() {
+        $('.ohm_three').treegrid('render')
+    })
+
 }
 
-function getohm3() {
-    $.getJSON(WEBDIR + "stats/ohm", function (data) {
-        $('#sillytest').jsonTree(data, {
-            mandatorySelect: true,
-            selectedIdElementName: 'simpleTreeContainer',
-            selectedItemId: 'simpleTreeContainer'
-        });
+ function unpack(obj) {
+     // for sensor
+     var t = $('<tr>').addClass('treegrid-1');
+     t.append($('<td>').text(obj.Text));
+     t.append($('<td>').text(obj.Min));
+     t.append($('<td>').text(obj.Value));
+     t.append($('<td>').text(obj.Max));
+     $('.ohm_three').append(t);
 
-        })
-    //$('.ohm_three').treegrid()
-}
+     if (obj.Children) {
+         $.each(obj.Children, function(i, child) {
+             // Add +1 since the sensor has to be done manually
+             tr = $('<tr>').addClass('treegrid-' + (child.id + 1)).addClass('treegrid-parent-' + (obj.id + 1));
+             tr.append($('<td>').text(child.Text));
+             tr.append($('<td>').text(child.Min));
+             tr.append($('<td>').text(child.Value));
+             tr.append($('<td>').text(child.Max));
+             $('.ohm_three').append(tr);
+             if (child.Children) {
+                 // use a new function cus the hack +1 hack
+                 unpack2(child);
+             }
+         });
+     }
+     //$('.ohm_three').treegrid()
+ }
 
-
-    function unpack2(obj) {
-        console.log("calling unpack 2")
-        console.log(obj.Text)
-        var t = $('<tr>').addClass('treegrid-1')
-        /*
-        Max: "Max"
-        Min: "Min"
-        Text: "Sensor"
-        Value: "Value"
-        id: 0
-        Children []
-        */
-        t.append($('<td>').text(obj.Text));
-        t.append($('<td>').text(obj.Min));
-        t.append($('<td>').text(obj.Value))
-        t.append($('<td>').text(obj.Max));
-        $('.ohm_three').append(t)
-
-
-        if (obj.Children) {
-            console.log("there are more bastard children")
-
-            $.each(obj.Children, function (i, child) {
-                console.log("lets find them one by one to kill them hahaha")
-                console.log(child.Text)
-
-                tr = $('<tr>').addClass('treegrid-parent-' + (obj.id+1))
-                tr.addClass('treegrid-' + (child.id+1))
-                //var tr = $('<tr>').addClass('treegrid-parent-' + child.id)
-                tr.append($('<td>').text(child.Text));
-                tr.append($('<td>').text(child.Min));
-                tr.append($('<td>').text(child.Value))
-                tr.append($('<td>').text(child.Max));
-
-                $('.ohm_three').append(tr)
-                if (child.Children) {
-                    console.log("they have even more childen")
-                    console.log(child.Children[i].Text)
-                    unpack(child);
-                }
-            });
-        }
-
-
-
-    }
-
-    function unpack(obj) {
-        if (obj.Children) {
-            $.each(obj.Children, function (i, child) {
-                var tr = $('<tr>').addClass('treegrid-parent-' + child.id)
-                tr.append($('<td>').text(child.Text));
-                tr.append($('<td>').text(child.Min));
-                tr.append($('<td>').text(child.Value))
-                tr.append($('<td>').text(child.Max));
-
-                $('.ohm_three').append(tr)
-                if (child.Children) {
-                    unpack(child);
-                }
-            });
-        }
-
-
-
-    }
+ function unpack2(obj) {
+     if (obj.Children) {
+         $.each(obj.Children, function(i, child) {
+             var tr = $('<tr>');
+             tr.addClass('treegrid-' + (child.id + 1)).addClass('treegrid-parent-' + (obj.id + 1));
+             tr.append($('<td>').text(child.Text));
+             tr.append($('<td>').text(child.Min));
+             tr.append($('<td>').text(child.Value));
+             tr.append($('<td>').text(child.Max));
+             $('.ohm_three').append(tr);
+             if (child.Children) {
+                 unpack2(child);
+             }
+         });
+     }
+     $('.ohm_three').treegrid();
+ }
 
 function return_stats_settings() {
     $.getJSON(WEBDIR + "stats/return_settings", function (return_settings) {
@@ -342,15 +281,11 @@ function reloadtab() {
         get_diskinfo();
     } else if ($('#proc').is(':visible')) {
         processes();
+    } else if ($('#ohm_').is(':visible')) {
+        getohm();
     }
 }
 
-   $('#diskl').click(function () {
-       get_diskinfo();
-   });
-    $('#procl').click(function () {
-       processes();
-   });
 
    //Used for kill and signal command
    $(document).on('click', '.cmd', function(e){

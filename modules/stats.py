@@ -41,8 +41,8 @@ class Stats(object):
                 {'type': 'text', 'label': 'Filesystem', 'placeholder': 'NTFS FAT32', 'desc': 'Use whitespace as separator', 'name': 'stats_filesystem'},
                 {'type': 'text', 'label': 'Mountpoint', 'placeholder': 'mountpoint1 mountpoint2', 'desc': 'Use whitespace as separator', 'name': 'stats_mountpoint'},
                 {'type': 'text', 'label': 'Limit processes', 'placeholder': '50', 'desc': 'Blank for all processes', 'name': 'stats_limit_processes'},
-                {'type': 'text', 'label': 'OHM ip', 'placeholder': 'localhost', 'desc': '', 'name': 'stats_ohm_ip'},
-                {'type': 'text', 'label': 'OHM port', 'placeholder': '50', 'desc': '', 'name': 'stats_ohm_port'}
+                {'type': 'text', 'label': 'OHM ip', 'placeholder': 'localhost', 'desc': 'Open Hardware Manager is used for grabbing hardware info', 'name': 'stats_ohm_ip'},
+                {'type': 'text', 'label': 'OHM port', 'placeholder': '8085', 'desc': 'Open', 'name': 'stats_ohm_port'}
 
             ]
         })
@@ -496,21 +496,16 @@ class Stats(object):
             self.logger.error('Sending command from stat module failed: %s' % e)
 
     @cherrypy.expose()
-    @require(member_of("admin"))
+    @require()
     @cherrypy.tools.json_out()
     def ohm(self):
-        print "running ohm"
         ip = htpc.settings.get('stats_ohm_ip', 'localhost')
         port = htpc.settings.get('stats_ohm_port')
-        print ip, port
         if ip and port:
             try:
                 u = 'http://%s:%s/data.json' % (ip, port)
-                print u
                 r = requests.get(u)
                 if r.status_code == requests.codes.ok:
                     return r.json()
             except Exception as e:
-                print "error %s" % e
-                self.logger.error('Failed to get info from ohm')
-
+                self.logger.error('Failed to get info from ohm %s' % e)

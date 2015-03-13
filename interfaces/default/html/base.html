@@ -21,6 +21,7 @@ webdir = htpc.WEBDIR
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
     <link href="${self.attr.webdir}css/${scriptname}.css" rel="stylesheet">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jstree/3.0.9/themes/default/style.min.css" /> <!-- replace thisone -->
     <script type="text/javascript">var WEBDIR="${htpc.WEBDIR}";</script>
 </head>
 
@@ -168,7 +169,7 @@ ${self.body()}
 <script src="${htpc.WEBDIR}js/libs/ChartNew.min.js"></script>
 <script src="${htpc.WEBDIR}js/libs/download.js"></script>
 <script src="${htpc.WEBDIR}js/libs/jquery.treegrid.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jsonTree.min.js"></script>
+<script src="${htpc.WEBDIR}js/libs/jquery.treegrid.bootstrap2.js"></script>
 <script src="${htpc.WEBDIR}js/default.js"></script>
 <script src="${htpc.WEBDIR}js/${scriptname}.js"></script>
 
