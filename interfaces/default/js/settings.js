@@ -91,7 +91,7 @@ $(document).ready(function () {
             msg = data ? 'Save successful' : 'Save failed';
             if ($('#kodi_server_id').is(":visible")) {
                 kodi_update_servers(0);
-                this.reset();
+                //this.reset();
             }
             if ($('#users_user_id').is(":visible")) {
                 users_update_user(0);
@@ -139,6 +139,7 @@ $(document).ready(function () {
             $('#kodi_server_username').val(data.username);
             $('#kodi_server_password').val(data.password);
             $('#kodi_server_mac').val(data.mac);
+			$('#kodi_server_starterport').val(data.starterport);
             $("button:reset:visible").html('Delete').addClass('btn-danger').click(function (e) {
                 var name = item.find('option:selected').text();
                 if (!confirm('Delete ' + name)) return;
