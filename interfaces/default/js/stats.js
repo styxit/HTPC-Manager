@@ -218,12 +218,43 @@ function return_stats_settings() {
     });
 }
 
+function smart() {
+    $('.spinner').show();
+    $.ajax({
+        'url': WEBDIR + 'stats/smart_info',
+            'dataType': 'json' ,
+            'success': function (response) {
+            byteSizeOrdering()
+            $('#smartlist').html("");
+            $('#error_message').text("");
+
+            $.each(response, function (i, drives) {
+                var row = $('<tr>');
+                row.append(
+                $('<td>').addClass('processes-name').text(drives.name),
+                $('<td>').addClass('processes-name').text(drives.model),
+                $('<td>').addClass('processes-name').text(drives.serial),
+                $('<td>').addClass('processes-name').text(drives.firmware),
+                $('<td>').addClass('processes-name').text(drives.capacity),
+                $('<td>').addClass('processes-name').text(drives.interface),
+                $('<td>').addClass('processes-name').text(drives.temperature + String.fromCharCode(176)),
+                $('<td>').addClass('processes-name').text(drives.assessment));
+                $('#smartlist').append(row);
+                $('table').trigger("update");
+            });
+            $('.spinner').hide();
+        }
+    });
+}
+
 function reloadtab() {
     if ($('#diskt').is(':visible')) {
-        get_diskinfo();
+		get_diskinfo();
     } else if ($('#proc').is(':visible')) {
-        processes();
-    }
+		processes();
+    } else if ($('#smart').is(':visible')) {
+		smart();
+	}
 }
 
    $('#diskl').click(function () {

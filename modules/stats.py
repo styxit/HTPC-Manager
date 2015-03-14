@@ -23,6 +23,13 @@ except ImportError:
     logger.error("Could't import psutil. See https://raw.githubusercontent.com/giampaolo/psutil/master/INSTALL.rst")
     importPsutil = False
 
+try:
+    import pySMART
+    importpySMART = True
+
+except ImportError:
+    logger.error("Could't import pySMART. See https://pypi.python.org/pypi/pySMART/")
+    importpySMART = False
 
 class Stats(object):
     def __init__(self):
@@ -490,3 +497,35 @@ class Stats(object):
 
         except Exception as e:
             self.logger.error('Sending command from stat module failed: %s' % e)
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def smart_info(self):
+        try:
+            from pySMART import DeviceList
+            devlist = DeviceList()
+            d = {}
+            i = 0
+            for hds in devlist.devices:	
+                temp = 0
+                for atts in hds.attributes:
+                    if hasattr(atts, 'name'):
+                        if atts.name == 'Temperature_Celsius':
+                            temp = atts.raw
+                d[i] = {"assessment": hds.assessment,
+                            "firmware": hds.firmware,
+                            "interface": hds.interface,
+                            "is_ssd": hds.is_ssd,
+                            "model": hds.model,
+                            "name": hds.name,
+                            "serial": hds.serial,
+                            "supports_smart": hds.supports_smart,
+                            "capacity": hds.capacity,
+                            "temperature": temp
+                            }
+                i = i + 1
+            return d
+
+        except Exception as e:
+            self.logger.error("Pulling S.M.A.R.T. data %s" % e)
