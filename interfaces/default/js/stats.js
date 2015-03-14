@@ -25,7 +25,7 @@ if (importPsutil) {
         sys_info();
         get_external_ip(); // dont want to spam a external service.
         get_local_ip();
-        getohm();
+        //getohm(); // Disable as it keeps locking up browser
     }, 10000);
 }
 
@@ -209,7 +209,7 @@ function getohm() {
         unpack(data);
 
     }).done(function() {
-        $('.ohm_three').treegrid('render')
+        //$('.ohm_three').treegrid('render')
     })
 
 }
