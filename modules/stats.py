@@ -41,8 +41,9 @@ class Stats(object):
                 {'type': 'text', 'label': 'Filesystem', 'placeholder': 'NTFS FAT32', 'desc': 'Use whitespace as separator', 'name': 'stats_filesystem'},
                 {'type': 'text', 'label': 'Mountpoint', 'placeholder': 'mountpoint1 mountpoint2', 'desc': 'Use whitespace as separator', 'name': 'stats_mountpoint'},
                 {'type': 'text', 'label': 'Limit processes', 'placeholder': '50', 'desc': 'Blank for all processes', 'name': 'stats_limit_processes'},
-                {'type': 'text', 'label': 'OHM ip', 'placeholder': 'localhost', 'desc': 'Open Hardware Manager is used for grabbing hardware info', 'name': 'stats_ohm_ip'},
-                {'type': 'text', 'label': 'OHM port', 'placeholder': '8085', 'desc': 'Open', 'name': 'stats_ohm_port'}
+                {'type': 'bool', 'label': 'Enable OHM', 'desc': 'Open Hardware Manager is used for grabbing hardware info', 'name': 'stats_ohm_enable'},
+                {'type': 'text', 'label': 'OHM ip', 'placeholder': 'localhost', 'name': 'stats_ohm_ip'},
+                {'type': 'text', 'label': 'OHM port', 'placeholder': '8085', 'desc': '', 'name': 'stats_ohm_port'}
 
             ]
         })
@@ -56,7 +57,9 @@ class Stats(object):
         else:
             self.logger.error("Psutil is outdated, needs atleast version 0,7")
 
-        return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats', importPsutil=importPsutil, cmdline=htpc.SHELL)
+        return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats',
+                                                             importPsutil=importPsutil,
+                                                             cmdline=htpc.SHELL, ohm=htpc.settings.get('stat_ohm_enable'))
 
     @cherrypy.expose()
     @require()
@@ -501,7 +504,9 @@ class Stats(object):
     def ohm(self):
         ip = htpc.settings.get('stats_ohm_ip', 'localhost')
         port = htpc.settings.get('stats_ohm_port')
-        if ip and port:
+        enabled = htpc.settings.get('stats_ohm_enable')
+
+        if ip and port and enabled:
             try:
                 u = 'http://%s:%s/data.json' % (ip, port)
                 r = requests.get(u)
@@ -509,3 +514,6 @@ class Stats(object):
                     return r.json()
             except Exception as e:
                 self.logger.error('Failed to get info from ohm %s' % e)
+        else:
+            self.logger.debug("Check settings, ohm isn't configured correct")
+            return

@@ -1,7 +1,7 @@
 // Document ready
 $(document).ready(function () {
     if (importPsutil) {
-        $('.spinner').show();
+        //$('.spinner').show();
         reloadtab();
         network_usage_table();
         return_stats_settings();
@@ -10,25 +10,41 @@ $(document).ready(function () {
         sys_info();
         get_external_ip();
         get_local_ip();
+
+        $('#diskl').click(function () {
+            get_diskinfo();
+        });
+
+        $('#procl').click(function () {
+            processes();
+        });
+
+
+    }
+    if (ohm) {
         getohm();
+
+        $('#ohm_').click(function () {
+            getohm();
+        });
+
     }
 });
 
 if (importPsutil) {
     // Set timeintercal to refresh stats
     setInterval(function () {
-        reloadtab();
+        get_diskinfo();
+        processes();
         network_usage_table();
         return_stats_settings();
         uptime();
         get_user();
         sys_info();
-        get_external_ip(); // dont want to spam a external service.
+        get_external_ip();
         get_local_ip();
-        //getohm(); // Disable as it keeps locking up browser
     }, 10000);
 }
-
 
 
 // For hdd. Converts bytes to filesize in kb,mb,gb
@@ -57,8 +73,13 @@ function getReadableFileSizeString(fileSizeInBytes) {
 function get_diskinfo() {
     $.ajax({
         'url': WEBDIR + 'stats/disk_usage',
+        'beforeSend': function() {
+            $('.spinner').show();
+        },
             'dataType': 'json' ,
             'success': function (response) {
+            $('.spinner').show();
+
             $('#disklist').html("");
             $('#error_message').text("");
 
@@ -80,7 +101,10 @@ function get_diskinfo() {
                 $('<td>').addClass('span3 stats_disk_progress').html(progress2),
                 $('<td>').addClass('stats_disk_percent').text(disk.percent));
                 $('#disklist').append(row);
-		});
+		})
+            //$('.spinner').hide();
+        },
+        complete: function() {
             $('.spinner').hide();
         }
     });
@@ -90,7 +114,10 @@ function get_diskinfo() {
 function processes() {
     $.ajax({
         'url': WEBDIR + 'stats/processes',
-            'dataType': 'json' ,
+        'beforeSend': function() {
+            $('.spinner').show();
+        },
+            'dataType': 'json',
             'success': function (response) {
             byteSizeOrdering()
             $('#proclist').html("");
@@ -110,7 +137,9 @@ function processes() {
                 $('<td>').append('<a href="#" class="btn btn-mini cmd" data-cmd="kill" data-name='+proc.name+' data-pid='+proc.pid+'><i class="icon-remove"></i></a>'));
                 $('#proclist').append(row);
                 $('table').trigger("update");
-            });
+            })
+        },
+        complete: function() {
             $('.spinner').hide();
         }
     });
@@ -203,13 +232,32 @@ function cpu_percent_table() {
     });
 }
 
-
 function getohm() {
+    $.ajax({
+        'url': WEBDIR + "stats/ohm",
+        'beforeSend': function () {
+            $('.spinner').show();
+        },
+        'success': function (data) {
+            unpack(data);
+        }
+
+    }).done(function () {
+        $('.spinner').hide();
+        // make the three after unpack set the correct markup
+        $('.ohm_three').treegrid();
+
+    });
+}
+
+function getohm2() {
     $.getJSON(WEBDIR + "stats/ohm", function (data) {
+        // Makes the table with correct classes
         unpack(data);
 
     }).done(function() {
-        //$('.ohm_three').treegrid('render')
+        // make the three after unpack set the correct markup
+        $('.ohm_three').treegrid()
     })
 
 }
@@ -238,7 +286,6 @@ function getohm() {
              }
          });
      }
-     //$('.ohm_three').treegrid()
  }
 
  function unpack2(obj) {
@@ -256,7 +303,6 @@ function getohm() {
              }
          });
      }
-     $('.ohm_three').treegrid();
  }
 
 function return_stats_settings() {
@@ -276,6 +322,7 @@ function return_stats_settings() {
     });
 }
 
+// Not in use atm
 function reloadtab() {
     if ($('#diskt').is(':visible')) {
         get_diskinfo();
