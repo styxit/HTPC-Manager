@@ -25,10 +25,12 @@ except ImportError:
 
 try:
     import pySMART
+    importpySMARTerror = ""
     importpySMART = True
 
-except ImportError:
-    logger.error("Could't import pySMART. See https://pypi.python.org/pypi/pySMART/")
+except Exception as e:
+    logger.error(e)
+    importpySMARTerror = e
     importpySMART = False
 
 class Stats(object):
@@ -59,7 +61,7 @@ class Stats(object):
         else:
             self.logger.error("Psutil is outdated, needs atleast version 0,7")
 
-        return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats', importPsutil=importPsutil, cmdline=htpc.SHELL)
+        return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats', importPsutil=importPsutil, cmdline=htpc.SHELL, importpySMART=importpySMART, importpySMARTerror=importpySMARTerror)
 
     @cherrypy.expose()
     @require()

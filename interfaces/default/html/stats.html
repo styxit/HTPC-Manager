@@ -34,9 +34,7 @@
     <ul class="nav nav-tabs">
     <li id="diskl" class="active"><a href="#diskt" data-toggle="tab">Disk</a></li>
     <li id="procl"><a href="#proc" data-toggle="tab">Process</a></li>
-    % if not importpySMART:
 	<li id="smartl"><a href="#smart" data-toggle="tab">S.M.A.R.T.</a></li>
-	% endif
 	</ul>
     
     <div class="tab-content">
@@ -86,9 +84,17 @@
             % endif
             <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
         </div>
-        % if not importpySMART:
         <div id="smart" class="tab-pane">
-            <table class="table disktable table-striped table-hover table-sortable">
+        % if not importpySMART:
+			<div class="row-fluid">
+				<div class="alert alert-error">
+					<h4>smartmontools was not found on your system</h4>
+					<p>${importpySMARTerror}
+					</p>
+				</div>
+			</div>
+		% else:
+			<table class="table disktable table-striped table-hover table-sortable">
                 <thead>
                     <tr>
                         <th class="">Mount Point</th>
@@ -104,8 +110,8 @@
                 <tbody id="smartlist"></tbody>
             </table>
             <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
-        </div>
         % endif
+		</div>
     </div>
     % endif
    

@@ -253,7 +253,9 @@ function reloadtab() {
     } else if ($('#proc').is(':visible')) {
 		processes();
     } else if ($('#smart').is(':visible')) {
-		smart();
+		if (importpySMART) {		
+			smart();
+		}
 	}
 }
 
