@@ -7,3 +7,5 @@ psutil>=0.7
 pyopenssl
 # "Needed" for the vnstat module
 paramiko
+# "Needed" for S.M.A.R.T. dara on stat module
+smarmontools
