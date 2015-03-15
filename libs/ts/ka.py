@@ -16,7 +16,8 @@ def search(what, cat='all'):
 
     while True and i < 3:
         results = []
-        json_data = requests.get(url + '/json.php?q=%s&page=%d' % (what, i), verify=False)
+        p = {'q': what, 'page': i}
+        json_data = requests.get(url + '/json.php', params=p, verify=False)
 
         try:
             # hasnt set the correct header
@@ -26,7 +27,7 @@ def search(what, cat='all'):
             continue
 
         if int(json_dict['total_results']) <= 0:
-            return
+            return []
 
         results = json_dict['list']
         for r in results:

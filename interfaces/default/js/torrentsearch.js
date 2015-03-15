@@ -41,7 +41,7 @@ function search(query) {
     $.getJSON(WEBDIR + "torrentsearch/search/" + query, function (response) {
 
         // Stops the function from running if the search dont get any hits
-        if (response.results === "0") {
+        if (!response.length) {
             $('#error_msg').text('Didnt find any torrents with the query ' + query);
             $('#error_msg').css({"font-weight": "bold"});
             $('.spinner').hide();
