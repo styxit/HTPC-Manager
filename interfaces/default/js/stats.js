@@ -1,7 +1,6 @@
 // Document ready
 $(document).ready(function () {
     if (importPsutil) {
-        //$('.spinner').show();
         reloadtab();
         network_usage_table();
         return_stats_settings();
@@ -24,12 +23,13 @@ $(document).ready(function () {
     if (ohm) {
         getohm();
 
-        $('#ohm_').click(function () {
+        $('#ohm').click(function () {
             getohm();
         });
 
     }
 });
+
 
 if (importPsutil) {
     // Set timeintercal to refresh stats
@@ -45,7 +45,6 @@ if (importPsutil) {
         get_local_ip();
     }, 10000);
 }
-
 
 // For hdd. Converts bytes to filesize in kb,mb,gb
  function getReadableFileSizeStringHDD(fileSizeInBytes) {
@@ -263,6 +262,7 @@ function getohm2() {
 }
 
  function unpack(obj) {
+    $('.ohm_three').empty()
      // for sensor
      var t = $('<tr>').addClass('treegrid-1');
      t.append($('<td>').text(obj.Text));

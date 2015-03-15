@@ -58,6 +58,7 @@
                 <tbody id="disklist"></tbody>
             </table>
             <span id="error_message"></span>
+            <div class="spinner"></div>
         </div>
         <div id="proc" class="tab-pane">
             <table class="table disktable table-striped table-hover table-sortable">
@@ -76,6 +77,7 @@
                 </thead>
                 <tbody id="proclist"></tbody>
             </table>
+            <div class="spinner"></div>
             % if cmdline:
             <div id="statscmd" class="span4">
                 <div class="input-append">
@@ -91,11 +93,9 @@
         <div id="ohm_" class="tab-pane">
             <table class="table table-condensed ohm_three">
             </table>
-            <div id="sillytest"></div>
-            <div id="tree"></div>
+            <div class="spinner"></div>
         <div>
         % endif
-        <div class="spinner"></div>
     </div>
     % endif
 

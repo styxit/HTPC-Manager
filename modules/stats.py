@@ -59,7 +59,7 @@ class Stats(object):
 
         return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats',
                                                              importPsutil=importPsutil,
-                                                             cmdline=htpc.SHELL, ohm=htpc.settings.get('stat_ohm_enable'))
+                                                             cmdline=htpc.SHELL)
 
     @cherrypy.expose()
     @require()
