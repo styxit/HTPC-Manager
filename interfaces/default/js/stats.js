@@ -1,7 +1,6 @@
 // Document ready
 $(document).ready(function () {
     if (importPsutil) {
-        $('.spinner').show();
         reloadtab();
         network_usage_table();
         return_stats_settings();
@@ -10,19 +9,39 @@ $(document).ready(function () {
         sys_info();
         get_external_ip();
         get_local_ip();
+
+        $('#diskl').click(function () {
+            get_diskinfo();
+        });
+
+        $('#procl').click(function () {
+            processes();
+        });
+
+
+    }
+    if (ohm) {
+        getohm();
+
+        $('#ohm').click(function () {
+            getohm();
+        });
+
     }
 });
+
 
 if (importPsutil) {
     // Set timeintercal to refresh stats
     setInterval(function () {
-        reloadtab();
+        get_diskinfo();
+        processes();
         network_usage_table();
         return_stats_settings();
         uptime();
         get_user();
         sys_info();
-        get_external_ip(); // dont want to spam a external service.
+        get_external_ip();
         get_local_ip();
     }, 10000);
 }
@@ -53,8 +72,13 @@ function getReadableFileSizeString(fileSizeInBytes) {
 function get_diskinfo() {
     $.ajax({
         'url': WEBDIR + 'stats/disk_usage',
+        'beforeSend': function() {
+            $('.spinner').show();
+        },
             'dataType': 'json' ,
             'success': function (response) {
+            $('.spinner').show();
+
             $('#disklist').html("");
             $('#error_message').text("");
 
@@ -76,7 +100,10 @@ function get_diskinfo() {
                 $('<td>').addClass('span3 stats_disk_progress').html(progress2),
                 $('<td>').addClass('stats_disk_percent').text(disk.percent));
                 $('#disklist').append(row);
-		});
+		})
+            //$('.spinner').hide();
+        },
+        complete: function() {
             $('.spinner').hide();
         }
     });
@@ -86,7 +113,10 @@ function get_diskinfo() {
 function processes() {
     $.ajax({
         'url': WEBDIR + 'stats/processes',
-            'dataType': 'json' ,
+        'beforeSend': function() {
+            $('.spinner').show();
+        },
+            'dataType': 'json',
             'success': function (response) {
             byteSizeOrdering()
             $('#proclist').html("");
@@ -106,7 +136,9 @@ function processes() {
                 $('<td>').append('<a href="#" class="btn btn-mini cmd" data-cmd="kill" data-name='+proc.name+' data-pid='+proc.pid+'><i class="icon-remove"></i></a>'));
                 $('#proclist').append(row);
                 $('table').trigger("update");
-            });
+            })
+        },
+        complete: function() {
             $('.spinner').hide();
         }
     });
@@ -162,7 +194,6 @@ function sys_info() {
     });
 }
 
-
 function virtual_memory_bar() {
     $.getJSON(WEBDIR + "stats/virtual_memory", function (virtual) {
 	$(".virmem").html("<div>Physical memory</div><div class=progress><div class=bar style=width:" + virtual.percent + "%><span class=sr-only>Used: "+ virtual.percent +"%</span></div><div class='bar bar-success' style=width:" + (100 - virtual.percent) + "%><span class=sr-only>Free: " + (100 - virtual.percent) +"%</span></div></div><div class=progress><div class=bar style=width:" + virtual.percent + "%><span class=sr-only>Used: "+ getReadableFileSizeString((virtual.total - virtual.available))+"</span></div><div class='bar bar-success' style=width:" + (100 - virtual.percent) + "% ><span class=sr-only>Free: " + getReadableFileSizeString(virtual.available) +"</span></div>");
@@ -188,7 +219,6 @@ function swap_memory_table() {
     });
 }
 
-
 function cpu_percent_bar() {
     $.getJSON(WEBDIR + "stats/cpu_percent", function (cpu) {
         $(".cpu").html("<div class=text-center>CPU</div><div class=progress><div class=bar style=width:" + (cpu.user + cpu.system).toFixed(1) + "%><span class=sr-only>Used: "+ (cpu.user + cpu.system).toFixed(1) +"%</span></div><div class='bar bar-success' style=width:" + (100 - (cpu.user + cpu.system)).toFixed(1) + "%><span class=sr-only>Idle: "+ cpu.idle.toFixed(1) +"%</span></div></div><div class=progress><div class=bar style=width:" + cpu.user.toFixed(1) + "%><span class=sr-only>User: "+ cpu.user.toFixed(1) +"%</span></div><div class='bar bar-warning' style=width:" + cpu.system.toFixed(1) + "%><span class=sr-only>System: "+ cpu.system.toFixed(1) +"%</span></div><div class='bar bar-success' style=width:" + (100 - (cpu.user + cpu.system)).toFixed(1) + "%><span class=sr-only>Idle: " + cpu.idle.toFixed(1) +"%</span></div></div>");
@@ -200,6 +230,80 @@ function cpu_percent_table() {
         $(".cpu").html("<table class='table nwtable'><tr><td class=span4>CPU</td><td class=span4>" + (100 - cpu.idle).toFixed(1) + "%</td></tr><tr><td>User</td><td>" + cpu.user + "%</td></tr><tr><td>System</td><td>" + cpu.system + "%</td></tr><tr><td>Idle</td><td>" + cpu.idle + "%</td></tr></tbody></table>");
     });
 }
+
+function getohm() {
+    $.ajax({
+        'url': WEBDIR + "stats/ohm",
+        'beforeSend': function () {
+            $('.spinner').show();
+        },
+        'success': function (data) {
+            unpack(data);
+        }
+
+    }).done(function () {
+        $('.spinner').hide();
+        // make the three after unpack set the correct markup
+        $('.ohm_three').treegrid();
+
+    });
+}
+
+function getohm2() {
+    $.getJSON(WEBDIR + "stats/ohm", function (data) {
+        // Makes the table with correct classes
+        unpack(data);
+
+    }).done(function() {
+        // make the three after unpack set the correct markup
+        $('.ohm_three').treegrid()
+    })
+
+}
+
+ function unpack(obj) {
+    $('.ohm_three').empty()
+     // for sensor
+     var t = $('<tr>').addClass('treegrid-1');
+     t.append($('<td>').text(obj.Text));
+     t.append($('<td>').text(obj.Min));
+     t.append($('<td>').text(obj.Value));
+     t.append($('<td>').text(obj.Max));
+     $('.ohm_three').append(t);
+
+     if (obj.Children) {
+         $.each(obj.Children, function(i, child) {
+             // Add +1 since the sensor has to be done manually
+             tr = $('<tr>').addClass('treegrid-' + (child.id + 1)).addClass('treegrid-parent-' + (obj.id + 1));
+             tr.append($('<td>').text(child.Text));
+             tr.append($('<td>').text(child.Min));
+             tr.append($('<td>').text(child.Value));
+             tr.append($('<td>').text(child.Max));
+             $('.ohm_three').append(tr);
+             if (child.Children) {
+                 // use a new function cus the hack +1 hack
+                 unpack2(child);
+             }
+         });
+     }
+ }
+
+ function unpack2(obj) {
+     if (obj.Children) {
+         $.each(obj.Children, function(i, child) {
+             var tr = $('<tr>');
+             tr.addClass('treegrid-' + (child.id + 1)).addClass('treegrid-parent-' + (obj.id + 1));
+             tr.append($('<td>').text(child.Text));
+             tr.append($('<td>').text(child.Min));
+             tr.append($('<td>').text(child.Value));
+             tr.append($('<td>').text(child.Max));
+             $('.ohm_three').append(tr);
+             if (child.Children) {
+                 unpack2(child);
+             }
+         });
+     }
+ }
 
 function return_stats_settings() {
     $.getJSON(WEBDIR + "stats/return_settings", function (return_settings) {
@@ -218,20 +322,17 @@ function return_stats_settings() {
     });
 }
 
+// Not in use atm
 function reloadtab() {
     if ($('#diskt').is(':visible')) {
         get_diskinfo();
     } else if ($('#proc').is(':visible')) {
         processes();
+    } else if ($('#ohm_').is(':visible')) {
+        getohm();
     }
 }
 
-   $('#diskl').click(function () {
-       get_diskinfo();
-   });
-    $('#procl').click(function () {
-       processes();
-   });
 
    //Used for kill and signal command
    $(document).on('click', '.cmd', function(e){
