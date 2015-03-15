@@ -91,11 +91,9 @@ $(document).ready(function () {
             msg = data ? 'Save successful' : 'Save failed';
             if ($('#kodi_server_id').is(":visible")) {
                 kodi_update_servers(0);
-                //this.reset();
             }
             if ($('#users_user_id').is(":visible")) {
                 users_update_user(0);
-                this.reset();
             }
             if ($('#plex_name').is(":visible")) {
                 $.post(WEBDIR + 'plex/myPlexSignin', '', function (data) {

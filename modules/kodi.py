@@ -24,9 +24,10 @@ class KodiServers(SQLObject):
     username = StringCol(default=None)
     password = StringCol(default=None)
     mac = StringCol(default=None)
+
     class sqlmeta:
         fromDatabase = True
-	
+
 class Kodi(object):
     def __init__(self):
         """ Add module to list of modules on load and set required settings """
@@ -36,7 +37,8 @@ class Kodi(object):
         try:
             KodiServers.sqlmeta.addColumn(IntCol('starterport'), changeSchema=True)
         except Exception, e:
-            self.logger.exception(e)
+            # Will always raise if column exist
+            pass
 
         htpc.MODULES.append({
             'name': 'KODI',
@@ -701,6 +703,7 @@ class Kodi(object):
         except Exception, e:
             self.logger.exception(e)
             self.logger.error("Unable to send XBMC Starter packet")
+            self.logger.debug('Have you installed http://yatse.leetzone.org/redmine/projects/androidwidget/wiki/XbmcStarter?')
             return "Unable to send XBMC Starter packet"
 
     @cherrypy.expose()
