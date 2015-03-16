@@ -142,8 +142,8 @@ class Updater:
         # Can return True, False
         latest = self.updateEngine.latest()
         htpc.LATEST_HASH = latest
-        self.logger.info("Latest is %s" % latest)
-        self.logger.info("Current is %s" % current)
+        self.logger.info("Latest commit is %s" % latest)
+        self.logger.info("Current commit is %s" % current)
 
         if latest is False:
             self.logger.error("Failed to determine the latest version for HTPC Manager.")
