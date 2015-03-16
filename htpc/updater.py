@@ -162,7 +162,7 @@ class Updater:
             return output
 
         # If HTPC Manager is up to date, updating is not needed
-        if current == latest or current != "Unknown":
+        if current == latest and current != "Unknown":
             self.logger.info("HTPC-Manager is Up-To-Date.")
             output['versionsBehind'] = 0
             htpc.COMMITS_BEHIND = 0
