@@ -34,7 +34,9 @@
     <ul class="nav nav-tabs">
     <li id="diskl" class="active"><a href="#diskt" data-toggle="tab">Disk</a></li>
     <li id="procl"><a href="#proc" data-toggle="tab">Process</a></li>
+	% if settings.get('stats_smart_enable'):
 	<li id="smartl"><a href="#smart" data-toggle="tab">S.M.A.R.T.</a></li>
+	% endif
 	</ul>
     
     <div class="tab-content">
@@ -84,7 +86,8 @@
             % endif
             <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
         </div>
-        <div id="smart" class="tab-pane">
+        % if settings.get('stats_smart_enable'):
+		<div id="smart" class="tab-pane">
         % if not importpySMART:
 			<div class="row-fluid">
 				<div class="alert alert-error">
@@ -111,6 +114,7 @@
             <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
         % endif
 		</div>
+		% endif
     </div>
     % endif
    
