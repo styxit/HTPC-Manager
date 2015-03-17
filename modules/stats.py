@@ -33,9 +33,10 @@ except Exception as e:
     importpySMARTerror = e
     importpySMART = False
 
-if pySMART.utils.admin() == False:
-    importpySMART = False
-    importpySMARTerror = "Python should be executed as an administrator to smartmontools to work properly. Please, try to run python with elevated credentials."
+if importpySMART:
+    if pySMART.utils.admin() == False:
+        importpySMART = False
+        importpySMARTerror = "Python should be executed as an administrator to smartmontools to work properly. Please, try to run python with elevated credentials."
 
 class Stats(object):
     def __init__(self):
