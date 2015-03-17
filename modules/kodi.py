@@ -25,6 +25,8 @@ class KodiServers(SQLObject):
     password = StringCol(default=None)
     mac = StringCol(default=None)
 
+    class sqlmeta:
+        fromDatabase = True
 
 class Kodi(object):
     def __init__(self):
@@ -32,6 +34,12 @@ class Kodi(object):
         self.logger = logging.getLogger('modules.kodi')
 
         KodiServers.createTable(ifNotExists=True)
+        try:
+            KodiServers.sqlmeta.addColumn(IntCol('starterport'), changeSchema=True)
+        except Exception, e:
+            # Will always raise if column exist
+            pass
+
         htpc.MODULES.append({
             'name': 'KODI',
             'id': 'kodi',
@@ -83,7 +91,11 @@ class Kodi(object):
                  'name': 'kodi_server_password'},
                 {'type': 'text',
                  'label': 'Mac addr.',
-                 'name': 'kodi_server_mac'}
+                 'name': 'kodi_server_mac'},
+                {'type': 'text',
+                 'label': 'XBMC Starter port',
+                 'placeholder': '9',
+                 'name': 'kodi_server_starterport'}
             ]
         })
         server = htpc.settings.get('kodi_current_server', 0)
@@ -147,8 +159,12 @@ class Kodi(object):
     @require()
     @cherrypy.tools.json_out()
     def setserver(self, kodi_server_id, kodi_server_name, kodi_server_host, kodi_server_port,
-            kodi_server_username=None, kodi_server_password=None, kodi_server_mac=None):
+            kodi_server_username=None, kodi_server_password=None, kodi_server_mac=None, kodi_server_starterport=''):
         """ Create a server if id=0, else update a server """
+        if kodi_server_starterport == '':
+            kodi_server_starterport = None
+        else:
+            kodi_server_starterport = int(kodi_server_starterport)
         if kodi_server_id == "0":
             self.logger.debug("Creating kodi-Server in database")
             try:
@@ -157,7 +173,8 @@ class Kodi(object):
                         port=int(kodi_server_port),
                         username=kodi_server_username,
                         password=kodi_server_password,
-                        mac=kodi_server_mac)
+                        mac=kodi_server_mac,
+						starterport=kodi_server_starterport)
                 self.changeserver(server.id)
                 return 1
             except Exception, e:
@@ -174,6 +191,7 @@ class Kodi(object):
                 server.username = kodi_server_username
                 server.password = kodi_server_password
                 server.mac = kodi_server_mac
+                server.starterport = kodi_server_starterport
                 return 1
             except SQLObjectNotFound, e:
                 self.logger.error("Unable to update kodi-Server " + server.name + " in database")
@@ -628,6 +646,10 @@ class Kodi(object):
     def System(self, action=''):
         """ Various system commands """
         kodi = Server(self.url('/jsonrpc', True))
+        if action == 'Quit':
+            self.logger.info("Exiting kodi")
+            kodi.Application.Quit()
+            return 'Exiting kodi.'
         if action == 'Shutdown':
             self.logger.info("Shutting down kodi")
             kodi.System.Shutdown()
@@ -666,6 +688,23 @@ class Kodi(object):
             self.logger.exception(e)
             self.logger.error("Unable to send WOL packet")
             return "Unable to send WOL packet"
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def Run(self):
+        """ Send XBMC Starter packet """
+        self.logger.info("Sending XBMC Starter packet")
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.sendto("YatseStart-Xbmc", (self.current.host, self.current.starterport))
+            self.logger.info("XBMC Starter package sent to %s:%s", self.current.host, self.current.starterport)
+            return "XBMC Starter packet sent"
+        except Exception, e:
+            self.logger.exception(e)
+            self.logger.error("Unable to send XBMC Starter packet")
+            self.logger.debug('Have you installed http://yatse.leetzone.org/redmine/projects/androidwidget/wiki/XbmcStarter?')
+            return "Unable to send XBMC Starter packet"
 
     @cherrypy.expose()
     @require()

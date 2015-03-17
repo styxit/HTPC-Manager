@@ -11,13 +11,14 @@ from subprocess import PIPE
 import cherrypy
 import htpc
 import logging
+import requests
 from cherrypy.lib.auth2 import require, member_of
 
 logger = logging.getLogger('modules.stats')
 
 try:
     import psutil
-    importPsutil = True
+    importPsutil = False
 
 except ImportError:
     logger.error("Could't import psutil. See https://raw.githubusercontent.com/giampaolo/psutil/master/INSTALL.rst")
@@ -49,12 +50,16 @@ class Stats(object):
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'stats_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'stats_name'},
+                {'type': 'bool', 'label': 'Enable psutil', 'name': 'stats_enable_psutil'},
                 {'type': 'bool', 'label': 'Use bars', 'name': 'stats_use_bars'},
                 {'type': 'bool', 'label': 'Whitelist', 'name': 'stats_use_whitelist', 'desc': 'By enabling this the filesystem and mountpoints fields will become whitelist instead of blacklist'},
                 {'type': 'text', 'label': 'Filesystem', 'placeholder': 'NTFS FAT32', 'desc': 'Use whitespace as separator', 'name': 'stats_filesystem'},
                 {'type': 'text', 'label': 'Mountpoint', 'placeholder': 'mountpoint1 mountpoint2', 'desc': 'Use whitespace as separator', 'name': 'stats_mountpoint'},
                 {'type': 'text', 'label': 'Limit processes', 'placeholder': '50', 'desc': 'Blank for all processes', 'name': 'stats_limit_processes'},
-                {'type': 'bool', 'label': 'Enable S.M.A.R.T.', 'desc': 'smartmontools is used for grabbing HDD health info (python must be executed as administrator', 'name': 'stats_smart_enable'}
+                {'type': 'bool', 'label': 'Enable OHM', 'desc': 'Open Hardware Manager is used for grabbing hardware info', 'name': 'stats_ohm_enable'},
+                {'type': 'text', 'label': 'OHM ip', 'placeholder': 'localhost', 'name': 'stats_ohm_ip'},
+                {'type': 'text', 'label': 'OHM port', 'placeholder': '8085', 'desc': '', 'name': 'stats_ohm_port'},
+                {'type': 'bool', 'label': 'Enable S.M.A.R.T.', 'desc': 'smartmontools is used for grabbing HDD health info (python must be executed as administrator)', 'name': 'stats_smart_enable'}
             ]
         })
 
@@ -67,7 +72,11 @@ class Stats(object):
         else:
             self.logger.error("Psutil is outdated, needs atleast version 0,7")
 
-        return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats', importPsutil=importPsutil, cmdline=htpc.SHELL, importpySMART=importpySMART, importpySMARTerror=importpySMARTerror)
+        return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats',
+                                                             importPsutil=importPsutil,
+                                                             cmdline=htpc.SHELL,
+                                                             importpySMART=importpySMART,
+                                                             importpySMARTerror=importpySMARTerror)
 
     @cherrypy.expose()
     @require()
@@ -537,3 +546,23 @@ class Stats(object):
                 return d
             except Exception as e:
                 self.logger.error("Pulling S.M.A.R.T. data %s" % e)
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def ohm(self):
+        ip = htpc.settings.get('stats_ohm_ip', 'localhost')
+        port = htpc.settings.get('stats_ohm_port')
+        enabled = htpc.settings.get('stats_ohm_enable')
+
+        if ip and port and enabled:
+            try:
+                u = 'http://%s:%s/data.json' % (ip, port)
+                r = requests.get(u)
+                if r.status_code == requests.codes.ok:
+                    return r.json()
+            except Exception as e:
+                self.logger.error('Failed to get info from ohm %s' % e)
+        else:
+            self.logger.debug("Check settings, ohm isn't configured correct")
+            return

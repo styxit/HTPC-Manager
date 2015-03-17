@@ -30,16 +30,20 @@
       <div class="span3 swpmem text-center"></div>
       <div class="span3 nw text-center"></div>
     </div>
-   
+
     <ul class="nav nav-tabs">
     <li id="diskl" class="active"><a href="#diskt" data-toggle="tab">Disk</a></li>
     <li id="procl"><a href="#proc" data-toggle="tab">Process</a></li>
+    % if settings.get('stats_ohm_enable'):
+    <li id="ohm"><a href="#ohm_" data-toggle="tab">Hardware Info</a></li>
+    % endif
 	% if settings.get('stats_smart_enable'):
 	<li id="smartl"><a href="#smart" data-toggle="tab">S.M.A.R.T.</a></li>
 	% endif
 	</ul>
-    
+
     <div class="tab-content">
+
         <div id="diskt" class="tab-pane active">
             <table class="table disktable table-striped table-hover table-sortable">
                 <thead>
@@ -56,7 +60,8 @@
                 </thead>
                 <tbody id="disklist"></tbody>
             </table>
-            <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
+            <span id="error_message"></span>
+            <div class="spinner"></div>
         </div>
         <div id="proc" class="tab-pane">
             <table class="table disktable table-striped table-hover table-sortable">
@@ -75,6 +80,7 @@
                 </thead>
                 <tbody id="proclist"></tbody>
             </table>
+            <div class="spinner"></div>
             % if cmdline:
             <div id="statscmd" class="span4">
                 <div class="input-append">
@@ -84,8 +90,9 @@
                 <div class="alert helper-block">WARNING! What is written here is passed to the shell! Dont come crying if you delete your hardrive</div>
             </div>
             % endif
-            <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
+            <span id="error_message"></i></span>
         </div>
+
         % if settings.get('stats_smart_enable'):
 		<div id="smart" class="tab-pane">
         % if not importpySMART:
@@ -115,13 +122,22 @@
         % endif
 		</div>
 		% endif
+
+        % if settings.get('stats_ohm_enable'):
+        <div id="ohm_" class="tab-pane">
+            <table class="table table-condensed ohm_three">
+            </table>
+            <div class="spinner"></div>
+        <div>
+        % endif
     </div>
     % endif
-   
+
   </div>
 </div>
 
 <script type="text/javascript">
+
   % if importPsutil:
     importPsutil = true;
   % else :
@@ -132,4 +148,10 @@
   % else :
     importpySMART = false;
   % endif
+  % if settings.get('stats_ohm_enable'):
+    ohm = true;
+  %else:
+    ohm = false;
+  % endif
+
 </script>

@@ -34,7 +34,7 @@ gitUser = 'Hellowlol'
 gitRepo = 'HTPC-Manager'
 
 
-class Updater:
+class Updater(object):
     """ Main class """
     def __init__(self):
         self.logger = logging.getLogger('htpc.updater')
@@ -142,6 +142,8 @@ class Updater:
         # Can return True, False
         latest = self.updateEngine.latest()
         htpc.LATEST_HASH = latest
+        self.logger.debug("Latest commit is %s" % latest)
+        self.logger.debug("Current commit is %s" % current)
 
         if latest is False:
             self.logger.error("Failed to determine the latest version for HTPC Manager.")
@@ -160,7 +162,7 @@ class Updater:
             return output
 
         # If HTPC Manager is up to date, updating is not needed
-        if current == latest or current != "Unknown":
+        if current == latest and current != "Unknown":
             self.logger.info("HTPC-Manager is Up-To-Date.")
             output['versionsBehind'] = 0
             htpc.COMMITS_BEHIND = 0
