@@ -21,7 +21,6 @@ webdir = htpc.WEBDIR
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
     <link href="${self.attr.webdir}css/${scriptname}.css" rel="stylesheet">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jstree/3.0.9/themes/default/style.min.css" /> <!-- replace thisone -->
     <script type="text/javascript">var WEBDIR="${htpc.WEBDIR}";</script>
 </head>
 
@@ -125,7 +124,7 @@ ${self.body()}
 % if htpc.CURRENT_HASH is False:
     <div class="footer2">
         <div class="navbar navbar-fixed-bottom footer2">
-            <div class="container">
+            <div class="container-fluid">
                     You're running an unknown version of HTPC-Manager. Use the updater <a href="do_update">Update</a>
                     <button type="button" class="close" data-dismiss="alert">&times;</button>
             <div>
@@ -135,7 +134,7 @@ ${self.body()}
 % elif s.get('check_for_updates') and htpc.CURRENT_HASH != htpc.LATEST_HASH and htpc.COMMITS_BEHIND > 0:
     <div class="footer2">
         <div class="navbar navbar-fixed-bottom">
-            <div class="container">
+            <div class="container-fluid">
                 A<a href="https://github.com/Hellowlol/HTPC-Manager/compare/${htpc.CURRENT_HASH}...${htpc.LATEST_HASH}"> newer version</a> is available. You're ${htpc.COMMITS_BEHIND} commits behind. <a href="do_update">Update</a>
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
             </div>

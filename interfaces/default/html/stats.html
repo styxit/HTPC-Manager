@@ -28,7 +28,30 @@
       <div class="span3 cpu"></div>
       <div class="span3 virmem text-center"></div>
       <div class="span3 swpmem text-center"></div>
-      <div class="span3 nw text-center"></div>
+      <div class="span3 nw text-center">
+        <table class="table nwtable">
+            <tr>
+                <td class="span4">Network</td>
+                <td class="span4">In</td>
+                <td class="span4">Out</td>
+            </tr>
+            <tr>
+                <td>Drop</td>
+                <td class="dropin"></td>
+                <td class="dropout"></td>
+            </tr>
+            <tr>
+                <td>Error</td>
+                <td class="errin"></td>
+                <td class="errout"></td>
+            </tr>
+            <tr>
+                <td>IP</td>
+                <td class="tlip"></td>
+                <td class="txip"></td>
+            </tr>
+        </table>
+      </div>
     </div>
 
     <ul class="nav nav-tabs">
@@ -58,7 +81,7 @@
                 <tbody id="disklist"></tbody>
             </table>
             <span id="error_message"></span>
-            <div class="spinner"></div>
+            <div class="spinner disktspinner"></div>
         </div>
         <div id="proc" class="tab-pane">
             <table class="table disktable table-striped table-hover table-sortable">
@@ -76,8 +99,8 @@
                     </tr>
                 </thead>
                 <tbody id="proclist"></tbody>
+                <div class="procspinner spinner"></div>
             </table>
-            <div class="spinner"></div>
             % if cmdline:
             <div id="statscmd" class="span4">
                 <div class="input-append">
@@ -93,7 +116,7 @@
         <div id="ohm_" class="tab-pane">
             <table class="table table-condensed ohm_three">
             </table>
-            <div class="spinner"></div>
+            <div class="spinner ohmspinner"></div>
         <div>
         % endif
     </div>

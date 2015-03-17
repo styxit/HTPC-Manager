@@ -72,12 +72,9 @@ function getReadableFileSizeString(fileSizeInBytes) {
 function get_diskinfo() {
     $.ajax({
         'url': WEBDIR + 'stats/disk_usage',
-        'beforeSend': function() {
-            $('.spinner').show();
-        },
             'dataType': 'json' ,
             'success': function (response) {
-            $('.spinner').show();
+            $('.disktspinner').show();
 
             $('#disklist').html("");
             $('#error_message').text("");
@@ -104,7 +101,7 @@ function get_diskinfo() {
             //$('.spinner').hide();
         },
         complete: function() {
-            $('.spinner').hide();
+            $('.disktspinner').hide();
         }
     });
 }
@@ -113,11 +110,9 @@ function get_diskinfo() {
 function processes() {
     $.ajax({
         'url': WEBDIR + 'stats/processes',
-        'beforeSend': function() {
-            $('.spinner').show();
-        },
-            'dataType': 'json',
-            'success': function (response) {
+        'dataType': 'json',
+        'success': function (response) {
+            $('.procspinner')
             byteSizeOrdering()
             $('#proclist').html("");
             $('#error_message').text("");
@@ -135,12 +130,12 @@ function processes() {
                 $('<td>').addClass('processes-percent').text(proc.cpu_percent+ '%'),
                 $('<td>').append('<a href="#" class="btn btn-mini cmd" data-cmd="kill" data-name='+proc.name+' data-pid='+proc.pid+'><i class="icon-remove"></i></a>'));
                 $('#proclist').append(row);
-                $('table').trigger("update");
+
             })
+            $('table').trigger("update");
         },
-        complete: function() {
-            $('.spinner').hide();
-        }
+
+
     });
 }
 
@@ -162,6 +157,12 @@ function get_local_ip() {
     });
 }
 
+function nw_table() {
+    $.getJSON(WEBDIR + 'stats/nw_table', function (response) {
+        //
+    })
+}
+
 // Not in use
 function network_usage() {
     $.getJSON(WEBDIR + "stats/network_usage", function (response) {
@@ -178,7 +179,11 @@ function network_usage_table() {
     $.getJSON(WEBDIR + "stats/network_usage", function (response) {
         $("#stat-sent").text(getReadableFileSizeString(response.bytes_sent));
         $("#stat-recv").text(getReadableFileSizeString(response.bytes_recv));
-        $(".nw").html("<table class='table nwtable'><tr><td class=span4>Network</td><td class=span4>In</td><td class=span4>Out</td></tr><tr><td>Drop</td><td>" + response.dropin + "</td><td>" + response.dropout + "</td></tr><tr><td>Error</td><td>" + response.errin + "</td><td>" + response.errout + "</td></tr><tr><td>IP</td><td class=tlip></td><td class=txip></td></tr></tbody></table>");
+        $(".errin").text(response.errin)
+        $(".errout").text(response.errout)
+        $(".dropin").text(response.dropin)
+        $(".dropout").text(response.dropout)
+        //$(".nw").html("<table class='table nwtable'><tr><td class=span4>Network</td><td class=span4>In</td><td class=span4>Out</td></tr><tr><td>Drop</td><td>" + response.dropin + "</td><td>" + response.dropout + "</td></tr><tr><td>Error</td><td>" + response.errin + "</td><td>" + response.errout + "</td></tr><tr><td>IP</td><td class=tlip></td><td class=txip></td></tr></tbody></table>");
     });
 }
 
@@ -234,15 +239,11 @@ function cpu_percent_table() {
 function getohm() {
     $.ajax({
         'url': WEBDIR + "stats/ohm",
-        'beforeSend': function () {
-            $('.spinner').show();
-        },
         'success': function (data) {
             unpack(data);
         }
 
     }).done(function () {
-        $('.spinner').hide();
         // make the three after unpack set the correct markup
         $('.ohm_three').treegrid();
 
