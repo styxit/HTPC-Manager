@@ -265,6 +265,9 @@ function reloadtab() {
     $('#procl').click(function () {
        processes();
    });
+    $('#smartl').click(function () {
+       smart();
+   });
 
    //Used for kill and signal command
    $(document).on('click', '.cmd', function(e){
