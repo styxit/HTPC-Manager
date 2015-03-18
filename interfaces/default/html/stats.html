@@ -1,5 +1,6 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
+<% active_tab = "active" %>
 <div class="container-fluid">
   <div class="content">
     <h1 class="page-header page-title">
@@ -9,16 +10,15 @@
         <i class="icon-arrow-up"></i><span id="stat-sent"></span>
       </small>
     </h1>
-
-    % if not importPsutil:
+	% if settings.get('stats_psutil_enable_'):
+      % if not importPsutil:
     <div class="row-fluid">
       <div class="alert alert-error">
         <h4>Psutil is was not found on your system</h4>
         <p>Stats can only be accessed if you install psutil on your system. See <a href="https://github.com/giampaolo/psutil/blob/master/INSTALL.rst">Psutil website</a>.
       </div>
     </div>
-
-    % else:
+      % else:
     <div class="row-fluid">
       <div class="span4 text-left" id="system_user"></div>
       <div class="span4 text-center" id="system_info"></div>
@@ -30,21 +30,28 @@
       <div class="span3 swpmem text-center"></div>
       <div class="span3 nw text-center"></div>
     </div>
-
+	  % endif
+	% endif
     <ul class="nav nav-tabs">
+	% if settings.get('stats_psutil_enable_'):
+      % if importPsutil:
     <li id="diskl" class="active"><a href="#diskt" data-toggle="tab">Disk</a></li>
     <li id="procl"><a href="#proc" data-toggle="tab">Process</a></li>
-    % if settings.get('stats_ohm_enable'):
+      %  endif
+	% endif
+	% if settings.get('stats_ohm_enable_'):
     <li id="ohm"><a href="#ohm_" data-toggle="tab">Hardware Info</a></li>
     % endif
-	% if settings.get('stats_smart_enable'):
+	% if settings.get('stats_smart_enable_'):
 	<li id="smartl"><a href="#smart" data-toggle="tab">S.M.A.R.T.</a></li>
 	% endif
 	</ul>
 
     <div class="tab-content">
-
-        <div id="diskt" class="tab-pane active">
+	% if settings.get('stats_psutil_enable_'):
+      % if importPsutil:
+        <div id="diskt" class="tab-pane ${active_tab}">
+        <% active_tab = "" %>
             <table class="table disktable table-striped table-hover table-sortable">
                 <thead>
                     <tr>
@@ -92,18 +99,31 @@
             % endif
             <span id="error_message"></i></span>
         </div>
+	  % endif
+	% endif
 
-        % if settings.get('stats_smart_enable'):
-		<div id="smart" class="tab-pane">
-        % if not importpySMART:
+    % if settings.get('stats_ohm_enable_'):
+        <div id="ohm_" class="tab-pane ${active_tab}">
+        <% active_tab = "" %>
+            <table class="table table-condensed ohm_three table-hover">
+            </table>
+            <div class="spinner"></div>
+        </div>
+    % endif
+
+
+    % if settings.get('stats_smart_enable_'):
+		<div id="smart" class="tab-pane ${active_tab}">
+        <% active_tab = "" %>
+          % if not importpySMART:
 			<div class="row-fluid">
 				<div class="alert alert-error">
 					<h4>smartmontools</h4>
 					<p>${importpySMARTerror}</p>
 				</div>
 			</div>
-		% else:
-			<table class="table disktable table-striped table-hover table-sortable">
+		  % else:
+			<table class="table table-striped table-hover smart_three">
                 <thead>
                     <tr>
                         <th class="">Mount Point</th>
@@ -118,39 +138,37 @@
                 </thead>
                 <tbody id="smartlist"></tbody>
             </table>
-            <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
-        % endif
+            <span id="smart_error_message"><i class="icon-spinner icon-spin smart-spinner"></i></span>
+          % endif
 		</div>
 		% endif
 
-        % if settings.get('stats_ohm_enable'):
-        <div id="ohm_" class="tab-pane">
-            <table class="table table-condensed ohm_three">
-            </table>
-            <div class="spinner"></div>
-        <div>
-        % endif
     </div>
-    % endif
-
   </div>
 </div>
 
 <script type="text/javascript">
-
-  % if importPsutil:
-    importPsutil = true;
-  % else :
+  % if settings.get('stats_psutil_enable_'):
+    % if importPsutil:
+      importPsutil = true;
+    % else:
+      importPsutil = false;
+    % endif
+  % else:
     importPsutil = false;
   % endif
-  % if importpySMART:
-    importpySMART = true;
-  % else :
+  % if settings.get('stats_smart_enable_'):
+    % if importpySMART:
+      importpySMART = true;
+    % else:
+      importpySMART = false;
+    % endif
+  % else:
     importpySMART = false;
   % endif
-  % if settings.get('stats_ohm_enable'):
+  % if settings.get('stats_ohm_enable_'):
     ohm = true;
-  %else:
+  % else:
     ohm = false;
   % endif
 
