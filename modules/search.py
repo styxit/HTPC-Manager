@@ -31,13 +31,27 @@ class Search(object):
 
     @cherrypy.expose()
     @require()
-    def thumb(self, url, h=None, w=None, o=100):
-        if url.startswith('rageid'):
-            settings = htpc.settings
-            host = settings.get('newznab_host', '').replace('http://', '').replace('https://', '')
-            ssl = 's' if settings.get('newznab_ssl', 0) else ''
+    def thumb(self, url, h=None, w=None, o=100, category=None):
+        host = htpc.settings.get('newznab_host', '').replace('http://', '').replace('https://', '')
+        ssl = 's' if htpc.settings.get('newznab_ssl', 0) else ''
 
-            url = 'http' + ssl + '://' + host + '/covers/tv/' + url[6:] + '.jpg'
+        if url.startswith('rageid'):
+
+            if category:
+                try:
+                    cat = category.split('>')[0].lower().strip()
+                except:
+                    cat = 'tv'
+            else:
+                cat = 'tv'
+
+            if host.startswith('www.usenet-crawler'):
+                url = 'http%s://%s/covers/%s/%s.jpg' % (ssl, cat, url[6:])
+
+            if host.startswith('api.dognzb'):
+                url = 'http%s://dognzb.cr/content/covers/%s/%s.jpg' % (ssl, cat, url[6:])
+
+            print url
 
         return get_image(url, h, w, o)
 

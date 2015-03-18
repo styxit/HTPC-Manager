@@ -62,7 +62,18 @@ function search(query, catid) {
                     $('#searchform').submit();
                     return false;
                 });
+                console.log(item);
+                var usenetdate;
+                if (item.attr['usenetdate']) {
+                    var age = moment(item.attr['usenetdate']).format("YYYY-MM-DD")
+                    var temp = moment().diff(age, 'days')
+                    usenetdate = temp + ' d'
+
+                } else {
+                    usenetdate = 'N/A'
+                }
                 row.append($('<td>').append(cat));
+                row.append($('<td>').addClass('right').html(usenetdate));
                 row.append($('<td>').addClass('right').html(bytesToSize(item.attr['size'], 2)));
 
                 // Make a group of nzbclient buttons
@@ -115,6 +126,8 @@ function anc(nzb) {
 }
 
 function showDetails(data) {
+    console.log("modal")
+    console.log(data)
     var modalTitle = data.description;
     if (data.attr['imdbtitle']) {
         modalTitle = data.attr['imdbtitle'];
@@ -125,11 +138,12 @@ function showDetails(data) {
 
     var modalImage = '';
     if (data.attr["coverurl"]) {
-        var url = WEBDIR + 'search/thumb?url='+data.attr['coverurl']+'&w=200&h=300';
+        var url = WEBDIR + 'search/thumb?url='+data.attr['coverurl']+'&w=200&h=300&category=';
         var modalImage = $('<div>').addClass('thumbnail pull-left');
         modalImage.append($('<img>').attr('src', url));
     } else if (data.attr["rageid"]) {
-        var url = WEBDIR + 'search/thumb?url=rageid'+data.attr['rageid']+'&w=200&h=300';
+        console.log("there is a rageid")
+        var url = WEBDIR + 'search/thumb?url=rageid'+data.attr['rageid']+'&w=200&h=300&category='+ data.category;
         var modalImage = $('<div>').addClass('thumbnail pull-left');
         modalImage.append($('<img>').attr('src', url));
     }
@@ -149,15 +163,28 @@ function showDetails(data) {
         modalInfo.append($('<p>').html('<b>Actors:</b> ' + data.attr['imdbactors']));
     }
     */
+    var posted;
+    if (data.attr['usenetdate']) {
+        posted = moment(data.attr['usenetdate']).fromNow()
+    } else {
+        posted = 'N/A'
+    }
+    modalInfo.append($('<p>').html('<b>Posted:</b> ' +  posted));
     modalInfo.append($('<p>').html('<b>Size:</b> ' + bytesToSize(data.attr['size'])));
     modalInfo.append($('<p>').html('<b>Grabs:</b> ' + data.attr['grabs']));
     modalInfo.append($('<p>').html('<b>Files:</b> ' + data.attr['files']));
 
     if (data.attr['password']) {
         var password = data.attr['password'];
-        if (password == 0) password = 'None';
-        modalInfo.append($('<p>').html('<b>Password:</b> ' + password));
+        if (password == 0) {
+        password = 'No';
     }
+        else {
+        password = 'Yes';
+    }
+     modalInfo.append($('<p>').html('<b>Password:</b> ' + password));
+    }
+
 
     if(data.attr['imdbscore']) {
         var rating = $('<span>').raty({
