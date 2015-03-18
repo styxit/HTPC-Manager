@@ -53,16 +53,16 @@ class Stats(object):
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'stats_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'stats_name'},
-                {'type': 'bool', 'label': 'Enable psutil', 'name': 'stats_psutil_enable_'},
+                {'type': 'bool', 'label': 'Enable psutil', 'name': 'stats_psutil_enabled'},
                 {'type': 'bool', 'label': 'Use bars', 'name': 'stats_use_bars'},
                 {'type': 'bool', 'label': 'Whitelist', 'name': 'stats_use_whitelist', 'desc': 'By enabling this the filesystem and mountpoints fields will become whitelist instead of blacklist'},
                 {'type': 'text', 'label': 'Filesystem', 'placeholder': 'NTFS FAT32', 'desc': 'Use whitespace as separator', 'name': 'stats_filesystem'},
                 {'type': 'text', 'label': 'Mountpoint', 'placeholder': 'mountpoint1 mountpoint2', 'desc': 'Use whitespace as separator', 'name': 'stats_mountpoint'},
                 {'type': 'text', 'label': 'Limit processes', 'placeholder': '50', 'desc': 'Blank for all processes', 'name': 'stats_limit_processes'},
-                {'type': 'bool', 'label': 'Enable OHM', 'desc': 'Open Hardware Manager is used for grabbing hardware info', 'name': 'stats_ohm_enable_'},
+                {'type': 'bool', 'label': 'Enable OHM', 'desc': 'Open Hardware Manager is used for grabbing hardware info', 'name': 'stats_ohm_enabled'},
                 {'type': 'text', 'label': 'OHM ip', 'placeholder': 'localhost', 'name': 'stats_ohm_ip'},
                 {'type': 'text', 'label': 'OHM port', 'placeholder': '8085', 'desc': '', 'name': 'stats_ohm_port'},
-                {'type': 'bool', 'label': 'Enable S.M.A.R.T.', 'desc': 'smartmontools is used for grabbing HDD health info (python must be executed as administrator)', 'name': 'stats_smart_enable_'}
+                {'type': 'bool', 'label': 'Enable S.M.A.R.T.', 'desc': 'smartmontools is used for grabbing HDD health info (python must be executed as administrator)', 'name': 'stats_smart_enabled'}
             ]
         })
 
@@ -571,7 +571,7 @@ class Stats(object):
     def ohm(self):
         ip = htpc.settings.get('stats_ohm_ip', 'localhost')
         port = htpc.settings.get('stats_ohm_port')
-        enabled = htpc.settings.get('stats_ohm_enable_')
+        enabled = htpc.settings.get('stats_ohm_enabled')
 
         if ip and port and enabled:
             try:
