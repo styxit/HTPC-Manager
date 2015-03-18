@@ -1,6 +1,5 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<% active_tab = "active" %>
 <div class="container-fluid">
   <div class="content">
     <h1 class="page-header page-title">
@@ -60,8 +59,7 @@
     <div class="tab-content">
 	% if settings.get('stats_psutil_enabled'):
       % if importPsutil:
-        <div id="diskt" class="tab-pane ${active_tab}">
-        <% active_tab = "" %>
+        <div id="diskt" class="tab-pane">
             <table class="table disktable table-striped table-hover table-sortable">
                 <thead>
                     <tr>
@@ -113,8 +111,7 @@
 	% endif
 
     % if settings.get('stats_ohm_enabled'):
-        <div id="ohm_" class="tab-pane ${active_tab}">
-        <% active_tab = "" %>
+        <div id="ohm_" class="tab-pane">
             <table class="table table-condensed ohm_three table-hover">
             </table>
             <div class="spinner"></div>
@@ -123,8 +120,7 @@
 
 
     % if settings.get('stats_smart_enabled'):
-		<div id="smart" class="tab-pane ${active_tab}">
-        <% active_tab = "" %>
+		<div id="smart" class="tab-pane">
           % if not importpySMART:
 			<div class="row-fluid">
 				<div class="alert alert-error">
