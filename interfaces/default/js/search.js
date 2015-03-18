@@ -62,7 +62,7 @@ function search(query, catid) {
                     $('#searchform').submit();
                     return false;
                 });
-                console.log(item);
+
                 var usenetdate;
                 if (item.attr['usenetdate']) {
                     var age = moment(item.attr['usenetdate']).format("YYYY-MM-DD")
@@ -126,8 +126,6 @@ function anc(nzb) {
 }
 
 function showDetails(data) {
-    console.log("modal")
-    console.log(data)
     var modalTitle = data.description;
     if (data.attr['imdbtitle']) {
         modalTitle = data.attr['imdbtitle'];
@@ -142,7 +140,6 @@ function showDetails(data) {
         var modalImage = $('<div>').addClass('thumbnail pull-left');
         modalImage.append($('<img>').attr('src', url));
     } else if (data.attr["rageid"]) {
-        console.log("there is a rageid")
         var url = WEBDIR + 'search/thumb?url=rageid'+data.attr['rageid']+'&w=200&h=300&category='+ data.category;
         var modalImage = $('<div>').addClass('thumbnail pull-left');
         modalImage.append($('<img>').attr('src', url));

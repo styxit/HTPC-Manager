@@ -51,8 +51,6 @@ class Search(object):
             if host.startswith('api.dognzb'):
                 url = 'http%s://dognzb.cr/content/covers/%s/%s.jpg' % (ssl, cat, url[6:])
 
-            print url
-
         return get_image(url, h, w, o)
 
     @cherrypy.expose()
@@ -68,7 +66,6 @@ class Search(object):
     def getclients(self):
         l = []
         nzbget = {"client": "nzbget",
-                  #"cmd":"",
                   "icon": "../img/nzbget.png",
                   "active": 0
         }
@@ -76,7 +73,6 @@ class Search(object):
             nzbget["active"] = 1
 
         sab = {"client": "sabnzbd",
-               #"cmd":"",
                "icon": "../img/sabnzbd.png",
                "active": 0
         }
