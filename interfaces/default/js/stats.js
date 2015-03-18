@@ -458,3 +458,5 @@ function reloadtab() {
        });
    }
    });
+
+   $('a[data-toggle="tab"]:first').tab('show')
