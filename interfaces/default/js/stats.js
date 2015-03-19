@@ -17,9 +17,17 @@ $(document).ready(function () {
         $('#procl').click(function () {
             processes();
         });
-
-
     }
+
+    if (importpySMART) {
+        if ($('#smartl').hasClass('active')){
+            smart();
+        }
+        $('#smartl').click(function (){
+            smart();
+        });
+    }
+
     if (ohm) {
         getohm();
 
@@ -331,6 +339,7 @@ function smart() {
             'dataType': 'json' ,
             'success': function (response) {
             byteSizeOrdering()
+            $('#smartlist').html("");
             var row_id = 1
             var parent_id = row_id
             $.each(response, function (i, drives) {
@@ -401,10 +410,6 @@ function reloadtab() {
 		processes();
     } else if ($('#ohm_').is(':visible')) {
         getohm();
-    } else if ($('#smart').is(':visible')) {
-		if (importpySMART) {		
-			smart();
-		}
     }
 }
 
@@ -417,10 +422,6 @@ function reloadtab() {
     $('#ohm').click(function () {
        getohm();
    });
-    $('#smartl').click(function () {
-       smart();
-   });
-
 
    //Used for kill and signal command
    $(document).on('click', '.cmd', function(e){

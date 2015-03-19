@@ -1,5 +1,9 @@
 <%inherit file="base.html"/>
-<% settings = self.attr.settings %>
+<% settings = self.attr.settings 
+import htpc
+webdir = htpc.WEBDIR
+%>
+
 <div class="container-fluid">
   <div class="content">
     <h1 class="page-header page-title">
@@ -15,7 +19,7 @@
     <div class="row-fluid">
       <div class="alert alert-error">
         <h4>All modules are disabled</h4>
-        <p>To enable a stats module go to <a href="/settings/#stats">settings</a> and enable some.
+        <p>To enable a stats module go to <a href="${htpc.WEBDIR}settings/#stats">settings</a> and enable some.
       </div>
     </div>
     % endif
