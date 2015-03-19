@@ -17,9 +17,17 @@ $(document).ready(function () {
         $('#procl').click(function () {
             processes();
         });
-
-
     }
+
+    if (importpySMART) {
+        if ($('#smartl').hasClass('active')){
+            smart();
+        }
+        $('#smartl').click(function (){
+            smart();
+        });
+    }
+
     if (ohm) {
         getohm();
 
@@ -323,17 +331,98 @@ function return_stats_settings() {
     });
 }
 
+
+function smart() {
+    $('.smart-spinner').show();
+    $('#smartlist').html("");
+    $.ajax({
+        'url': WEBDIR + 'stats/smart_info',
+            'dataType': 'json' ,
+            'success': function (response) {
+            byteSizeOrdering()
+            $('#smartlist').html("");
+            var row_id = 1
+            var parent_id = row_id
+            $.each(response, function (i, drives) {
+                row = $('<tr>');
+                row_id = row_id + 1
+                row.addClass('treegrid-' + row_id);
+                row.append(
+                $('<td>').text(drives.name),
+                $('<td>').text(drives.model),
+                $('<td>').text(drives.serial),
+                $('<td>').text(drives.firmware),
+                $('<td>').text(drives.capacity),
+                $('<td>').text(drives.interface),
+                $('<td>').text(drives.temperature + String.fromCharCode(176)),
+                $('<td>').text(drives.assessment));
+                $('.smart_three').append(row);
+                parent_id = row_id
+                row_id = row_id + 1
+                row = $('<tr>');                
+                row.addClass('treegrid-' + row_id).addClass('treegrid-parent-' + parent_id);
+                row.append(
+                $('<td>').text(""),
+                $('<td>').attr('colspan',6).append(
+                    $('<table>').addClass('table').addClass('table-condensed').addClass('smart_attributes').attr('id','attributes-' + drives.name).attr('width','100%').append(
+                      $('<thead>').append(
+                        $('<tr>').append(
+                            $('<th>').text("ID"),
+                            $('<th>').text("Attribute Name"),
+                            $('<th>').text("Cur"),
+                            $('<th>').text("Wst"),
+                            $('<th>').text("Thr"),
+                            $('<th>').text("Raw"),
+                            $('<th>').text("Flags"),
+                            $('<th>').text("Type"),
+                            $('<th>').text("Updated"),
+                            $('<th>').text("When Failed")
+                        )))),
+                $('<td>').text(""));
+                $('.smart_three').append(row);
+                $.each(drives.attributes, function (x, attr) {
+                    row = $('<tr>');                
+                    row.append(
+                    $('<td>').text(attr.id),
+                    $('<td>').text(attr.name),
+                    $('<td>').text(attr.cur),
+                    $('<td>').text(attr.wst),
+                    $('<td>').text(attr.thr),
+                    $('<td>').text(attr.raw),
+                    $('<td>').text(attr.flags),
+                    $('<td>').text(attr.type),
+                    $('<td>').text(attr.updated),
+                    $('<td>').text(attr.when_failed));
+                    $('#attributes-' + drives.name).append(row);
+                    })
+                $('.smart_three').treegrid({'initialState': 'collapsed'})
+            });
+            $('.smart-spinner').hide();
+        }
+    });
+}
+
+
 // Not in use atm
 function reloadtab() {
     if ($('#diskt').is(':visible')) {
-        get_diskinfo();
+		get_diskinfo();
     } else if ($('#proc').is(':visible')) {
-        processes();
+		processes();
     } else if ($('#ohm_').is(':visible')) {
         getohm();
     }
 }
 
+   $('#diskl').click(function () {
+       get_diskinfo();
+   });
+    $('#procl').click(function () {
+       processes();
+   });
+    $('#ohm').click(function () {
+       getohm();
+   });
 
    //Used for kill and signal command
    $(document).on('click', '.cmd', function(e){
@@ -371,3 +460,9 @@ function reloadtab() {
        });
    }
    });
+
+    if (location.hash) {
+        $('a[href='+location.hash+']').tab('show');
+    } else {
+        $('a[data-toggle="tab"]:first').tab('show')
+    }

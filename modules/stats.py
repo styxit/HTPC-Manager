@@ -24,6 +24,23 @@ except ImportError:
     logger.error("Could't import psutil. See https://raw.githubusercontent.com/giampaolo/psutil/master/INSTALL.rst")
     importPsutil = False
 
+importpySMART = False
+importpySMARTerror = ""
+try:
+    import pySMART
+    importpySMARTerror = ""
+    importpySMART = True
+
+except Exception as e:
+    logger.error(e)
+    importpySMARTerror = e
+    importpySMART = False
+
+if importpySMART:
+    if pySMART.utils.admin() == False:
+        importpySMART = False
+        importpySMARTerror = "Python should be executed as an administrator to smartmontools to work properly. Please, try to run python with elevated credentials."
+        logger.error(importpySMARTerror)
 
 class Stats(object):
     def __init__(self):
@@ -36,15 +53,16 @@ class Stats(object):
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'stats_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'stats_name'},
+                {'type': 'bool', 'label': 'Enable psutil', 'name': 'stats_psutil_enabled'},
                 {'type': 'bool', 'label': 'Use bars', 'name': 'stats_use_bars'},
                 {'type': 'bool', 'label': 'Whitelist', 'name': 'stats_use_whitelist', 'desc': 'By enabling this the filesystem and mountpoints fields will become whitelist instead of blacklist'},
                 {'type': 'text', 'label': 'Filesystem', 'placeholder': 'NTFS FAT32', 'desc': 'Use whitespace as separator', 'name': 'stats_filesystem'},
                 {'type': 'text', 'label': 'Mountpoint', 'placeholder': 'mountpoint1 mountpoint2', 'desc': 'Use whitespace as separator', 'name': 'stats_mountpoint'},
                 {'type': 'text', 'label': 'Limit processes', 'placeholder': '50', 'desc': 'Blank for all processes', 'name': 'stats_limit_processes'},
-                {'type': 'bool', 'label': 'Enable OHM', 'desc': 'Open Hardware Manager is used for grabbing hardware info', 'name': 'stats_ohm_enable'},
+                {'type': 'bool', 'label': 'Enable OHM', 'desc': 'Open Hardware Manager is used for grabbing hardware info', 'name': 'stats_ohm_enabled'},
                 {'type': 'text', 'label': 'OHM ip', 'placeholder': 'localhost', 'name': 'stats_ohm_ip'},
-                {'type': 'text', 'label': 'OHM port', 'placeholder': '8085', 'desc': '', 'name': 'stats_ohm_port'}
-
+                {'type': 'text', 'label': 'OHM port', 'placeholder': '8085', 'desc': '', 'name': 'stats_ohm_port'},
+                {'type': 'bool', 'label': 'Enable S.M.A.R.T.', 'desc': 'smartmontools is used for grabbing HDD health info (python must be executed as administrator)', 'name': 'stats_smart_enabled'}
             ]
         })
 
@@ -59,7 +77,9 @@ class Stats(object):
 
         return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats',
                                                              importPsutil=importPsutil,
-                                                             cmdline=htpc.SHELL)
+                                                             cmdline=htpc.SHELL,
+                                                             importpySMART=importpySMART,
+                                                             importpySMARTerror=importpySMARTerror)
 
     @cherrypy.expose()
     @require()
@@ -501,10 +521,57 @@ class Stats(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
+    def smart_info(self):
+    	if importpySMART == True:
+            try:
+                from pySMART import DeviceList
+                devlist = DeviceList()
+                d = {}
+                i = 0
+                for hds in devlist.devices:	
+                    temp = 0
+                    a = {}
+                    x = 0
+                    for atts in hds.attributes:
+                        if hasattr(atts, 'name'):
+                            a[x] = {"id": atts.num,
+                                    "name": atts.name,
+                                    "cur": atts.value,
+                                    "wst": atts.worst,
+                                    "thr": atts.thresh,
+                                    "raw": atts.raw,
+                                    "flags": atts.flags,
+                                    "type": atts.type,
+                                    "updated": atts.updated,
+                                    "when_fail": atts.when_failed
+                                    }
+                            if atts.name == 'Temperature_Celsius':
+                                temp = atts.raw
+                            x = x + 1
+                    d[i] = {"assessment": hds.assessment,
+                                "firmware": hds.firmware,
+                                "interface": hds.interface,
+                                "is_ssd": hds.is_ssd,
+                                "model": hds.model,
+                                "name": hds.name,
+                                "serial": hds.serial,
+                                "supports_smart": hds.supports_smart,
+                                "capacity": hds.capacity,
+                                "temperature": temp,
+                                "attributes": a
+                                }
+                    i = i + 1
+                return d
+            except Exception as e:
+                self.logger.error("Pulling S.M.A.R.T. data %s" % e)
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
     def ohm(self):
         ip = htpc.settings.get('stats_ohm_ip', 'localhost')
         port = htpc.settings.get('stats_ohm_port')
-        enabled = htpc.settings.get('stats_ohm_enable')
+        enabled = htpc.settings.get('stats_ohm_enabled')
 
         if ip and port and enabled:
             try:
