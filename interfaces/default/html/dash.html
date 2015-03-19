@@ -166,6 +166,13 @@ settings = self.attr.settings
                 </table>
             </div>
             %endif
+             %if settings.get('dash_smart', 0):
+            <div class="span4">
+                <h3><a href="stats/#smart">S.M.A.R.T.</a><span style="float:right;"><i class="icon-spinner icon-spin smart-spinner"></i></span></h3>
+                <table class="table table-striped table-main" id="dash_smart_table_body">
+                </table>
+            </div>
+            %endif
             %if settings.get('dash_sysinfo', 0):
             <div class="span4">
                 <h3>System info</h3>
@@ -279,6 +286,7 @@ settings = self.attr.settings
         dashcount += settings.get('dash_nzbget', 0);
         dashcount += settings.get('dash_wanted_albums', 0);
         dashcount += settings.get('dash_disks', 0);
+        dashcount += settings.get('dash_smart', 0);
         %>
         %if dashcount == 0:
         <div class="row-fluid">

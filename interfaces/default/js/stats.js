@@ -460,4 +460,8 @@ function reloadtab() {
    }
    });
 
-   $('a[data-toggle="tab"]:first').tab('show')
+    if (location.hash) {
+        $('a[href='+location.hash+']').tab('show');
+    } else {
+        $('a[data-toggle="tab"]:first').tab('show')
+    }

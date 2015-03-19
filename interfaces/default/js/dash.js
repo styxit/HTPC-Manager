@@ -451,6 +451,33 @@ function loadsysinfo(options) {
         });
     }
 
+function loadsmartinfo() {
+    $('.smart-spinner').show();
+    $('#dash_smart_table_body').html("");
+    $.ajax({
+        'url': WEBDIR + 'stats/smart_info',
+            'dataType': 'json' ,
+            'success': function (response) {
+            if (response == null || response.length == 0 || jQuery.isEmptyObject(response)) {
+                    var row = $('<tr>');
+                    row.append($('<td>').text("S.M.A.R.T not correctly configured."));
+                    $('#dash_smart_table_body').append(row);
+            } else {
+                byteSizeOrdering()
+                $.each(response, function (i, drives) {
+                    var row = $('<tr>');
+                    row.append(
+                    $('<td>').text(drives.name),
+                    $('<td>').addClass('span4').text(drives.model),
+                    $('<td>').text(drives.temperature + String.fromCharCode(176)),
+                    $('<td>').text(drives.assessment));
+                    $('#dash_smart_table_body').append(row);
+                });
+            }
+            $('.smart-spinner').hide();
+        }
+    });
+}
 
 
 // For hdd. Converts bytes to filesize in kb,mb,gb
@@ -492,6 +519,5 @@ $(document).ready(function () {
     loadsysinfo()
     loadWantedAlbums()
     loaddiskinfo()
-
-
+    loadsmartinfo()
 })
