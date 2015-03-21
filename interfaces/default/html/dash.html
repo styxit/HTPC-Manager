@@ -156,13 +156,6 @@ settings = self.attr.settings
             <div class="span4 dash-module" id="dash_disks">
                 <h3><a href="stats/#diskt">HDD</a></h3>
                 <table class="table table-striped table-main">
-                    <thead>
-                        <tr>
-                            <th>x</th>
-                            <th class="span4">y</th>
-                            <th>z</th>
-                        </tr>
-                    </thead>
                     <tbody id="dash_disks_table_body"></tbody>
                 </table>
             </div>
@@ -175,7 +168,7 @@ settings = self.attr.settings
             %endif
             %if settings.get('dash_sysinfo', 0):
             <div class="span4 dash-module" id="dash_sysinfo">
-                <h3><a href="stats/#smart">System info</a></h3>
+                <h3><a href="stats">System info</a></h3>
                 <table class="table table-striped table-main table-condensed" id="dash_sysinfo_table_body"></table>
             </div>
             %endif
@@ -186,30 +179,6 @@ settings = self.attr.settings
                     <div class="carousel-inner"></div>
                     <a class="carousel-control left" href="#headphones-carousel" data-slide="prev">&lsaquo;</a>
                     <a class="carousel-control right" href="#headphones-carousel" data-slide="next">&rsaquo;</a>
-                </div>
-            </div>
-            %endif
-            %if settings.get('dash_doesnotexist', 0):
-            <div class="span4 dash-module" id="dash_doesnotexist">
-                <div class="span3">
-                    <span>Bandwidth</span>
-                    <div class="sysbw">
-                    </div>
-                </div>
-                <div class="span3">
-                    <span>CPU</span>
-                    <div class="syscpu">
-                    </div>
-                </div>
-                <div class="span3">
-                    <span>Memory</span>
-                    <div class="sysmem">
-                    </div>
-                </div>
-                <div class="span3">
-                    <span>IP</span>
-                    <div class="sysip">
-                    </div>
                 </div>
             </div>
             %endif
