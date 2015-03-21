@@ -69,3 +69,20 @@
     margin-bottom: 10px !important;
     padding: 5px !important;
 }
+
+.refresh-btns{
+    float: right !important;
+}
+
+#dash_sysinfo_table_body div{
+    width:50%;
+    display:inline-block
+}
+
+#dash_sysinfo_table_body td{
+    text-align: center !important;
+}
+
+#dash_sysinfo_table_body tr td:first-of-type{
+    text-align: left !important;
+}

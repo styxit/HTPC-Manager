@@ -364,102 +364,123 @@ function loadNextAiredSickrage(options) {
     })
 }
 
+/*
+                        <tr>
+                            <td>CPU</td>
+                            <td class="dash_sysinfo_cpu_idle"></td>
+                            <td class="dash_sysinfo_cpu_system"></td>
+                            <td class="dash_sysinfo_cpu_user"></td>
+                        </tr>
+                        <tr>
+                            <td>MEM</td>
+                            <td class="dash_sysinfo_mem_avail"></td>
+                            <td class="dash_sysinfo_mem_percent"></td>
+                            <td class="dash_sysinfo_mem_total"></td>
+                        </tr>
+                        <tr>
+                            <td>Speed</td>
+                            <td class="dash_sysinfo_speed_down"></td>
+                            <td class="dash_sysinfo_speed_up"></td>
+                            <td class="dash_sysinfo_speed_total"></td>
+                        </tr>
+                        <tr>
+                            <td>IP</td>
+                                <td colspan="3">
+                                    <span class="dash_sysinfo_localip pull-left"></span>
+                                    <span class="dash_sysinfo_externalip pull-right"></span>
+                                    <!--<td class="dash_sysinfo_localip"></td>
+                                    <td class="dash_sysinfo_externalip"></td>
+                                    <td class="">&nbsp;</td>-->
+
+                                </td>
+                        </tr>
+                        <tr>
+                            <td>BW</td>
+                            <td colspan="3">
+                                <span class="dash_sysinfo_download_current_month pull-left"></span>
+                                <span class="dash_sysinfo_download_total pull-right"></span>
+                            </td>
+                            <!--<td class="dash_sysinfo_average_download_speed"></td>-->
+                            <!--<td class="dash_sysinfo_average_upload_speed"></td>-->
+                        </tr>*/
+
+
 function loadsysinfo(options) {
-    if (!$('#sysinfo_table_body').length) return
-    var dashspeed;
-    $.getJSON(WEBDIR + 'vnstat/oneline', function(result) {
-        dashspeed = result;
-        var bwtot = (parseFloat(result.download_speed, 10) + parseFloat(result.upload_speed, 10)).toFixed(2);
-        $('.dash_sysinfo_speed_down').text(result.download_speed);
-        $('.dash_sysinfo_speed_up').text(result.upload_speed);
-        $('.dash_sysinfo_speed_total').text(bwtot + ' kbits/s');
-        $('.dash_sysinfo_').text(bwtot + ' kbits/s');
-        $('.dash_sysinfo_download_current_month').text("DL CM: " + result.rx_current_month)
-        $('.dash_sysinfo_download_total').text("DL AT: "+ result.alltime_total_traffic)
-
-        /*
-        $('.sysbw').append(
-            $('<div>').text("DL Month " + result.rx_current_month),
-            $('<div>').text("DL alltime " + result.alltime_total_traffic),
-            $('<div>').text("DL speed " + result.download_speed),
-            $('<div>').text("UL speed  " + result.upload_speed),
-            $('<div>').text("Av DL speed " + result.average_download_today),
-            $('<div>').text("Av UL speed " + result.average_upload_today)
-        )
-        */
-
-
-
-        return dashspeed;
-    });
-
+    start_refresh('sysinfo','loadsysinfo');
     $.getJSON(WEBDIR + 'stats/sysinfodash', function(result) {
-            // feed the bastard
-            $(".dash_sysinfo_cpu_idle").text('I '+ result.cpu.idle + ' %');
-            $(".dash_sysinfo_cpu_system").text('S '+ result.cpu.system + ' %');
-            $(".dash_sysinfo_cpu_user").text('U '+ result.cpu.user + ' %');
-
-            $(".dash_sysinfo_mem_avail").text(bytesToSize(result.vmem.available));
-            $(".dash_sysinfo_mem_percent").text(result.vmem.percent + ' %');
-            $(".dash_sysinfo_mem_total").text(bytesToSize(result.vmem.total));
-
-            $(".dash_sysinfo_localip").text(result.localip);
-            $(".dash_sysinfo_externalip").text(result.externalip);
-
-            /*
-            $(".syscpu").append(
-                $('<div>').text("Idle " + result.cpu.idle + ' %'),
-                $('<div>').text("System " + result.cpu.system + ' %'),
-                $('<div>').text("User " + result.cpu.user + ' %')
+        var row = $('<tr>');
+        row.append(
+            $('<td>').text("CPU"),
+            $('<td>').text('I: '+ result.cpu.idle + ' %'),
+            $('<td>').text('S: '+ result.cpu.system + ' %'),
+            $('<td>').text('U: '+ result.cpu.user + ' %')
+        )
+        $('#dash_sysinfo_table_body').append(row);
+        row = $('<tr>');
+        row.append(
+            $('<td>').text("MEM"),
+            $('<td>').text('U: '+ result.vmem.percent + ' %'),
+            $('<td>').text('A: '+ bytesToSize(result.vmem.available)),
+            $('<td>').text('T: '+ bytesToSize(result.vmem.total))
+        )
+        $('#dash_sysinfo_table_body').append(row);
+        row = $('<tr>');
+        row.append(
+            $('<td>').text("IP"),
+            $('<td>').attr("colspan",3).html('<div>L: ' + result.localip + '</div>' +
+                                            '<div>E: ' + result.externalip + '</div>')
+        )
+        $('#dash_sysinfo_table_body').append(row);
+    }).always(function() {
+        $.getJSON(WEBDIR + 'vnstat/oneline', function(result) {
+            var bwtot = (parseFloat(result.download_speed, 10) + parseFloat(result.upload_speed, 10)).toFixed(2);
+            row = $('<tr>');
+            row.append(
+                $('<td>').text("Speed"),
+                $('<td>').text('D: '+ result.download_speed),
+                $('<td>').text('U: '+ result.upload_speed),
+                $('<td>').text('T: '+ bwtot + ' kbits/s')
             )
-
-            $(".sysmem").append(
-                $('<div>').text("Avail " + bytesToSize(result.vmem.available)),
-                $('<div>').text("Total " + bytesToSize(result.vmem.total)),
-                $('<div>').text("Used " + result.vmem.percent + ' %')
+            $('#dash_sysinfo_table_body').append(row);
+            row = $('<tr>');
+            row.append(
+                $('<td>').text("BW"),
+                $('<td>').attr("colspan",3).html('<div>DL CM: ' + result.rx_current_month + '</div>' +
+                                                '<div>DL AT: ' + result.alltime_total_traffic + '</div>')
             )
-
-            $(".sysip").append(
-                $('<div>').text("Local " + result.localip),
-                $('<div>').text("Total " + result.externalip)
-            )
-            */
-
-        }
-
-    );
+            $('#dash_sysinfo_table_body').append(row);
+        }).always(function() {
+            end_refresh('sysinfo');
+        });
+    });
 }
 
 function loaddiskinfo() {
-    $('#disks-refresh').hide();
-    $('#dash_disks_table_body').html("");
-    $('#disks-spinner').show();
-        $.ajax({
-            'url': WEBDIR + 'stats/disk_usage',
-                'dataType': 'json' ,
-                'success': function (response) {
-                $.each(response, function (i, disk) {
-                    var row = $('<tr>');
-                    var progress =     "<div class='progress' style=margin-bottom:0px><div class=bar style=width:" + disk.percent + "%><span class=sr-only>"+ getReadableFileSizeStringHDD(disk.used) +"</span></div><div class='bar bar-success' style=width:" + (100 - disk.percent) + "% ><span class=sr-only>" + getReadableFileSizeStringHDD(disk.free) +"</span></div>";
-                    row.append(
-                    $('<td>').addClass('stats_disk_mountpoint').text(disk.mountpoint),
-                    $('<td>').addClass('stats_disk_progress span4').html(progress),
-                    $('<td>').addClass('stats_disk_percent').text(disk.percent + '%'));
-                    $('#dash_disks_table_body').append(row);
+    start_refresh('disks','loaddiskinfo')
+    $.ajax({
+        'url': WEBDIR + 'stats/disk_usage',
+        'dataType': 'json' ,
+        'complete': function () { end_refresh('disks') },
+        'success': function (response) {
+            $.each(response, function (i, disk) {
+                var row = $('<tr>');
+                var progress =     "<div class='progress' style=margin-bottom:0px><div class=bar style=width:" + disk.percent + "%><span class=sr-only>"+ getReadableFileSizeStringHDD(disk.used) +"</span></div><div class='bar bar-success' style=width:" + (100 - disk.percent) + "% ><span class=sr-only>" + getReadableFileSizeStringHDD(disk.free) +"</span></div>";
+                row.append(
+                $('<td>').addClass('stats_disk_mountpoint').text(disk.mountpoint),
+                $('<td>').addClass('stats_disk_progress span4').html(progress),
+                $('<td>').addClass('stats_disk_percent').text(disk.percent + '%'));
+                $('#dash_disks_table_body').append(row);
             });
         }
-    });
-    $('#disks-spinner').hide();
-    $('#disks-refresh').show();
+    })
 }
 
 function loadsmartinfo() {
-    $('#smart-refresh').hide();
-    $('#dash_smart_table_body').html("");
-    $('#smart-spinner').show();
+    start_refresh('smart','loadsmartinfo')
     $.ajax({
         'url': WEBDIR + 'stats/smart_info',
             'dataType': 'json' ,
+            'complete': function () { end_refresh('smart') },
             'success': function (response) {
             if (response == null || response.length == 0 || jQuery.isEmptyObject(response)) {
                     var row = $('<tr>');
@@ -479,8 +500,6 @@ function loadsmartinfo() {
             }
         }
     });
-    $('#smart-spinner').hide();
-    $('#smart-refresh').show();
 }
 
 
@@ -507,12 +526,11 @@ function bytestospeed(bytes) {
 }
 
 function loadqbit() {
-    $('#qbit-refresh').hide();
-    $('#dash_qbit_table_body').html("");
-    $('#qbit-spinner').show();
+    start_refresh('qbit','loadqbit')
     $.ajax({
         'url': WEBDIR + 'qbittorrent/fetch',
         'dataType': 'json',
+        'complete': function () { end_refresh('qbit') },
         'success': function (response) {
             var numberofloop = 0;
             var downloads = {};
@@ -547,8 +565,22 @@ function loadqbit() {
             }
         }
     });
-    $('#qbit-spinner').hide();
-    $('#qbit-refresh').show();
+}
+
+function start_refresh(module, fn){
+    if ($('#dash_'+module).children('h3:first-child').has('.refresh-btns').length == 0){
+        $('#dash_'+module).children('h3:first-child').append('<span class="refresh-btns">' +
+                                '<i id="'+module+'-refresh" class="btn icon-refresh" title="Refresh" onclick="'+fn+'();"></i>' +
+                                '<i class="icon-spinner icon-spin" id="'+module+'-spinner"></i></span>');
+    }
+    $('#'+module+'-refresh').hide();
+    $('#dash_'+module+'_table_body').html("");
+    $('#'+module+'-spinner').show();
+}
+
+function end_refresh(module){
+    $('#'+module+'-refresh').show();
+    $('#'+module+'-spinner').hide();
 }
 
 function enable_module (module, dest, fn){
@@ -614,42 +646,43 @@ $('#dash-save').click(function() {
     $(".dash-row").each(function(index) {
         sorted += $(this).sortable("toArray") + ";"; 
     });
-    $.get("/save_dash", 'dash_order=' + encodeURIComponent(sorted), function (data) {
+    $.get(WEBDIR + "save_dash", 'dash_order=' + encodeURIComponent(sorted), function (data) {
           notify('Dashboard',data,'info');
     })
     $(".dash-row").sortable('destroy');
 });
 
 $(document).ready(function () {
-    if (modules.length == 0) {    
-        enable_module("notConfigured", "dash-content");
+    if (Object.keys(modules).length == 0) {    
+        jQuery("#notConfigured").detach().appendTo("#dash-content"); //display setup msg if no modules enabled
     } else {
-        created_modules = [];
-        if (dash_order != 0 && dash_order != 'False' && dash_order != false) {
+        var modules_per_row = 0;
+        if (dash_order != '0' && dash_order != 'False') { // create modules if dash_order is set
             rows_to_build = dash_order.split(";");
-            for (i = 0; i < rows_to_build.length; i++) {
-                if (rows_to_build[i].length) {
-                    new_row();
-                    modules_to_build = rows_to_build[i].split(',')
-                    for (x = 0; x < modules_to_build.length; x++) {
-                        if (modules_to_build[x] in modules){
-                            enable_module(modules_to_build[x], "dash-row-" + row_n, modules[modules_to_build[x]])
-                            created_modules.push(modules_to_build[x]);
-                        }
+            for (i = 0; i < rows_to_build.length; i++) { //loop rows
+                new_row();
+                modules_per_row = 0;
+                modules_to_build = rows_to_build[i].split(',')
+                for (x = 0; x < modules_to_build.length; x++) { //loop modules
+                    if (modules_to_build[x] in modules){
+                        enable_module(modules_to_build[x], "dash-row-" + row_n, modules[modules_to_build[x]])
+                        delete modules[modules_to_build[x]]; //delete module from modules object so it will not be re-created on next loop
+                        modules_per_row++;
                     }
                 }
             }
         } 
-        var y = 0;
-        for (module in modules) {  
-            if (created_modules.indexOf(module) == -1){
-                if (y == 0) {new_row();}
-                y++;
+        for (module in modules) {  // create aditional modules not in dash_order
+                if (modules_per_row == 0) {
+                    new_row();
+                }
+                modules_per_row++;
                 enable_module(module, "dash-row-" + row_n, modules[module])
-                if (y > 2) {y = 0;}
-            }
+                if (modules_per_row > 2) {
+                    modules_per_row = 0;
+                }
         }
-        enable_module("editButtons", "dashboard", "");
+        $('.dash-row:empty').remove();
+        jQuery("#editButtons").detach().prependTo("#dash-content"); //show edit buttons
     }
-        
 })
