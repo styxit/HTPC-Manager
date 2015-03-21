@@ -364,47 +364,6 @@ function loadNextAiredSickrage(options) {
     })
 }
 
-/*
-                        <tr>
-                            <td>CPU</td>
-                            <td class="dash_sysinfo_cpu_idle"></td>
-                            <td class="dash_sysinfo_cpu_system"></td>
-                            <td class="dash_sysinfo_cpu_user"></td>
-                        </tr>
-                        <tr>
-                            <td>MEM</td>
-                            <td class="dash_sysinfo_mem_avail"></td>
-                            <td class="dash_sysinfo_mem_percent"></td>
-                            <td class="dash_sysinfo_mem_total"></td>
-                        </tr>
-                        <tr>
-                            <td>Speed</td>
-                            <td class="dash_sysinfo_speed_down"></td>
-                            <td class="dash_sysinfo_speed_up"></td>
-                            <td class="dash_sysinfo_speed_total"></td>
-                        </tr>
-                        <tr>
-                            <td>IP</td>
-                                <td colspan="3">
-                                    <span class="dash_sysinfo_localip pull-left"></span>
-                                    <span class="dash_sysinfo_externalip pull-right"></span>
-                                    <!--<td class="dash_sysinfo_localip"></td>
-                                    <td class="dash_sysinfo_externalip"></td>
-                                    <td class="">&nbsp;</td>-->
-
-                                </td>
-                        </tr>
-                        <tr>
-                            <td>BW</td>
-                            <td colspan="3">
-                                <span class="dash_sysinfo_download_current_month pull-left"></span>
-                                <span class="dash_sysinfo_download_total pull-right"></span>
-                            </td>
-                            <!--<td class="dash_sysinfo_average_download_speed"></td>-->
-                            <!--<td class="dash_sysinfo_average_upload_speed"></td>-->
-                        </tr>*/
-
-
 function loadsysinfo(options) {
     start_refresh('sysinfo','loadsysinfo');
     $.getJSON(WEBDIR + 'stats/sysinfodash', function(result) {
