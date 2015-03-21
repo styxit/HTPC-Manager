@@ -4,6 +4,9 @@
 .alignright {
     text-align: right !important;
 }
+.aligncenter {
+    text-align: center !important;
+}
 .carousel-item {
     height: 200px;
     background-position: center 20%;
@@ -48,4 +51,21 @@
 }
 .dashboard .span4 #nzbgetdownloads_table_body td:last-child {
     width: 14px;
+}
+.dash-module-edit{
+    min-height: 140px !important;
+    border: 1px solid !important;
+    border-color: #FFFF00 !important;
+    max-height: 140px !important;
+    height: 140px !important;
+    overflow: hidden !important;
+
+}
+
+.dash-row-edit { 
+    min-height: 150px !important;
+    border: 1px solid !important;
+    border-color: #FF0000 !important;
+    margin-bottom: 10px !important;
+    padding: 5px !important;
 }

@@ -1,3 +1,4 @@
+var row_n = 0
 
 function loadWantedAlbums () {
     if (!$('#headphones-carousel').length) return
@@ -429,31 +430,33 @@ function loadsysinfo(options) {
     );
 }
 
-    function loaddiskinfo() {
+function loaddiskinfo() {
+    $('#disks-refresh').hide();
+    $('#dash_disks_table_body').html("");
+    $('#disks-spinner').show();
         $.ajax({
             'url': WEBDIR + 'stats/disk_usage',
                 'dataType': 'json' ,
                 'success': function (response) {
-                $('#dash_disks_table_body').html("");
-
                 $.each(response, function (i, disk) {
                     var row = $('<tr>');
                     var progress =     "<div class='progress' style=margin-bottom:0px><div class=bar style=width:" + disk.percent + "%><span class=sr-only>"+ getReadableFileSizeStringHDD(disk.used) +"</span></div><div class='bar bar-success' style=width:" + (100 - disk.percent) + "% ><span class=sr-only>" + getReadableFileSizeStringHDD(disk.free) +"</span></div>";
-
                     row.append(
                     $('<td>').addClass('stats_disk_mountpoint').text(disk.mountpoint),
                     $('<td>').addClass('stats_disk_progress span4').html(progress),
                     $('<td>').addClass('stats_disk_percent').text(disk.percent + '%'));
                     $('#dash_disks_table_body').append(row);
             });
-
-            }
-        });
-    }
+        }
+    });
+    $('#disks-spinner').hide();
+    $('#disks-refresh').show();
+}
 
 function loadsmartinfo() {
-    $('.smart-spinner').show();
+    $('#smart-refresh').hide();
     $('#dash_smart_table_body').html("");
+    $('#smart-spinner').show();
     $.ajax({
         'url': WEBDIR + 'stats/smart_info',
             'dataType': 'json' ,
@@ -474,9 +477,10 @@ function loadsmartinfo() {
                     $('#dash_smart_table_body').append(row);
                 });
             }
-            $('.smart-spinner').hide();
         }
     });
+    $('#smart-spinner').hide();
+    $('#smart-refresh').show();
 }
 
 
@@ -502,22 +506,150 @@ function bytestospeed(bytes) {
     return bytes.toFixed(2) + byteUnits[i]+ '\\s';
 }
 
+function loadqbit() {
+    $('#qbit-refresh').hide();
+    $('#dash_qbit_table_body').html("");
+    $('#qbit-spinner').show();
+    $.ajax({
+        'url': WEBDIR + 'qbittorrent/fetch',
+        'dataType': 'json',
+        'success': function (response) {
+            var numberofloop = 0;
+            var downloads = {};
+            var i = 0;
+            $.each(response, function (index, torrent) {
+                if (torrent.state != "uploading"){
+                    downloads[i] = torrent;
+                    i = i + 1;
+                }
+            });
+            if (i > 0) { 
+                var max = i;
+                if (i > 5) { var max = 4; }
+                $.each(downloads, function (index, torrent) {
+                    tr = $('<tr>');
+                    numberofloop += 1;
+                    if (numberofloop <= max) {
+                        tr.append(
+                        $('<td>').addClass('span5 qbt_name').html(torrent.name),
+                        $('<td>').addClass('qbit_eta alignright').text(torrent.eta));
+                        $('#dash_qbit_table_body').append(tr);
+                    } else {
+                        tr.append($('<td>').addClass('span6 aligncenter').attr("colspan",2).html("<small>" + (i - max) + " more torrents</small>"))
+                        $('#dash_qbit_table_body').append(tr);
+                        return false;
+                    }
+                });
+            } else {
+                tr = $('<tr>');
+                tr.append($('<td>').addClass('span6 aligncenter').attr("colspan",2).html("<small>No active downloads</small>"))
+                $('#dash_qbit_table_body').append(tr);
+            }
+        }
+    });
+    $('#qbit-spinner').hide();
+    $('#qbit-refresh').show();
+}
+
+function enable_module (module, dest, fn){
+    jQuery("#" + module).detach().appendTo("#" + dest);
+    if (fn in window) {
+        window[fn]();
+    }
+}
+
+function new_row(){
+    row_n++;
+    var newrow = $('<div>').addClass('row-fluid dash-row').attr('id', 'dash-row-' + row_n);
+    $("#dash-content").append(newrow);
+}
+
+function enable_sortable() {
+   $(".dash-row").sortable({
+        connectWith: '.dash-row',
+        //receive: This event is triggered when a
+        //connected sortable list has received an item from another list.
+        receive: function(event, ui) {
+            // so if > 3
+            if ($(this).children().length > 3) {
+                //ui.sender: will cancel the change.
+                //Useful in the 'receive' callback.
+                $(ui.sender).sortable('cancel');
+            }
+        }
+    }).disableSelection();
+}
+
+$('#dash-edit').click(function() {
+    $(".dash-row").addClass("dash-row-edit");
+    $(".dash-module").addClass("dash-module-edit");
+    $("#dash-edit").hide();
+    $("#dash-addRow").show();
+    $("#dash-cancel").show();
+    $("#dash-save").show();
+    enable_sortable()
+});
+
+$('#dash-addRow').click(function() {
+    row_n++;
+    var newrow = $('<div>').addClass('row-fluid dash-row dash-row-edit').attr('id', 'dash-row-' + row_n);
+    $("#dash-content").append(newrow);
+    enable_sortable()
+});
+
+$('#dash-cancel').click(function() {
+    location.reload();
+});
+
+$('#dash-save').click(function() {
+    $("#dash-addRow").hide();
+    $("#dash-save").hide();
+    $("#dash-cancel").hide();
+    $("#dash-edit").show();
+    $(".dash-row").removeClass('dash-row-edit')
+    $(".dash-module").removeClass("dash-module-edit");
+    $(".dash-row").sortable('disable');
+    $('.dash-row:empty').remove();
+    var sorted = "";
+    $(".dash-row").each(function(index) {
+        sorted += $(this).sortable("toArray") + ";"; 
+    });
+    $.get("/save_dash", 'dash_order=' + encodeURIComponent(sorted), function (data) {
+          notify('Dashboard',data,'info');
+    })
+    $(".dash-row").sortable('destroy');
+});
 
 $(document).ready(function () {
-    loadRecentMovies()
-    loadRecentTVshows()
-    loadRecentAlbums()
-    loadRecentMoviesPlex()
-    loadRecentTVshowsPlex()
-    loadRecentAlbumsPlex()
-    loadDownloadHistory()
-    loadNZBGetDownloadHistory()
-    loadWantedMovies()
-    loadNextAired()
-    loadsonarrCalendar()
-    loadNextAiredSickrage()
-    loadsysinfo()
-    loadWantedAlbums()
-    loaddiskinfo()
-    loadsmartinfo()
+    if (modules.length == 0) {    
+        enable_module("notConfigured", "dash-content");
+    } else {
+        created_modules = [];
+        if (dash_order != 0 && dash_order != 'False' && dash_order != false) {
+            rows_to_build = dash_order.split(";");
+            for (i = 0; i < rows_to_build.length; i++) {
+                if (rows_to_build[i].length) {
+                    new_row();
+                    modules_to_build = rows_to_build[i].split(',')
+                    for (x = 0; x < modules_to_build.length; x++) {
+                        if (modules_to_build[x] in modules){
+                            enable_module(modules_to_build[x], "dash-row-" + row_n, modules[modules_to_build[x]])
+                            created_modules.push(modules_to_build[x]);
+                        }
+                    }
+                }
+            }
+        } 
+        var y = 0;
+        for (module in modules) {  
+            if (created_modules.indexOf(module) == -1){
+                if (y == 0) {new_row();}
+                y++;
+                enable_module(module, "dash-row-" + row_n, modules[module])
+                if (y > 2) {y = 0;}
+            }
+        }
+        enable_module("editButtons", "dashboard", "");
+    }
+        
 })
