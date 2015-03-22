@@ -99,3 +99,10 @@ class Root(object):
     def save_dash(self, dash_order=0):
         htpc.settings.set("dash_order", urllib.unquote(dash_order).decode('utf-8'))
         return "Dashboard saved."
+
+    @cherrypy.tools.json_out()
+    @cherrypy.expose()
+    @require()
+    def save_menu(self, menu_order=0):
+        htpc.settings.set("menu_order", urllib.unquote(menu_order).decode('utf-8'))
+        return "Menu order saved."

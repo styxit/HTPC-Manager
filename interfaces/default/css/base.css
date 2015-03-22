@@ -71,3 +71,11 @@ table th.tablesorter-header {
 .nav-collapse.in.collapse {
     height: auto !important;
 }
+
+.nav-menu-edit{
+    background-color: #cccccc;
+}
+
+.nav-menu-item-edit a{
+    cursor: move;
+}
