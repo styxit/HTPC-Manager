@@ -34,12 +34,15 @@ webdir = htpc.WEBDIR
             </a>
             <a href="${htpc.WEBDIR}" class="brand">HTPC Manager</a>
             <div class="nav-collapse">
-                <ul class="nav">
+                <ul class="nav" id="nav-menu">
+                <script>
+                    menus = {}
                     % for m in htpc.MODULES:
                     % if s.get(m.get('id')+'_enable') and m.get('id') != 'nzbsearch':
-                    <li id="nav-${m.get('id')|h, entity}"><a href="${htpc.WEBDIR}${m.get('id')|h, entity}/">${s.get(m.get('id')+'_name')|h, entity}</a></li>
+                        menus['${m.get('id')}'] = '<li id="nav-${m.get('id')|h, entity}"><a href="${htpc.WEBDIR}${m.get('id')|h, entity}/">${s.get(m.get('id')+'_name')|h, entity}</a></li>';
                     %endif
                     % endfor
+                </script>
                     <% customurls = s.getUrls() %>
                     % if len(customurls) > 1:
                     <li class="dropdown">
@@ -101,6 +104,7 @@ webdir = htpc.WEBDIR
                             <li><a href="http://github.com/Hellowlol/HTPC-Manager"><i class="icon-github"></i> Github project</a></li>
                             <li><a href="#" class="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
                             <li><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
+                            <li><a href="#" id="btn-menuorder"><i class="icon-sort"></i> Menu Order</a></li>
                             <li><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a></li>
                             % if htpc.AUTH:
                             <li><a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC-Manager"><i class="icon-signout"></i> Logout</a></li>
