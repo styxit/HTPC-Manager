@@ -93,6 +93,11 @@ $(document).ready(function () {
         $('#modal_dialog .trans').removeClass('trans')
         $('#modal_dialog .modal-fanart').css('background', '#fff')
     })
+    
+    for (item in menus) {  
+        $("#nav-menu").append(menus[item])
+    }
+        
 })
 
 function byteSizeOrdering() {
