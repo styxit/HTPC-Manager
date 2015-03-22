@@ -34,15 +34,10 @@ webdir = htpc.WEBDIR
             </a>
             <a href="${htpc.WEBDIR}" class="brand">HTPC Manager</a>
             <div class="nav-collapse">
-                <ul class="nav">
-                    % for m in htpc.MODULES:
-                    % if s.get(m.get('id')+'_enable') and m.get('id') != 'nzbsearch':
-                    <li id="nav-${m.get('id')|h, entity}"><a href="${htpc.WEBDIR}${m.get('id')|h, entity}/">${s.get(m.get('id')+'_name')|h, entity}</a></li>
-                    %endif
-                    % endfor
+                <ul class="nav" id="nav-menu">
                     <% customurls = s.getUrls() %>
                     % if len(customurls) > 1:
-                    <li class="dropdown">
+                    <li class="dropdown" id="nav-menu-others">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                         % for link in customurls:
@@ -94,12 +89,12 @@ webdir = htpc.WEBDIR
                 <!-- end phone tablet -->
                 <div class="pull-right hidden-tablet hidden-phone visible-desktop">
                     %if s.get('nzbsearch_enable'):
-                    <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}search/" method="get" class="navbar-form pull-right">
+                    <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}search/" method="get" class="navbar-form pull-right" id="menu-search">
                     %else:
-                    <form class="navbar-form pull-right disabled formsearch">
+                    <form class="navbar-form pull-right disabled formsearch" id="menu-search">
                     %endif
                     <input type="text" name="query" id="search" class="span3 search" accesskey="s" placeholder="Search">
-                        <div class="btn-group">
+                        <div class="btn-group" id="menu-settings">
                           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
                             <i class="icon-cogs"></i>
                             <span class="caret"></span>
@@ -109,6 +104,7 @@ webdir = htpc.WEBDIR
                             <li><a class="dash-edit" href="#"><i class="icon-move"></i> Edit Dash</a></li>
                             <li><a href="#" class="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
                             <li><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
+                            <li><a href="#" id="btn-menuorder"><i class="icon-sort"></i> Menu Order</a></li>
                             <li><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a></li>
                             % if htpc.AUTH:
                             <li><a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC-Manager"><i class="icon-signout"></i> Logout</a></li>
@@ -118,6 +114,10 @@ webdir = htpc.WEBDIR
                           </ul>
                         </div>
                     </form>
+                    <div class="btn-group hide" id="menu-editing">
+                        <i id="menu-save" class="btn icon-ok" title="Save"></i>
+                        <i id="menu-cancel" class="btn icon-remove" title="Discard"></i>
+                    </div>
                 </div>
             </div>
 
@@ -158,6 +158,16 @@ ${self.body()}
     <div class="modal-footer"></div>
 </div>
 
+<script>
+    menus = {}
+    % for m in htpc.MODULES:
+        % if s.get(m.get('id')+'_enable') and m.get('id') != 'nzbsearch':
+            menus['nav-${m.get('id')}'] = '<li class="nav-menu-item" id="nav-${m.get('id')|h, entity}"><a href="${htpc.WEBDIR}${m.get('id')|h, entity}/">${s.get(m.get('id')+'_name')|h, entity}</a></li>';
+        %endif
+    % endfor
+    menu_order = "${settings.get('menu_order', 0)}";
+</script>
+
 <script src="${htpc.WEBDIR}js/libs/jquery.min.js"></script>
 <script src="${htpc.WEBDIR}js/libs/jquery-ui.min.js"></script>
 <script src="${htpc.WEBDIR}js/libs/jquery.form.js"></script>
@@ -179,7 +189,6 @@ ${self.body()}
 <script src="${htpc.WEBDIR}js/libs/jquery.treegrid.bootstrap2.js"></script>
 <script src="${htpc.WEBDIR}js/default.js"></script>
 <script src="${htpc.WEBDIR}js/${scriptname}.js"></script>
-
 
 </body>
 </html>

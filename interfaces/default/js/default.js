@@ -97,6 +97,49 @@ $(document).ready(function () {
         $('#modal_dialog .trans').removeClass('trans')
         $('#modal_dialog .modal-fanart').css('background', '#fff')
     })
+
+    
+    $('#btn-menuorder').click(function() {
+        $('#nav-menu-others').hide();
+        $('#menu-search').hide();
+        $('#menu-editing').show();
+        $('#nav-menu').addClass('nav-menu-edit');
+        $('.nav-menu-item').addClass('nav-menu-item-edit');
+        $('#nav-menu').sortable({ items: ".nav-menu-item"});
+    });
+    
+    $('#menu-cancel').click(function() {
+        location.reload();
+    });
+
+    $('#menu-save').click(function() {
+        $('#menu-editing').hide();
+        $('#nav-menu-others').show();
+        $('#menu-search').show();
+        $('#nav-menu').removeClass('nav-menu-edit');
+        $('.nav-menu-item').removeClass('nav-menu-item-edit');
+        $("#nav-menu").sortable('disable');
+        $.get(WEBDIR + "save_menu", 'menu_order=' + encodeURIComponent($("#nav-menu").sortable("toArray")), function (data) {
+            notify('Menu',data,'info');
+        })
+        $("#nav-menu").sortable('destroy');
+    });
+    
+    //build the menu
+    menu_ordered = ""
+    if (menu_order != '0' && menu_order != 'False') { 
+        menus_to_build = menu_order.split(',')
+        for (x = 0; x < menus_to_build.length; x++) { 
+            if (menus_to_build[x] in menus){
+                menu_ordered += menus[menus_to_build[x]];
+                delete menus[menus_to_build[x]]
+            }
+        }
+    }
+    for (item in menus) {  //build aditional items not in menu_order
+        menu_ordered += menus[item];
+    }
+    $("#nav-menu").prepend(menu_ordered) // prepend to others dropdown item
 })
 
 function byteSizeOrdering() {
