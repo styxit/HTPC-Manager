@@ -29,7 +29,11 @@ $(document).ready(function () {
         $.getJSON(link.attr('href'), function(data) {
             notify(link.text(), data, 'success')
         })
-    })
+    });
+
+    $('a.linkdisabled').click(function (e) {
+        e.preventDefault();
+    });
 
     // Set the correct images path for raty plugin
     $.fn.raty.defaults.path = WEBDIR + '/img'

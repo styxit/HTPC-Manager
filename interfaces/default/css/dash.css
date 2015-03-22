@@ -86,3 +86,7 @@
 #dash_sysinfo_table_body tr td:first-of-type{
     text-align: left !important;
 }
+
+#editButtons{
+    display: None;
+}

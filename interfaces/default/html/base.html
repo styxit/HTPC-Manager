@@ -53,7 +53,13 @@ webdir = htpc.WEBDIR
                     % elif len(customurls) > 0:
                       <li><a href="${customurls[0]['url']|h, entity}" target="_blank">${customurls[0]['name']|h, entity}</a></li>
                     % endif
-
+                    <!-- start phone tablet -->
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a href="http://github.com/Hellowlol/HTPC-Manager"><img src="/../../..${htpc.WEBDIR}img/github.png"></img> Github project</a>
+                    </li>
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a class="dash-edit" href="#"><i id="" class="icon-move"></i> Edit Dash</a>
+                    </li>
                     <li class="hidden-desktop visible-phone visible-tablet">
                         <a href="#" class="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a>
                     </li>
@@ -85,6 +91,7 @@ webdir = htpc.WEBDIR
                         <input type="text" name="query" id="search" class="span6 search" accesskey="s" placeholder="Search">
                     </form>
                 </div>
+                <!-- end phone tablet -->
                 <div class="pull-right hidden-tablet hidden-phone visible-desktop">
                     %if s.get('nzbsearch_enable'):
                     <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}search/" method="get" class="navbar-form pull-right">
@@ -98,7 +105,8 @@ webdir = htpc.WEBDIR
                             <span class="caret"></span>
                           </a>
                           <ul class="dropdown-menu pull-right">
-                            <li><a href="http://github.com/Hellowlol/HTPC-Manager"><i class="icon-github"></i> Github project</a></li>
+                            <li><a href="http://github.com/Hellowlol/HTPC-Manager"><img src="/../../..${htpc.WEBDIR}img/github.png"></img> Github project</a></li>
+                            <li><a class="dash-edit" href="#"><i class="icon-move"></i> Edit Dash</a></li>
                             <li><a href="#" class="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
                             <li><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
                             <li><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a></li>
@@ -163,7 +171,7 @@ ${self.body()}
 <script src="${htpc.WEBDIR}js/libs/bootstrap-slider.js"></script>
 <script src="${htpc.WEBDIR}js/libs/holder.js"></script>
 <script src="${htpc.WEBDIR}js/libs/moment.js"></script>
-
+<script src="${htpc.WEBDIR}js/libs/jquery.ui.touch-punch.min.js"></script>
 <script src="${htpc.WEBDIR}js/libs/Sortable.min.js"></script>
 <script src="${htpc.WEBDIR}js/libs/ChartNew.min.js"></script>
 <script src="${htpc.WEBDIR}js/libs/download.js"></script>
@@ -171,7 +179,6 @@ ${self.body()}
 <script src="${htpc.WEBDIR}js/libs/jquery.treegrid.bootstrap2.js"></script>
 <script src="${htpc.WEBDIR}js/default.js"></script>
 <script src="${htpc.WEBDIR}js/${scriptname}.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.ui.touch-punch.min.js"></script>
 
 
 </body>

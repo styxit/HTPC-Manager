@@ -500,7 +500,7 @@ function loadqbit() {
                     i = i + 1;
                 }
             });
-            if (i > 0) { 
+            if (i > 0) {
                 var max = i;
                 if (i > 5) { var max = 4; }
                 $.each(downloads, function (index, torrent) {
@@ -571,10 +571,10 @@ function enable_sortable() {
     }).disableSelection();
 }
 
-$('#dash-edit').click(function() {
+$('.dash-edit').click(function() {
+    $("#editButtons").show();
     $(".dash-row").addClass("dash-row-edit");
     $(".dash-module").addClass("dash-module-edit");
-    $("#dash-edit").hide();
     $("#dash-addRow").show();
     $("#dash-cancel").show();
     $("#dash-save").show();
@@ -603,7 +603,7 @@ $('#dash-save').click(function() {
     $('.dash-row:empty').remove();
     var sorted = "";
     $(".dash-row").each(function(index) {
-        sorted += $(this).sortable("toArray") + ";"; 
+        sorted += $(this).sortable("toArray") + ";";
     });
     $.get(WEBDIR + "save_dash", 'dash_order=' + encodeURIComponent(sorted), function (data) {
           notify('Dashboard',data,'info');
@@ -612,7 +612,7 @@ $('#dash-save').click(function() {
 });
 
 $(document).ready(function () {
-    if (Object.keys(modules).length == 0) {    
+    if (Object.keys(modules).length == 0) {
         jQuery("#notConfigured").detach().appendTo("#dash-content"); //display setup msg if no modules enabled
     } else {
         var modules_per_row = 0;
@@ -630,7 +630,7 @@ $(document).ready(function () {
                     }
                 }
             }
-        } 
+        }
         for (module in modules) {  // create aditional modules not in dash_order
                 if (modules_per_row == 0) {
                     new_row();
