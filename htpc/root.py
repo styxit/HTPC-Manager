@@ -10,6 +10,7 @@ import sys
 import cherrypy
 import htpc
 import logging
+import urllib
 from threading import Thread
 from cherrypy.lib.auth2 import *
 
@@ -91,3 +92,17 @@ class Root(object):
         if username:
             cherrypy.request.login = None
         raise cherrypy.HTTPRedirect(str(htpc.WEBDIR) or from_page)
+        
+    @cherrypy.tools.json_out()
+    @cherrypy.expose()
+    @require()
+    def save_dash(self, dash_order=0):
+        htpc.settings.set("dash_order", urllib.unquote(dash_order).decode('utf-8'))
+        return "Dashboard saved."
+
+    @cherrypy.tools.json_out()
+    @cherrypy.expose()
+    @require()
+    def save_menu(self, menu_order=0):
+        htpc.settings.set("menu_order", urllib.unquote(menu_order).decode('utf-8'))
+        return "Menu order saved."

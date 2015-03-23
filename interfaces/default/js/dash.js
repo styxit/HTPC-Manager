@@ -1,3 +1,4 @@
+var row_n = 0
 
 function loadWantedAlbums () {
     if (!$('#headphones-carousel').length) return
@@ -364,99 +365,81 @@ function loadNextAiredSickrage(options) {
 }
 
 function loadsysinfo(options) {
-    if (!$('#sysinfo_table_body').length) return
-    var dashspeed;
-    $.getJSON(WEBDIR + 'vnstat/oneline', function(result) {
-        dashspeed = result;
-        var bwtot = (parseFloat(result.download_speed, 10) + parseFloat(result.upload_speed, 10)).toFixed(2);
-        $('.dash_sysinfo_speed_down').text(result.download_speed);
-        $('.dash_sysinfo_speed_up').text(result.upload_speed);
-        $('.dash_sysinfo_speed_total').text(bwtot + ' kbits/s');
-        $('.dash_sysinfo_').text(bwtot + ' kbits/s');
-        $('.dash_sysinfo_download_current_month').text("DL CM: " + result.rx_current_month)
-        $('.dash_sysinfo_download_total').text("DL AT: "+ result.alltime_total_traffic)
-
-        /*
-        $('.sysbw').append(
-            $('<div>').text("DL Month " + result.rx_current_month),
-            $('<div>').text("DL alltime " + result.alltime_total_traffic),
-            $('<div>').text("DL speed " + result.download_speed),
-            $('<div>').text("UL speed  " + result.upload_speed),
-            $('<div>').text("Av DL speed " + result.average_download_today),
-            $('<div>').text("Av UL speed " + result.average_upload_today)
-        )
-        */
-
-
-
-        return dashspeed;
-    });
-
+    start_refresh('sysinfo','loadsysinfo');
     $.getJSON(WEBDIR + 'stats/sysinfodash', function(result) {
-            // feed the bastard
-            $(".dash_sysinfo_cpu_idle").text('I '+ result.cpu.idle + ' %');
-            $(".dash_sysinfo_cpu_system").text('S '+ result.cpu.system + ' %');
-            $(".dash_sysinfo_cpu_user").text('U '+ result.cpu.user + ' %');
-
-            $(".dash_sysinfo_mem_avail").text(bytesToSize(result.vmem.available));
-            $(".dash_sysinfo_mem_percent").text(result.vmem.percent + ' %');
-            $(".dash_sysinfo_mem_total").text(bytesToSize(result.vmem.total));
-
-            $(".dash_sysinfo_localip").text(result.localip);
-            $(".dash_sysinfo_externalip").text(result.externalip);
-
-            /*
-            $(".syscpu").append(
-                $('<div>').text("Idle " + result.cpu.idle + ' %'),
-                $('<div>').text("System " + result.cpu.system + ' %'),
-                $('<div>').text("User " + result.cpu.user + ' %')
+        var row = $('<tr>');
+        row.append(
+            $('<td>').text("CPU"),
+            $('<td>').text('I: '+ result.cpu.idle + ' %'),
+            $('<td>').text('S: '+ result.cpu.system + ' %'),
+            $('<td>').text('U: '+ result.cpu.user + ' %')
+        )
+        $('#dash_sysinfo_table_body').append(row);
+        row = $('<tr>');
+        row.append(
+            $('<td>').text("MEM"),
+            $('<td>').text('U: '+ result.vmem.percent + ' %'),
+            $('<td>').text('A: '+ bytesToSize(result.vmem.available)),
+            $('<td>').text('T: '+ bytesToSize(result.vmem.total))
+        )
+        $('#dash_sysinfo_table_body').append(row);
+        row = $('<tr>');
+        row.append(
+            $('<td>').text("IP"),
+            $('<td>').attr("colspan",3).html('<div>L: ' + result.localip + '</div>' +
+                                            '<div>E: ' + result.externalip + '</div>')
+        )
+        $('#dash_sysinfo_table_body').append(row);
+    }).always(function() {
+        $.getJSON(WEBDIR + 'vnstat/oneline', function(result) {
+            var bwtot = (parseFloat(result.download_speed, 10) + parseFloat(result.upload_speed, 10)).toFixed(2);
+            row = $('<tr>');
+            row.append(
+                $('<td>').text("Speed"),
+                $('<td>').text('D: '+ result.download_speed),
+                $('<td>').text('U: '+ result.upload_speed),
+                $('<td>').text('T: '+ bwtot + ' kbits/s')
             )
-
-            $(".sysmem").append(
-                $('<div>').text("Avail " + bytesToSize(result.vmem.available)),
-                $('<div>').text("Total " + bytesToSize(result.vmem.total)),
-                $('<div>').text("Used " + result.vmem.percent + ' %')
+            $('#dash_sysinfo_table_body').append(row);
+            row = $('<tr>');
+            row.append(
+                $('<td>').text("BW"),
+                $('<td>').attr("colspan",3).html('<div>DL CM: ' + result.rx_current_month + '</div>' +
+                                                '<div>DL AT: ' + result.alltime_total_traffic + '</div>')
             )
-
-            $(".sysip").append(
-                $('<div>').text("Local " + result.localip),
-                $('<div>').text("Total " + result.externalip)
-            )
-            */
-
-        }
-
-    );
+            $('#dash_sysinfo_table_body').append(row);
+        }).always(function() {
+            end_refresh('sysinfo');
+        });
+    });
 }
 
-    function loaddiskinfo() {
-        $.ajax({
-            'url': WEBDIR + 'stats/disk_usage',
-                'dataType': 'json' ,
-                'success': function (response) {
-                $('#dash_disks_table_body').html("");
-
-                $.each(response, function (i, disk) {
-                    var row = $('<tr>');
-                    var progress =     "<div class='progress' style=margin-bottom:0px><div class=bar style=width:" + disk.percent + "%><span class=sr-only>"+ getReadableFileSizeStringHDD(disk.used) +"</span></div><div class='bar bar-success' style=width:" + (100 - disk.percent) + "% ><span class=sr-only>" + getReadableFileSizeStringHDD(disk.free) +"</span></div>";
-
-                    row.append(
-                    $('<td>').addClass('stats_disk_mountpoint').text(disk.mountpoint),
-                    $('<td>').addClass('stats_disk_progress span4').html(progress),
-                    $('<td>').addClass('stats_disk_percent').text(disk.percent + '%'));
-                    $('#dash_disks_table_body').append(row);
+function loaddiskinfo() {
+    start_refresh('disks','loaddiskinfo')
+    $.ajax({
+        'url': WEBDIR + 'stats/disk_usage',
+        'dataType': 'json' ,
+        'complete': function () { end_refresh('disks') },
+        'success': function (response) {
+            $.each(response, function (i, disk) {
+                var row = $('<tr>');
+                var progress =     "<div class='progress' style=margin-bottom:0px><div class=bar style=width:" + disk.percent + "%><span class=sr-only>"+ getReadableFileSizeStringHDD(disk.used) +"</span></div><div class='bar bar-success' style=width:" + (100 - disk.percent) + "% ><span class=sr-only>" + getReadableFileSizeStringHDD(disk.free) +"</span></div>";
+                row.append(
+                $('<td>').addClass('stats_disk_mountpoint').text(disk.mountpoint),
+                $('<td>').addClass('stats_disk_progress span4').html(progress),
+                $('<td>').addClass('stats_disk_percent').text(disk.percent + '%'));
+                $('#dash_disks_table_body').append(row);
             });
-
-            }
-        });
-    }
+        }
+    })
+}
 
 function loadsmartinfo() {
-    $('.smart-spinner').show();
-    $('#dash_smart_table_body').html("");
+    start_refresh('smart','loadsmartinfo')
     $.ajax({
         'url': WEBDIR + 'stats/smart_info',
             'dataType': 'json' ,
+            'complete': function () { end_refresh('smart') },
             'success': function (response) {
             if (response == null || response.length == 0 || jQuery.isEmptyObject(response)) {
                     var row = $('<tr>');
@@ -474,7 +457,6 @@ function loadsmartinfo() {
                     $('#dash_smart_table_body').append(row);
                 });
             }
-            $('.smart-spinner').hide();
         }
     });
 }
@@ -502,22 +484,164 @@ function bytestospeed(bytes) {
     return bytes.toFixed(2) + byteUnits[i]+ '\\s';
 }
 
+function loadqbit() {
+    start_refresh('qbit','loadqbit')
+    $.ajax({
+        'url': WEBDIR + 'qbittorrent/fetch',
+        'dataType': 'json',
+        'complete': function () { end_refresh('qbit') },
+        'success': function (response) {
+            var numberofloop = 0;
+            var downloads = {};
+            var i = 0;
+            $.each(response, function (index, torrent) {
+                if (torrent.state != "uploading"){
+                    downloads[i] = torrent;
+                    i = i + 1;
+                }
+            });
+            if (i > 0) {
+                var max = i;
+                if (i > 5) { var max = 4; }
+                $.each(downloads, function (index, torrent) {
+                    tr = $('<tr>');
+                    numberofloop += 1;
+                    if (numberofloop <= max) {
+                        tr.append(
+                        $('<td>').addClass('span5 qbt_name').html(torrent.name),
+                        $('<td>').addClass('qbit_eta alignright').text(torrent.eta));
+                        $('#dash_qbit_table_body').append(tr);
+                    } else {
+                        tr.append($('<td>').addClass('span6 aligncenter').attr("colspan",2).html("<small>" + (i - max) + " more torrents</small>"))
+                        $('#dash_qbit_table_body').append(tr);
+                        return false;
+                    }
+                });
+            } else {
+                tr = $('<tr>');
+                tr.append($('<td>').addClass('span6 aligncenter').attr("colspan",2).html("<small>No active downloads</small>"))
+                $('#dash_qbit_table_body').append(tr);
+            }
+        }
+    });
+}
+
+function start_refresh(module, fn){
+    if ($('#dash_'+module).children('h3:first-child').has('.refresh-btns').length == 0){
+        $('#dash_'+module).children('h3:first-child').append('<span class="refresh-btns">' +
+                                '<i id="'+module+'-refresh" class="btn icon-refresh" title="Refresh" onclick="'+fn+'();"></i>' +
+                                '<i class="icon-spinner icon-spin" id="'+module+'-spinner"></i></span>');
+    }
+    $('#'+module+'-refresh').hide();
+    $('#dash_'+module+'_table_body').html("");
+    $('#'+module+'-spinner').show();
+}
+
+function end_refresh(module){
+    $('#'+module+'-refresh').show();
+    $('#'+module+'-spinner').hide();
+}
+
+function enable_module (module, dest, fn){
+    jQuery("#" + module).detach().appendTo("#" + dest);
+    if (fn in window) {
+        window[fn]();
+    }
+}
+
+function new_row(){
+    row_n++;
+    var newrow = $('<div>').addClass('row-fluid dash-row').attr('id', 'dash-row-' + row_n);
+    $("#dash-content").append(newrow);
+}
+
+function enable_sortable() {
+   $(".dash-row").sortable({
+        connectWith: '.dash-row',
+        //receive: This event is triggered when a
+        //connected sortable list has received an item from another list.
+        receive: function(event, ui) {
+            // so if > 3
+            if ($(this).children().length > 3) {
+                //ui.sender: will cancel the change.
+                //Useful in the 'receive' callback.
+                $(ui.sender).sortable('cancel');
+            }
+        }
+    }).disableSelection();
+}
+
+$('.dash-edit').click(function() {
+    $("#editButtons").show();
+    $(".dash-row").addClass("dash-row-edit");
+    $(".dash-module").addClass("dash-module-edit");
+    $("#dash-addRow").show();
+    $("#dash-cancel").show();
+    $("#dash-save").show();
+    enable_sortable()
+});
+
+$('#dash-addRow').click(function() {
+    row_n++;
+    var newrow = $('<div>').addClass('row-fluid dash-row dash-row-edit').attr('id', 'dash-row-' + row_n);
+    $("#dash-content").append(newrow);
+    enable_sortable()
+});
+
+$('#dash-cancel').click(function() {
+    location.reload();
+});
+
+$('#dash-save').click(function() {
+    $("#dash-addRow").hide();
+    $("#dash-save").hide();
+    $("#dash-cancel").hide();
+    $("#dash-edit").show();
+    $(".dash-row").removeClass('dash-row-edit')
+    $(".dash-module").removeClass("dash-module-edit");
+    $(".dash-row").sortable('disable');
+    $('.dash-row:empty').remove();
+    var sorted = "";
+    $(".dash-row").each(function(index) {
+        sorted += $(this).sortable("toArray") + ";";
+    });
+    $.get(WEBDIR + "save_dash", 'dash_order=' + encodeURIComponent(sorted), function (data) {
+          notify('Dashboard',data,'info');
+    })
+    $(".dash-row").sortable('destroy');
+});
 
 $(document).ready(function () {
-    loadRecentMovies()
-    loadRecentTVshows()
-    loadRecentAlbums()
-    loadRecentMoviesPlex()
-    loadRecentTVshowsPlex()
-    loadRecentAlbumsPlex()
-    loadDownloadHistory()
-    loadNZBGetDownloadHistory()
-    loadWantedMovies()
-    loadNextAired()
-    loadsonarrCalendar()
-    loadNextAiredSickrage()
-    loadsysinfo()
-    loadWantedAlbums()
-    loaddiskinfo()
-    loadsmartinfo()
+    if (Object.keys(modules).length == 0) {
+        jQuery("#notConfigured").detach().appendTo("#dash-content"); //display setup msg if no modules enabled
+    } else {
+        var modules_per_row = 0;
+        if (dash_order != '0' && dash_order != 'False') { // create modules if dash_order is set
+            rows_to_build = dash_order.split(";");
+            for (i = 0; i < rows_to_build.length; i++) { //loop rows
+                new_row();
+                modules_per_row = 0;
+                modules_to_build = rows_to_build[i].split(',')
+                for (x = 0; x < modules_to_build.length; x++) { //loop modules
+                    if (modules_to_build[x] in modules){
+                        enable_module(modules_to_build[x], "dash-row-" + row_n, modules[modules_to_build[x]])
+                        delete modules[modules_to_build[x]]; //delete module from modules object so it will not be re-created on next loop
+                        modules_per_row++;
+                    }
+                }
+            }
+        }
+        for (module in modules) {  // create aditional modules not in dash_order
+                if (modules_per_row == 0) {
+                    new_row();
+                }
+                modules_per_row++;
+                enable_module(module, "dash-row-" + row_n, modules[module])
+                if (modules_per_row > 2) {
+                    modules_per_row = 0;
+                }
+        }
+        $('.dash-row:empty').remove();
+        jQuery("#editButtons").detach().prependTo("#dash-content"); //show edit buttons
+    }
 })
