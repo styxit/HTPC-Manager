@@ -528,7 +528,7 @@ class Stats(object):
                 devlist = DeviceList()
                 d = {}
                 i = 0
-                for hds in devlist.devices:	
+                for hds in devlist.devices:
                     temp = 0
                     a = {}
                     x = 0
@@ -548,19 +548,20 @@ class Stats(object):
                             if atts.name == 'Temperature_Celsius':
                                 temp = atts.raw
                             x = x + 1
-                    d[i] = {"assessment": hds.assessment,
-                                "firmware": hds.firmware,
-                                "interface": hds.interface,
-                                "is_ssd": hds.is_ssd,
-                                "model": hds.model,
-                                "name": hds.name,
-                                "serial": hds.serial,
-                                "supports_smart": hds.supports_smart,
-                                "capacity": hds.capacity,
-                                "temperature": temp,
-                                "attributes": a
-                                }
-                    i = i + 1
+                    if x > 0:
+                        d[i] = {"assessment": hds.assessment,
+                                    "firmware": hds.firmware,
+                                    "interface": hds.interface,
+                                    "is_ssd": hds.is_ssd,
+                                    "model": hds.model,
+                                    "name": hds.name,
+                                    "serial": hds.serial,
+                                    "supports_smart": hds.supports_smart,
+                                    "capacity": hds.capacity,
+                                    "temperature": temp,
+                                    "attributes": a
+                                    }
+                        i = i + 1
                 return d
             except Exception as e:
                 self.logger.error("Pulling S.M.A.R.T. data %s" % e)

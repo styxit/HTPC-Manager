@@ -364,7 +364,7 @@ function smart() {
                 row.append(
                 $('<td>').text(""),
                 $('<td>').attr('colspan',6).append(
-                    $('<table>').addClass('table').addClass('table-condensed').addClass('smart_attributes').attr('id','attributes-' + drives.name).attr('width','100%').append(
+                    $('<table>').addClass('table').addClass('table-condensed').addClass('smart_attributes').attr('id','attributes-' + drives.name.replace( /(:|\.|\[|\]|,)/g, "_")).attr('width','100%').append(
                       $('<thead>').append(
                         $('<tr>').append(
                             $('<th>').text("ID"),
@@ -393,7 +393,7 @@ function smart() {
                     $('<td>').text(attr.type),
                     $('<td>').text(attr.updated),
                     $('<td>').text(attr.when_failed));
-                    $('#attributes-' + drives.name).append(row);
+                    $('#attributes-' + drives.name.replace( /(:|\.|\[|\]|,)/g, "_")).append(row);
                     })
                 $('.smart_three').treegrid({'initialState': 'collapsed'})
             });
