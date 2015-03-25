@@ -17,7 +17,7 @@ class YTS(object):
 
     def _fetch(self, url):
         try:
-            r = requests.get(url)
+            r = requests.get(url, verify=False)
             if r.status_code == 200 and r.json()["status"] == "ok":
                 return r.json()
         except:

@@ -26,14 +26,32 @@ class Sonarr(object):
                 {'type': 'text', 'label': 'Port', 'placeholder': '8989', 'name': 'sonarr_port'},
                 {'type': 'text', 'label': 'Basepath', 'placeholder': '/sonarr', 'name': 'sonarr_basepath'},
                 {'type': 'text', 'label': 'API', 'name': 'sonarr_apikey'},
-                {'type': 'bool', 'label': 'Use SSL', 'name': 'sonarr_ssl'}
+                {'type': 'bool', 'label': 'Use SSL', 'name': 'sonarr_ssl'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://sonarr.domain.com', 'name': 'sonarr_reverse_proxy_link'},
+
             ]
         })
 
     @cherrypy.expose()
     @require()
     def index(self):
-        return htpc.LOOKUP.get_template('sonarr.html').render(scriptname='sonarr')
+        return htpc.LOOKUP.get_template('sonarr.html').render(scriptname='sonarr', webinterface=self.webinterface())
+
+    def webinterface(self):
+        host = striphttp(htpc.settings.get('sonarr_host', ''))
+        port = str(htpc.settings.get('sonarr_port', ''))
+        sonarr_basepath = htpc.settings.get('sonarr_basepath', '/')
+        ssl = 's' if htpc.settings.get('sonarr_ssl', True) else ''
+
+        # Makes sure that the basepath is /whatever/
+        sonarr_basepath = fix_basepath(sonarr_basepath)
+
+        url = 'http%s://%s:%s%s' % (ssl, host, port, sonarr_basepath)
+
+        if htpc.settings.get('sonarr_reverse_proxy_link'):
+            url = htpc.settings.get('sonarr_reverse_proxy_link')
+
+        return url
 
     def fetch(self, path, banner=None, type=None, data=None):
         try:
@@ -72,7 +90,7 @@ class Sonarr(object):
                 return loads(r.text)
 
         except Exception as e:
-            self.logger.error('Failed to fetch path=%s error %s' % (path, e))
+            self.logger.error('Failed to fetch url=%s path=%s error %s' % (url, path, e))
 
     @cherrypy.expose()
     @require()

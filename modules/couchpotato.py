@@ -26,7 +26,9 @@ class Couchpotato(object):
                 {"type": "text", "label": "Port", "placeholder": "5050", "name": "couchpotato_port"},
                 {"type": "text", "label": "Basepath", "placeholder": "/couchpotato", "name": "couchpotato_basepath"},
                 {"type": "text", "label": "API key", "desc": "Press test get apikey", "name": "couchpotato_apikey"},
-                {"type": "bool", "label": "Use SSL", "name": "couchpotato_ssl"}
+                {"type": "bool", "label": "Use SSL", "name": "couchpotato_ssl"},
+                {"type": "text", "label": "Reverse proxy link", "placeholder": "", "desc":"Reverse proxy link ex: https://couchpotato.domain.com", "name": "couchpotato_reverse_proxy_link"},
+
             ]
         })
 
@@ -43,6 +45,9 @@ class Couchpotato(object):
         basepath = fix_basepath(htpc.settings.get("couchpotato_basepath", "/"))
 
         url = "http%s://%s:%s%s" % (ssl, host, port, basepath)
+
+        if htpc.settings.get('couchpotato_reverse_proxy_link'):
+            url = htpc.settings.get('couchpotato_reverse_proxy_link')
 
         return url
 

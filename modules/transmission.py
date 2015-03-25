@@ -55,15 +55,15 @@ class Transmission(object):
     @require()
     @cherrypy.tools.json_out()
     def ping(self, **kwargs):
-        """ Test connection to Transmission """
-        host = kwargs["transmission_host"]
-        port = kwargs["transmission_port"]
-        username = kwargs["transmission_username"]
-        password = kwargs["transmission_password"]
-        basepath = kwargs["transmission_rpcbasepath"]
+        ''' Test connection to Transmission '''
+        host = kwargs['transmission_host']
+        port = kwargs['transmission_port']
+        username = kwargs['transmission_username']
+        password = kwargs['transmission_password']
+        basepath = kwargs['transmission_rpcbasepath']
 
         if not basepath:
-            basepath = fix_basepath("/transmission/")
+            basepath = fix_basepath('/transmission/')
         url = 'http://%s:%s%srpc/' % (striphttp(host), port, basepath)
 
         # format post data
@@ -79,7 +79,7 @@ class Transmission(object):
         # Add authentication
         if username and password:
             authentication = base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
-            header['Authorization'] = "Basic %s" % authentication
+            header['Authorization'] = 'Basic %s' % authentication
 
         try:
             request = urllib2.Request(url, data=data, headers=header)
@@ -88,12 +88,12 @@ class Transmission(object):
         except urllib2.HTTPError, e:
             # Fetching url failed Maybe Transmission session must be renewed
             if (e.getcode() == 409 and e.headers['X-Transmission-Session-Id']):
-                self.logger.debug("Setting new session ID provided by Transmission")
+                self.logger.debug('Setting new session ID provided by Transmission')
 
                 # If response is 409 re-set session id from header
                 self.sessionId = e.headers['X-Transmission-Session-Id']
 
-                self.logger.debug("Retry Transmission api with new session id.")
+                self.logger.debug('Retry Transmission api with new session id.')
                 try:
                     header['X-Transmission-Session-Id'] = self.sessionId
 
@@ -101,10 +101,10 @@ class Transmission(object):
                     response = urllib2.urlopen(req).read()
                     return loads(response)
                 except:
-                    self.logger.error("Unable access Transmission api with new session id.")
+                    self.logger.error('Unable access Transmission api with new session id.')
                     return
         except Exception:
-            self.logger.error("Unable to fetch information from: " + url)
+            self.logger.error('Unable to fetch information from: ' + url)
             return
 
     @cherrypy.expose()
@@ -117,7 +117,7 @@ class Transmission(object):
     @require()
     @cherrypy.tools.json_out()
     def set_downspeed(self, speed):
-        print "running", speed
+        print 'running', speed
         if int(speed) == 0:
             self.fetch('session-set', {'speed-limit-down': False})
         return self.fetch('session-set', {'speed-limit-down': int(speed), 'speed-limit-down-enabled': True})
@@ -190,16 +190,20 @@ class Transmission(object):
     # Wrapper to access the Transmission Api
     # If the first call fails, there probably is no valid Session ID so we try it again
     def fetch(self, method, arguments=''):
-        """ Do request to Transmission api """
-        self.logger.debug("Request transmission method: " + method)
+        ''' Do request to Transmission api '''
+        self.logger.debug('Request transmission method: ' + method)
 
         host = striphttp(htpc.settings.get('transmission_host', ''))
         port = str(htpc.settings.get('transmission_port', ''))
+        basepath = htpc.settings.get('transmission_rpcbasepath')
 
         # Default basepath is transmission
-        basepath = fix_basepath(htpc.settings.get('transmission_rpcbasepath', '/transmission/'))
+        if not basepath:
+            basepath = '/transmission/'
 
-        url = 'http://' + host + ':' + str(port) + basepath + 'rpc/'
+        basepath = fix_basepath(basepath)
+
+        url = 'http://%s:%s%srpc/' % (host, str(port), basepath)
 
         # format post data
         data = {'method': method}
@@ -216,7 +220,7 @@ class Transmission(object):
         # Add authentication
         authentication = self.auth()
         if authentication:
-            header['Authorization'] = "Basic %s" % authentication
+            header['Authorization'] = 'Basic %s' % authentication
 
         try:
             request = urllib2.Request(url, data=data, headers=header)
@@ -225,12 +229,12 @@ class Transmission(object):
         except urllib2.HTTPError, e:
             # Fetching url failed Maybe Transmission session must be renewed
             if (e.getcode() == 409 and e.headers['X-Transmission-Session-Id']):
-                self.logger.debug("Setting new session ID provided by Transmission")
+                self.logger.debug('Setting new session ID provided by Transmission')
 
                 # If response is 409 re-set session id from header
                 self.sessionId = e.headers['X-Transmission-Session-Id']
 
-                self.logger.debug("Retry Transmission api with new session id.")
+                self.logger.debug('Retry Transmission api with new session id.')
                 try:
                     header['X-Transmission-Session-Id'] = self.sessionId
 
@@ -238,16 +242,16 @@ class Transmission(object):
                     response = urllib2.urlopen(req).read()
                     return loads(response)
                 except:
-                    self.logger.error("Unable access Transmission api with new session id.")
+                    self.logger.error('Unable access Transmission api with new session id.')
                     return
         except Exception:
-            self.logger.error("Unable to fetch information from: " + url)
+            self.logger.error('Unable to fetch information from: %s' % url)
             return
 
     # Construct url with login details
     def auth(self):
-        """ Generate a base64 HTTP auth string based on settings """
-        self.logger.debug("Generating authentication string for transmission")
+        ''' Generate a base64 HTTP auth string based on settings '''
+        self.logger.debug('Generating authentication string for transmission')
 
         password = htpc.settings.get('transmission_password', '')
         username = htpc.settings.get('transmission_username', '')

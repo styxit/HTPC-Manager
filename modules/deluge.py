@@ -32,7 +32,9 @@ class Deluge(object):
                 {'type': 'text', 'label': 'Port *', 'name': 'deluge_port'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'deluge_ssl'},
                 {'type': 'text', 'label': 'Basepath', 'name': 'deluge_basepath'},
-                {'type': 'password', 'label': 'Password', 'name': 'deluge_password'}
+                {'type': 'password', 'label': 'Password', 'name': 'deluge_password'},
+                {"type": "text", "label": "Reverse proxy link", "placeholder": "", "desc":"Reverse proxy link ex: https://deluge.domain.com", "name": "deluge_reverse_proxy_link"}
+
             ]
         })
 
@@ -48,6 +50,10 @@ class Deluge(object):
         ssl = 's' if htpc.settings.get('deluge_ssl') else ''
 
         url = 'http%s://%s:%s%s' % (ssl, host, port, deluge_basepath)
+
+        if htpc.settings.get('deluge_reverse_proxy_link'):
+            url = htpc.settings.get('deluge_reverse_proxy_link')
+
         return url
 
     @cherrypy.expose()

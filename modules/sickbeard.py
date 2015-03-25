@@ -25,7 +25,9 @@ class Sickbeard(object):
                 {"type": "text", "label": "Port", "placeholder": "8081", "name": "sickbeard_port"},
                 {"type": "text", "label": "Basepath", "placeholder": "/sickbeard", "name": "sickbeard_basepath"},
                 {"type": "text", "label": "API key", "name": "sickbeard_apikey"},
-                {"type": "bool", "label": "Use SSL", "name": "sickbeard_ssl"}
+                {"type": "bool", "label": "Use SSL", "name": "sickbeard_ssl"},
+                {"type": "text", "label": "Reverse proxy link", "placeholder": "", "desc":"Reverse proxy link ex: https://sb.domain.com", "name": "sickbeard_reverse_proxy_link"},
+
             ]
         })
 
@@ -42,6 +44,9 @@ class Sickbeard(object):
         basepath = fix_basepath(htpc.settings.get("sickbeard_basepath", "/"))
 
         url = "http%s://%s::%s%s" % (ssl, host, port, basepath)
+
+        if htpc.settings.get("sickbeard_reverse_proxy_link"):
+            url = htpc.settings.get("sickbeard_reverse_proxy_link")
 
         return url
 

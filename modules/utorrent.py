@@ -109,14 +109,26 @@ class UTorrent(object):
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'utorrent_host'},
                 {'type': 'text', 'label': 'Port', 'placeholder': '8080', 'name': 'utorrent_port'},
                 {'type': 'text', 'label': 'Username', 'name': 'utorrent_username'},
-                {'type': 'password', 'label': 'Password', 'name': 'utorrent_password'}
+                {'type': 'password', 'label': 'Password', 'name': 'utorrent_password'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://utorrent.domain.com', 'name': 'utorrent_reverse_proxy_link'},
+
             ]
         })
 
     @cherrypy.expose()
     @require()
     def index(self):
-        return htpc.LOOKUP.get_template('utorrent.html').render(scriptname='utorrent')
+        return htpc.LOOKUP.get_template('utorrent.html').render(scriptname='utorrent', webinterface=self.webinterface())
+
+    def webinterface(self):
+        ip = htpc.settings.get('utorrent_host')
+        port = htpc.settings.get('utorrent_port')
+        url = 'http://%s:%s/gui/' % (ip, port)
+
+        if htpc.settings.get('utorrent_reverse_proxy_link'):
+            url = htpc.settings.get('utorrent_reverse_proxy_link')
+
+        return url
 
     @cherrypy.expose()
     @require()

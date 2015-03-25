@@ -25,14 +25,26 @@ class TVHeadend(object):
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'tvheadend_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'tvheadend_port'},
                 {'type': 'text', 'label': 'Username', 'name': 'tvheadend_username'},
-                {'type': 'password', 'label': 'Password', 'name': 'tvheadend_password'}
+                {'type': 'password', 'label': 'Password', 'name': 'tvheadend_password'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://domain.com/tvh', 'name': 'tvheadend_reverse_proxy_link'},
+
             ]
         })
 
     @cherrypy.expose()
     @require()
     def index(self):
-        return htpc.LOOKUP.get_template("tvheadend.html").render(scriptname="tvheadend")
+        return htpc.LOOKUP.get_template("tvheadend.html").render(scriptname="tvheadend", webinterface=self.webinterface())
+
+    def webinterface(self):
+        ip = htpc.settings.get('tvheadend_host')
+        port = htpc.settings,get('tvheadend_port')
+        url = 'http://%s:%s/' % (ip, port)
+
+        if htpc.settings.get('tvheadend_reverse_proxy_link'):
+            url = htpc.settings.get('tvheadend_reverse_proxy_link')
+
+        return url
 
     @cherrypy.expose()
     @require()

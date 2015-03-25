@@ -8,6 +8,8 @@ import imghdr
 import logging
 from cherrypy.lib.static import serve_file
 from urllib2 import Request, urlopen
+import time
+from functools import wraps
 try:
     import Image
     PIL = True
@@ -24,7 +26,7 @@ logger = logging.getLogger('helpers')
 def get_image(url, height=None, width=None, opacity=100, auth=None, headers=None):
     """ Load image form cache if possible, else download. Resize if needed """
     opacity = float(opacity)
-    logger = logging.getLogger('htpc.proxy')
+    logger = logging.getLogger('htpc.helpers')
 
     # Create image directory if it doesnt exist
     imgdir = os.path.join(htpc.DATADIR, 'images/')
@@ -74,7 +76,7 @@ def get_image(url, height=None, width=None, opacity=100, auth=None, headers=None
 
 def download_image(url, dest, auth=None, headers=None):
     """ Download image and save to disk """
-    logger = logging.getLogger('htpc.proxy')
+    logger = logging.getLogger('htpc.helpers')
     logger.debug("Downloading image from " + url + " to " + dest)
 
     try:
@@ -119,7 +121,8 @@ def resize_image(img, height, width, opacity, dest):
 def fix_basepath(s):
     """ Removes whitespace and adds / on each end """
     if s:
-        s.strip(" ")
+        s.strip(' ')
+        s = s.replace('/', '')
     if not s.startswith('/'):
         s = '/' + s
     if not s.endswith('/'):
@@ -130,13 +133,21 @@ def fix_basepath(s):
 def striphttp(s):
     # hate regex and this was faster
     if s:
-        s = s.strip(" ")
-        s = s.replace("https://", "")
-        s = s.replace("http://", "")
+        s = s.strip(' ')
+        s = s.replace('https://', '')
+        s = s.replace('http://', '')
         return s
     else:
         return ""
 
+def timt_func(func):
+    @wraps(func)
+    def inner(*args, **kwargs):
+        start = time.time()
+        res = func(*args)
+        print "%s took %s" % (func.__name__, time.time() - start)
+        return res
+    return inner
 
 def create_https_certificates(ssl_cert, ssl_key):
     """
@@ -170,4 +181,3 @@ def create_https_certificates(ssl_cert, ssl_key):
         return False
 
     return True
-

@@ -25,7 +25,8 @@ class Sickrage(object):
                 {'type': 'text', 'label': 'Port', 'placeholder': '8081', 'name': 'sickrage_port'},
                 {'type': 'text', 'label': 'Basepath', 'placeholder': '/sickrage', 'name': 'sickrage_basepath'},
                 {'type': 'text', 'label': 'API key', 'name': 'sickrage_apikey'},
-                {'type': 'bool', 'label': 'Use SSL', 'name': 'sickrage_ssl'}
+                {'type': 'bool', 'label': 'Use SSL', 'name': 'sickrage_ssl'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc':'Reverse proxy link ex: https://sr.domain.com', 'name': 'sickrage_reverse_proxy_link'}
             ]
         })
 
@@ -43,14 +44,17 @@ class Sickrage(object):
 
         url = 'http%s://%s:%s%s' % (ssl, host, port, sickrage_basepath)
 
+        if htpc.settings.get('sickrage_reverse_proxy_link'):
+            url = htpc.settings.get('sickrage_reverse_proxy_link')
+
         return url
 
     @cherrypy.expose()
     @require()
     def view(self, indexerid):
         if not (indexerid.isdigit()):
-            raise cherrypy.HTTPError("500 Error", "Invalid show ID.")
-            self.logger.error("Invalid show ID was supplied: " + str(indexerid))
+            raise cherrypy.HTTPError('500 Error', 'Invalid show ID.')
+            self.logger.error('Invalid show ID was supplied: ' + str(indexerid))
             return False
 
         return htpc.LOOKUP.get_template('sickrage_view.html').render(scriptname='sickrage_view', indexerid=indexerid)
@@ -60,47 +64,47 @@ class Sickrage(object):
     @cherrypy.tools.json_out()
     def ping(self, sickrage_host, sickrage_port, sickrage_apikey, sickrage_basepath, sickrage_ssl=False, **kwargs):
         ssl = 's' if sickrage_ssl else ''
-        self.logger.debug("Testing connectivity")
+        self.logger.debug('Testing connectivity')
         try:
             if not sickrage_basepath:
                 sickrage_basepath = fix_basepath(sickrage_basepath)
 
             url = 'http%s://%s:%s%sapi/%s/?cmd=sb.ping' % (ssl, striphttp(sickrage_host), sickrage_port, sickrage_basepath, sickrage_apikey)
 
-            self.logger.debug("Trying to contact sickrage via " + url)
+            self.logger.debug('Trying to contact sickrage via ' + url)
             response = loads(urlopen(url, timeout=10).read())
-            if response.get('result') == "success":
-                self.logger.debug("Sickrage connectivity test success")
+            if response.get('result') == 'success':
+                self.logger.debug('Sickrage connectivity test success')
                 return response
         except:
-            self.logger.error("Unable to contact sickrage via %s" % url)
+            self.logger.error('Unable to contact sickrage via %s' % url)
             return
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def GetShowList(self):
-        self.logger.debug("Fetching Show list")
+        self.logger.debug('Fetching Show list')
         return self.fetch('shows&sort=name', False, 200)
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def GetNextAired(self):
-        self.logger.debug("Fetching Next Aired Episodes")
+        self.logger.debug('Fetching Next Aired Episodes')
         return self.fetch('future')
 
     @cherrypy.expose()
     @require()
     def GetBanner(self, indexerid):
-        self.logger.debug("Fetching Banner")
+        self.logger.debug('Fetching Banner')
         cherrypy.response.headers['Content-Type'] = 'image/jpeg'
         return self.fetch('show.getbanner&indexerid=' + indexerid, True)
 
     @cherrypy.expose()
     @require()
     def GetPoster(self, indexerid):
-        self.logger.debug("Fetching Poster")
+        self.logger.debug('Fetching Poster')
         cherrypy.response.headers['Content-Type'] = 'image/jpeg'
         return self.fetch('show.getposter&indexerid=' + indexerid, True)
 
@@ -108,14 +112,14 @@ class Sickrage(object):
     @require()
     @cherrypy.tools.json_out()
     def GetHistory(self, limit=''):
-        self.logger.debug("Fetching History")
+        self.logger.debug('Fetching History')
         return self.fetch('history&limit=' + limit)
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def GetLogs(self):
-        self.logger.debug("Fetching Logs")
+        self.logger.debug('Fetching Logs')
         return self.fetch('logs&min_level=info')
 
     @cherrypy.expose()
@@ -123,34 +127,34 @@ class Sickrage(object):
     @cherrypy.tools.json_out()
     def AddShow(self, indexername='', indexerid='', **kwargs):
         # indexername=tvrageid or tvdbid
-        self.logger.debug("Adding a Show")
+        self.logger.debug('Adding a Show')
         return self.fetch('show.addnew&' + urlencode(kwargs))
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def GetShow(self, indexerid):
-        self.logger.debug("Fetching Show")
+        self.logger.debug('Fetching Show')
         return self.fetch('show&indexerid=' + indexerid)
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def GetEpisode(self, strShowID, strSeason, strEpisode):
-        return self.fetch("episode&indexerid=" + strShowID + "&season=" + strSeason + "&episode=" + strEpisode + "&full_path=1")
+        return self.fetch('episode&indexerid=' + strShowID + '&season=' + strSeason + '&episode=' + strEpisode + '&full_path=1')
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def GetSeason(self, indexerid, season):
-        self.logger.debug("Fetching Season")
+        self.logger.debug('Fetching Season')
         return self.fetch('show.seasons&indexerid=' + indexerid + '&season=' + season)
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def Postprocess(self, path='', force_replace=False, return_data=False, is_priority=False, type=False):
-        self.logger.debug("Postprocess")
+        self.logger.debug('Postprocess')
         if path:
             path = '&%s' % path
         return self.fetch('postprocess' + path, False, 120)
@@ -159,64 +163,64 @@ class Sickrage(object):
     @require()
     @cherrypy.tools.json_out()
     def Restart(self):
-        self.logger.debug("Restart sr")
+        self.logger.debug('Restart sr')
         return self.fetch('sb.restart', False, 15)
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def SearchEpisodeDownload(self, indexerid, season, episode):
-        self.logger.debug("Fetching Episode Downloads")
+        self.logger.debug('Fetching Episode Downloads')
         return self.fetch('episode.search&indexerid=' + indexerid + '&season=' + season + '&episode=' + episode, False, 45)
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def SearchSubtitle(self, indexerid, season, episode):
-        self.logger.debug("Fetching subtitle")
+        self.logger.debug('Fetching subtitle')
         return self.fetch('episode.subtitlesearch&indexerid=' + indexerid + '&season=' + season + '&episode=' + episode, False, 45)
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def Shutdown(self):
-        self.logger.debug("Shutdown sickrage")
+        self.logger.debug('Shutdown sickrage')
         return self.fetch('sb.shutdown', False, 20)
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def ForceFullUpdate(self, indexerid):
-        self.logger.debug("Force full update for indexerid %s" % indexerid)
-        return self.fetch("show.update&indexerid=" + indexerid)
+        self.logger.debug('Force full update for indexerid %s' % indexerid)
+        return self.fetch('show.update&indexerid=' + indexerid)
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def RescanFiles(self, indexerid):
-        self.logger.debug("Rescan all local files for indexerid %s" % indexerid)
-        return self.fetch("show.refresh&indexerid=" + indexerid)
+        self.logger.debug('Rescan all local files for indexerid %s' % indexerid)
+        return self.fetch('show.refresh&indexerid=' + indexerid)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     @require()
     def RemoveShow(self, indexerid, show_name=''):
-        self.logger.debug("Delete %s from Sickrage indexerid %s" % (show_name, indexerid))
-        return self.fetch("show.delete&indexerid=%s" % indexerid)
+        self.logger.debug('Delete %s from Sickrage indexerid %s' % (show_name, indexerid))
+        return self.fetch('show.delete&indexerid=%s' % indexerid)
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
     @require()
     def SearchShow(self, query):
-        self.logger.debug("Searching tvdb and tvrage for %s query")
-        return self.fetch("sb.searchindexers&indexer=0&name=%s" % quote(query), False, 60)
+        self.logger.debug('Searching tvdb and tvrage for %s query')
+        return self.fetch('sb.searchindexers&indexer=0&name=%s' % quote(query), False, 60)
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def ShowsStats(self):
-        self.logger.debug("Grabbing tvrage statistics")
-        return self.fetch("shows.stats")
+        self.logger.debug('Grabbing tvrage statistics')
+        return self.fetch('shows.stats')
 
     def fetch(self, cmd, img=False, timeout=20):
         try:
@@ -228,7 +232,7 @@ class Sickrage(object):
 
             url = 'http%s://%s:%s%sapi/%s/?cmd=%s' % (ssl, host, port, sickrage_basepath, apikey, cmd)
 
-            self.logger.debug("Fetching information from: %s" % url)
+            self.logger.debug('Fetching information from: %s' % url)
 
             if img is True:
                 # Cache the images
@@ -236,7 +240,7 @@ class Sickrage(object):
 
             return loads(urlopen(url, timeout=timeout).read())
         except Exception as e:
-            self.logger.error("Unable to fetch information")
+            self.logger.error('Unable to fetch information')
             self.logger.error(url)
             self.logger.error(e)
             return

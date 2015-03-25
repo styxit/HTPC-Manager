@@ -21,14 +21,27 @@ class Squeezebox(object):
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'squeezebox_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'squeezebox_port'},
                 {'type': 'text', 'label': 'Username', 'name': 'squeezebox_username'},
-                {'type': 'password', 'label': 'Password', 'name': 'squeezebox_password'}
+                {'type': 'password', 'label': 'Password', 'name': 'squeezebox_password'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://domain.com/sq', 'name': 'squeezebox_reverse_proxy_link'},
+
             ]
         })
 
     @cherrypy.expose()
     @require()
     def index(self):
-        return htpc.LOOKUP.get_template('squeezebox.html').render(scriptname='squeezebox')
+        return htpc.LOOKUP.get_template('squeezebox.html').render(scriptname='squeezebox',webinterface=self.webinterface())
+
+    def webinterface(self):
+        ip = htpc.settings.get('squeezebox_host')
+        port = htp.settings.get('squeezebox_ip')
+        url = 'http://%s:%s' % (ip, port)
+
+        if htpc.settings.get('squeezebox_reverse_proxy_link'):
+            url = htpc.settings.get('squeezebox_reverse_proxy_link')
+
+        return url
+
 
     @cherrypy.expose()
     @require()

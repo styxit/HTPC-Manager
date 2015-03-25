@@ -27,6 +27,8 @@ class Headphones(object):
                 {'type': 'text', 'label': 'Basepath', 'name': 'headphones_basepath'},
                 {'type': 'text', 'label': 'API key', 'name': 'headphones_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'headphones_ssl'},
+                {"type": "text", "label": "Reverse proxy link", "placeholder": "", "desc":"Reverse proxy link ex: https://domain.com/hp", "name": "headphones_reverse_proxy_link"}
+
             ]
         })
 
@@ -40,10 +42,16 @@ class Headphones(object):
         return template.render(
             scriptname='headphones',
             settings=settings,
-            url=url,
+            url=self.webinterface(),
             name=settings.get('headphones_name', 'Headphones')
         )
 
+
+    def webinterface(self):
+        url = self._build_url
+        if htpc.settings.get('headphones_reverse_proxy_link'):
+            url = htpc.settings.get('headphones_reverse_proxy_link')
+        return url
     @cherrypy.expose()
     @require()
     def GetThumb(self, url=None, thumb=None, h=None, w=None, o=100):

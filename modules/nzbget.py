@@ -28,7 +28,9 @@ class NZBGet(object):
                 {'type': 'text', 'label': 'Basepath', 'placeholder': '/nzbget', 'name': 'nzbget_basepath'},
                 {'type': 'text', 'label': 'User', 'name': 'nzbget_username'},
                 {'type': 'password', 'label': 'Password', 'name': 'nzbget_password'},
-                {'type': 'bool', 'label': 'Use SSL', 'name': 'nzbget_ssl'}
+                {'type': 'bool', 'label': 'Use SSL', 'name': 'nzbget_ssl'},
+                {"type": "text", "label": "Reverse proxy link", "placeholder": "", "desc":"Reverse proxy link ex: https://nzbget.domain.com", "name": "nzbget_reverse_proxy_link"},
+
             ]
         })
 
@@ -69,8 +71,11 @@ class NZBGet(object):
             authstring = ''
 
         url = 'http%s://%s%s:%s%s' % (ssl, authstring, host, port, nzbget_basepath)
-        return url
 
+        if htpc.settings.get('nzbget_reverse_proxy_link'):
+            url = htpc.settings.get('nzbget_reverse_proxy_link')
+
+        return url
 
     @cherrypy.expose()
     @require()
