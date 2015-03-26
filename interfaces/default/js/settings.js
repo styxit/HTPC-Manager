@@ -296,3 +296,7 @@ function samsung_tvs(id) {
         });
     }, 'json');
 }
+
+if ($('#reorder').length){
+    $('#reorder').sortable();
+}
