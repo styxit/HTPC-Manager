@@ -136,8 +136,8 @@ $(document).ready(function () {
             }
         }
     }
-    for (item in menus) {  //build aditional items not in menu_order
-        menu_ordered += menus[item];
+    for (menu_item in menus) {  //build aditional items not in menu_order
+        menu_ordered += menus[menu_item];
     }
     $("#nav-menu").prepend(menu_ordered) // prepend to others dropdown item
 })
