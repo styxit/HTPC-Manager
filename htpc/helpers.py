@@ -10,6 +10,9 @@ from cherrypy.lib.static import serve_file
 from urllib2 import Request, urlopen
 import time
 from functools import wraps
+from operator import itemgetter
+import itertools
+
 try:
     import Image
     PIL = True
@@ -148,6 +151,14 @@ def timt_func(func):
         print "%s took %s" % (func.__name__, time.time() - start)
         return res
     return inner
+
+def remove_dict_dupe_from_list(l, key):
+    getvals = itemgetter(key)
+    l.sort(key=getvals)
+    result = []
+    for k, g in itertools.groupby(l, getvals):
+        result.append(g.next())
+    return result
 
 def create_https_certificates(ssl_cert, ssl_key):
     """
