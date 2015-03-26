@@ -98,8 +98,8 @@ $(document).ready(function () {
         $('#modal_dialog .modal-fanart').css('background', '#fff')
     })
 
-    
-    $('#btn-menuorder').click(function() {
+
+    $('.btn-menuorder').click(function() {
         $('#nav-menu-others').hide();
         $('#menu-search').hide();
         $('#menu-editing').show();
@@ -107,7 +107,7 @@ $(document).ready(function () {
         $('.nav-menu-item').addClass('nav-menu-item-edit');
         $('#nav-menu').sortable({ items: ".nav-menu-item"});
     });
-    
+
     $('#menu-cancel').click(function() {
         location.reload();
     });
@@ -124,12 +124,12 @@ $(document).ready(function () {
         })
         $("#nav-menu").sortable('destroy');
     });
-    
+
     //build the menu
     menu_ordered = ""
-    if (menu_order != '0' && menu_order != 'False') { 
+    if (menu_order != '0' && menu_order != 'False') {
         menus_to_build = menu_order.split(',')
-        for (x = 0; x < menus_to_build.length; x++) { 
+        for (x = 0; x < menus_to_build.length; x++) {
             if (menus_to_build[x] in menus){
                 menu_ordered += menus[menus_to_build[x]];
                 delete menus[menus_to_build[x]]

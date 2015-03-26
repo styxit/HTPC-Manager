@@ -50,11 +50,16 @@ webdir = htpc.WEBDIR
                     % endif
                     <!-- start phone tablet -->
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="http://github.com/Hellowlol/HTPC-Manager"><img src="/../../..${htpc.WEBDIR}img/github.png"></img> Github project</a>
+                        <a href="http://github.com/Hellowlol/HTPC-Manager"><img src="/../../..${htpc.WEBDIR}img/github.png"> Github project</a>
                     </li>
                     <li class="hidden-desktop visible-phone visible-tablet">
                         <a class="dash-edit" href="#"><i id="" class="icon-move"></i> Edit Dash</a>
                     </li>
+                    <!-- Didnt find a good way to add this in mobile/tablet view.
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a href="#" class="btn-menuorder"><i class="icon-sort"></i> Edit Menu</a>
+                    </li>
+                    -->
                     <li class="hidden-desktop visible-phone visible-tablet">
                         <a href="#" class="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a>
                     </li>
@@ -77,6 +82,7 @@ webdir = htpc.WEBDIR
                     </li>
 
                 </ul>
+
                 <div class="mobile-search hidden-desktop visible-phone visible-tablet">
                     %if s.get('nzbsearch_enable'):
                         <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}search/" method="get">
@@ -86,6 +92,7 @@ webdir = htpc.WEBDIR
                         <input type="text" name="query" id="search" class="span6 search" accesskey="s" placeholder="Search">
                     </form>
                 </div>
+
                 <!-- end phone tablet -->
                 <div class="pull-right hidden-tablet hidden-phone visible-desktop">
                     %if s.get('nzbsearch_enable'):
@@ -100,11 +107,11 @@ webdir = htpc.WEBDIR
                             <span class="caret"></span>
                           </a>
                           <ul class="dropdown-menu pull-right">
-                            <li><a href="http://github.com/Hellowlol/HTPC-Manager"><img src="/../../..${htpc.WEBDIR}img/github.png"></img> Github project</a></li>
-                            <li><a class="dash-edit" href="${htpc.WEBDIR}#edit"><i class="icon-move"></i> Edit Dash</a></li>
+                            <li><a href="http://github.com/Hellowlol/HTPC-Manager"><img src="/../../..${htpc.WEBDIR}img/github.png"> Github project</a></li>
                             <li><a href="#" class="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
                             <li><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
-                            <li><a href="#" id="btn-menuorder"><i class="icon-sort"></i> Menu Order</a></li>
+                            <li><a class="dash-edit" href="${htpc.WEBDIR}#edit"><i class="icon-move"></i> Edit Dash</a></li>
+                            <li><a href="#" class="btn-menuorder"><i class="icon-sort"></i> Edit Menu</a></li>
                             <li><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a></li>
                             % if htpc.AUTH:
                             <li><a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC-Manager"><i class="icon-signout"></i> Logout</a></li>
