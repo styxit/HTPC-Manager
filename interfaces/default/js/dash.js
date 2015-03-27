@@ -613,11 +613,11 @@ $(document).ready(function () {
         var modules_per_row = 0;
         if (dash_order != '0' && dash_order != 'False') { // create modules if dash_order is set
             rows_to_build = dash_order.split(";");
-            for (var i = 0; i < rows_to_build.length; i++) { //loop rows
+            for (i = 0; i < rows_to_build.length; i++) { //loop rows
                 new_row();
                 modules_per_row = 0;
                 modules_to_build = rows_to_build[i].split(',')
-                for (var x = 0; x < modules_to_build.length; x++) { //loop modules
+                for (x = 0; x < modules_to_build.length; x++) { //loop modules
                     if (modules_to_build[x] in modules){
                         enable_module(modules_to_build[x], "dash-row-" + row_n, modules[modules_to_build[x]])
                         delete modules[modules_to_build[x]]; //delete module from modules object so it will not be re-created on next loop
@@ -626,7 +626,7 @@ $(document).ready(function () {
                 }
             }
         }
-        for (var module in modules) {  // create aditional modules not in dash_order
+        for (module in modules) {  // create aditional modules not in dash_order
                 if (modules_per_row == 0) {
                     new_row();
                 }
