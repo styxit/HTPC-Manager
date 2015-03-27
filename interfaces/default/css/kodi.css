@@ -137,4 +137,9 @@ h6.title {
 	.modal .modal-movieinfo {
 		margin-left: 0px;
 	}
+
+    .dropdown-menu {
+        right:initial!important;
+        left: 0 !important;
+    }
 }
