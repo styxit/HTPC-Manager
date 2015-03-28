@@ -47,7 +47,7 @@ $(document).ready(function(){
 	});
 	
 	setInterval(function() {
-     //getAMuleData();
+     getAMuleData();
   }, 4000);
 });
 function getAMuleData(){
