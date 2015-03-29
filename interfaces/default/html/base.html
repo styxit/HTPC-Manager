@@ -168,6 +168,7 @@ ${self.body()}
 <script>
     menus = {}
     %for m in htpc.MODULES:
+       %if s.get(m.get('id')+'_enable') and m.get('id') == 'nzbsearch' and not s.get('newznab_show_in_menu'):
             <% continue %>
         %endif
         %if s.get(m.get('id')+'_enable'):
