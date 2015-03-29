@@ -38,6 +38,7 @@ $(document).ready(function () {
 });
 
 function loadShows() {
+    $('.spinner').show();
     $.ajax({
         url: WEBDIR + 'sonarr/Series',
         type: 'get',
@@ -63,10 +64,31 @@ function loadShows() {
                 } else {
                     nextair = 'N/A';
                 }
+
+                // Start progressbar
+                var calc = (tvshow.episodeFileCount*100/tvshow.episodeCount)
+                if (calc == 0) {
+                    calc = 100
+                }
+                var progress = $('<div>').addClass("progress")
+                var progressbar = $('<div>').addClass("bar bar-success").css("width", calc + '%')
+                if (tvshow.episodeCount > tvshow.episodeFileCount) {
+                    progressbar.removeClass("bar-success").addClass("bar-danger")
+                }
+                // For if no eps are aired
+                if (tvshow.episodeCount === 0) {
+                    progressbar.removeClass("bar-success").addClass("bar-warning").css("width", 100 + '%')
+                }
+                var progresstext = $('<span>').text(tvshow.episodeFileCount + '/' + tvshow.episodeCount)
+                progress.append(progressbar, progresstext);
+                // end progressbar
+
                 row.append(
                 $('<td>').html(name),
                 $('<td>').html(sonarrStatusLabel(tvshow.status)),
                 $('<td>').html(nextair),
+                $('<td>').html(progress),
+
                 $('<td>').html(tvshow.network),
                 $('<td>').html(sonarrStatusLabel(qname)));
                 $('#tvshows_table_body').append(row);
@@ -77,6 +99,7 @@ function loadShows() {
                     [0, 0]
                 ]
             ]);
+            $('.spinner').hide();
         }
     });
 }
