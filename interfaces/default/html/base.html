@@ -167,11 +167,14 @@ ${self.body()}
 
 <script>
     menus = {}
-    % for m in htpc.MODULES:
-        % if s.get(m.get('id')+'_enable') and m.get('id') != 'nzbsearch':
-                menus['nav-${m.get('id')}'] = '<li class="nav-menu-item" id="nav-${m.get('id')|h, entity}"><a href="${htpc.WEBDIR}${m.get('id')|h, entity}/">${m.get('name') if s.get(m.get('id')+'_name').strip() == "" else s.get(m.get('id')+'_name')|h, entity}</a></li>';
+    %for m in htpc.MODULES:
+            <% continue %>
         %endif
-    % endfor
+        %if s.get(m.get('id')+'_enable'):
+            menus['nav-${m.get('id')}'] = '<li class="nav-menu-item" id="nav-${m.get('id')|h, entity}"><a href="${htpc.WEBDIR}${m.get('id')|h, entity}/">${m.get('name') if s.get(m.get('id')+'_name').strip() == "" else s.get(m.get('id')+'_name')|h, entity}</a></li>';
+
+        %endif
+    %endfor
     menu_order = "${settings.get('menu_order', 0)}";
 </script>
 

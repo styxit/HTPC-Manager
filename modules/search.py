@@ -18,9 +18,12 @@ class Search(object):
             'id': 'nzbsearch',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'nzbsearch_enable'},
+                {'type': 'text', 'label': 'Menu name', 'name': 'newznab_name'},
+                {'type': 'bool', 'label': 'Show link in menu', 'name': 'newznab_show_in_menu'},
                 {'type': 'text', 'label': 'Host', 'name': 'newznab_host'},
                 {'type': 'text', 'label': 'Apikey', 'name': 'newznab_apikey'},
-                {'type': 'bool', 'label': 'Use SSL', 'name': 'newznab_ssl'}
+                {'type': 'bool', 'label': 'Use SSL', 'name': 'newznab_ssl'},
+
             ]
         })
 
