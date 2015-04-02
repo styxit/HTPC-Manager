@@ -47,7 +47,10 @@ $(document).delegate('[data-player-control]', 'click', function () {
 
 function playItem(item, player) {
     type = typeof type !== 'undefined';
-    $.get(WEBDIR + 'plex/PlayItem?item='+item+ '&player='+player);
+    d = {'item': item,
+        'playerip': player.address,
+        'machineid': player.machineIdentifier}
+    $.get(WEBDIR + 'plex/PlayItem', d);
 }
 
 function loadMovies(options) {
@@ -151,7 +154,7 @@ function loadMovie(movie) {
         $.each(data.players, function (i, player) {
         $('.modal-footer').prepend(
             $('<button>').html('Play on ' + player.name).addClass('btn btn-primary').click(function() {
-                playItem(movie.id, player.address);
+                playItem(movie.id, player);
                 hideModal();
             })
         )
@@ -190,7 +193,7 @@ function loadEpisode(episode) {
         $.each(data.players, function (i, player) {
         $('.modal-footer').prepend(
             $('<button>').html('Play on ' + player.name).addClass('btn btn-primary').click(function() {
-                playItem(episode.id, player.address);
+                playItem(episode.id, player);
                 hideModal();
             })
         )

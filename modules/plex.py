@@ -8,14 +8,15 @@ import socket
 import struct
 from json import loads
 from urllib2 import Request, urlopen, quote
-from htpc.helpers import get_image, striphttp
+from htpc.helpers import get_image, striphttp, joinArgs
 import logging
 import urllib
 import base64
-import uuid
 import platform
 from cherrypy.lib.auth2 import require
-
+import requests
+import platform
+from uuid import getnode
 '''
 Credits.
 
@@ -28,6 +29,7 @@ https://github.com/iBaa/PlexConnect/blob/master/PlexAPI.py
 class Plex(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.plex')
+        self.headers = None
 
         htpc.MODULES.append({
             'name': 'Plex',
@@ -62,12 +64,12 @@ class Plex(object):
         try:
             self.logger.debug('Testing Plex connectivity')
             url = 'http://%s:%s' % (plex_host, plex_port)
-            self.logger.debug('Trying to contact Plex via ' + url)
+            self.logger.debug('Trying to contact Plex via %s' % url)
             request = loads(urlopen(Request(url, headers=self.getHeaders())).read())
             self.logger.info('Connected to the Plex Media Server %s at %s' % (request.get('friendlyName'), url))
             return True
         except:
-            self.logger.error('Unable to contact Plex via ' + url)
+            self.logger.error('Unable to contact Plex via %s' % url)
             return
 
     @cherrypy.expose()
@@ -141,8 +143,8 @@ class Plex(object):
                                 movies.append(jmovie)
 
             return {'movies': sorted(movies, key=lambda k: k['addedAt'], reverse=True)[:int(limit)]}
-        except Exception, e:
-            self.logger.error('Unable to fetch recent movies! Exception: ' + str(e))
+        except Exception as e:
+            self.logger.error('Unable to fetch recent movies! Exception: %s' % e)
             return
 
     @cherrypy.expose()
@@ -155,46 +157,51 @@ class Plex(object):
             plex_port = htpc.settings.get('plex_port', '32400')
             episodes = []
             checked_path = []
+            sec = []
 
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())['_children']:
                 # Only check file paths once!
+                sec.append(section)
                 if section['_children'][0]['path'] not in checked_path:
                     checked_path.append(section['_children'][0]['path'])
 
                     if section['type'] == 'show':
                         for episode in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all?type=4&sort=addedAt:desc&X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_host, plex_port, section['key'], limit), headers=self.getHeaders())).read())['_children']:
-                            jepisode = {}
+                            try:
+                                jepisode = {}
 
-                            jepisode['label'] = '%sx%s. %s' % (episode['parentIndex'], episode['index'], episode['title'])
-                            jepisode['id'] = int(episode['ratingKey'])
+                                jepisode['label'] = '%sx%s. %s' % (episode['parentIndex'], episode['index'], episode['title'])
+                                jepisode['id'] = int(episode['ratingKey'])
 
-                            if 'summary'in episode:
-                                jepisode['plot'] = episode['summary']
+                                if 'summary'in episode:
+                                    jepisode['plot'] = episode['summary']
 
-                            if 'index'in episode:
-                                jepisode['episode'] = episode['index']
+                                if 'index'in episode:
+                                    jepisode['episode'] = episode['index']
 
-                            if 'parentIndex'in episode:
-                                jepisode['season'] = episode['parentIndex']
+                                if 'parentIndex'in episode:
+                                    jepisode['season'] = episode['parentIndex']
 
-                            if 'grandparentTitle'in episode:
-                                jepisode['showtitle'] = episode['grandparentTitle']
+                                if 'grandparentTitle'in episode:
+                                    jepisode['showtitle'] = episode['grandparentTitle']
 
-                            if 'duration'in episode:
-                                jepisode['runtime'] = int(episode['duration']) / 60000
+                                if 'duration'in episode:
+                                    jepisode['runtime'] = int(episode['duration']) / 60000
 
-                            if 'thumb'in episode:
-                                jepisode['fanart'] = episode['thumb']
+                                if 'thumb'in episode:
+                                    jepisode['fanart'] = episode['thumb']
 
-                            if 'addedAt'in episode:
-                                jepisode['addedAt'] = episode['addedAt']
+                                if 'addedAt'in episode:
+                                    jepisode['addedAt'] = episode['addedAt']
 
-                            episodes.append(jepisode)
-
+                                episodes.append(jepisode)
+                            except Exception as e:
+                                self.logger.debug("Failed looping ep %s %s" % (episode, e))
+                                continue
 
             return {'episodes': sorted(episodes, key=lambda k: k['addedAt'], reverse=True)[:int(limit)]}
-        except Exception, e:
-            self.logger.error('Unable to fetch episodes movies! Exception: ' + str(e))
+        except Exception as e:
+            self.logger.error('Unable to fetch episodes! Exception: %s' % s)
             return
 
     @cherrypy.expose()
@@ -235,8 +242,8 @@ class Plex(object):
                             albums.append(jalbum)
 
             return {'albums': sorted(albums, key=lambda k: k['addedAt'], reverse=True)[:int(limit)]}
-        except Exception, e:
-            self.logger.error('Unable to fetch albums! Exception: ' + str(e))
+        except Exception as e:
+            self.logger.error('Unable to fetch albums! Exception: %s' % e)
             return
 
     @cherrypy.expose()
@@ -254,7 +261,7 @@ class Plex(object):
         else:
             url = '/images/DefaultVideo.png'
 
-        self.logger.debug('Trying to fetch image via ' + url)
+        self.logger.debug('Trying to fetch image via %s' % url)
         return get_image(url, h, w, o, headers=self.getHeaders())
 
     @cherrypy.expose()
@@ -271,6 +278,8 @@ class Plex(object):
             movies = []
             limits = {}
             checked_path = []
+            dupe_check = []
+            sortedmovies = []
 
             if hidewatched == '1':
                 hidewatched = 'unwatched'
@@ -285,55 +294,68 @@ class Plex(object):
                     if section['type'] == 'movie':
                         if section['agent'] != 'com.plexapp.agents.none' or not plex_hide_homemovies:
                             for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], hidewatched), headers=self.getHeaders())).read())['_children']:
-                                jmovie = {}
-                                genre = []
-                                jmovie['playcount'] = 0
-                                jmovie['id'] = int(movie['ratingKey'])
+                                if movie['title'] not in dupe_check:
+                                    dupe_check.append(movie['title'])
 
-                                jmovie['title'] = movie['title']
-                                if 'thumb'in movie:
-                                    jmovie['thumbnail'] = movie['thumb']
+                                    jmovie = {}
+                                    genre = []
+                                    jmovie['playcount'] = 0
+                                    jmovie['id'] = int(movie['ratingKey'])
 
-                                if 'year'in movie:
-                                    jmovie['year'] = int(movie['year'])
+                                    if 'titleSort' not in movie:
+                                        jmovie['titlesort'] = movie['title']
 
-                                if 'summary'in movie:
-                                    jmovie['plot'] = movie['summary']
+                                    if 'titleSort' in movie:
+                                        jmovie['titlesort'] = movie['titleSort']
 
-                                if 'studio'in movie:
-                                    jmovie['studio'] = movie['studio']
+                                    jmovie['title'] = movie['title']
+                                    if 'thumb'in movie:
+                                        jmovie['thumbnail'] = movie['thumb']
 
-                                if 'duration'in movie:
-                                    jmovie['runtime'] = int(movie['duration']) / 60000
+                                    if 'year'in movie:
+                                        jmovie['year'] = int(movie['year'])
 
-                                if 'art'in movie:
-                                    jmovie['fanart'] = movie['art']
+                                    if 'summary'in movie:
+                                        jmovie['plot'] = movie['summary']
 
-                                if 'rating'in movie:
-                                    jmovie['rating'] = movie['rating']
+                                    if 'studio'in movie:
+                                        jmovie['studio'] = movie['studio']
 
-                                if 'viewCount' in movie:
-                                    jmovie['playcount'] = int(movie['viewCount'])
+                                    if 'duration'in movie:
+                                        jmovie['runtime'] = int(movie['duration']) / 60000
 
-                                for attrib in movie['_children']:
-                                    if attrib['_elementType'] == 'Genre':
-                                        genre.append(attrib['tag'])
+                                    if 'art'in movie:
+                                        jmovie['fanart'] = movie['art']
 
-                                if len(genre) != 0:
-                                    jmovie['genre'] = genre
+                                    if 'rating'in movie:
+                                        jmovie['rating'] = movie['rating']
 
-                                movies.append(jmovie)
+                                    if 'viewCount' in movie:
+                                        jmovie['playcount'] = int(movie['viewCount'])
 
-                            limits['start'] = int(start)
-                            limits['total'] = len(movies)
-                            limits['end'] = int(end)
-                            if int(end) >= len(movies):
-                                limits['end'] = len(movies)
+                                    for attrib in movie['_children']:
+                                        if attrib['_elementType'] == 'Genre':
+                                            genre.append(attrib['tag'])
 
-            return {'limits': limits, 'movies': sorted(movies, key=lambda k: k['title'])[int(start):int(end)]}
-        except Exception, e:
+                                    if len(genre) != 0:
+                                        jmovie['genre'] = genre
 
-            self.logger.error('Unable to fetch all movies! Exception: ' + str(e))
+                                    movies.append(jmovie)
+
+                                else:
+                                    continue
+
+            limits['start'] = int(start)
+            limits['total'] = len(movies)
+            limits['end'] = int(end)
+            if int(end) >= len(movies):
+                limits['end'] = len(movies)
+
+            sortedmovies = sorted(movies, key=lambda k: k['titlesort'])
+
+            return {'limits': limits, 'movies': sortedmovies[int(start):int(end)]}
+        except Exception as e:
+            self.logger.error('Unable to fetch all movies! Exception: %s' % e)
             return
 
     @cherrypy.expose()
@@ -347,6 +369,8 @@ class Plex(object):
             tvShows = []
             limits = {}
             checked_path = []
+            dupe_check = []
+            sortedshows = []
 
             if hidewatched == '1':
                 hidewatched = 'unwatched'
@@ -360,41 +384,57 @@ class Plex(object):
 
                     if section['type'] == 'show':
                         for tvShow in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], hidewatched), headers=self.getHeaders())).read())['_children']:
-                            jshow = {}
-                            jshow['itemcount'] = 0
-                            jshow['playcount'] = 0
+                            # Only allow unique showname in dupecheck
+                            if tvShow['title'] not in dupe_check:
+                                dupe_check.append(tvShow['title'])
+                                jshow = {}
+                                jshow['itemcount'] = 0
+                                jshow['playcount'] = 0
 
-                            jshow['title'] = tvShow['title']
+                                # Since titleSort only exist in titles like the showname etc
+                                # Set title as titlesort
+                                if 'titleSort' not in tvShow:
+                                    jshow['titlesort'] = tvShow['title']
 
-                            jshow['id'] = tvShow['ratingKey']
+                                if 'titleSort' in tvShow:
+                                    jshow['titlesort'] = tvShow['titleSort']
 
-                            if 'thumb'in tvShow:
-                                jshow['thumbnail'] = tvShow['thumb']
+                                jshow['title'] = tvShow['title']
 
-                            if 'year'in tvShow:
-                                jshow['year'] = int(tvShow['year'])
+                                jshow['id'] = tvShow['ratingKey']
 
-                            if 'summary'in tvShow:
-                                jshow['plot'] = tvShow['summary']
+                                if 'thumb'in tvShow:
+                                    jshow['thumbnail'] = tvShow['thumb']
 
-                            if 'viewedLeafCount'in tvShow:
-                                jshow['playcount'] = int(tvShow['viewedLeafCount'])
+                                if 'year'in tvShow:
+                                    jshow['year'] = int(tvShow['year'])
 
-                            if 'leafCount'in tvShow:
-                                jshow['itemcount'] = int(tvShow['leafCount'])
+                                if 'summary'in tvShow:
+                                    jshow['plot'] = tvShow['summary']
 
-                            tvShows.append(jshow)
+                                if 'viewedLeafCount'in tvShow:
+                                    jshow['playcount'] = int(tvShow['viewedLeafCount'])
 
-                        limits['start'] = int(start)
-                        limits['total'] = len(tvShows)
-                        limits['end'] = int(end)
-                        if int(end) >= len(tvShows):
-                            limits['end'] = len(tvShows)
+                                if 'leafCount'in tvShow:
+                                    jshow['itemcount'] = int(tvShow['leafCount'])
 
-            return {'limits': limits, 'tvShows': sorted(tvShows, key=lambda k: k['title'])[int(start):int(end)]}
-        except Exception, e:
+                                tvShows.append(jshow)
+                            else:
+                                continue
 
-            self.logger.error('Unable to fetch all shows! Exception: ' + str(e))
+            limits['start'] = int(start)
+            limits['total'] = len(tvShows)
+            limits['end'] = int(end)
+            if int(end) >= len(tvShows):
+                limits['end'] = len(tvShows)
+
+            # sort the shows before return
+            sortedshows = sorted(tvShows, key=lambda k: k['titlesort'])
+
+            return {'limits': limits, 'tvShows': sortedshows[int(start):int(end)]}
+
+        except Exception as e:
+            self.logger.error('Unable to fetch all shows! Exception: %s' % e)
             return
 
     @cherrypy.expose()
@@ -408,6 +448,8 @@ class Plex(object):
             artists = []
             limits = {}
             checked_path = []
+            dupe_check = []
+            sortedartist = []
 
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())['_children']:
                 # Only check file paths once!
@@ -415,14 +457,23 @@ class Plex(object):
                     checked_path.append(section['_children'][0]['path'])
                     if section['type'] == 'artist':
                         for artist in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all' % (plex_host, plex_port, section['key']), headers=self.getHeaders())).read())['_children']:
-                            jartist = {}
-                            genre = []
+                            if artist['title'] not in dupe_check:
+                                dupe_check.append(artist['title'])
+                                # Since titleSort only exist in titles like the xx etc
+                                # Set title as titlesort
+                                if 'titleSort' not in artist:
+                                    jartist['titlesort'] = artist['title']
 
-                            jartist['title'] = artist['title']
+                                if 'titleSort' in artist:
+                                    jartist['titlesort'] = artist['titleSort']
+                                genre = []
+                                jartist = {}
+                                jartist['title'] = artist['title']
+                                jartist['id'] = artist['ratingKey']
 
-                            jartist['id'] = artist['ratingKey']
-
-                            artists.append(jartist)
+                                artists.append(jartist)
+                            else:
+                                continue
 
             limits['start'] = int(start)
             limits['total'] = len(artists)
@@ -430,9 +481,11 @@ class Plex(object):
             if int(end) >= len(artists):
                 limits['end'] = len(artists)
 
-            return {'limits': limits, 'artists': sorted(artists, key=lambda k: k['title'])[int(start):int(end)]}
-        except Exception, e:
-            self.logger.error('Unable to fetch all artists! Exception: ' + str(e))
+            sortedartist = sorted(artists, key=lambda k: k['titlesort'])
+
+            return {'limits': limits, 'artists': sortedartist[int(start):int(end)]}
+        except Exception as e:
+            self.logger.error('Unable to fetch all artists! Exception: %s' % s)
             return
 
     @cherrypy.expose()
@@ -473,8 +526,8 @@ class Plex(object):
                 limits['end'] = len(albums)
 
             return {'limits': limits, 'albums': sorted(albums, key=lambda k: k['title'])[int(start):int(end)]}
-        except Exception, e:
-            self.logger.error('Unable to fetch all Albums! Exception: ' + str(e))
+        except Exception as e:
+            self.logger.error('Unable to fetch all Albums! Exception: %s' % e)
             return
 
     @cherrypy.expose()
@@ -542,8 +595,8 @@ class Plex(object):
                 limits['end'] = len(songs)
 
             return {'limits': limits, 'songs': songs[int(start):int(end)]}
-        except Exception, e:
-            self.logger.error('Unable to fetch all songs! Exception: ' + str(e))
+        except Exception as e:
+            self.logger.error('Unable to fetch all songs! Exception: %s' % e)
             return
 
     @cherrypy.expose()
@@ -551,7 +604,7 @@ class Plex(object):
     @cherrypy.tools.json_out()
     def GetEpisodes(self, start=0, end=0, tvshowid=None, hidewatched=0):
         ''' Get information about a single TV Show '''
-        self.logger.debug('Loading information for TVID' + str(tvshowid))
+        self.logger.debug('Loading information for TVID %s' % tvshowid)
         try:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
@@ -600,8 +653,8 @@ class Plex(object):
                 limits['end'] = len(episodes)
 
             return {'limits': limits, 'episodes': episodes[int(start):int(end)]}
-        except Exception, e:
-            self.logger.error('Unable to fetch all episodes! Exception: ' + str(e))
+        except Exception as e:
+            self.logger.error('Unable to fetch all episodes! Exception: %s' % e)
             return
 
     @cherrypy.expose()
@@ -623,10 +676,10 @@ class Plex(object):
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             s.sendto(msg, ('255.255.255.255', 9))
-            self.logger.info('WOL package sent to ' + htpc.settings.get('plex_mac', ''))
+            self.logger.info('WOL package sent to %s' % htpc.settings.get('plex_mac', ''))
             return 'WOL package sent'
-        except Exception, e:
-            self.logger.debug('Exception: ' + str(e))
+        except Exception as e:
+            self.logger.debug('Exception: %s' % e)
             self.logger.error('Unable to send WOL packet')
             return 'Unable to send WOL packet'
 
@@ -659,7 +712,7 @@ class Plex(object):
                 self.logger.debug('Fetching auth token')
                 headers = {}
                 headers['Authorization'] = 'Basic %s' % base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
-                headers['X-Plex-Client-Identifier'] = quote(base64.encodestring(str(uuid.getnode())).replace('\n', ''))
+                headers['X-Plex-Client-Identifier'] = str(hex(getnode()))
                 headers['X-Plex-Product'] = 'HTPC-Manager'
                 headers['X-Plex-Device'] = 'HTPC-Manager'
                 headers['X-Plex-Version'] = '1.0'
@@ -684,36 +737,47 @@ class Plex(object):
                     htpc.settings.set('plex_authtoken', '')
                     self.logger.debug('Removed myPlex Token')
                 return
-        except Exception, e:
+        except Exception as e:
             self.logger.error('Exception: ' + str(e))
             return 'Failed to logg in to myPlex: %s' % str(e)
 
     def getHeaders(self):
-        authtoken = htpc.settings.get('plex_authtoken', '')
-        username = htpc.settings.get('plex_username', '')
-        password = htpc.settings.get('plex_password', '')
-
-        # Dont try fetch token untelss you have u/p
-        if not authtoken and username and password:
-            self.myPlexSignin()
+        if self.headers is None:
+            # Make headers if they dont exist
             authtoken = htpc.settings.get('plex_authtoken', '')
+            username = htpc.settings.get('plex_username', '')
+            password = htpc.settings.get('plex_password', '')
 
-        headers = {'Accept': 'application/json'}
+            # Dont try fetch token untelss you have u/p
+            if not authtoken and username and password:
+                self.myPlexSignin()
+                authtoken = htpc.settings.get('plex_authtoken', '')
 
-        if authtoken:
-            headers['X-Plex-Token'] = authtoken
-        if username:
-            headers['X-Plex-Username'] = username
+            headers = {'Accept': 'application/json'}
 
-        return headers
+            headers["X-Plex-Provides"] = 'controller'
+            headers["X-Plex-Platform"] = platform.uname()[0]
+            headers["X-Plex-Platform-Version"] = platform.uname()[2]
+            headers['X-Plex-Product'] = 'HTPC-Manager'
+            headers['X-Plex-Version'] = '0.9.5'
+            headers['X-Plex-Device'] = platform.platform()
+            headers['X-Plex-Client-Identifier'] = str(hex(getnode()))
+
+            if authtoken:
+                headers['X-Plex-Token'] = authtoken
+            if username:
+                headers['X-Plex-Username'] = username
+            self.headers = headers
+            return headers
+        else:
+            return self.headers
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def NowPlaying(self):
         ''' Get information about current playing item '''
-        self.logger.debug('Fetching currently playing information')
-
+        #self.logger.debug('Fetching currently playing information')
         playing_items = []
 
         try:
@@ -764,8 +828,8 @@ class Plex(object):
                 if jplaying_item['viewOffset'] < (int(jplaying_item['duration']) - 10000):
                     playing_items.append(jplaying_item)
 
-        except Exception, e:
-            self.logger.error('Unable to fetch currently playing information! Exception: ' + str(e))
+        except Exception as e:
+            self.logger.error('Unable to fetch currently playing information! Exception: %s' % e)
             pass
         return {'playing_items': playing_items}
 
@@ -784,11 +848,11 @@ class Plex(object):
                     self.logger.debug('Updating section %s' % section['key'])
                     try:
                         urllib.urlopen('http://%s:%s/library/sections/%s/refresh' % (plex_host, plex_port, section['key']))
-                    except Exception, e:
+                    except Exception as e:
                         self.logger.error('Failed to update section %s on Plex: %s' % (section['key'], e))
             return 'Update command sent to Plex'
-        except Exception, e:
-            self.logger.error('Failed to update library! Exception: ' + str(e))
+        except Exception as e:
+            self.logger.error('Failed to update library! Exception: %s' % e)
             return 'Failed to update library!'
 
     @cherrypy.expose()
@@ -796,7 +860,7 @@ class Plex(object):
     @cherrypy.tools.json_out()
     def ControlPlayer(self, player, action, value=''):
         ''' Various commands to control Plex Player '''
-        self.logger.debug('Sending control to Plex: ' + action)
+        self.logger.debug('Sending %s to %s value %s: ' % (action, player, value))
         try:
 
             self.navigationCommands = ['moveUp', 'moveDown', 'moveLeft', 'moveRight', 'pageUp', 'pageDown', 'nextLetter', 'previousLetter', 'select', 'back', 'contextMenu', 'toggleOSD']
@@ -812,11 +876,12 @@ class Plex(object):
             elif action.split('?')[0] in self.applicationCommands:
                 urllib.urlopen('http://%s:%s/system/players/%s/application/%s' % (plex_host, plex_port, player, action))
             else:
-                raise ValueError('Unable to control Plex with action: ' + action)
+                raise ValueError('Unable to control Plex with action: %s' % action)
 
-        except Exception, e:
-            self.logger.debug('Exception: ' + str(e))
-            self.logger.error('Unable to control Plex with action: ' + action)
+        except Exception as e:
+            self.logger.debug('Exception: %s' % e)
+            #self.logger.error('Unable to control Plex with action: ' + action)
+            self.logger.debug('Unable to control %s to %s value %s' % (action, player, value))
             return 'error'
 
     @cherrypy.expose()
@@ -830,7 +895,9 @@ class Plex(object):
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
             players = []
+            players2 = []
             for player in self.JsonLoader(urlopen(Request('http://%s:%s/clients' % (plex_host, plex_port), headers=self.getHeaders())).read())['_children']:
+                players2.append(player)
 
                 try:
                     del player['_elementType']
@@ -841,11 +908,11 @@ class Plex(object):
                     player['protocolCapabilities'] = player['protocolCapabilities'].split(',')
                 if filter == None or filter in player['protocolCapabilities']:
                     players.append(player)
-
+            self.logger.debug(players2)
             return {'players': players}
 
-        except Exception, e:
-            self.logger.debug('Exception: ' + str(e))
+        except Exception as e:
+            self.logger.debug('Exception: %s' % e)
             self.logger.error('Unable to get players')
             return 'error'
 
@@ -924,24 +991,54 @@ class Plex(object):
 
             return {'servers': PMS_list}
 
-        except Exception, e:
-            self.logger.debug('Exception: ' + str(e))
+        except Exception as e:
+            self.logger.debug('Exception: %s' % e)
             self.logger.error('Unable to get players')
             return 'error'
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def PlayItem(self, player, item=None, type=None, offset=0):
+    def PlayItem(self, playerip, machineid, item=None, type=None, offset=0, **kwargs):
         ''' Play a file in Plex '''
-        self.logger.debug('Playing '' + item + '' on player ' + player)
+        self.logger.debug('Playing %s on %s type %s offset %s' % (item, playerip, type, offset))
+        # Ripped a lot for plexapi so all credits goes there, the parameters are very picky...
+        # The maybe swich to the api?
         try:
-
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
-            urllib.urlopen('http://%s:%s/system/players/%s/application/playMedia?key=/library/metadata/%s&viewOffset=%s&path=http://%s:%s/library/metadata/%s' % (plex_host, plex_port, player, item, offset, plex_host, plex_port, item))
+            # urllib2 sucks should use requests
+            data = {'shuffle': 0,
+                    'continuous': 0,
+                    'type': 'video'}
 
-        except Exception, e:
-            self.logger.debug('Exception: ' + str(e))
-            self.logger.error('Unable to play '' + item + '' on player ' + player)
+            data['X-Plex-Client-Identifier'] = str(hex(getnode()))
+            data['uri'] = 'library://__GID__/item//library/metadata/%s' % item
+            data['key'] = '/library/metadata/%s' % item
+            path = 'playQueues%s' % joinArgs(data)
+
+            quecommand = "http://%s:%s/%s" % (plex_host, plex_port, path)
+            x = requests.post(quecommand, headers=self.getHeaders())
+            # So we have qued the video, lets find it playQueueID
+            find_playerq = x.json()
+            playerq = find_playerq.get('playQueueID')
+            # Need machineIdentifier
+            s = self.JsonLoader(urlopen(Request('http://%s:%s/' % (plex_host, plex_port), headers=self.getHeaders())).read())
+
+            b_url = 'http://%s:%s/system/players/%s/' % (plex_host, plex_port, playerip)
+
+            ctkey = '/playQueues/%s?window=100&own=1' % playerq
+            arg = {'machineIdentifier': s.get('machineIdentifier'),
+                   'key': '/library/metadata/' + item,
+                   'containerKey': ctkey,
+                   'offset': 0
+                   }
+            play = 'playback/playMedia%s' % joinArgs(arg)
+            playcommand = b_url + play
+            r = requests.get(playcommand, headers=self.getHeaders())
+            self.logger.debug("playcommand is %s" % playcommand)
+
+        except Exception as e:
+            self.logger.debug('Exception: %s' % e)
+            self.logger.error('Unable to play %s on player %s type %s offset %s' % (item, playerip, type, offset))
             return 'error'

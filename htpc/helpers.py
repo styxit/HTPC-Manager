@@ -8,6 +8,7 @@ import imghdr
 import logging
 from cherrypy.lib.static import serve_file
 from urllib2 import Request, urlopen
+import urllib
 import time
 from functools import wraps
 from operator import itemgetter
@@ -192,3 +193,13 @@ def create_https_certificates(ssl_cert, ssl_key):
         return False
 
     return True
+
+
+def joinArgs(args):
+    ''' stolen for plexapi '''
+    if not args: return ''
+    arglist = []
+    for key in sorted(args, key=lambda x: x.lower()):
+        value = str(args[key])
+        arglist.append('%s=%s' % (key, urllib.quote(value)))
+    return '?%s' % '&'.join(arglist)
