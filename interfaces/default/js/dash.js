@@ -393,7 +393,7 @@ function loadsysinfo(options) {
     }).always(function() {
         $.getJSON(WEBDIR + 'vnstat/oneline', function(result) {
             var bwtot = (parseFloat(result.download_speed, 10) + parseFloat(result.upload_speed, 10)).toFixed(2);
-            row = $('<tr>');
+            row = $('<tr>').addClass("hidden-phone");
             row.append(
                 $('<td>').text("Speed"),
                 $('<td>').text('D: '+ result.download_speed),
@@ -401,7 +401,7 @@ function loadsysinfo(options) {
                 $('<td>').text('T: '+ bwtot + ' kbits/s')
             )
             $('#dash_sysinfo_table_body').append(row);
-            row = $('<tr>');
+            row = $('<tr>').addClass("hidden-phone");
             row.append(
                 $('<td>').text("BW"),
                 $('<td>').attr("colspan",3).html('<div>DL CM: ' + result.rx_current_month + '</div>' +

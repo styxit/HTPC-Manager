@@ -122,26 +122,32 @@ class Vnstat(object):
     @require()
     @cherrypy.tools.json_out()
     def oneline(self):
-        speed = self.tr(dash=True)
-        vnstat = self.run('--oneline') # with --xml is returns shit
-        l = vnstat.replace('\n', '').split(';')
-        d = {"rxtoday": l[3],
-             "txtoday": l[4],
-             "totaltoday": l[5],
-             "average_download_today": l[6],
-             "timestamp_current_month": l[7],
-             "rx_current_month": l[8],
-             "tx_current_month": l[9],
-             "total_current_month": l[10],
-             "average_upload_today": l[11],
-             "alltime_total_rx": l[12],
-             "alltime_total_tx": l[13],
-             "alltime_total_traffic": l[14]
+        try:
+            speed = self.tr(dash=True)
+            # with --xml is returns shit
+            vnstat = self.run('--oneline')
+            l = vnstat.replace('\n', '').split(';')
+            d = {"rxtoday": l[3],
+                 "txtoday": l[4],
+                 "totaltoday": l[5],
+                 "average_download_today": l[6],
+                 "timestamp_current_month": l[7],
+                 "rx_current_month": l[8],
+                 "tx_current_month": l[9],
+                 "total_current_month": l[10],
+                 "average_upload_today": l[11],
+                 "alltime_total_rx": l[12],
+                 "alltime_total_tx": l[13],
+                 "alltime_total_traffic": l[14]
 
-        }
-        # combine dicts
-        info = dict(chain(d.items(), speed.items()))
-        return info
+            }
+            # combine dicts
+            info = dict(chain(d.items(), speed.items()))
+            return info
+
+        except Exception as e:
+            self.logger.debug('Failed to return oneline %s' % e)
+            return {}
 
     @cherrypy.expose()
     @require()
