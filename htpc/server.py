@@ -18,7 +18,7 @@ def secureheaders():
     headers = cherrypy.response.headers
     headers['X-Frame-Options'] = 'DENY'
     headers['X-XSS-Protection'] = '1; mode=block'
-    headers['Content-Security-Policy'] = "default-src='self'"
+    #headers['Content-Security-Policy'] = "default-src 'self';"
 
 
 def start():
@@ -59,7 +59,7 @@ def start():
         cherrypy.config.update({
             'tools.sessions.on': True,
             'tools.auth.on': True,
-            'tools.sessions.timeout': 60,
+            'tools.sessions.timeout': 43200,
             'tools.sessions.httponly': True
             #'tools.sessions.secure': True #  Auth does not work with this on #TODO
         })
