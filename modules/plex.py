@@ -7,7 +7,7 @@ import re
 import socket
 import struct
 from json import loads
-from urllib2 import Request, urlopen, quote
+from urllib2 import Request, urlopen
 from htpc.helpers import get_image, striphttp, joinArgs
 import logging
 import urllib
@@ -17,6 +17,19 @@ from cherrypy.lib.auth2 import require
 import requests
 import platform
 from uuid import getnode
+
+# Only imported to check if pil is installed
+# Dont remove even if import is unused
+try:
+    import Image
+    use_pil = True
+except ImportError:
+    try:
+        from PIL import Image
+        use_pil = True
+    except ImportError:
+        use_pil = False
+
 '''
 Credits.
 
@@ -42,8 +55,8 @@ class Plex(object):
                  'label': 'Existing Servers',
                  'name': 'gdm_plex_servers',
                  'options': [
-                        {'name': 'Select', 'value': 0}
-                    ]
+                            {'name': 'Select', 'value': 0}
+                        ]
                 },
                 {'type': 'text', 'label': 'Menu name', 'name': 'plex_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'plex_host'},
@@ -52,7 +65,10 @@ class Plex(object):
                 {'type': 'password', 'label': 'Password (optional)', 'desc': 'Plex Home actived server req password', 'name': 'plex_password'},
                 {'type': 'text', 'label': 'Mac addr.', 'name': 'plex_mac'},
                 {'type': 'bool', 'label': 'Hide watched', 'name': 'plex_hide_watched'},
-                {'type': 'bool', 'label': 'Hide homemovies', 'name': 'plex_hide_homemovies'}
+                {'type': 'bool', 'label': 'Hide homemovies', 'name': 'plex_hide_homemovies'},
+                {'type': 'bool', 'label': 'Disable image resize', 'name': 'plex_disable_img_resize'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://plex.mydomain.com', 'name': 'plex_reverse_proxy_link'}
+
             ]
         })
 
@@ -85,6 +101,10 @@ class Plex(object):
         plex_port = htpc.settings.get('plex_port', '32400')
 
         url = 'http://%s:%s/web' % (plex_host, plex_port)
+
+        if htpc.settings.get('plex_reverse_proxy_link'):
+            url = htpc.settings.get('plex_reverse_proxy_link')
+            return url
 
         raise cherrypy.HTTPRedirect(url)
 
@@ -201,7 +221,7 @@ class Plex(object):
 
             return {'episodes': sorted(episodes, key=lambda k: k['addedAt'], reverse=True)[:int(limit)]}
         except Exception as e:
-            self.logger.error('Unable to fetch episodes! Exception: %s' % s)
+            self.logger.error('Unable to fetch episodes! %s Exception: %s' % (section, e))
             return
 
     @cherrypy.expose()
@@ -249,19 +269,23 @@ class Plex(object):
     @cherrypy.expose()
     @require()
     def GetThumb(self, thumb=None, h=None, w=None, o=100):
-        ''' Parse thumb to get the url and send to htpc.proxy.get_image '''
+        ''' Parse thumb to get the url and send to htpc.helpers.get_image '''
+        if htpc.settings.get('plex_disable_img_resize', False):
+            self.logger.debug("Image resize is disabled")
+            h = None
+            w = None
         if thumb:
-            if o > 100:
+            if use_pil:
+                # Use pil is its enabled as quality is 95
                 url = 'http://%s:%s%s' % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), thumb)
+                self.logger.debug('Using PIL to resize image to %sx%s opacity %s url %s' % (w, h, o, url))
             else:
-                # If o < 100 transcode on Plex server to widen format support
-                url = 'http://%s:%s/photo/:/transcode?height=%s&width=%s&url=%s' % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), h, w, urllib.quote_plus('http://%s:%s%s' % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), thumb)))
-                h = None
-                w = None
+                # Fallback to transcode if pil isnt installed, plex quality 75
+                url = 'http://%s:%s/photo/:/transcode?height=%s&width=%s&opacity=%s&saturation=%s&url=%s' % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), h, w, o, 100, urllib.quote_plus('http://%s:%s%s' % (htpc.settings.get('plex_host', 'localhost'), htpc.settings.get('plex_port', '32400'), thumb)))
+                self.logger.debug('Using plex to resize image to %sx%s opacity %s url %s' % (w, h, o, url))
         else:
             url = '/images/DefaultVideo.png'
 
-        self.logger.debug('Trying to fetch image via %s' % url)
         return get_image(url, h, w, o, headers=self.getHeaders())
 
     @cherrypy.expose()
@@ -302,9 +326,12 @@ class Plex(object):
                                     jmovie['playcount'] = 0
                                     jmovie['id'] = int(movie['ratingKey'])
 
+                                    # To fix sorting we add that to title to title sort
                                     if 'titleSort' not in movie:
                                         jmovie['titlesort'] = movie['title']
 
+                                    # As title titleSort only exist if the name is like The ... etc
+                                    # Add that to titlesort
                                     if 'titleSort' in movie:
                                         jmovie['titlesort'] = movie['titleSort']
 
@@ -458,6 +485,7 @@ class Plex(object):
                     if section['type'] == 'artist':
                         for artist in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all' % (plex_host, plex_port, section['key']), headers=self.getHeaders())).read())['_children']:
                             if artist['title'] not in dupe_check:
+                                jartist = {}
                                 dupe_check.append(artist['title'])
                                 # Since titleSort only exist in titles like the xx etc
                                 # Set title as titlesort
@@ -466,7 +494,6 @@ class Plex(object):
 
                                 if 'titleSort' in artist:
                                     jartist['titlesort'] = artist['titleSort']
-                                genre = []
                                 jartist = {}
                                 jartist['title'] = artist['title']
                                 jartist['id'] = artist['ratingKey']
@@ -485,7 +512,7 @@ class Plex(object):
 
             return {'limits': limits, 'artists': sortedartist[int(start):int(end)]}
         except Exception as e:
-            self.logger.error('Unable to fetch all artists! Exception: %s' % s)
+            self.logger.error('Unable to fetch all artists! %s Exception: %s' % (section, e))
             return
 
     @cherrypy.expose()
@@ -666,12 +693,13 @@ class Plex(object):
         try:
             addr_byte = htpc.settings.get('plex_mac', '').split(':')
             hw_addr = struct.pack('BBBBBB',
-            int(addr_byte[0], 16),
-            int(addr_byte[1], 16),
-            int(addr_byte[2], 16),
-            int(addr_byte[3], 16),
-            int(addr_byte[4], 16),
-            int(addr_byte[5], 16))
+                                  int(addr_byte[0], 16),
+                                  int(addr_byte[1], 16),
+                                  int(addr_byte[2], 16),
+                                  int(addr_byte[3], 16),
+                                  int(addr_byte[4], 16),
+                                  int(addr_byte[5], 16))
+
             msg = '\xff' * 6 + hw_addr * 16
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -777,7 +805,7 @@ class Plex(object):
     @cherrypy.tools.json_out()
     def NowPlaying(self):
         ''' Get information about current playing item '''
-        #self.logger.debug('Fetching currently playing information')
+        # self.logger.debug('Fetching currently playing information')
         playing_items = []
 
         try:
@@ -880,7 +908,6 @@ class Plex(object):
 
         except Exception as e:
             self.logger.debug('Exception: %s' % e)
-            #self.logger.error('Unable to control Plex with action: ' + action)
             self.logger.debug('Unable to control %s to %s value %s' % (action, player, value))
             return 'error'
 
@@ -906,7 +933,7 @@ class Plex(object):
 
                 if 'protocolCapabilities' in player:
                     player['protocolCapabilities'] = player['protocolCapabilities'].split(',')
-                if filter == None or filter in player['protocolCapabilities']:
+                if filter is None or filter in player['protocolCapabilities']:
                     players.append(player)
             self.logger.debug(players2)
             return {'players': players}
@@ -947,8 +974,8 @@ class Plex(object):
                         data, server = GDM.recvfrom(1024)
                         self.logger.debug('Received data from %s' % str(server))
                         self.logger.debug('Data received: %s' % str(data))
-                        returnData.append( { 'from' : server,
-                                             'data' : data } )
+                        returnData.append({'from': server,
+                                           'data': data})
                     except socket.timeout:
                         break
             finally:

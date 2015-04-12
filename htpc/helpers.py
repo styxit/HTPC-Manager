@@ -54,7 +54,8 @@ def get_image(url, height=None, width=None, opacity=100, auth=None, headers=None
 
         if PIL:
             # Set filename for resized file
-            resized = image + '_w' + width + '_h' + height + '_o' + str(opacity)
+            resized = '%s_w%s_h%s_o_%s' % (image, width, height, opacity)
+
 
             # If there is no local resized copy
             if not os.path.isfile(resized):
@@ -81,7 +82,7 @@ def get_image(url, height=None, width=None, opacity=100, auth=None, headers=None
 def download_image(url, dest, auth=None, headers=None):
     """ Download image and save to disk """
     logger = logging.getLogger('htpc.helpers')
-    logger.debug("Downloading image from " + url + " to " + dest)
+    logger.debug("Downloading image from %s to %s" % (url, dest))
 
     try:
         request = Request(url)
