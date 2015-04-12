@@ -18,7 +18,16 @@ def search(q, cat):
             l = []
             for torrent in result:
                 # Add this manually as api swicthed to magnet
-                download_url = 'https://getstrike.net/api/v2/torrents/download/?hash=%s' % torrent['torrent_hash']
+                # Query the api to download the torrent, it else returns 404
+                # This should be rewritten when all the torrent clientscan accept a magnet ## TODO
+                doesit_exist = 'https://getstrike.net/api/v2/torrents/download/?hash=%s' % torrent['torrent_hash']
+                t = requests.get(doesit_exist)
+                data = t.json()
+                if data['statuscode'] == 404:
+                    # Couldnt get the torrent, skip it
+                    continue
+                else:
+                    download_url = data['message']
 
                 r = {
                         'Provider': 'getstrike',
