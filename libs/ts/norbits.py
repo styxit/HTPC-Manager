@@ -8,7 +8,7 @@ import requests
 
 
 def search(q, cat):
-    logger = logging.getLogger('modules.torrents')
+    logger = logging.getLogger('modules.torrentsearch')
     username = htpc.settings.get('torrents_norbits_username', '')
     passkey = htpc.settings.get('torrents_norbits_passkey', '')
     result_list = []

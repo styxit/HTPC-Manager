@@ -8,6 +8,7 @@ import logging
 from ts import norbits
 from ts import yts
 from ts import ka
+from ts import getstrike
 from cherrypy.lib.auth2 import require
 
 
@@ -27,6 +28,7 @@ class Torrentsearch(object):
                 {'type': 'text', 'label': 'Norbits passkey', 'name': 'torrents_norbits_passkey'},
                 {'type': 'bool', 'label': 'YTS', 'name': 'torrents_yts_enabled'},
                 {'type': 'bool', 'label': 'KAT', 'name': 'torrents_ka_enabled'},
+                {'type': 'bool', 'label': 'Strike', 'name': 'torrents_getstrike_enabled'},
             ]
         })
 
@@ -50,6 +52,8 @@ class Torrentsearch(object):
             r += self.search_yts(query)
         if htpc.settings.get('torrents_ka_enabled'):
             r += self.search_ka(query)
+        if htpc.settings.get('torrents_getstrike_enabled'):
+            r += self.search_getstrike(query, 'all')
         return r
 
     def btn(self, query=None):
@@ -92,6 +96,9 @@ class Torrentsearch(object):
 
         if htpc.settings.get('torrents_ka_enabled') == 1:
             torrentproviders.append('ka')
+
+        if htpc.settings.get('torrents_getstrike_enabled') == 1:
+            torrentproviders.append('getstrike')
 
         return torrentproviders
 
@@ -155,3 +162,6 @@ class Torrentsearch(object):
 
     def search_ka(self, q, cat="all"):
         return ka.search(q, cat)
+
+    def search_getstrike(self, q, cat):
+        return getstrike.search(q, cat)
