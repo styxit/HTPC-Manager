@@ -120,15 +120,16 @@ class Deluge(object):
             self.logger.info('Added %s to deluge' % torrentname)
             # Find download path
             download_path = self.fetch('core.get_config_value', ['download_location'])
-            self.logger.info(download_path['result'])
             if link.startswith('magnet'):
                 path = link
             else:
+                # deluge doesnt like a named download...
+                link = link.split('?title=')[0]
                 get_url = self.fetch('web.download_torrent_from_url', [link])
                 path = get_url['result']
 
-            #Load temp torrent in client
             return self.fetch('web.add_torrents', [[{'path': path, 'options': {'download_location': download_path['result']}}]])
+
         except Exception as e:
             self.logger.debug('Failed adding %s to deluge %s %s' % (torrentname, link, e))
 

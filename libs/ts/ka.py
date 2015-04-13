@@ -13,11 +13,12 @@ def search(what, cat='all'):
     ret = []
     i = 1
     hits = 0
+    req = requests.Session()
 
     while True and i < 3:
         results = []
         p = {'q': what, 'page': i}
-        json_data = requests.get(url + '/json.php', params=p, verify=False)
+        json_data = req.get(url + '/json.php', params=p, verify=False)
 
         try:
             # hasnt set the correct header
