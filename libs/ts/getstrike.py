@@ -11,7 +11,6 @@ requests.packages.urllib3.disable_warnings()
 def search(q, cat):
     # add cat's if ts is rewritten
     url = 'https://getstrike.net/api/v2/torrents/search/?phrase=%s' % urllib.quote_plus(q)
-    r = requests.get(url)
     logger = logging.getLogger('modules.torrentsearch')
     try:
         req = requests.Session()
