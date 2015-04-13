@@ -79,6 +79,17 @@ table th.tablesorter-header {
 .nav-menu-item-edit a{
     cursor: move;
 }
+
 .ofa {
     overflow: auto;
 }
+
+.mofa::-webkit-scrollbar {
+    display: none;
+}
+
+.mofa {
+    overflow: auto;
+}
+
+
