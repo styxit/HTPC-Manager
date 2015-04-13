@@ -117,13 +117,18 @@ class Deluge(object):
     @cherrypy.tools.json_out()
     def to_client(self, link, torrentname, **kwargs):
         try:
-            #Fetch download path from settings
-            download_path = self.fetch('core.get_config_value', ['download_location'])
-            #Download the torrent from zhe interwebz
-            get_url = self.fetch('web.download_torrent_from_url', [link])
-            #Load temp torrent in client
             self.logger.info('Added %s to deluge' % torrentname)
-            return self.fetch('web.add_torrents', [[{'path': get_url['result'], 'options': {'download_location': download_path['result']}}]])
+            # Find download path
+            download_path = self.fetch('core.get_config_value', ['download_location'])
+            self.logger.info(download_path['result'])
+            if link.startswith('magnet'):
+                path = link
+            else:
+                get_url = self.fetch('web.download_torrent_from_url', [link])
+                path = get_url['result']
+
+            #Load temp torrent in client
+            return self.fetch('web.add_torrents', [[{'path': path, 'options': {'download_location': download_path['result']}}]])
         except Exception as e:
             self.logger.debug('Failed adding %s to deluge %s %s' % (torrentname, link, e))
 
@@ -156,6 +161,7 @@ class Deluge(object):
             ssl = 's' if htpc.settings.get('deluge_ssl') else ''
 
             url = 'http%s://%s:%s%sjson' % (ssl, host, port, deluge_basepath)
+            self.logger.debug('read data url is %s' % url)
 
             post_data = dumps(data)
             buf = StringIO(self.opener.open(url, post_data, 1).read())
