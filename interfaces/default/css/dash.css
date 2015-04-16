@@ -13,11 +13,26 @@
     background-size: cover;
     background-repeat: no-repeat;
 }
+.carousel-control.left {
+	background: none;
+	border: none;
+	left: 0px;
+	opacity: 0.7;
+}
+.carousel-control.right {
+	background: none;
+	border: none;
+	right: 0px;
+	opacity: 0.7;
+}
 .carousel-caption h4 {
+    font-weight: normal;
+    font-size: small;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     cursor: pointer;
+    line-height: 15px;
 }
 .carousel-caption p {
     font-size: smaller;

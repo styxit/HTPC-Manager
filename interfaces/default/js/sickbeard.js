@@ -309,18 +309,18 @@ function sickbeardStatusIcon(iconText, white){
     'Skipped'
   ];
   var icons = [
-    'icon-download-alt',
-    'icon-repeat',
-    'icon-share-alt',
-    'icon-time',
-    'icon-lock',
-    'icon-fast-forward'
+    'fa fa-download',
+    'fa fa-repeat',
+    'fa fa-share-alt',
+    'fa fa-clock-o',
+    'fa fa-lock',
+    'fa fa-fast-forward'
   ];
 
   if (text.indexOf(iconText) != -1) {
     var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
     if (white == true) {
-      icon.addClass('icon-white');
+      icon.addClass('fa-inverse');
     }
     return icon;
   }

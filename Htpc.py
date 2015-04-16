@@ -40,7 +40,7 @@ def parse_arguments():
     parser.add_argument('--webdir', default=None,
                         help='Use a custom webdir')
     parser.add_argument('--resetauth', action='store_true', default=False,
-                        help='Resets the username and password to HTPC-Manager')
+                        help='Resets the username and password to HTPC Manager')
     parser.add_argument('--loglevel', default='info',
                         help='Set a loglevel. Allowed values: debug, info, warning, error, critical')
     return parser.parse_args()
@@ -224,7 +224,7 @@ def main():
         openbrowser = 'http%s://%s:%s%s' % (browser_ssl, str(browser_host), htpc.PORT, htpc.WEBDIR[:-1])
         webbrowser.open(openbrowser, new=2, autoraise=True)
 
-    #Select if you want to controll processes and popen from HTPC-Manager
+    #Select if you want to controll processes and popen from HTPC Manager
     htpc.SHELL = args.shell
 
     # Select wether to run as daemon

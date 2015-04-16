@@ -1,14 +1,14 @@
 
 $("#qbt_rp_icon").click(function () {
-    if ($("#qbt_rp_icon").hasClass("icon-play")) {
+    if ($("#qbt_rp_icon").hasClass("fa fa-play")) {
         $.get(WEBDIR+'qbittorrent/command/resumeall');
         notify('Resume', 'all torrents', 'info');
-        $('#qbt_rp_icon').removeClass("icon-play").addClass("icon-pause");
+        $('#qbt_rp_icon').removeClass("fa fa-play").addClass("fa fa-pause");
         get_torrents();
     } else {
         $.get(WEBDIR + 'qbittorrent/command/pauseall');
         notify('Pause', 'all torrents', 'info');
-        $('#qbt_rp_icon').removeClass("icon-pause").addClass("icon-play");
+        $('#qbt_rp_icon').removeClass("fa fa-pause").addClass("fa fa-play");
         get_torrents();
     }
 });
@@ -57,7 +57,7 @@ function get_torrents() {
                 // Remove button
                 removeButton = $('<a class="qbt_removetorrent" data-action="delete" data-hash="" data-name="">').
                 addClass('btn btn-mini').
-                html('<i class="icon-remove"></i>').
+                html('<i class="fa fa-times"></i>').
                 attr('data-hash', torrent.hash).
                 attr('data-name', torrent.name).
                 attr('title', 'Remove torrent');
@@ -65,7 +65,7 @@ function get_torrents() {
 
                 tr.append(
 
-                $('<td>').addClass('qbt_name').html(torrent.name + '<br><small><i class="icon-long-arrow-down"></i> ' + torrent.dlspeed + '<i class="icon-long-arrow-up"></i> ' + torrent.upspeed + '</small>'),
+                $('<td>').addClass('qbt_name').html(torrent.name + '<br><small><i class="fa fa-long-arrow-down"></i> ' + torrent.dlspeed + '<i class="fa fa-long-arrow-up"></i> ' + torrent.upspeed + '</small>'),
                 $('<td>').text(torrent.num_seeds),
                 $('<td>').text(torrent.num_leechs),
                 $('<td>').addClass('qbt_ratio').text(torrent.ratio),
@@ -76,9 +76,9 @@ function get_torrents() {
                 $('#torrents-queue').append(tr);
             });
             if (times_in === numberofloop) {
-                $("#qbt_rp_icon").removeClass("icon-pause").addClass("icon-play");
+                $("#qbt_rp_icon").removeClass("fa fa-pause").addClass("fa fa-play");
             } else {
-                $("#qbt_rp_icon").removeClass("icon-play").addClass("icon-pause");
+                $("#qbt_rp_icon").removeClass("fa fa-play").addClass("fa fa-pause");
             }
             $('.spinner').hide();
 
@@ -105,11 +105,11 @@ function generateTorrentActionButton(torrent) {
     var icon = cmd = title = "";
 
     if (status == "pausedUP" || status == "pausedDL" || status == "error" || status == "checkingUP") {
-        icon = "icon-play";
+        icon = "fa fa-play";
         title = "Resume torrent";
         cmd = "resume";
     } else {
-        icon = "icon-pause";
+        icon = "fa fa-pause";
         title = "Pause torrent";
         cmd = "pause";
     }
@@ -135,10 +135,10 @@ $(document).on('click', '.qbt_removetorrent', function () {
 
 // resume/pause all torrents
 $(document).on('click', '.qbt_rp', function () {
-    if ($(this).children("i").hasClass("icon-play")) {
-        ($(this).children("i").removeClass("icon-play").addClass("icon-pause"));
+    if ($(this).children("i").hasClass("fa fa-play")) {
+        ($(this).children("i").removeClass("fa fa-play").addClass("fa fa-pause"));
     } else {
-        ($(this).children("i").removeClass("icon-pause").addClass("icon-play"));
+        ($(this).children("i").removeClass("fa fa-pause").addClass("fa fa-play"));
     }
     var action = $(this).attr('data-action');
     var name = $(this).attr('data-name')

@@ -7,23 +7,23 @@
             <div class="btn-toolbar pull-right">
 
                 <div class="btn-group">
-                    <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-th-list"></i>
-                    <i class="caret"></i></a>
+                    <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i>
+                    <i class="fa fa-caret-down"></i></a>
                     <ul class="dropdown-menu pull-right">
                         %if settings.get('plex_hide_watched', 0):
-                        <li><a href="#" id="hidewatched" class="active"><i class="icon-eye-open"></i> Show Watched</a></li>
+                        <li><a href="#" id="hidewatched" class="active"><i class="fa fa-eye"></i> Show Watched</a></li>
                         %else:
-                        <li><a href="#" id="hidewatched"><i class="icon-eye-open"></i> Hide Watched</a></li>
+                        <li><a href="#" id="hidewatched"><i class="fa fa-eye"></i> Hide Watched</a></li>
                         %endif
-                        <li><a href="UpdateLibrary" class="ajax-link"><i class="icon-search"></i> Update All Sections</a></li>
-                        <li><a href="UpdateLibrary?section_type=movie" class="ajax-link"><i class="icon-search"></i> Update Movie Section</a></li>
-                        <li><a href="UpdateLibrary?section_type=show" class="ajax-link"><i class="icon-search"></i> Update TV Show Section</a></li>
-                        <li><a href="UpdateLibrary?section_type=artist" class="ajax-link"><i class="icon-search"></i> Update Music Section</a></li>
+                        <li><a href="UpdateLibrary" class="ajax-link"><i class="fa fa-refresh"></i> Update All Sections</a></li>
+                        <li><a href="UpdateLibrary?section_type=movie" class="ajax-link"><i class="fa fa-refresh"></i> Update Movie Section</a></li>
+                        <li><a href="UpdateLibrary?section_type=show" class="ajax-link"><i class="fa fa-refresh"></i> Update TV Show Section</a></li>
+                        <li><a href="UpdateLibrary?section_type=artist" class="ajax-link"><i class="fa fa-refresh"></i> Update Music Section</a></li>
                     </ul>
                 </div>
                 %if settings.get('plex_mac', 0):
                 <div class="btn-group">
-                    <a href="Wake" id="plex_wake_button" class="ajax-link btn"><i class="icon-off"></i> Wake</a>
+                    <a href="Wake" id="plex_wake_button" class="ajax-link btn"><i class="fa fa-power-off"></i> Wake</a>
                 </div>
                 %endif
             </div>
@@ -38,7 +38,7 @@
             <li class="hide"><a href="#episodes" data-toggle="tab">Episodes</a></li>
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Music
-                <i class="caret"></i></a>
+                <i class="fa fa-caret-down"></i></a>
                 <ul class="dropdown-menu">
                     <li><a href="#artists" data-toggle="tab">Artists</a></li>
                     <li><a href="#albums" data-toggle="tab">Albums</a></li>

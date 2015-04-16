@@ -5,12 +5,12 @@
             <span class="headphones_albumname">${album['AlbumTitle']}</span>
             <div class="btn-group show-options-menu pull-right">
                 <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="icon-wrench"></i>&nbsp;<span class="caret"></span>
+                    <i class="fa fa-cogs"></i>&nbsp;<span class="fa fa-caret-down"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="${self.attr.webdir}headphones/QueueAlbum/${album_id}&new=True" class="ajax-link"><i class="icon-search"></i> Force Check </a></li>
-                    <li><a href="${self.attr.webdir}headphones/QueueAlbum/${album_id}" class="ajax-link"><i class="icon-heart"></i> Wanted Album </a></li>
-                    <li><a href="${self.attr.webdir}headphones/UnqueueAlbum/${album_id}" class="ajax-link"><i class="icon-step-forward"></i> Skip Album </a></li>
+                    <li><a href="${self.attr.webdir}headphones/QueueAlbum/${album_id}&new=True" class="ajax-link"><i class="fa fa-search"></i> Force Check </a></li>
+                    <li><a href="${self.attr.webdir}headphones/QueueAlbum/${album_id}" class="ajax-link"><i class="fa fa-heart"></i> Wanted Album </a></li>
+                    <li><a href="${self.attr.webdir}headphones/UnqueueAlbum/${album_id}" class="ajax-link"><i class="fa fa-step-forward"></i> Skip Album </a></li>
                 </ul>
             </div>
         </h1>

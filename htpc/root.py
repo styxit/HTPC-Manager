@@ -59,7 +59,7 @@ class Root(object):
     @require(member_of("admin"))
     def shutdown(self):
         """ Shutdown CherryPy and exit script """
-        self.logger.info("Shutting down htpc-manager.")
+        self.logger.info("Shutting down HTPC Manager.")
         cherrypy.engine.exit()
         # Fix for rotation logs on windows
         logging.shutdown()
@@ -79,7 +79,7 @@ class Root(object):
     @require()
     def restart(self):
         """ Shutdown script and rerun with the same variables """
-        self.logger.info("Restarting htpc-manager.")
+        self.logger.info("Restarting HTPC Manager.")
         Thread(target=do_restart).start()
         return "Restart in progress."
 

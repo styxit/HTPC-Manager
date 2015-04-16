@@ -69,7 +69,7 @@ function getMovies(strStatus, pHTMLElement) {
             }
 
             if (pMovie.releases.length > 0) {
-                strHTML.append($("<i>").attr("title", "Download").addClass("icon-white icon-download status"));
+                strHTML.append($("<i>").attr("title", "Download").addClass("fa fa-arrow-circle-o-down fa-inverse status"));
             }
 
             strHTML.append($("<h6>").addClass("movie-title").html(shortenText(pMovie.info.original_title, 12)));
@@ -220,7 +220,7 @@ function showMovie(movie, was_search) {
         modalInfo.append(
         $('<div>').raty({
             readOnly: true,
-            path: WEBDIR + 'img',
+            path: null,
             score: (info.rating.imdb[0] / 2)
         }));
     }
@@ -321,13 +321,13 @@ function showMovie(movie, was_search) {
                 $("<tr>").append(
                 $("<td>").append(
                 $("<a>").attr("href", "#").append(
-                $("<i>").attr("title", "Download").addClass("icon-download")).click(function (pEvent) {
+                $("<i>").attr("title", "Download").addClass("fa fa-download")).click(function (pEvent) {
                     pEvent.preventDefault();
                     hideModal();
                     $.getJSON("DownloadRelease/?id=" + pRelease._id);
                 }),
                 $("<a>").attr("href", "#").append(
-                $("<i>").attr("title", "Ignore").addClass("icon-remove-sign")).click(function (pEvent) {
+                $("<i>").attr("title", "Ignore").addClass("fa fa-times-circle")).click(function (pEvent) {
                     pEvent.preventDefault();
                     $(this).closest("tr").toggleClass("ignore");
                     $.getJSON("IgnoreRelease/?id=" + pRelease._id);
@@ -453,7 +453,7 @@ if (info.rating && info.rating.imdb) {
     modalInfo.append(
     $('<div>').raty({
         readOnly: true,
-        path: WEBDIR + 'img',
+        path: null,
         score: (info.rating.imdb[0] / 2)
     }));
 }

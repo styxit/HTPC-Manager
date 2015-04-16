@@ -70,7 +70,7 @@ class Sonarr(object):
             if banner:
                 #  the path includes the basepath automaticly
                 url = 'http%s://%s:%s%s' % (ssl, host, port, path)
-                # Cache the image in htpc-manager aswell.
+                # Cache the image in HTPC Manager aswell.
                 return get_image(url, headers=headers)
 
             if type == 'post':

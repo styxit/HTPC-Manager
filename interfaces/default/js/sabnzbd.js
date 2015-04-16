@@ -104,14 +104,14 @@ function loadHistory() {
             }
             $('#history_table_body').html('');
             $.each(data.history.slots, function (i, slot) {
-                var deleteImage = makeIcon('icon-remove', 'Delete');
+                var deleteImage = makeIcon('fa fa-times', 'Delete');
                 deleteImage.click(function () {
                     removeHistoryItem(slot.nzo_id);
                 });
 
                 var retryImage = null;
                 if (slot.status == 'Failed') {
-                    var retryImage = makeIcon('icon-repeat', 'Retry');
+                    var retryImage = makeIcon('fa fa-repeat', 'Retry');
                     retryImage.click(function () {
                         retryHistoryItem(slot.nzo_id);
                     });
@@ -132,7 +132,7 @@ function loadHistory() {
                     $(name).append('&nbsp;').append(failMessage);
                 }
                 if (slot.script && slot.script_line.length) {
-                    $(name).append('&nbsp;').append(makeIcon('icon-list-alt', slot.script_line))
+                    $(name).append('&nbsp;').append(makeIcon('fa fa-list-alt', slot.script_line))
                 }
 
                 // Use to make a info string regarding speed unpack
@@ -211,10 +211,10 @@ function loadQueue(once) {
 
             $('#nzb_pause_button').button('reset');
             if (data.status == 'Paused') {
-                $('#nzb_pause_button').html('<i class="icon-play"></i> Resume');
+                $('#nzb_pause_button').html('<i class="fa fa-play"></i> Resume');
                 queueToggleStatusAction = 'resume';
             } else {
-                $('#nzb_pause_button').html('<i class="icon-pause"></i> Pause')
+                $('#nzb_pause_button').html('<i class="fa fa-pause"></i> Pause')
                 queueToggleStatusAction = 'pause';
             }
 
@@ -388,18 +388,18 @@ function sabnzbdStatusIcon(iconText, white){
     'Repairing'
   ];
   var icons = [
-    'icon-ok',
-    'icon-share',
-    'icon-play-circle',
-    'icon-exchange',
-    'icon-remove',
-    'icon-wrench'
+    'fa fa-check',
+    'fa fa-share',
+    'fa fa-play-circle',
+    'fa fa-exchange',
+    'fa fa-times',
+    'fa fa-wrench'
   ];
 
   if (text.indexOf(iconText) != -1) {
     var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
     if (white == true) {
-      icon.addClass('icon-white');
+      icon.addClass('fa-inverse');
     }
     return icon;
   }

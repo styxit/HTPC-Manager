@@ -33,8 +33,8 @@ class Samsungtv:
                 ]},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'samsungtv_host'},
                 {'type': 'text', 'label': 'Tv Model', 'name': 'samsungtv_model'},
-                {'type': 'text', 'label': 'HTPC-Manager MAC', 'name': 'samsung_htpcmac'},
-                {'type': 'text', 'label': 'HTPC-Manager IP', 'name': 'samsung_htpchost'}
+                {'type': 'text', 'label': 'HTPC Manager MAC', 'name': 'samsung_htpcmac'},
+                {'type': 'text', 'label': 'HTPC Manager IP', 'name': 'samsung_htpchost'}
 
         ]})
 
@@ -53,7 +53,7 @@ class Samsungtv:
             else:
                 src = htpc.settings.get('samsung_htpchost', '')
                 mac = htpc.settings.get('samsung_htpcmac', '')
-                remote = 'HTPC-Manager remote'
+                remote = 'HTPC Manager Remote'
                 dst = htpc.settings.get('samsungtv_host', '')
                 application = 'python'
                 tv  = htpc.settings.get('samsungtv_model', '')

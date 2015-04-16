@@ -92,7 +92,7 @@ function loadHistory() {
 
                 removeButton = $('<a class="nzbget_removenzbhistory nzb_action" data-action="" data-id="" data-name="">').
                 addClass('btn btn-mini').
-                html('<i class="icon-remove"></i>').
+                html('<i class="fa fa-remove"></i>').
                 attr('data-id', slot.NZBID).
                 attr('data-action', 'hidehistory').
                 attr('data-name', slot.Name).
@@ -137,10 +137,10 @@ function getStatus(initial) {
                 // if server is paused
                 status = 'Paused'
                 queueToggleStatusAction = 'resume';
-                $('#nzb_pause_button').html('<i class="icon-play"></i> Resume'); 
+                $('#nzb_pause_button').html('<i class="fa fa-play"></i> Resume'); 
             } else {
                 status = 'Running'
-                $('#nzb_pause_button').html('<i class="icon-pause"></i> Pause')
+                $('#nzb_pause_button').html('<i class="fa fa-pause"></i> Pause')
                 queueToggleStatusAction = 'pause';
             }
 
@@ -233,7 +233,7 @@ function loadQueue(once) {
                 
                 deleteButton = $('<a class="nzbget_deleteenzb nzb_action" data-action="delete" data-id="" data-name="">').
                 addClass('btn btn-mini').
-                html('<i class="icon-remove"></i>').
+                html('<i class="fa fa-remove"></i>').
                 attr('data-id', job.NZBID).
                 attr('data-name', job.NZBName).
                 attr('title', 'Delete NZB');
@@ -305,18 +305,18 @@ function nzbgetStatusIcon(iconText, white){
     'Repairing'
   ];
   var icons = [
-    'icon-ok',
-    'icon-share',
-    'icon-play-circle',
-    'icon-exchange',
-    'icon-remove',
-    'icon-wrench'
+    'fa fa-check',
+    'fa fa-share-square-o',
+    'fa fa-play-circle-o',
+    'fa fa-exchange',
+    'fa fa-times',
+    'fa fa-wrench'
   ];
 
   if (text.indexOf(iconText) != -1) {
     var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
     if (white == true) {
-      icon.addClass('icon-white');
+      icon.addClass('fa-inverse');
     }
     return icon;
   }
@@ -360,11 +360,11 @@ function generateNzbActionButton(nzb) {
     var icon = cmd = title = "";
 
     if (status == "PAUSED") {
-        icon = "icon-play";
+        icon = "fa fa-play";
         title = "Resume NZB";
         cmd = "resume";
     } else {
-        icon = "icon-pause";
+        icon = "fa fa-pause";
         title = "Pause NZB";
         cmd = "pause";
     }

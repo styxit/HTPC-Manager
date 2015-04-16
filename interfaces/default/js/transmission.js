@@ -18,7 +18,7 @@ $(document).ready(function(){
     event.preventDefault();
 
     // set spinner inside button
-    $(this).html('<i class="icon-spinner icon-spin"></i>');
+    $(this).html('<i class="fa fa-spinner fa-pulse"></i>');
 
     // do ajax request
     $.ajax({
@@ -131,15 +131,15 @@ function getTorrents(){
           // Remove button
           removeButton = $('<a>').
             addClass('btn btn-mini').
-            html('<i class="icon-remove"></i>').
+            html('<i class="fa fa-times"></i>').
             attr('href', WEBDIR + 'transmission/remove/' + torrent.id).
             attr('title', 'Remove torrent');
           buttons.append(removeButton);
 
           tr.append(
             $('<td>').html(torrent.name
-              +'<br><small><i class="icon-long-arrow-down"></i> ' + getReadableFileSizeString(torrent.rateDownload)
-              +'/s <i class="icon-long-arrow-up"></i> ' + getReadableFileSizeString(torrent.rateUpload) + '/s</small>'
+              +'<br><small><i class="fa fa-long-arrow-down"></i> ' + getReadableFileSizeString(torrent.rateDownload)
+              +'/s <i class="fa fa-long-arrow-up"></i> ' + getReadableFileSizeString(torrent.rateUpload) + '/s</small>'
             ),
             $('<td>').text(ratio),
             $('<td>').text(getReadableTime(torrent.eta)),
@@ -162,11 +162,11 @@ function generateTorrentActionButton(torrent) {
   button = $('<a>').addClass('btn btn-mini');
   // Resume button if torrent is paused
   if (torrent.status == 0) {
-    button.html('<i class="icon-play"></i>');
+    button.html('<i class="fa fa-play"></i>');
     button.attr('href', WEBDIR + 'transmission/start/' + torrent.id);
     button.attr('title', 'Resume torrent');
   } else { // Pause button
-    button.html('<i class="icon-pause"></i>');
+    button.html('<i class="fa fa-pause"></i>');
     button.attr('href', WEBDIR + 'transmission/stop/' + torrent.id);
     button.attr('title', 'Pause torrent');
   }

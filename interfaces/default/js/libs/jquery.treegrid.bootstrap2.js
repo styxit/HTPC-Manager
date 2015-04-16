@@ -1,5 +1,5 @@
 $.extend($.fn.treegrid.defaults, {
     expanderTemplate: '<i class="treegrid-expander"></i>',
-    expanderExpandedClass: 'icon-chevron-down',
-    expanderCollapsedClass: 'icon-chevron-right'
+    expanderExpandedClass: 'fa fa-chevron-down',
+    expanderCollapsedClass: 'fa fa-chevron-right'
 });

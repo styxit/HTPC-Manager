@@ -60,7 +60,7 @@ class Log:
         htpc.LOGGER.addHandler(self.logch)
         htpc.LOGGER.addHandler(self.logfh)
 
-        htpc.LOGGER.info("Welcome to HTPC-Manager!")
+        htpc.LOGGER.info("Welcome to HTPC Manager!")
         htpc.LOGGER.info("Loglevel set to " + htpc.LOGLEVEL)
 
     @cherrypy.expose()

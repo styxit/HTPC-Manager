@@ -217,9 +217,9 @@ function loadDownloadHistory() {
     if (!$('#downloads_table_body').length) return
     $.getJSON(WEBDIR + 'sabnzbd/GetHistory?limit=5', function (data) {
         $.each(data.history.slots, function (i, slot) {
-            var status = $('<i>').addClass('icon-ok')
+            var status = $('<i>').addClass('fa fa-check')
             if (slot.status == 'Failed') {
-                status.removeClass().addClass('icon-remove').attr('title', slot.fail_message)
+                status.removeClass().addClass('fa fa-times').attr('title', slot.fail_message)
             }
             $('#downloads_table_body').append(
                 $('<tr>').append(
@@ -239,9 +239,9 @@ function loadNZBGetDownloadHistory() {
             return;
         }
         $.each(data, function (i, slot) {
-            var status = $('<i>').addClass('icon-ok');
+            var status = $('<i>').addClass('fa fa-check');
             if (slot.ParStatus == 'FAILURE') {
-                status.removeClass().addClass('icon-remove').attr('title', slot.fail_message);
+                status.removeClass().addClass('fa fa-times').attr('title', slot.fail_message);
             }
             // Limit the results to 5
             if (i >= 5) return;
@@ -532,8 +532,8 @@ function loadqbit() {
 function start_refresh(module, fn){
     if ($('#dash_'+module).children('h3:first-child').has('.refresh-btns').length == 0){
         $('#dash_'+module).children('h3:first-child').append('<span class="refresh-btns">' +
-                                '<i id="'+module+'-refresh" class="btn icon-refresh" title="Refresh" onclick="'+fn+'();"></i>' +
-                                '<i class="icon-spinner icon-spin" id="'+module+'-spinner"></i></span>');
+                                '<i id="'+module+'-refresh" class="btn fa fa-refresh" style="font-size:0.6em" title="Refresh" onclick="'+fn+'();"></i>' +
+                                '<i class="fa fa-spinner fa-pulse" style="font-size:0.7em" id="'+module+'-spinner"></i></span>');
     }
     $('#'+module+'-refresh').hide();
     $('#dash_'+module+'_table_body').html("");

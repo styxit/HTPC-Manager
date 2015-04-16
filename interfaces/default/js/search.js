@@ -118,7 +118,7 @@ function anc(nzb) {
         "height": "18px"
     }).click(function () {
         downloadFile(nzb.link);
-    }).append($('<i>').addClass('icon-download-alt'));
+    }).append($('<i>').addClass('fa fa-download'));
 
     b.append(browserdl);
 
@@ -186,6 +186,7 @@ function showDetails(data) {
     if(data.attr['imdbscore']) {
         var rating = $('<span>').raty({
             readOnly: true,
+            path: null,
             score: (data.attr['imdbscore'] / 2),
         })
         modalInfo.append(rating);

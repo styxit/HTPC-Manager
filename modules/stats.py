@@ -509,7 +509,7 @@ class Stats(object):
                 return d
 
             else:
-                msg = 'HTPC-Manager is not started with --shell'
+                msg = 'HTPC Manager is not started with --shell'
                 self.logger.error(msg)
                 d['msg'] = msg
                 self.logger.error(msg)

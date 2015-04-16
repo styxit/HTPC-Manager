@@ -1,4 +1,4 @@
-This is Htpc-Manager the way i want it.
+This is HTPC Manager the way i want it.
 
 Some of the difference is:
 
@@ -54,9 +54,9 @@ INCLUDE THIS IN YOUR ISSUE:
  - Link to a copy/paste of your logfile with clear debug info of the error on [PASTEBIN](http://www.pastebin.com)
 
 #### How to enable detailed logs
-1. Shutdown HTPC-Manager
+1. Shutdown HTPC Manager
 2. Start Htpc.py --loglevel debug (Do NOT start with --debug)
-3. Start HTPC-Manager and wait for error to occure again
+3. Start HTPC Manager and wait for error to occure again
 
 HTPC Manager
 =====

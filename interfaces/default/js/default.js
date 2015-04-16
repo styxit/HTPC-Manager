@@ -36,7 +36,7 @@ $(document).ready(function () {
     });
 
     // Set the correct images path for raty plugin
-    $.fn.raty.defaults.path = WEBDIR + '/img'
+    $.fn.raty.defaults.path = null
 
     $('a.ajax-confirm').click(function (e) {
         e.preventDefault()

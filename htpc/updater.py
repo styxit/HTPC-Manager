@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Update HTPC-Manager from Github. Either through git command or tarball.
+Update HTPC Manager from Github. Either through git command or tarball.
 
 Updater and SourceUpdater written by styxit
 https://github.com/styxit
@@ -163,7 +163,7 @@ class Updater(object):
 
         # If HTPC Manager is up to date, updating is not needed
         if current == latest and current != "Unknown":
-            self.logger.info("HTPC-Manager is Up-To-Date.")
+            self.logger.info("HTPC Manager is Up-To-Date.")
             output['versionsBehind'] = 0
             htpc.COMMITS_BEHIND = 0
             output['updateNeeded'] = False

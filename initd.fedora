@@ -1,13 +1,13 @@
 #! /bin/sh
 
 ### BEGIN INIT INFO
-# Provides:          HTPC-Manager application instance
+# Provides:          HTPC Manager application instance
 # Required-Start:    $all
 # Required-Stop:     $all
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: starts instance of HTPC-Manager
-# Description:       starts instance of HTPC-Manager
+# Short-Description: starts instance of HTPC Manager
+# Description:       starts instance of HTPC Manager
 ### END INIT INFO
 
 # Source function library.
@@ -35,7 +35,7 @@ OPTIONS=" --daemon --pid=$PID_FILE"
 # script name (doesn't need to be changed)
 NAME=htpc
 # app name
-DESC=HTPC-Manager
+DESC=HTPC Manager
 # User you want to run service as
 RUN_AS=RUNAS_USER
 ############### END EDIT ME ##################

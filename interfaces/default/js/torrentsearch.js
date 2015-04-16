@@ -71,7 +71,7 @@ function search(query) {
 
 
         });
-    // Leting sort plugin know that there was a ajax call
+    // Letting sort plugin know that there was a ajax call
     $('.spinner').hide();
     $('.torrent_search_table').trigger('update');
     // sort on seeds 0 based 0 1 2
@@ -96,7 +96,7 @@ function atc(torrent) {
                 // If there any active clients add 1 to n
                 n += 1;
                 // Makes icon and pop title
-                var img = makeIcon("icon-download-alt", client.title);
+                var img = makeIcon("fa fa-download", client.title);
                 button.append(img);
                 b.append(button);
             }

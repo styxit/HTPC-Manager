@@ -129,7 +129,7 @@ function renderSeason(){
       $.each(data.data, function(index, value){
         var row = $('<tr>');
 
-        var search_link = $('<a>').addClass('btn btn-mini').attr('title', 'Search new download').append($('<i>').addClass('icon-search')).on('click', function(){
+        var search_link = $('<a>').addClass('btn btn-mini').attr('title', 'Search new download').append($('<i>').addClass('fa fa-search')).on('click', function(){
           searchEpisode(showid, season, index, value.name);
         });
 
@@ -195,18 +195,18 @@ function sickbeardStatusIcon(iconText, white){
     'Skipped'
   ];
   var icons = [
-    'icon-download-alt',
-    'icon-repeat',
-    'icon-share-alt',
-    'icon-time',
-    'icon-lock',
-    'icon-fast-forward'
+    'fa fa-download',
+    'fa fa-rotate-right',
+    'fa fa-share-alt',
+    'fa fa-clock-o',
+    'fa fa-lock',
+    'fa fa-fast-forward'
   ];
 
   if (text.indexOf(iconText) != -1) {
     var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
     if (white == true) {
-      icon.addClass('icon-white');
+      icon.addClass('fa-inverse');
     }
     return icon;
   }

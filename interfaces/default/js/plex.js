@@ -31,7 +31,7 @@ $(document).ready(function() {
         e.preventDefault();
         hideWatched = $(this).toggleClass('active').hasClass('active')?1:0;
         $(this).text(hideWatched?' Show Watched':' Hide Watched');
-        $(this).prepend('<i class="icon-eye-open"></i>');
+        $(this).prepend('<i class="fa fa-eye"></i>');
         $.get(WEBDIR + 'settings?plex_hide_watched='+hideWatched);
         reloadTab();
     });
@@ -103,7 +103,7 @@ function loadMovies(options) {
                     movieAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (movie.playcount >= 1) {
-                        movieAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched'));
+                        movieAnchor.append($('<i>').attr('title', 'Watched').addClass('fa-inverse fa-check-circle watched'));
                     }
 
                     movieAnchor.append($('<h6>').addClass('title').html(shortenText(movie.title, 12)));
@@ -139,7 +139,7 @@ function loadMovie(movie) {
     if (movie.rating) {
         info.append($('<span>').raty({
             readOnly: true,
-            path: WEBDIR + 'img',
+            path: null,
             score: (movie.rating / 2),
         }));
     }
@@ -178,7 +178,7 @@ function loadEpisode(episode) {
     if (episode.rating) {
         info.append($('<span>').raty({
             readOnly: true,
-            path: WEBDIR + 'img',
+            path: null,
             score: (episode.rating / 2),
         }));
     }
@@ -258,7 +258,7 @@ function loadShows(options) {
                     showAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (show.playcount >= show.itemcount) {
-                        showAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched'));
+                        showAnchor.append($('<i>').attr('title', 'Watched').addClass('fa-inverse fa-check-circle watched'));
                     }
 
                     showAnchor.append($('<h6>').addClass('title').html(shortenText(show.title, 11)));
@@ -333,7 +333,7 @@ function loadEpisodes(options) {
                     episodeAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (episode.playcount >= 1) {
-                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched_episode'));
+                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('fa-inverse fa-check-circle watched_episode'));
                     }
 
                     episodeAnchor.append($('<h6>').addClass('title').html(shortenText(episode.label, 18)));
@@ -633,16 +633,16 @@ function loadNowPlaying() {
                 if (item.protocolCapabilities.indexOf('playback') != -1) {
                     var btn_toolbar = $('<div id="nowplaying_control"/>').addClass("btn-toolbar");
                     var btn_group = $('<div>').addClass("btn-group");
-                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'skipPrevious').attr('data-player', item.address).append('<i class="icon-fast-backward"></i>'));
-                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stepBack').attr('data-player', item.address).append('<i class="icon-backward"></i>'));
-                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stop').attr('data-player', item.address).append('<i class="icon-stop"></i>'));
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'skipPrevious').attr('data-player', item.address).append('<i class="fa fa-fast-backward"></i>'));
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stepBack').attr('data-player', item.address).append('<i class="fa fa-backward"></i>'));
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stop').attr('data-player', item.address).append('<i class="fa fa-stop"></i>'));
                     if (item.state == 'playing') {
-                        btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'play').attr('data-player', item.address).append('<i class="icon-pause"></i>'));
+                        btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'play').attr('data-player', item.address).append('<i class="fa fa-pause"></i>'));
                     } else {
-                        btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'play').attr('data-player', item.address).append('<i class="icon-play"></i>'));
+                        btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'play').attr('data-player', item.address).append('<i class="fa fa-play"></i>'));
                     }
-                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stepForward').attr('data-player', item.address).append('<i class="icon-forward"></i>'));
-                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'skipNext').attr('data-player', item.address).append('<i class="icon-fast-forward"></i>'));
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stepForward').attr('data-player', item.address).append('<i class="fa fa-forward"></i>'));
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'skipNext').attr('data-player', item.address).append('<i class="fa fa-fast-forward"></i>'));
 
                     btn_toolbar.append(btn_group);
                     info.append(btn_toolbar);

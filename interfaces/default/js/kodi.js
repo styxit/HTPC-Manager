@@ -83,7 +83,7 @@ $(document).ready(function() {
         e.preventDefault();
         hideWatched = $(this).toggleClass('active').hasClass('active')?1:0;
         $(this).text(hideWatched?' Show Watched':' Hide Watched');
-        $(this).prepend('<i class="icon-eye-open"></i>');
+        $(this).prepend('<i class="fa fa-eye"></i>');
         $.get(WEBDIR + 'settings?kodi_hide_watched='+hideWatched);
         reloadTab();
     });
@@ -212,7 +212,7 @@ function loadMovies(options) {
                     movieAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (movie.playcount >= 1) {
-                        movieAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched'));
+                        movieAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-check-circle fa-inverse watched'));
                     }
 
                     movieAnchor.append($('<h6>').addClass('title').html(shortenText(movie.title, 12)));
@@ -249,7 +249,7 @@ function loadMovie(movie) {
     if (movie.rating) {
         info.append($('<span>').raty({
             readOnly: true,
-            path: WEBDIR + 'img',
+            path: null,
             score: (movie.rating / 2),
         }));
     }
@@ -342,7 +342,7 @@ function loadShows(options) {
                     showAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (show.playcount >= 1) {
-                        showAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched'));
+                        showAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-check-circle fa-inverse watched'));
                     }
 
                     showAnchor.append($('<h6>').addClass('title').html(shortenText(show.title, 11)));
@@ -417,7 +417,7 @@ function loadEpisodes(options) {
                     episodeAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (episode.playcount >= 1) {
-                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched'));
+                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-check-circle fa-inverse watched'));
                     }
 
                     episodeAnchor.append($('<h6>').addClass('title').html(shortenText(episode.label, 18)));
@@ -479,11 +479,11 @@ function loadArtists(options) {
                 $.each(data.artists, function (i, artist) {
                     $('#artist-grid').append($('<tr>').append(
                         $('<td>').append(
-                            $('<a>').attr('href','#').attr('title', 'Play all').html('<i class="icon-play">').click(function(e) {
+                            $('<a>').attr('href','#').attr('title', 'Play all').html('<i class="fa fa-play">').click(function(e) {
                                 e.preventDefault();
                                 playItem(artist.artistid, 'artist');
                             }),
-                            $('<a>').attr('href','#').attr('title', 'Enqueue all').html('<i class="icon-plus">').click(function(e) {
+                            $('<a>').attr('href','#').attr('title', 'Enqueue all').html('<i class="fa fa-plus">').click(function(e) {
                                 e.preventDefault();
                                 queueItem(artist.artistid, 'artist');
                             })
@@ -660,7 +660,7 @@ function loadSongs(options) {
                     var row = $('<tr>');
                     row.append(
                         $('<td>').append(
-                            $('<a>').attr('href','#').append($('<i>').addClass('icon-plus')).click(function(e) {
+                            $('<a>').attr('href','#').append($('<i>').addClass('fa fa-plus')).click(function(e) {
                                 e.preventDefault();
                                 queueItem(song.songid, 'song')
                             }),
@@ -776,14 +776,14 @@ function loadNowPlaying() {
             }
 
             if (data.playerInfo.speed == 1) {
-                $('#nowplaying i.icon-play').removeClass().addClass('icon-pause')
+                $('#nowplaying i.icon-play').removeClass().addClass('fa fa-pause')
             } else {
-                $('#nowplaying i.icon-pause').removeClass().addClass('icon-play')
+                $('#nowplaying i.icon-pause').removeClass().addClass('fa fa-play')
             }
             if (data.app.muted) {
-                $('#nowplaying i.icon-volume-up').removeClass().addClass('icon-volume-off')
+                $('#nowplaying i.icon-volume-up').removeClass().addClass('fa fa-volume-off')
             } else {
-                $('#nowplaying i.icon-volume-off').removeClass().addClass('icon-volume-up')
+                $('#nowplaying i.icon-volume-off').removeClass().addClass('fa fa-volume-up')
             }
 
             var playingTime = pad(data.playerInfo.time.hours, 2) + ':' +
@@ -894,7 +894,7 @@ function loadPlaylist(type){
                 if (item.type == 'song') {
                     listItem.append(
                         $('<td>').html(shortenText(item.title,90)).prepend(
-                            $('<i>').addClass('remove icon-remove').click(function(e) {
+                            $('<i>').addClass('fa fa-times remove').click(function(e) {
                                 e.stopPropagation();
                                 removeItem(i);
                                 nowPlaying = null;
@@ -903,7 +903,7 @@ function loadPlaylist(type){
                         $('<td>').html(item.artist[0]),
                         $('<td>').html(item.album),
                         $('<td>').html(parseSec(item.duration)),
-                        $('<td>').append($('<i>').addClass('handle icon-align-justify'))
+                        $('<td>').append($('<i>').addClass('fa fa-align-justify handle'))
                     );
                 } else {
                     var label = item.label + ' (' + item.year + ')';

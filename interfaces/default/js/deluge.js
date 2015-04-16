@@ -10,7 +10,7 @@ $(document).ready(function(){
     event.preventDefault();
 
     // set spinner inside button
-    $(this).html('<i class="icon-spinner icon-spin"></i>');
+    $(this).html('<i class="fa fa-spinner fa-pulse"></i>');
 
     // do ajax request
     $.ajax({
@@ -108,7 +108,7 @@ function getTorrents(){
           // Remove button
           removeButton = $('<a>').
             addClass('btn btn-mini').
-            html('<i class="icon-remove"></i>').
+            html('<i class="fa fa-times"></i>').
             attr('title', 'Remove torrent').
             attr('data-torrent-id', torrent.hash).
             click(function(){
@@ -118,8 +118,8 @@ function getTorrents(){
 
           tr.append(
             $('<td>').html(torrent.name
-              +'<br><small><i class="icon-long-arrow-down"></i> ' + getReadableFileSizeString(torrent.download_payload_rate)
-              +'/s <i class="icon-long-arrow-up"></i> ' + getReadableFileSizeString(torrent.upload_payload_rate) + '/s</small>'
+              +'<br><small><i class="fa fa-long-arrow-down"></i> ' + getReadableFileSizeString(torrent.download_payload_rate)
+              +'/s <i class="fa fa-long-arrow-up"></i> ' + getReadableFileSizeString(torrent.upload_payload_rate) + '/s</small>'
             ),
             $('<td>').text(getReadableFileSizeString(torrent.total_size)),
             $('<td>').text(ratio),
@@ -140,11 +140,11 @@ function generateTorrentActionButton(torrent) {
   button = $('<a>').addClass('btn btn-mini ajax-btn');
   // Resume button if torrent is paused
   if (torrent.state == 'Paused') {
-    button.html('<i class="icon-play"></i>');
+    button.html('<i class="fa fa-play"></i>');
     button.attr('href', WEBDIR + 'deluge/start/' + torrent.hash);
     button.attr('title', 'Resume torrent');
   } else { // Pause button
-    button.html('<i class="icon-pause"></i>');
+    button.html('<i class="fa fa-pause"></i>');
     button.attr('href', WEBDIR + 'deluge/stop/' + torrent.hash);
     button.attr('title', 'Pause torrent');
   }

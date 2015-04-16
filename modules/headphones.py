@@ -322,15 +322,15 @@ def _get_status_icon(status):
     red = ["Unprocessed"]
 
     mapsicon = {
-        'Downloaded': 'icon-download-alt',
-        'Active': 'icon-repeat',
-        'Error': 'icon-bell',
-        'Paused': 'icon-pause',
-        'Snatched': 'icon-share-alt',
-        'Skipped': 'icon-fast-forward',
-        'Wanted': 'icon-heart',
-        'Processed': 'icon-ok',
-        'Unprocessed': 'icon-exclamation-sign'
+        'Downloaded': 'fa fa-download',
+        'Active': 'fa fa-rotate-right',
+        'Error': 'fa fa-bell-o',
+        'Paused': 'fa fa-pause',
+        'Snatched': 'fa fa-share-alt',
+        'Skipped': 'fa fa-fast-forward',
+        'Wanted': 'fa fa-heart',
+        'Processed': 'fa fa-check',
+        'Unprocessed': 'fa fa-exclamation-circle'
     }
 
     if not status:
@@ -348,6 +348,6 @@ def _get_status_icon(status):
     else:
         pass
 
-    fmt = '<span class="label %s"><i class="%s icon-white"></i> %s</span>'
+    fmt = '<span class="label %s"><i class="%s fa-inverse"></i> %s</span>'
 
     return fmt % (label, mapsicon[status], status)

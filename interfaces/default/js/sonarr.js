@@ -113,17 +113,17 @@ function sonarrStatusIcon(iconText, white) {
         'archived',
         'skipped'];
     var icons = [
-        'icon-download-alt',
-        'icon-repeat',
-        'icon-share-alt',
-        'icon-time',
-        'icon-lock',
-        'icon-fast-forward'];
+        'fa fa-download',
+        'fa fa-repeat',
+        'fa fa-share-alt',
+        'fa fa-clock-o',
+        'fa fa-lock',
+        'fa fa-fast-forward'];
 
     if (text.indexOf(iconText) != -1) {
         var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
         if (white === true) {
-            icon.addClass('icon-white');
+            icon.addClass('fa-inverse');
         }
         return icon;
     }
@@ -196,7 +196,7 @@ function calendar() {
                 e.preventDefault();
                 loadShow(cal.seriesId);
             });
-            var img = makeIcon('icon-info-sign', cal.overview);
+            var img = makeIcon('fa fa-info-circle', cal.overview);
             row.append(
             $('<td>').append(name),
             $('<td>').html(cal.title + '&nbsp').append(img),

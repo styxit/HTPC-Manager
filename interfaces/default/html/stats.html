@@ -10,8 +10,8 @@ webdir = htpc.WEBDIR
       <span>${settings.get('stats_name', 'Stats')}</span>
 	% if settings.get('stats_psutil_enabled'):
       <small>
-        <i class="icon-arrow-down"></i><span id="stat-recv"></span>
-        <i class="icon-arrow-up"></i><span id="stat-sent"></span>
+        <i class="fa fa-arrow-down"></i><span id="stat-recv"></span>
+        <i class="fa fa-arrow-up"></i><span id="stat-sent"></span>
       </small>
     % endif
     </h1>
@@ -103,7 +103,7 @@ webdir = htpc.WEBDIR
                 <tbody id="disklist"></tbody>
             </table>
             <span id="error_message"></span>
-            <div class="spinner disktspinner"></div>
+            <div class="disktspinner"></div>
         </div>
         <div id="proc" class="tab-pane">
             <table class="table disktable table-striped table-hover table-sortable">
@@ -121,7 +121,7 @@ webdir = htpc.WEBDIR
                     </tr>
                 </thead>
                 <tbody id="proclist"></tbody>
-                <div class="procspinner spinner"></div>
+                <div class="procspinner"></div>
             </table>
             % if cmdline:
             <div id="statscmd" class="span4">
@@ -141,7 +141,7 @@ webdir = htpc.WEBDIR
         <div id="ohm_" class="tab-pane">
             <table class="table table-condensed ohm_three table-hover">
             </table>
-            <div class="spinner ohmspinner"></div>
+            <div class="ohmspinner"></div>
         </div>
     % endif
 
@@ -171,7 +171,7 @@ webdir = htpc.WEBDIR
                 </thead>
                 <tbody id="smartlist"></tbody>
             </table>
-            <span id="smart_error_message"><i class="icon-spinner icon-spin smart-spinner"></i></span>
+            <span id="smart_error_message"><i class="smart-spinner"></i></span>
           % endif
 		</div>
 		% endif

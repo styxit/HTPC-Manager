@@ -741,8 +741,8 @@ class Plex(object):
                 headers = {}
                 headers['Authorization'] = 'Basic %s' % base64.encodestring('%s:%s' % (username, password)).replace('\n', '')
                 headers['X-Plex-Client-Identifier'] = str(hex(getnode()))
-                headers['X-Plex-Product'] = 'HTPC-Manager'
-                headers['X-Plex-Device'] = 'HTPC-Manager'
+                headers['X-Plex-Product'] = 'HTPC Manager'
+                headers['X-Plex-Device'] = 'HTPC Manager'
                 headers['X-Plex-Version'] = '1.0'
                 headers['X-Plex-Device-Name'] = socket.gethostname()
                 headers['X-Plex-Platform'] = platform.system()
@@ -786,7 +786,7 @@ class Plex(object):
             headers["X-Plex-Provides"] = 'controller'
             headers["X-Plex-Platform"] = platform.uname()[0]
             headers["X-Plex-Platform-Version"] = platform.uname()[2]
-            headers['X-Plex-Product'] = 'HTPC-Manager'
+            headers['X-Plex-Product'] = 'HTPC Manager'
             headers['X-Plex-Version'] = '0.9.5'
             headers['X-Plex-Device'] = platform.platform()
             headers['X-Plex-Client-Identifier'] = str(hex(getnode()))

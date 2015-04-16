@@ -713,7 +713,7 @@ class Kodi(object):
         """ Create popup in kodi """
         self.logger.debug("Sending notification to kodi: %s", text)
         kodi = Server(self.url('/jsonrpc', True))
-        image = 'https://raw.github.com/styxit/HTPC-Manager/master/interfaces/default/img/kodi-logo.png'
+        image = '../interfaces/default/img/kodi-logo.png'
         return kodi.GUI.ShowNotification(title='HTPC manager', message=text, image=image)
 
     @cherrypy.expose()

@@ -59,20 +59,20 @@ $(document).ready(function () {
                     $('#couchpotato_apikey').val(data.api_key);
                 } else {
                     notify('Settings', 'Failed to get couchpotato apikey', 'error');
-                    btn.addClass('btn-danger').append(' ').append($('<i>').addClass('icon-white icon-exclamation-sign'));
+                    btn.addClass('btn-danger').append(' ').append($('<i>').addClass('fa fa-exclamation-circle fa-inverse'));
                 }
             }
             if (data !== null) {
-                btn.addClass('btn-success').append(' ').append($('<i>').addClass('icon-white icon-ok'));
+                btn.addClass('btn-success').append(' ').append($('<i>').addClass('fa fa-check fa-inverse'));
                 if (data['Network.MacAddress'] && data['Network.MacAddress'] != 'Busy') {
                     $('#kodi_server_mac:visible').val(data['Network.MacAddress']);
                 }
             } else {
-                btn.addClass('btn-danger').append(' ').append($('<i>').addClass('icon-white icon-exclamation-sign'));
+                btn.addClass('btn-danger').append(' ').append($('<i>').addClass('fa fa-exclamation-circle fa-inverse'));
             }
         }).error(function () {
             btn.button('reset');
-            btn.addClass('btn-danger').append(' ').append($('<i>').addClass('icon-white icon-exclamation-sign'));
+            btn.addClass('btn-danger').append(' ').append($('<i>').addClass('fa fa-exclamation-circle fa-inverse'));
         });
     });
     $('input, radio, select, button').bind('change input', function (e) {

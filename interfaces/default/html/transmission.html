@@ -5,11 +5,11 @@
       <h1 class="page-header page-title">
         <a href="http://${settings.get('transmission_host')}:${settings.get('transmission_port')}${settings.get('transmission_revproxy', '/')}" target="_blank">${settings.get('transmission_name', 'Transmission')}</a>
           <small>
-            <i class="icon-arrow-down"></i> <span id="queue_download"></span>
-            <i class="icon-arrow-up"></i> <span id="queue_upload"></span>
+            <i class="fa fa-arrow-down"></i> <span id="queue_download"></span>
+            <i class="fa fa-arrow-up"></i> <span id="queue_upload"></span>
           </small>
           <div class="btn-group pull-right">
-            <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">Actions <span class="caret"></span></a>
+            <a class="btn btn-mini dropdown-toggle" data-toggle="dropdown" href="#">Actions <span class="fa fa-caret-down"></span></a>
             <ul class="dropdown-menu">
               <!-- dropdown menu links -->
               <li><a href="#" id="transmission-resume-all" data-action="start">Resume all</a></li>
@@ -19,7 +19,7 @@
       </h1>
 	  <div class="well form-inline">
 			<input class="span6" id="add_torrent_url" type="text">
-      <button class="btn btn-success" type="button" id="add_torrent_button"><i class="icon-plus icon-white"></i> Add torrent</button>
+      <button class="btn btn-success" type="button" id="add_torrent_button"><i class="fa fa-plus fa-inverse"></i> Add torrent</button>
 
 
       <a class="btn btn-info" onclick="$('#add_torrent_file').click();">Browse</a>
@@ -47,6 +47,6 @@
         </tbody>
       </table>
 
-      <i class="icon-spinner icon-spin spinner"></i>
+      <i class="fa fa-spinner fa-pulse"></i>
     </div>
 </div>

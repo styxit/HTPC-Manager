@@ -251,7 +251,7 @@ function loadWanteds() {
                     }
 
                     //var buttons = $('<div>').addClass('btn-group')
-                    var remove = $('<a class="btn btn-mini btn-cancel" title="Set Skipped"><i class="icon-step-forward"></i></a></td>').click(function () {
+                    var remove = $('<a class="btn btn-mini btn-cancel" title="Set Skipped"><i class="fa fa-step-forward"></i></a></td>').click(function () {
                                 $.ajax({
                                     url: WEBDIR + 'headphones/UnqueueAlbum',
                                     data: {'albumId': wanted.AlbumID},
@@ -262,7 +262,7 @@ function loadWanteds() {
                                     }
                                 })
                             })
-                    var search = $('<a class="btn btn-mini" title="Set wanted"><i class="icon-heart"></i></a></td>').click(function () {
+                    var search = $('<a class="btn btn-mini" title="Set wanted"><i class="fa fa-heart"></i></a></td>').click(function () {
                                 $.ajax({
                                     url: WEBDIR + 'headphones/QueueAlbum',
                                     data: {'albumId': wanted.AlbumID},
@@ -272,7 +272,7 @@ function loadWanteds() {
                                     }
                                 })
                             })
-                    var force = $('<a class="btn btn-mini" title="Force Check"><i class="icon-search"></i></a></td>').click(function () {
+                    var force = $('<a class="btn btn-mini" title="Force Check"><i class="fa fa-search"></i></a></td>').click(function () {
                                 $.ajax({
                                     url: WEBDIR + 'headphones/QueueAlbum&new=True',
                                     data: {'albumId': wanted.AlbumID},
@@ -300,7 +300,7 @@ function loadWanteds() {
                         $('<td>').append(headphonesStatusLabel(wanted.Status)),
                         $('<td>').append(div)
                         /*
-                        $('<td><a class="btn btn-mini"><i class="icon-remove-circle"></i></a></td>')
+                        $('<td><a class="btn btn-mini"><i class="fa fa-minus-circle"></i></a></td>')
 
 
                                 $.get(WEBDIR + 'headphones/UnqueueAlbum', {'albumId': wanted.AlbumID}, function(r) {
@@ -398,14 +398,14 @@ function headphonesStatusLabel(text) {
 
 
 var headphonesStatusMap = {
-    'Active': 'icon-repeat',
-    'Error': 'icon-bell',
-    'Paused': 'icon-pause',
-    'Snatched': 'icon-share-alt',
-    'Skipped': 'icon-fast-forward',
-    'Wanted': 'icon-heart',
-    'Processed': 'icon-ok',
-    'Unprocessed': 'icon-exclamation-sign'
+    'Active': 'fa fa-repeat',
+    'Error': 'fa fa-bell',
+    'Paused': 'fa fa-pause',
+    'Snatched': 'fa fa-share-alt',
+    'Skipped': 'fa fa-fast-forward',
+    'Wanted': 'fa fa-heart',
+    'Processed': 'fa fa-ok',
+    'Unprocessed': 'fa fa-exclamation'
 }
 function headphonesStatusIcon(iconText, white){
     var iconClass = headphonesStatusMap[iconText];
@@ -417,7 +417,7 @@ function headphonesStatusIcon(iconText, white){
     var icon = $('<i>').addClass(iconClass);
 
     if (white == true) {
-        icon.addClass('icon-white');
+        icon.addClass('fa- fa-inverse');
     }
     return icon;
 }
