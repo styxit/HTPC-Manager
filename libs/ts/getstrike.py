@@ -8,6 +8,7 @@ import logging
 # Disable the damn warnings
 requests.packages.urllib3.disable_warnings()
 
+
 def search(q, cat):
     # add cat's if ts is rewritten
     url = 'https://getstrike.net/api/v2/torrents/search/?phrase=%s' % urllib.quote_plus(q)
@@ -23,7 +24,6 @@ def search(q, cat):
                 r = {
                         'Provider': 'getstrike',
                         'BrowseURL': torrent['page'],
-                        #'DownloadURL': download_url,
                         'DownloadURL': torrent['magnet_uri'],
                         'ReleaseName': torrent['torrent_title'],
                         'Seeders': torrent['seeds'],
@@ -38,6 +38,9 @@ def search(q, cat):
 
                 l.append(r)
             return l
+        else:
+            logger.debug('Failed to fetch torrents from getstrike with query %s category %s message %s' (q, cat, r.json()['message']))
+            return []
     except Exception as e:
-        logger.debug('Failed to fetch any forrents from getstrike with query %s category %s error is %s' % (q, cat, e))
+        logger.debug('Failed to fetch any torrents from getstrike with query %s category %s error is %s' % (q, cat, e))
         return []
