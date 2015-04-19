@@ -42,8 +42,16 @@ webdir = htpc.WEBDIR
         </div>
 
 
+        <!-- To disable the use of CDNs comment out the following two lines -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        
+        <!-- To enable local js sources uncomment the following two linesk -->
+        <!--
         <script src="${htpc.WEBDIR}js/libs/jquery.min.js"></script>
         <script src="${htpc.WEBDIR}js/libs/bootstrap.min.js"></script>
+        -->
+        
         <script type="text/javascript">$(function () {$('#username').focus();});</script>
 
     </body>
