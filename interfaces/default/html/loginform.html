@@ -13,12 +13,22 @@ webdir = htpc.WEBDIR
     <link rel="apple-touch-icon" href="${htpc.WEBDIR}img/homescreen.png">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- To enable the use of CDNs uncomment out this block -->
+    <!--
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/minified/jquery-ui.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    -->
+    
+    <!-- To enable the us of CDNs comment out this block -->
     <link href="${htpc.WEBDIR}css/bootstrap-responsive.min.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
+    
     <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/base.css" rel="stylesheet"/>
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
     <link href="${self.attr.webdir}css/${scriptname}.css" rel="stylesheet">
     <script type="text/javascript">var WEBDIR="${htpc.WEBDIR}";</script>
 </head>
@@ -42,15 +52,15 @@ webdir = htpc.WEBDIR
         </div>
 
 
-        <!-- To disable the use of CDNs comment out the following two lines -->
+        <!-- To enable the use of CDNs uncomment out this block -->
+        <!--
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+        -->
         
-        <!-- To enable local js sources uncomment the following two linesk -->
-        <!--
+        <!-- To enable the us of CDNs comment out this block -->
         <script src="${htpc.WEBDIR}js/libs/jquery.min.js"></script>
         <script src="${htpc.WEBDIR}js/libs/bootstrap.min.js"></script>
-        -->
         
         <script type="text/javascript">$(function () {$('#username').focus();});</script>
 
