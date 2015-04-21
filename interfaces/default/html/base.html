@@ -14,19 +14,15 @@ webdir = htpc.WEBDIR
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
     <link href="${htpc.WEBDIR}css/bootstrap-slider.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- To enable the use of CDNs uncomment out this block -->
-    <!--
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/minified/jquery-ui.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-    -->
-    
-    <!-- To enable the us of CDNs comment out this block -->
-    <link href="${htpc.WEBDIR}css/bootstrap-responsive.min.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
-    
+    % if s.get('app_use_cdn', 0):
+	    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css" rel="stylesheet">
+	    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/minified/jquery-ui.min.css" rel="stylesheet">
+	    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    % else:
+	    <link href="${htpc.WEBDIR}css/bootstrap-responsive.min.css" rel="stylesheet">
+	    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
+	    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
+    % endif
     <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/base.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css" rel="stylesheet">
@@ -187,52 +183,50 @@ ${self.body()}
     %endfor
     menu_order = "${settings.get('menu_order', 0)}";
 </script>
-<!-- To enable the use of CDNs uncomment out this block -->
-<!--
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.09/jquery.form.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.1.10/js/jquery.metadata.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.1.10/js/jquery.tablesorter.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.raty.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.pnotify.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.pager.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/bootstrap-slider.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/holder/1.9/holder.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.2/moment.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/Sortable/1.0.0/Sortable.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/ChartNew.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/download.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.treegrid.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.treegrid.bootstrap2.js"></script>
-<script src="${htpc.WEBDIR}js/default.js"></script>
-<script src="${htpc.WEBDIR}js/${scriptname}.js"></script>
--->
-
-<!-- To enable the us of CDNs comment out this block -->
-<script src="${htpc.WEBDIR}js/libs/jquery.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery-ui.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.form.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.cookie.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.metadata.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.tablesorter.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.raty.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.pnotify.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.pager.js"></script>
-<script src="${htpc.WEBDIR}js/libs/bootstrap.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/bootstrap-slider.js"></script>
-<script src="${htpc.WEBDIR}js/libs/holder.js"></script>
-<script src="${htpc.WEBDIR}js/libs/moment.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.ui.touch-punch.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/Sortable.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/ChartNew.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/download.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.treegrid.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.treegrid.bootstrap2.js"></script>
-<script src="${htpc.WEBDIR}js/default.js"></script>
-<script src="${htpc.WEBDIR}js/${scriptname}.js"></script>
+% if s.get('app_use_cdn', 0):
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.09/jquery.form.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.1.10/js/jquery.metadata.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.1.10/js/jquery.tablesorter.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.raty.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.pnotify.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.pager.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/bootstrap-slider.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/holder/1.9/holder.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.2/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/Sortable/1.0.0/Sortable.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/ChartNew.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/download.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.treegrid.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.treegrid.bootstrap2.js"></script>
+	<script src="${htpc.WEBDIR}js/default.js"></script>
+	<script src="${htpc.WEBDIR}js/${scriptname}.js"></script>
+% else:
+	<script src="${htpc.WEBDIR}js/libs/jquery.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery-ui.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.form.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.cookie.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.metadata.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.tablesorter.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.raty.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.pnotify.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.pager.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/bootstrap.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/bootstrap-slider.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/holder.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/moment.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.ui.touch-punch.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/Sortable.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/ChartNew.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/download.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.treegrid.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.treegrid.bootstrap2.js"></script>
+	<script src="${htpc.WEBDIR}js/default.js"></script>
+	<script src="${htpc.WEBDIR}js/${scriptname}.js"></script>
+% endif
 </body>
 </html>
