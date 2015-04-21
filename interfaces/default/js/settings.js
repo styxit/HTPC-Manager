@@ -55,11 +55,10 @@ $(document).ready(function () {
         $.post(action, data, function (data) {
             btn.button('reset');
             if ($('#couchpotato_name').is(":visible")) {
-                if (data.success) {
-                    $('#couchpotato_apikey').val(data.api_key);
-                } else {
+                if (data === null || !data.success) {
                     notify('Settings', 'Failed to get couchpotato apikey', 'error');
-                    btn.addClass('btn-danger').append(' ').append($('<i>').addClass('fa fa-exclamation-circle fa-inverse'));
+                } else {
+                    $('#couchpotato_apikey').val(data.api_key);
                 }
             }
             if (data !== null) {
