@@ -147,7 +147,7 @@ class Vnstat(object):
 
         except Exception as e:
             self.logger.debug('Failed to return oneline %s' % e)
-            return {}
+            return
 
     @cherrypy.expose()
     @require()
