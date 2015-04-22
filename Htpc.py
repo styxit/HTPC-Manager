@@ -224,7 +224,7 @@ def main():
         openbrowser = 'http%s://%s:%s%s' % (browser_ssl, str(browser_host), htpc.PORT, htpc.WEBDIR[:-1])
         webbrowser.open(openbrowser, new=2, autoraise=True)
 
-    #Select if you want to controll processes and popen from HTPC Manager
+    #Select if you want to control processes and open from HTPC Manager
     htpc.SHELL = args.shell
 
     # Select wether to run as daemon

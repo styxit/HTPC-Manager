@@ -1,34 +1,34 @@
-This is HTPC Manager the way i want it.
+This is HTPC Manager the way I want it.
 
-Some of the difference is:
+Some of the differences are:
 
 #### [New modules]
-- sonarr
+- Sonarr
 - Headphones
 - Samsung TV remote
-- Sickrage module
+- SickRage module
 - Torrent search (BTN, Norbits, KAT and YTS)
-- Vnstat
+- vnStat
 
-#### [Improved]
+#### [Improvements]
 - NZBGet module (rewritten)
 - qBittorrent module
 - Transmission (add url, upload local torrent)
 - SABnzbd (drag'n drop to edit que)
 - Stats module is sortable.
-- Couchpotato
-- KODI/XBMC addons tab, where you can search/execute/enable/disable addons and a volume slider instead of a progressbar
+- CouchPotato
+- KODI/XBMC addons tab, where you can search/execute/enable/disable addons and a volume slider instead of a progress bar
 - Send a nzb from NZB search to NZBGet in addition to SABnzbd.
-- Set wanted category while adding movies in Couchpotato
+- Set wanted category while adding movies in CouchPotato
 
 #### [Misc]
 - Notification if a update is available and autoupdate
 - Htpc manager is now fluid. (Looks much better on high res screens)
 - Delete cache folder from the settings page
-- The brave and bold can choose what branch they want to use.
+- The brave and bold can choose which branch they want to use.
 - Added a option for robots.txt for bot crawlers
-- Make ssl cert and key automatically if you dont add a path for it
-- Mask sensetive stuff from the log (username, apikey, password etc)
+- Make ssl cert and key automatically if you don't add a path for it
+- Mask sensitive stuff from the log (username, apikey, password etc)
 - Reduced size on static files
 - Docker support
 - Various fixes
@@ -36,7 +36,7 @@ Some of the difference is:
 
 
 
-If your missing something dont be afraid to make a request :)
+If you're missing something don't be afraid to make a request :)
 
 See here for full list:
 https://github.com/Hellowlol/HTPC-Manager/compare/styxit:master...master2
@@ -49,19 +49,19 @@ INCLUDE THIS IN YOUR ISSUE:
  - What did you do?
  - What happened?
  - What did you expect to happen?
- - If its a visual bug, screenshot or it didnt happen!
- - What browser, including version
+ - If it's a visual bug, screenshot or it didn't happen!
+ - Which browser, including version
  - Link to a copy/paste of your logfile with clear debug info of the error on [PASTEBIN](http://www.pastebin.com)
 
 #### How to enable detailed logs
 1. Shutdown HTPC Manager
 2. Start Htpc.py --loglevel debug (Do NOT start with --debug)
-3. Start HTPC Manager and wait for error to occure again
+3. Start HTPC Manager and wait for error to occur again
 
 HTPC Manager
 =====
 
-A python based web application to manage the software on your Htpc. Htpc Manager combines all your favorite software into one slick interface. See [http://htpc.io](http://htpc.io).
+A python based web application to manage the software on your HTPC. HTPC Manager combines all your favorite software into one slick interface. See [http://htpc.io](http://htpc.io).
 
 ![Screenshot](http://htpc.io/img/screenshots/dashboard.png)
 
