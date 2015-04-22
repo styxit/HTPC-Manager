@@ -22,7 +22,7 @@ $(document).ready(function () {
     $('#add_show_button').click(addShowAction);
 
     $('#add_tvdbid_button').click(function () {
-        addShow($('#add_show_select').val(), $('#add_show_quality').val(), $('#add_show_folder').val());
+        addShow($('#add_show_select').val(), $('#add_show_quality').val(), $('#add_show_folder').val(), $('#add_show_seasonfolder').val(), $('#add_show_specials').val());
     });
 
     $('#cancel_show_button').click(function () {
@@ -254,13 +254,16 @@ function searchTvDb(query) {
             $('#add_tvdbid_button').show();
             $('#add_show_quality').fadeIn().show();
             $('#add_show_folder').fadeIn().show();
+            $('.sonarr_checkboxs').show();
         }
     });
 }
 
-function addShow(tvdbid, quality, rootfolder) {
+function addShow(tvdbid, quality, rootfolder, seasonfolder, specials) {
     var data = {
-        rootfolder: rootfolder
+        rootfolder: rootfolder,
+        seasonfolder: seasonfolder,
+        specials: specials
     };
 
     $.ajax({
@@ -293,6 +296,7 @@ function cancelAddShow() {
     $('#add_show_button').show();
     $('#add_show_quality').hide();
     $('#add_show_folder').hide();
+    $('.sonarr_checkboxs').hide();
 }
 
 

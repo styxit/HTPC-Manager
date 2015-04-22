@@ -226,7 +226,7 @@ class Sonarr(object):
 
     @cherrypy.expose()
     @require()
-    def AddShow(self, tvdbid, quality, rootfolder):
+    def AddShow(self, tvdbid, quality, rootfolder='', seasonfolder='on', specials=False):
         d = {}
         try:
             tvshow = self.fetch('Series/lookup?term=tvdbid:%s' % tvdbid)
@@ -240,8 +240,16 @@ class Sonarr(object):
                 d["qualityProfileId"] = int(quality)
                 d["titleSlug"] = i['titleSlug']
                 d["RootFolderPath"] = rootfolder
+                d["monitored"] = True
 
-                for x in xrange(1, int(seasoncount)):
+                if seasonfolder == 'on':
+                    d["seasonFolder"] = True
+                if specials == 'on':
+                    start_on_season = 0
+                else:
+                    start_on_season = 1
+
+                for x in xrange(start_on_season, int(seasoncount)):
                     s = {"seasonNumber": x, "monitored": True}
                     season.append(s)
 
