@@ -227,7 +227,7 @@ def main():
     #Select if you want to control processes and open from HTPC Manager
     htpc.SHELL = args.shell
 
-    # Select wether to run as daemon
+    # Select whether to run as daemon
     htpc.DAEMON = args.daemon
 
     # Set Application PID

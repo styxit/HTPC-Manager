@@ -26,7 +26,7 @@ $(document).ready(function() {
         }
     });
 
-    // Toggle wether to show already seen episodes
+    // Toggle whether to show already seen episodes
     $('#hidewatched').click(function(e) {
         e.preventDefault();
         hideWatched = $(this).toggleClass('active').hasClass('active')?1:0;
