@@ -40,7 +40,7 @@ function search(query) {
 
     $.getJSON(WEBDIR + "torrentsearch/search/" + query, function (response) {
 
-        // Stops the function from running if the search dont get any hits
+        // Stops the function from running if the search doesn't get any hits
         if (!response.length) {
             $('#error_msg').text('Didnt find any torrents with the query ' + query);
             $('#error_msg').css({"font-weight": "bold"});
@@ -50,12 +50,10 @@ function search(query) {
 
         $.each(response, function (index, torrent) {
             tr = $('<tr>');
-
-            img = $('<img alt="icon">').attr('src', '../img/'+ torrent.Provider + '.png')
             link = $('<a target="_blank">').attr('href', torrent.BrowseURL).text(torrent.ReleaseName)
 
             tr.append(
-            $('<td>').append(img), // provider icon
+            $('<td>').append($('<i>').addClass('rg rg-provider rg-' + torrent.Provider)), // provider icon
             $('<td>').append(link),
             //$('<td class="span3 torrentsearch_releasename">').text(torrent.ReleaseName),
             $('<td>').addClass('torrentsearch_seeders').text(torrent.Seeders),
