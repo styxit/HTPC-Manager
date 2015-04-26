@@ -534,6 +534,9 @@ class Plex(object):
             return
 
     def check_ignore(self, name):
+        """ Checks if a sections name is in the ignore list
+            Returns True if its not in it or there is no ignore list """
+
         ign = htpc.settings.get('plex_ignore_sections', '')
         if ign:
             ign = htpc.settings.get('plex_ignore_sections').split(', ')
@@ -542,7 +545,7 @@ class Plex(object):
             else:
                 return False
         else:
-            return False
+            return True
 
     @cherrypy.expose()
     @require()
