@@ -153,6 +153,15 @@ table th.tablesorter-header {
     -moz-box-shadow:none !important;
 }
 
+.rg-provider {
+	font-size: 20px !important;
+	vertical-align: middle !important;
+}
+
+.rg-client {
+	font-size: 18px !important;
+}
+
 
 
 
