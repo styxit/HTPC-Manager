@@ -23,6 +23,7 @@ webdir = htpc.WEBDIR
 	    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
 	    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
     % endif
+    <link href="${htpc.WEBDIR}css/rg-icons.min.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/base.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css" rel="stylesheet">
@@ -38,7 +39,7 @@ webdir = htpc.WEBDIR
             <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
                 <i class="fa fa-bars fa-inverse"></i>
             </a>
-            <a href="${htpc.WEBDIR}" class="brand">HTPC Manager</a>
+            <a href="${htpc.WEBDIR}"><i class="rg rg-htpc brand" style="font-family: 'rg-icons';font-size:28px;font-weight: normal"></i></a>
             <div class="nav-collapse">
                 <ul class="nav" id="nav-menu">
                     <% customurls = s.getUrls() %>

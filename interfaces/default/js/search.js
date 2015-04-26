@@ -99,26 +99,29 @@ function anc(nzb) {
     var n = 0;
     $.each(clients, function (i, client) {
         if (client.active === 1) {
-            // If there any active clients add 1 to n
+            // If any active clients add 1 to n
             n += 1;
-            var button = $('<img>').addClass("btn btn-mini").attr('src', client.icon).
-            attr('title', "Send to " + client.client).
-            css("cursor", "pointer").click(function () {
-                sendToclient(nzb, client);
-            });
-
-            b.append(button);
+		    var button = $('<button>').addClass("btn btn-mini rg-client").attr('title', 'Send to ' + client.client)
+		        .css({
+		        "cursor": "pointer",
+		        "height": "24px"
+		    }).click(function () {
+		        sendToclient(nzb, client);
+		    }).append($('<i>').addClass('rg rg-' + client.client));
+		
+		    b.append(button);
+    
         }
     });
 
-    // Manuel download button
-    var browserdl = $('<button>').addClass("btn btn-mini").attr('title', 'Download NZB to browser')
+    // Manual download button
+    var browserdl = $('<button>').addClass("btn btn-mini rg-client").attr('title', 'Download NZB to browser')
         .css({
         "cursor": "pointer",
-        "height": "18px"
+        "height": "24px"
     }).click(function () {
         downloadFile(nzb.link);
-    }).append($('<i>').addClass('fa fa-download'));
+    }).append($('<i>').addClass('fa fa-download rg-client'));
 
     b.append(browserdl);
 
