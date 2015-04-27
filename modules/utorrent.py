@@ -162,6 +162,12 @@ class UTorrent(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
+    def remove_data(self, torrent_id):
+        return self.do_action('removedata', hash=torrent_id).json()
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
     def add_url(self, url):
         try:
             res = self.do_action('add-url', s=url)
@@ -206,7 +212,7 @@ class UTorrent(object):
         :rtype: requests.Response
         :return:
         """
-        if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove', 'add-url'):
+        if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove', 'add-url', 'removedata'):
             raise AttributeError
         if action == 'add-url':
             return self.fetch('?action=%s&s=%s' %(action, s))
