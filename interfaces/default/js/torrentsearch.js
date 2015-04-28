@@ -84,7 +84,7 @@ function atc(torrent) {
         var n = 0;
         $.each(clients, function (i, client) {
             if (client.active === 1) {
-                var button = $('<a>').addClass('btn btn-mini dlt').
+                var button = $('<a>').addClass('btn btn-mini dlt rg-client').
                 attr('data-client', client.title).
                 attr('data-path', client.path).
                 attr('data-cmd', client.cmd).
