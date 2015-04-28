@@ -95,7 +95,7 @@ function get_clients() {
 
 function anc(nzb) {
     var b = $('<div>').addClass('btn-group clearfix');
-    // Used to check if there is any active clients
+    // Used to check if there are any active clients
     var n = 0;
     $.each(clients, function (i, client) {
         if (client.active === 1) {
@@ -107,7 +107,7 @@ function anc(nzb) {
 		        "height": "24px"
 		    }).click(function () {
 		        sendToclient(nzb, client);
-		    }).append($('<i>').addClass('rg rg-' + client.client));
+		    }).append($('<i>').addClass('rg rg-' + client.client + '-c'));
 		
 		    b.append(button);
     

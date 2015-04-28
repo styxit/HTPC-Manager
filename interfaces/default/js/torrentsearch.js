@@ -53,7 +53,7 @@ function search(query) {
             link = $('<a target="_blank">').attr('href', torrent.BrowseURL).text(torrent.ReleaseName)
 
             tr.append(
-            $('<td>').append($('<i>').addClass('rg rg-provider rg-' + torrent.Provider)), // provider icon
+            $('<td>').append($('<i>').addClass('rg rg-provider rg-' + torrent.Provider + '-c')), // provider icon
             $('<td>').append(link),
             //$('<td class="span3 torrentsearch_releasename">').text(torrent.ReleaseName),
             $('<td>').addClass('torrentsearch_seeders').text(torrent.Seeders),
@@ -80,26 +80,26 @@ function search(query) {
 
 function atc(torrent) {
     var b = $('<div>').addClass('btn-group');
-        // Used to check if there is any active clients
+        // Used to check if there are any active clients
         var n = 0;
         $.each(clients, function (i, client) {
             if (client.active === 1) {
-                var button = $('<a>').addClass('btn btn-mini dlt').
+                var button = $('<a>').addClass('btn btn-mini dlt rg-client').
                 attr('data-client', client.title).
                 attr('data-path', client.path).
                 attr('data-cmd', client.cmd).
                 attr('data-name', torrent.ReleaseName). // not correct
                 attr('data-hash', torrent.DownloadURL).
                 attr('href', "#");
-                // If there any active clients add 1 to n
+                // If there are any active clients add 1 to n
                 n += 1;
                 // Makes icon and pop title
-                var img = makeIcon("rg rg-" + client.title.toLowerCase(), client.title);
+                var img = makeIcon("rg rg-" + client.title.toLowerCase(), client.title + "-c");
                 button.append(img);
                 b.append(button);
             }
         });
-        // Checks if there is any active clients, if it isnt add a error message.
+        // Checks if there are any active clients, if there isn't add an error message.
         if (n === 0) { // remove || 1 if needed was to test
             b.append('No active clients').removeClass('btn-group');
             return b;
