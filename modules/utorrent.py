@@ -95,10 +95,12 @@ class ConnectionError(Exception):
 
 
 class UTorrent(object):
-    _token = None
+    _token = ''
     _cookies = None
+    #sess = requests.session()
 
     def __init__(self):
+        self.sess = requests.session()
         htpc.MODULES.append({
             'name': 'uTorrent',
             'id': 'utorrent',
@@ -134,12 +136,13 @@ class UTorrent(object):
     @require()
     @cherrypy.tools.json_out()
     def torrents(self):
-        try:
-            req = self.fetch('?list=1')
-        except ConnectionError:
+        req = self.fetch('&list=1')
+        # handle this better
+        if req:
+            torrents = req.json()['torrents']
+            return {'torrents': [TorrentResult(tor) for tor in torrents], 'result': req.status_code}
+        else:
             return {'result': 500}
-        torrents = req.json()['torrents']
-        return {'torrents': [TorrentResult(tor) for tor in torrents], 'result': req.status_code}
 
     @cherrypy.expose()
     @require()
@@ -178,7 +181,7 @@ class UTorrent(object):
             res = self.do_action('add-url', s=link)
             return {'result': res.status_code}
         except Exception as e:
-            logger.error('Failed to sendt %s to uTorrent %s' % (link, torrentname))
+            logger.error('Failed to sendt %s to uTorrent %s %s' % (link, torrentname, e))
 
     @cherrypy.expose()
     @require()
@@ -194,7 +197,7 @@ class UTorrent(object):
             else:
                 return
         except Exception, e:
-            logger.debug("Exception: " + str(e))
+            logger.debug("Exception: %s" % e)
             logger.error("Unable to contact uTorrent via " + self._get_url(utorrent_host, utorrent_port))
             return
 
@@ -209,12 +212,10 @@ class UTorrent(object):
         if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove', 'add-url'):
             raise AttributeError
         if action == 'add-url':
-            return self.fetch('?action=%s&s=%s' %(action, s))
-        try:
-            params_str = ''.join(["&%s=%s" % (k, v) for k, v in kwargs.items()])
-            return self.fetch('?action=%s%s&hash=%s' % (action, params_str, hash))
-        except ConnectionError:
-            return {'result': 500}
+            return self.fetch('&action=%s&s=%s' % (action, s))
+
+        params_str = ''.join(["&%s=%s" % (k, v) for k, v in kwargs.items()])
+        return self.fetch('&action=%s%s&hash=%s' % (action, params_str, hash))
 
     def _get_url(self, host=None, port=None):
         u_host = host or htpc.settings.get('utorrent_host')
@@ -223,9 +224,11 @@ class UTorrent(object):
         return 'http://{}:{}/gui/'.format(striphttp(u_host), u_port)
 
     def auth(self, host, port, username, pwd):
+        logger.debug('Fetching auth token')
         token_page = requests.get(self._get_url(host, port) + 'token.html', auth=(username, pwd))
         self._token = AuthTokenParser().token(token_page.content)
         self._cookies = token_page.cookies
+        logger.debug('Auth token is %s' % self._token)
 
     def _fetch(self, host, port, username, pwd, args):
         """
@@ -238,16 +241,24 @@ class UTorrent(object):
         :rtype: requests.Response
         :return:
         """
-
-        if not self._cookies or not self._token:
-            self.auth(host, port, username, pwd)
+        # On 2.2.1 uTorrent never returns cookies,
         if not args:
             return
-        token_str = '&token=%s' % self._token
 
-        response = requests.get(self._get_url(host, port) + args + token_str, auth=(username, pwd),
-                                cookies=self._cookies)
-        return response
+        token_str = '?token=%s' % self._token
+
+        url = self._get_url(host, port) + token_str + args
+        logger.debug('Trying to _fetch %s' % url)
+
+        try:
+            response = self.sess.get(self._get_url(host, port) + token_str + args,
+                                     auth=(username, pwd), cookies=self._cookies)
+            return response
+        except Exception as e:
+            print "failed to get %e"
+            logger.error("Fail to get %s exception %s" % (url, e))
+
+        #return response
 
     def fetch(self, args):
         """
@@ -260,6 +271,20 @@ class UTorrent(object):
         host = htpc.settings.get('utorrent_host')
         port = htpc.settings.get('utorrent_port')
         try:
-            return self._fetch(host, port, username, password, args)
-        except requests.ConnectionError:
-            raise ConnectionError
+            r = self._fetch(host, port, username, password, args)
+            # Api returns 300 if invalid token according to the docs
+            # really returns 400
+            # Check for a valid http code
+            if r.status_code == 200:
+                return r
+            elif r.status_code == 400:
+                # Fetch a new token
+                self.auth(host, port, username, password)
+                r = self._fetch(host, port, username, password, args)
+            else:
+                # log http status and error message
+                self.logger.error("%s" % r.raise_for_status())
+                return r
+
+        except Exception as e:
+            logger.error("Failed to fetch args %s %s" % (args, e))
