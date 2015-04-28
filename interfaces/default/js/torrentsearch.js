@@ -94,7 +94,7 @@ function atc(torrent) {
                 // If there are any active clients add 1 to n
                 n += 1;
                 // Makes icon and pop title
-                var img = makeIcon("rg rg-" + client.title.toLowerCase(), client.title + "-c");
+                var img = makeIcon("rg rg-" + client.title.toLowerCase() + "-c", client.title);
                 button.append(img);
                 b.append(button);
             }
