@@ -97,7 +97,6 @@ class ConnectionError(Exception):
 class UTorrent(object):
     _token = ''
     _cookies = None
-    #sess = requests.session()
 
     def __init__(self):
         self.sess = requests.session()
@@ -172,6 +171,9 @@ class UTorrent(object):
         except ConnectionError, e:
             logger.exception(e)
 
+    def settings(self):
+        return self.do_action('getsettings')
+
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
@@ -182,6 +184,9 @@ class UTorrent(object):
             return {'result': res.status_code}
         except Exception as e:
             logger.error('Failed to sendt %s to uTorrent %s %s' % (link, torrentname, e))
+
+    def change_label(self, hash, label):
+        return self.do_action('setprops', hash=hash, s='label', v=label)
 
     @cherrypy.expose()
     @require()
@@ -209,12 +214,18 @@ class UTorrent(object):
         :rtype: requests.Response
         :return:
         """
-        if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove', 'add-url'):
+        if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove', 'add-url', 'recheck', 'setprio',
+                          'queuebottom', 'queuetop', 'queuedown', 'queueup', 'getfiles', 'getsettings'):
             raise AttributeError
         if action == 'add-url':
             return self.fetch('&action=%s&s=%s' % (action, s))
 
         params_str = ''.join(["&%s=%s" % (k, v) for k, v in kwargs.items()])
+
+        if hash is None:
+            # getsettings
+            return self.fetch('&action=%s%s' % (action, params_str))
+
         return self.fetch('&action=%s%s&hash=%s' % (action, params_str, hash))
 
     def _get_url(self, host=None, port=None):
@@ -241,7 +252,6 @@ class UTorrent(object):
         :rtype: requests.Response
         :return:
         """
-        # On 2.2.1 uTorrent never returns cookies,
         if not args:
             return
 
@@ -254,11 +264,9 @@ class UTorrent(object):
             response = self.sess.get(self._get_url(host, port) + token_str + args,
                                      auth=(username, pwd), cookies=self._cookies)
             return response
-        except Exception as e:
-            print "failed to get %e"
-            logger.error("Fail to get %s exception %s" % (url, e))
 
-        #return response
+        except Exception as e:
+            logger.error("Fail to get %s exception %s" % (url, e))
 
     def fetch(self, args):
         """
