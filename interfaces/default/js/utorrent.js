@@ -1,9 +1,11 @@
 $(document).ready(function () {
     $('.spinner').show();
     getTorrents();
-    setAddTorrentModal();
+    get_speed_limit()
+    //setAddTorrentModal();
     setInterval(function () {
         getTorrents();
+        get_speed_limit();
     }, 4000);
 
     $('#addurlform').submit(function (e) {
@@ -11,6 +13,27 @@ $(document).ready(function () {
         var url = $('#torrenturl').val()
         if (url) addUrl(url)
     })
+
+    $('#add_torrent_button').click(function() {
+        var l = $('#add_torrent_url').val()
+        console.log(l)
+        if (l.length) {
+            addUrl(l)
+        }
+
+    })
+
+    $('#utorrent_speed_down').keyup(function(event){
+        if(event.keyCode == 13){
+            set_dl($('#utorrent_speed_down').val())
+        }
+    });
+
+    $('#utorrent_speed_up').keyup(function(event){
+        if(event.keyCode == 13){
+            set_ul($('#utorrent_speed_up').val())
+        }
+    });
 
     // Torrent button ajax load
     $(document.body).off('click', '#torrents .torrent-action a');
@@ -70,6 +93,7 @@ function addUrl(url) {
             'success': function (response) {
 
                 if (response.result == 200) {
+                    $('#add_torrent_url').val('')
                     notify('Success', '<strong>Success</strong> Torrent added !', 'success', 5);
                 }
                 else {
@@ -122,7 +146,7 @@ function getTorrents() {
                         attr('href', WEBDIR + 'utorrent/remove/' + torrent.id).
                         attr('title', 'Remove torrent');
                     buttons.append(removeButton);
-                    
+
                     // Delete Button button
                     removeDataButton = $('<a>').
                         addClass('btn btn-mini').
@@ -242,4 +266,40 @@ function getStatusInfo(torrent) {
             }
         }
     }
+}
+
+
+function set_dl(speed) {
+    $.get(WEBDIR + 'utorrent/set_downspeed/' + speed, function () {
+        if (speed === 0) {
+            notify('uTorrent', 'Removed download speed limit', 'info');
+        } else {
+            notify('uTorrent', 'Changed download speed to ' + speed + ' kB/s', 'info');
+        }
+
+    });
+}
+
+function set_ul(speed) {
+    $.get(WEBDIR + 'utorrent/set_upspeed/' + speed, function () {
+        if (speed === 0) {
+            notify('uTorrent', 'Removed upload speed limit', 'info');
+        } else {
+            notify('uTorrent', 'Changed upload speed to ' + speed + ' kB/s', 'info');
+        }
+
+    });
+}
+
+function get_speed_limit() {
+    $.ajax({
+        'url': WEBDIR + 'utorrent/get_speed_limit',
+            'dataType': 'json',
+            'success': function (response) {
+                console.log(response);
+                $('#utorrent_speed_down').attr("placeholder", response.dl + ' kB/s');
+                $('#utorrent_speed_up').attr("placeholder", response.ul + ' kB/s');
+            }
+        }
+    );
 }
