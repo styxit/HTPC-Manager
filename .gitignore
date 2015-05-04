@@ -19,3 +19,5 @@ Thumbs.db
 .idea
 htpc_manager.log
 *.orig
+config.codekit
+.flux

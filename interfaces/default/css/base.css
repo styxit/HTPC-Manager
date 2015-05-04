@@ -50,6 +50,11 @@ table th.tablesorter-header {
 .footer {
   height: 30px;
 }
+.navbar .brand {
+	font-family: "rg-icons" !important;
+	font-size: 28px !important;
+	font-weight: normal !important;
+}
 .nav-collapse.in.collapse {
     height: auto !important;
 }
@@ -59,19 +64,35 @@ table th.tablesorter-header {
 .nav-menu-item-edit a{
     cursor: move;
 }
-
+.nav-menu-item {
+  	line-height: 26px !important;
+}
+.navbar .dropdown {
+	line-height: 26px !important;
+}
+.navbar .btn-group > a {
+    background:none !important;
+    border:none !important;
+    box-shadow:none !important;
+    -webkit-background:none !important;
+    -webkit-border:none !important;
+    -webkit-box-shadow:none !important;
+    -moz-background:none !important;
+    -moz-border:none !important;
+    -moz-box-shadow:none !important;
+}
+.navbar .fa-bars {
+	font-size: 2em;
+}
 .ofa {
     overflow: auto;
 }
-
 .mofa::-webkit-scrollbar {
     display: none;
 }
-
 .mofa {
     overflow: auto;
 }
-
 .spinner {
   font-size: 6px;
   margin: 5em auto;
@@ -141,31 +162,10 @@ table th.tablesorter-header {
   }
  }
 
-.menu-bars > a {
-    background:none !important;
-    border:none !important;
-    box-shadow:none !important;
-    -webkit-background:none !important;
-    -webkit-border:none !important;
-    -webkit-box-shadow:none !important;
-    -moz-background:none !important;
-    -moz-border:none !important;
-    -moz-box-shadow:none !important;
-}
-
 .rg-provider {
 	font-size: 20px !important;
 	vertical-align: middle !important;
 }
-
 .rg-client {
 	font-size: 18px !important;
 }
-
-.nav-menu-item {
-  line-height: 26px;
-}
-
-
-
-
