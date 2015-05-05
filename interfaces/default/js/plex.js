@@ -98,7 +98,7 @@ function loadMovies(options) {
 
                     var src = 'holder.js/100x150/text:No artwork';
                     if (movie.thumbnail != undefined) {
-                        src = WEBDIR + 'plex/GetThumb?w=100&h=150&thumb='+encodeURIComponent(movie.thumbnail);
+                        src = WEBDIR + 'plex/GetThumb?w=225&h=338&thumb='+encodeURIComponent(movie.thumbnail);
                     }
                     movieAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
@@ -122,7 +122,7 @@ function loadMovies(options) {
 }
 
 function loadMovie(movie) {
-    var poster = WEBDIR + 'plex/GetThumb?w=200&h=300&thumb='+encodeURIComponent(movie.thumbnail)
+    var poster = WEBDIR + 'plex/GetThumb?w=375&h=563&thumb='+encodeURIComponent(movie.thumbnail)
     var info = $('<div>').addClass('modal-movieinfo');
     if (movie.runtime) {
     info.append($('<p>').html('<b>Runtime:</b> ' + movie.runtime + ' min'));
@@ -162,12 +162,12 @@ function loadMovie(movie) {
         }, 'json');
 
     $('.modal-fanart').css({
-        'background-image' : 'url('+WEBDIR+'plex/GetThumb?w=675&h=400&o=10&thumb='+encodeURIComponent(movie.fanart)+')'
+        'background-image' : 'url('+WEBDIR+'plex/GetThumb?w=1013&h=600&o=10&thumb='+encodeURIComponent(movie.fanart)+')'
     });
 }
 
 function loadEpisode(episode) {
-    var poster = WEBDIR + 'plex/GetThumb?w=200&h=300&thumb='+encodeURIComponent(episode.thumbnail)
+    var poster = WEBDIR + 'plex/GetThumb?w=375&h=563&thumb='+encodeURIComponent(episode.thumbnail)
     var info = $('<div>').addClass('modal-episodeinfo');
     if (episode.runtime) {
     info.append($('<p>').html('<b>Runtime:</b> ' + episode.runtime + ' min'));
@@ -253,7 +253,7 @@ function loadShows(options) {
 
                     var src = 'holder.js/100x150/text:No artwork';
                     if (show.thumbnail != undefined) {
-                        src = WEBDIR + 'plex/GetThumb?w=100&h=150&thumb='+encodeURIComponent(show.thumbnail);
+                        src = WEBDIR + 'plex/GetThumb?w=225&h=338&thumb='+encodeURIComponent(show.thumbnail);
                     }
                     showAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
@@ -328,7 +328,7 @@ function loadEpisodes(options) {
 
                     var src = 'holder.js/150x85/text:No artwork';
                     if (episode.thumbnail != '') {
-                        src = WEBDIR + 'plex/GetThumb?w=150&h=85&thumb='+encodeURIComponent(episode.thumbnail);
+                        src = WEBDIR + 'plex/GetThumb?w=375&h=210&thumb='+encodeURIComponent(episode.thumbnail);
                     }
                     episodeAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
@@ -471,7 +471,7 @@ function loadAlbums(options) {
 
                     var src = 'holder.js/150x150/text:No artwork';
                     if (album.thumbnail != '') {
-                        src = WEBDIR + 'plex/GetThumb?w=150&h=150&thumb='+encodeURIComponent(album.thumbnail);
+                        src = WEBDIR + 'plex/GetThumb?w=300&h=300&thumb='+encodeURIComponent(album.thumbnail);
                     }
                     albumItem.append($('<img>').attr('src', src).addClass('thumbnail'));
 
@@ -598,16 +598,16 @@ function loadNowPlaying() {
                 } else {
                     switch(item.type) {
                         case 'episode':
-                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=150&h=75&thumb='+nowPlayingThumb);
+                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=525&h=300&thumb='+nowPlayingThumb);
                             thumbnail.attr('width', '150').attr('height', '75');
                             break;
                         case 'movie':
-                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=100&h=150&thumb='+nowPlayingThumb);
+                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=225&h=338&thumb='+nowPlayingThumb);
                             thumbnail.attr('width', '100').attr('height', '150');
                             break;
                         default:
-                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=140&h=140&thumb='+nowPlayingThumb);
-                            thumbnail.attr('width', '140').attr('height', '140');
+                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=300&h=300&thumb='+nowPlayingThumb);
+                            thumbnail.attr('width', '150').attr('height', '150');
                     }
                 }
                 if (item.type == 'episode') {
