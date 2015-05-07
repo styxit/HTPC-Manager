@@ -73,7 +73,11 @@ def start():
     # If ssl is enabled but there is not cert og key, try to make self signed.
     if htpc.USE_SSL:
         # Check if the cert and  key exists
-        if not (htpc.SSLCERT and os.path.exists(htpc.SSLCERT)) and not (htpc.SSLKEY and os.path.exists(htpc.SSLKEY)):
+        logger.debug("htpc.SSLCERT %s %s" % (htpc.SSLCERT, os.path.exists(htpc.SSLCERT)))
+        logger.debug("htpc.SSLKEY %s %s" % (htpc.SSLKEY, os.path.exists(htpc.SSLKEY)))
+
+        if not os.path.exists(htpc.settings.get('app_ssl_cert')) and not os.path.exists(htpc.settings.get('app_ssl_key')):
+        #if not os.path.exists(htpc.SSLCERT) and not os.path.exists(htpc.SSLKEY):
             serverkey = os.path.join(htpc.DATADIR, 'server.key')
             cert = os.path.join(htpc.DATADIR, 'server.crt')
             logger.debug('There isnt any certificate or key, trying to make them')
@@ -81,14 +85,14 @@ def start():
             # If they dont exist, make them.
             if create_https_certificates(serverkey, cert):
                 # Save the new crt and key to settings
-                htpc.SSLKEY = htpc.settings.set('app_ssl_key', serverkey)
-                htpc.SSLCERT = htpc.settings.set('app_ssl_cert', cert)
+                htpc.SSLKEY = htpc.settings.set('app_ssl_key', os.path.abspath(serverkey))
+                htpc.SSLCERT = htpc.settings.set('app_ssl_cert', os.path.abspath(cert))
                 htpc.ENABLESSL = True
                 logger.debug("Created certificate and key successfully")
                 logger.info("Restarting to activate SSL")
                 do_restart()
 
-        if (htpc.SSLCERT and os.path.exists(htpc.SSLCERT)) and (htpc.SSLKEY and os.path.exists(htpc.SSLKEY)):
+        if os.path.exists(htpc.SSLCERT) and os.path.exists(htpc.SSLKEY):
             htpc.ENABLESSL = True
 
     if htpc.ENABLESSL:
