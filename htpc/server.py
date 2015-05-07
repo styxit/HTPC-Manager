@@ -71,28 +71,24 @@ def start():
         })
 
     # If ssl is enabled but there is not cert og key, try to make self signed.
-    if htpc.USE_SSL:
+    if htpc.settings.get('app_use_ssl'):
         # Check if the cert and  key exists
-        logger.debug("htpc.SSLCERT %s %s" % (htpc.SSLCERT, os.path.exists(htpc.SSLCERT)))
-        logger.debug("htpc.SSLKEY %s %s" % (htpc.SSLKEY, os.path.exists(htpc.SSLKEY)))
-
         if not os.path.exists(htpc.settings.get('app_ssl_cert')) and not os.path.exists(htpc.settings.get('app_ssl_key')):
-        #if not os.path.exists(htpc.SSLCERT) and not os.path.exists(htpc.SSLKEY):
             serverkey = os.path.join(htpc.DATADIR, 'server.key')
-            cert = os.path.join(htpc.DATADIR, 'server.crt')
+            cert = os.path.join(htpc.DATADIR, 'server.cert')
             logger.debug('There isnt any certificate or key, trying to make them')
 
             # If they dont exist, make them.
             if create_https_certificates(serverkey, cert):
                 # Save the new crt and key to settings
-                htpc.SSLKEY = htpc.settings.set('app_ssl_key', os.path.abspath(serverkey))
-                htpc.SSLCERT = htpc.settings.set('app_ssl_cert', os.path.abspath(cert))
+                htpc.SSLKEY = htpc.settings.set('app_ssl_key', serverkey)
+                htpc.SSLCERT = htpc.settings.set('app_ssl_cert', cert)
                 htpc.ENABLESSL = True
                 logger.debug("Created certificate and key successfully")
                 logger.info("Restarting to activate SSL")
                 do_restart()
 
-        if os.path.exists(htpc.SSLCERT) and os.path.exists(htpc.SSLKEY):
+        if os.path.exists(htpc.settings.get('app_ssl_cert')) and os.path.exists(htpc.settings.get('app_ssl_key')):
             htpc.ENABLESSL = True
 
     if htpc.ENABLESSL:
@@ -100,8 +96,8 @@ def start():
         logger.debug("SSL is enabled")
         cherrypy.config.update({
                 'server.ssl_module': 'builtin',
-                'server.ssl_certificate': htpc.SSLKEY,
-                'server.ssl_private_key': htpc.SSLCERT
+                'server.ssl_certificate': htpc.settings.get('app_ssl_cert'),
+                'server.ssl_private_key': htpc.settings.get('app_ssl_key')
 
         })
 
