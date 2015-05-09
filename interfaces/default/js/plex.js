@@ -637,7 +637,7 @@ function loadNowPlaying() {
                     btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stepBack').attr('data-player', item.address).append('<i class="fa fa-backward"></i>'));
                     btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stop').attr('data-player', item.address).append('<i class="fa fa-stop"></i>'));
                     if (item.state == 'playing') {
-                        btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'play').attr('data-player', item.address).append('<i class="fa fa-pause"></i>'));
+                        btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'pause').attr('data-player', item.address).append('<i class="fa fa-pause"></i>'));
                     } else {
                         btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'play').attr('data-player', item.address).append('<i class="fa fa-play"></i>'));
                     }
