@@ -474,7 +474,7 @@ class Plex(object):
 
                                 if 'titleSort' in artist:
                                     jartist['titlesort'] = artist['titleSort']
-                                jartist = {}
+                                
                                 jartist['title'] = artist['title']
                                 jartist['id'] = artist['ratingKey']
 
