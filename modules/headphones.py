@@ -46,12 +46,12 @@ class Headphones(object):
             name=settings.get('headphones_name', 'Headphones')
         )
 
-
     def webinterface(self):
-        url = self._build_url
+        url = Headphones._build_url()
         if htpc.settings.get('headphones_reverse_proxy_link'):
             url = htpc.settings.get('headphones_reverse_proxy_link')
         return url
+
     @cherrypy.expose()
     @require()
     def GetThumb(self, url=None, thumb=None, h=None, w=None, o=100):
