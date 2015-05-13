@@ -100,6 +100,8 @@ def load_modules():
     htpc.ROOT.vnstat = Vnstat()
     from modules.headphones import Headphones
     htpc.ROOT.headphones = Headphones()
+    from modules.mylar import Mylar
+    htpc.ROOT.mylar = Mylar()
 
 
 def init_sched():

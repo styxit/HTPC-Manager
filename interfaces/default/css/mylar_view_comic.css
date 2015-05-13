@@ -1,0 +1,86 @@
+table td{
+	vertical-align: middle !important;
+}
+
+.comic_img {
+  height: 525px;
+}
+
+#banner {
+  margin-bottom: 15 px;
+}
+
+.mylar_comic .banner{
+  position: relative;
+  border-radius: 6px 0px 0px 6px;
+  background:  center left no-repeat ;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  margin-bottom: 15px;
+}
+
+.mylar_comic .banner .comic_details {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+    color: White;
+    overflow:hidden;
+}
+.mylar_comic .banner .comic_details #comic_details_top{
+  background: Red;
+  display: block;
+  height: 15px;
+  min-height: 10px;
+  position: absolute;
+  top: -15px;
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+  border-radius: 6px 6px 0px 0px;
+}
+
+.mylar_comic .banner .comic_details #comic_details_bottom{
+  display: block;
+  height: 15px;
+  min-height: 10px;
+  position: absolute;
+  margin-left: 0px;
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+  border-radius: 0px 0px 6px 6px;
+}
+
+.mylar_comic .banner .comic_details td{
+  padding: 2px 5px;
+}
+
+.mylar_comic .banner .comic_details table,
+.mylar_comic .banner .comic_details strong {
+  margin:10px;
+}
+
+@media all and  (max-width: 767px) {
+  /*
+   * On small screens, remove top and bottom round bars on comic-detail block
+   */
+  .mylar_comic .banner .comic_details #comic_details_bottom,
+  .mylar_comic .banner .comic_details #comic_details_top{
+    display: none;
+  }
+  .comic_img {
+    display: none;
+  }
+  /*
+   * On small screens, Add rounded corners on all sides on banner and detail-box
+   */
+  .mylar_comic .banner .comic_details,
+  .mylar_comic .banner{
+    border-radius: 6px;
+  }
+}
+
+.episodeinfo tr {
+	border-bottom: 1px solid #CCCCCC;
+}
+
+.episodeinfo  td {
+	width: auto;
+	padding-right: 20px;
+}
