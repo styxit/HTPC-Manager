@@ -109,7 +109,7 @@ function addcomic(id, name) {
         dataType: 'json',
         success: function (data) {
             $('#add_comic_name').val('');
-            notify('Add ' + stype, 'Successfully added ' + name, 'success');
+            notify('Add Comic', 'Successfully added ' + name, 'success');
             cancelAddcomic();
         }
     })

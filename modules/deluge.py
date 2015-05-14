@@ -135,9 +135,12 @@ class Deluge(object):
 
     # Wrapper to access the Deluge Api
     # If the first call fails, there probably is no valid Session ID so we try it again
-    def fetch(self, method, arguments=[]):
+    def fetch(self, method, arguments=None):
         """ Do request to Deluge api """
-        self.logger.debug("Request deluge method: " + method)
+        if arguments is None:
+            arguments = []
+
+        self.logger.debug("Request deluge method: %s arguments %s" % (method, arguments))
 
         # format post data
         data = {'id': 1, 'method': method, 'params': arguments}
