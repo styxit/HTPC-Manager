@@ -9,11 +9,8 @@ from cherrypy.lib.auth2 import require
 
 from urllib import urlencode
 from json import loads
-from htpc.proxy import get_image
+from htpc.helpers import get_image
 from htpc.helpers import fix_basepath
-
-# http://localhost:8090/api?apikey=4ddb6b0f7414b6391be6efbc45ba087e&cmd=getIndex
-#https://github.com/evilhero/mylar/blob/master/API_REFERENCE
 
 
 class Mylar(object):
@@ -66,7 +63,6 @@ class Mylar(object):
     @require()
     def viewcomic(self, artist_id):
         response = self.fetch('getComic&id=%s' % artist_id)
-        self.logger.debug(response)
 
         for a in response['comic']:
             a['StatusText'] = _get_status_icon(a['Status'])
