@@ -3,20 +3,20 @@
     haveissues = 0 if comic['Have'] is None else comic["Have"]
     totalissues = 0 if comic['Total'] is None else comic['Total']
 %>
-${self.attr.webdir}
+
 <div class="container-fluid">
     <div class="content maincontent mylar_comic">
         <h1 class="page-header page-title" data-comicid="${comic_id}" data-comicimg="${comicimg}">
             <span class="mylar_comicname">${comic['ComicName']}</span>
             <div class="btn-group show-options-menu pull-right">
                 <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="icon-wrench"></i>&nbsp;<span class="caret"></span>
+                    <i class="fa fa-wrench"></i>&nbsp;<span class="fa fa-caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="${self.attr.webdir}mylar/RefreshComic/${comic_id}" class="ajax-link"><i class="icon-refresh"></i> Refresh</a></li>
-                    <li><a href="${self.attr.webdir}mylar/DeleteComic/${comic_id}" class="ajax-link"><i class="icon-trash"></i> Delete</a></li>
-                    <li><a href="${self.attr.webdir}mylar/PauseComic/${comic_id}" class="ajax-link"><i class="icon-pause"></i> Pause</a></li>
-                    <li><a href="${self.attr.webdir}mylar/ResumeComic/${comic_id}" class="ajax-link"><i class="icon-play"></i> Resume</a></li>
+                    <li><a href="${self.attr.webdir}mylar/RefreshComic/${comic_id}" class="ajax-link"><i class="fa fa-refresh"></i> Refresh</a></li>
+                    <li><a href="${self.attr.webdir}mylar/DeleteComic/${comic_id}" class="ajax-link"><i class="fa fa-trash"></i> Delete</a></li>
+                    <li><a href="${self.attr.webdir}mylar/PauseComic/${comic_id}" class="ajax-link"><i class="fa fa-pause"></i> Pause</a></li>
+                    <li><a href="${self.attr.webdir}mylar/ResumeComic/${comic_id}" class="ajax-link"><i class="fa fa-play"></i> Resume</a></li>
                 </ul>
             </div>
         </h1>
@@ -26,26 +26,38 @@ ${self.attr.webdir}
             <li><a href="${self.attr.webdir}mylar">${module_name}</a> <span class="divider">/</span></li>
             <li class="active mylar_showname">${comic['ComicName']}</li>
         </ul>
-
+        ##${comic}
         <div id="banner" class="row-fluid banner">
             <div class="span8" style="min-height: 0px;"><img class="img-polaroid img-rounded comic_img"></div>
             <div class="comic_details span4 pull-right">
                 <div id="comic_details_top" class="span4"></div>
-                <strong>comic details</strong>
+                <strong>Comic details</strong>
                 <table class="table table-condensed">
+                    <tr>
+                        <td>Published</td>
+                        <td class="">${comic.get('ComicPublished', '')}</td>
+                    </tr>
+                    <tr>
+                        <td>Publisher</td>
+                        <td class="">${comic.get('ComicPublisher', '')}</td>
+                    </tr>
                     <tr><td>Issues</td><td class="mylar_total_tracks"> ${haveissues} / ${totalissues}</td></tr>
                     <tr><td>Status</td><td class="mylar_status">${comic['Status']}</td></tr>
                     %if comic['ComicID'] is not None:
                         <tr>
                             <td>Last comic</td>
-                            <td class="mylar_last_comic">${comic['LatestIssue']} (${comic['ComicYear']})</a></td>
+                            <td class="mylar_last_comic">${comic['LatestIssue']} (${comic['LatestDate']})</a></td>
                         </tr>
                     %else:
                         <tr>
-                            <td>Last Issue</td>
+                            <td>Last comic</td>
                             <td>N/A</td>
                         </tr>
                     %endif
+                    <tr>
+                        <td>Location</td>
+                        <td>${comic.get('ComicLocation', '')}</td>
+                    </tr>
 
                 </table>
                 <div id="comic_details_bottom" class="span4"></div>
@@ -72,7 +84,7 @@ ${self.attr.webdir}
                     </thead>
                     <tbody id="comic-issues">
                     % for issue in issues:
-                    <div>${issue}</div>
+                    ##<div>${issue}</div>
                     <tr data-comicid="${comic['ComicID']}" data-issueid="${issue['IssueID']}">
                         <td>${issue['Issue_Number']}</td>
                         % if issue['IssueName'] != "None":
@@ -87,11 +99,11 @@ ${self.attr.webdir}
                             <div class="btn-group">
                             ## % if issue['can_download'] is True:
                             <a class="btn btn-mini btn-search" title="Set as wanted">
-                                <i class="icon-heart"></i>
+                                <i class="fa fa-heart"></i>
                             </a>
                             ## % endif
                             <a class="btn btn-mini unque-issue-mylar" title="Set as skipped">
-                                <i class="icon-step-forward"></i>
+                                <i class="fa fa-step-forward"></i>
                             </a>
 
                             </div>

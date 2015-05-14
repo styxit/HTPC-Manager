@@ -4,7 +4,6 @@ $(document).ready(function () {
     loadWanteds();
     loadHistory();
 
-
     var searchforcomicaction = function () {
         var query = $('#add_comic_name').val()
         if (query) {
@@ -23,8 +22,6 @@ $(document).ready(function () {
             searchforcomicaction();
         }
     });
-
-
 
     $('#add_comic_button').click(searchforcomicaction);
 
@@ -104,7 +101,6 @@ function searchForcomic(name) {
 }
 
 function addcomic(id, name) {
-    //var searchtype = 'comicId'
     $.ajax({
         url: WEBDIR + 'mylar/AddComic',
         data: {'id': id,
@@ -136,7 +132,7 @@ function loadcomics() {
         success: function (result) {
             if (result.length == 0) {
                 var row = $('<tr>')
-                row.append($('<td>').html('No comics found')); // add colspan
+                row.append($('<td>').html('No comics found').attr('colspan', '6'));
                 $('#comics_table_body').append(row);
             } else {
                 $.each(result, function (index, comic) {
@@ -221,11 +217,10 @@ function loadWanteds() {
 
                     }
 
-                    //var buttons = $('<div>').addClass('btn-group')
-                    var remove = $('<a class="btn btn-mini btn-cancel" title="Set Skipped"><i class="icon-step-forward"></i></a></td>').click(function () {
+                    var remove = $('<a class="btn btn-mini btn-cancel" title="Set Skipped"><i class="fa fa-step-forward"></i></a></td>').click(function () {
                                 $.ajax({
-                                    url: WEBDIR + 'mylar/UnqueueAlbum',
-                                    data: {'albumId': wanted.ComicID},
+                                    url: WEBDIR + 'mylar/UnqueueIssue',
+                                    data: {'issueid': wanted.IssueID},
                                     type: 'get',
                                     complete: function (result) {
                                         loadWanteds()
@@ -233,20 +228,20 @@ function loadWanteds() {
                                     }
                                 })
                             })
-                    var search = $('<a class="btn btn-mini" title="Set wanted"><i class="icon-heart"></i></a></td>').click(function () {
+                    var search = $('<a class="btn btn-mini" title="Set wanted"><i class="fa fa-heart"></i></a></td>').click(function () {
                                 $.ajax({
-                                    url: WEBDIR + 'mylar/QueueAlbum',
-                                    data: {'albumId': wanted.ComicID},
+                                    url: WEBDIR + 'mylar/QueueIssue',
+                                    data: {'issueid': wanted.IssueID},
                                     type: 'get',
                                     complete: function (result) {
                                         notify('Set wanted', wanted.ComicName + ' - ' + wanted.IssueName);
                                     }
                                 })
                             })
-                    var force = $('<a class="btn btn-mini" title="Force Check"><i class="icon-search"></i></a></td>').click(function () {
+                    var force = $('<a class="btn btn-mini" title="Force Check"><i class="fa fa-search"></i></a></td>').click(function () {
                                 $.ajax({
-                                    url: WEBDIR + 'mylar/QueueAlbum&new=True',
-                                    data: {'albumId': wanted.ComicID},
+                                    url: WEBDIR + 'mylar/QueueIssue',
+                                    data: {'issueid': wanted.IssueID, 'new': true},
                                     type: 'get',
                                     complete: function (result) {
                                         notify('Force Check', wanted.ComicName + ' - ' + wanted.IssueName);
@@ -279,6 +274,7 @@ function loadWanteds() {
     })
 }
 
+// unqueueissue?IssueID=468047&ComicID=73098
 
 function loadHistory() {
     $.ajax({
@@ -329,17 +325,18 @@ function mylarStatusLabel(text) {
     return label;
 }
 
-
 var mylarStatusMap = {
-    'Active': 'icon-repeat',
-    'Error': 'icon-bell',
-    'Paused': 'icon-pause',
-    'Snatched': 'icon-share-alt',
-    'Skipped': 'icon-fast-forward',
-    'Wanted': 'icon-heart',
-    'Processed': 'icon-ok',
-    'Unprocessed': 'icon-exclamation-sign'
+    'Downloaded': 'fa fa-download',
+    'Active': 'fa fa-rotate-right',
+    'Error': 'fa fa-bell-o',
+    'Paused': 'fa fa-pause',
+    'Snatched': 'fa fa-share-alt',
+    'Skipped': 'fa fa-fast-forward',
+    'Wanted': 'fa fa-heart',
+    'Processed': 'fa fa-check',
+    'Unprocessed': 'fa fa-exclamation-circle'
 }
+
 function mylarStatusIcon(iconText, white){
     var iconClass = mylarStatusMap[iconText];
 
@@ -373,19 +370,3 @@ function Postprocess() {
     }
 }
 
-function fixpython(s) {
-    if (s.length) {
-        if (s == 'None' || 'none') {
-            return null
-        } else if  (s == 'True' || 'true') {
-            return true
-
-        } else if (s == 'False' || 'false') {
-            return false
-        } else if (s == 0) {
-            return '0'
-        }
-    } else {
-        return false
-    }
-}

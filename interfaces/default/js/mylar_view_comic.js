@@ -2,7 +2,6 @@ $(document).ready(function () {
     $(window).trigger('hashchange');
     var albumid = $('h1.page-title').attr('data-albumid');
     var comicimg = $('h1.page-title').attr('data-comicimg');
-    //$('#banner').css('background-image', 'url(' + WEBDIR + 'headphones/GetThumb/?url=' + artistimg + ')'); // encodeURIComponent should resize img?
     $('#comic-issues .btn-search').click(function () {
         var $parentRow = $(this).parents('tr')
         var issueid = $parentRow.attr('data-issueid');
@@ -30,7 +29,7 @@ function searchForIssue(Id, name) {
     var modalcontent = $('<div>');
     modalcontent.append($('<p>').html('Looking for Issue &quot;'+ name +'&quot;.'));
     modalcontent.append($('<div>').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'));
-    showModal('Searching for album "'+ name + '"', modalcontent, {});
+    showModal('Searching for Issue "'+ name + '"', modalcontent, {});
 
     $.ajax({
         url: WEBDIR + 'mylar/QueueIssue?issueid=' + Id,

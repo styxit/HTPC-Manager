@@ -6,7 +6,6 @@ import htpc
 import logging
 import requests
 from cherrypy.lib.auth2 import require
-
 from urllib import urlencode
 from json import loads
 from htpc.helpers import get_image
@@ -41,7 +40,6 @@ class Mylar(object):
 
         return template.render(
             scriptname='mylar',
-            settings=settings,
             url=Mylar.webinterface(),
             name=settings.get('mylar_name', 'mylar')
         )
@@ -154,7 +152,9 @@ class Mylar(object):
     @require()
     def QueueIssue(self, issueid=None, new=False, **kwargs):
         # Force check
+        print "calling que issue"
         if new:
+            print "was new"
             return self.fetch('queueIssue&id=%s&new=True' % issueid, text=True)
         return self.fetch('queueIssue&id=%s' % issueid, text=True)
 
@@ -217,6 +217,7 @@ class Mylar(object):
                 json = False
             result = ''
             self.logger.debug('calling api @ %s' % url)
+            # set a high timeout as some requests take a while..
             response = requests.get(url, timeout=120, verify=False)
 
             if response.status_code != 200:
@@ -265,15 +266,15 @@ def _get_status_icon(status):
     red = ["Unprocessed"]
 
     mapsicon = {
-        'Downloaded': 'icon-download-alt',
-        'Active': 'icon-repeat',
-        'Error': 'icon-bell',
-        'Paused': 'icon-pause',
-        'Snatched': 'icon-share-alt',
-        'Skipped': 'icon-fast-forward',
-        'Wanted': 'icon-heart',
-        'Processed': 'icon-ok',
-        'Unprocessed': 'icon-exclamation-sign'
+        'Downloaded': 'fa fa-download',
+        'Active': 'fa fa-rotate-right',
+        'Error': 'fa fa-bell-o',
+        'Paused': 'fa fa-pause',
+        'Snatched': 'fa fa-share-alt',
+        'Skipped': 'fa fa-fast-forward',
+        'Wanted': 'fa fa-heart',
+        'Processed': 'fa fa-check',
+        'Unprocessed': 'fa fa-exclamation-circle'
     }
 
     if not status:
