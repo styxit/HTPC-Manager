@@ -249,10 +249,18 @@ function loadQueue(once) {
                 categories.change(function() {
                     changeCategory(job.nzo_id, $(this).val());
                 });
-                setCategories(categories, job.cat);
+
+                $.each(data.categories, function (i, cat) {
+                    var option = $('<option>');
+                    if (job.cat == cat) {
+                        option.attr('selected', true);
+                    }
+                    option.attr('value', cat);
+                    option.html(cat);
+                    categories.append(option);
+                });
 
                 row.append($('<td>').html(categories));
-
                 row.append($('<td>').html(progress));
                 row.append($('<td>').html(job.timeleft + ' / ' + job.mbleft + 'MB').addClass('span3'));
 

@@ -10,6 +10,8 @@ from urllib import urlencode
 from json import loads
 from htpc.helpers import get_image
 from htpc.helpers import fix_basepath
+from StringIO import StringIO
+from contextlib import closing
 
 
 class Mylar(object):
@@ -152,9 +154,7 @@ class Mylar(object):
     @require()
     def QueueIssue(self, issueid=None, new=False, **kwargs):
         # Force check
-        print "calling que issue"
         if new:
-            print "was new"
             return self.fetch('queueIssue&id=%s&new=True' % issueid, text=True)
         return self.fetch('queueIssue&id=%s' % issueid, text=True)
 
@@ -163,6 +163,20 @@ class Mylar(object):
     def UnqueueIssue(self, issueid, name=''):
         self.logger.debug('unqued %s' % name)
         return self.fetch('unqueueIssue&id=%s' % issueid, text=True)
+
+    @cherrypy.expose()
+    @require()
+    def DownloadIssue(self, issueid, name=''):
+        """ downloads a issue via api and returns it to the browser """
+        self.logger.debug('Downloading issue %s' % name)
+        getfile = self.fetch('downloadIssue&id=%s' % issueid, img=True)
+        try:
+            with closing(StringIO()) as f:
+                f = StringIO()
+                f.write(getfile)
+                return cherrypy.lib.static.serve_fileobj(f.getvalue(), content_type='application/x-download', disposition=None, name=name, debug=False)
+        except Exception as e:
+            self.logger.error('Failed to download %s %s %s' % (name, issueid, e))
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()

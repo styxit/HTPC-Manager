@@ -105,6 +105,11 @@
                             <a class="btn btn-mini unque-issue-mylar" title="Set as skipped">
                                 <i class="fa fa-step-forward"></i>
                             </a>
+                            % if issue['Status'] == 'Downloaded':
+                                <a href="${self.attr.webdir}mylar/DownloadIssue?issueid=${issue['IssueID']}&name=${issue['Location']}"class="btn btn-mini" title="Download to browser" download="${issue['Location']}">
+                                    <i class="fa fa-download"></i>
+                                </a>
+                            % endif
 
                             </div>
                         </td>

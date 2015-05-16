@@ -1,6 +1,5 @@
 $(document).ready(function () {
     $(window).trigger('hashchange');
-    var albumid = $('h1.page-title').attr('data-albumid');
     var comicimg = $('h1.page-title').attr('data-comicimg');
     $('#comic-issues .btn-search').click(function () {
         var $parentRow = $(this).parents('tr')
