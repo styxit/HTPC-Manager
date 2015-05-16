@@ -1,5 +1,7 @@
 $(document).ready(function () {
     get_branches()
+    // Activates the tooltips
+    $('.settingstooltip').tooltip({placement: 'right'})
 
     // Only look for tvs if its enabled.
     if ($("#samsungtv_enable").is(':checked')) {

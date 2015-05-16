@@ -37,10 +37,11 @@ except Exception as e:
     importpySMART = False
 
 if importpySMART:
-    if pySMART.utils.admin() == False:
+    if pySMART.utils.admin() is False:
         importpySMART = False
         importpySMARTerror = "Python should be executed as an administrator to smartmontools to work properly. Please, try to run python with elevated credentials."
         logger.error(importpySMARTerror)
+
 
 class Stats(object):
     def __init__(self):
@@ -49,12 +50,13 @@ class Stats(object):
         self.last_check_ip = None
         htpc.MODULES.append({
             'name': 'Computer stats',
+            'description': 'This module can show stats about you computer, CPU/HDD space, hardware info',
             'id': 'stats',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'stats_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'stats_name'},
                 {'type': 'bool', 'label': 'Enable psutil', 'name': 'stats_psutil_enabled'},
-                {'type': 'bool', 'label': 'Use bars', 'name': 'stats_use_bars'},
+                {'type': 'bool', 'label': 'Use bars', 'name': 'stats_use_bars', 'desc': 'Renders cpu/memory bar instead of table'},
                 {'type': 'bool', 'label': 'Whitelist', 'name': 'stats_use_whitelist', 'desc': 'By enabling this the filesystem and mountpoints fields will become whitelist instead of blacklist'},
                 {'type': 'text', 'label': 'Filesystem', 'placeholder': 'NTFS FAT32', 'desc': 'Use whitespace as separator', 'name': 'stats_filesystem'},
                 {'type': 'text', 'label': 'Mountpoint', 'placeholder': 'mountpoint1 mountpoint2', 'desc': 'Use whitespace as separator', 'name': 'stats_mountpoint'},
