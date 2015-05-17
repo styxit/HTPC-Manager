@@ -1,6 +1,13 @@
-This is HTPC Manager the way I want it.
+Hellowlol HTPC Manager fork [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=U3BELJYUPR95U)
 
-Some of the differences are:
+=====
+A python based web application to manage the software on your HTPC. HTPC Manager combines all your favorite software into one slick interface.
+![Screenshot](http://i.imgur.com/6QEWPFf.png)
+
+Requires Python 2.6 or 2.7
+
+Start with ```python Htpc.py```
+
 
 #### [New modules]
 - Sonarr
@@ -9,17 +16,35 @@ Some of the differences are:
 - SickRage module
 - Torrent search (BTN, Norbits, KAT and YTS)
 - vnStat
+- Mylar
+
+### [Modules]
+- Couchpotato
+- Deluge
+- kodi
+- NZBGet
+- Plex
+- qBittorrent
+- SABnzbd
+- nzb search (newznab)
+- Sickbeard
+- squeezebox
+- Stats
+- Transmission
+- Tvheadend
+- uTorrent
 
 #### [Improvements]
+- Pretty much every module has been improved in some way or another
 - NZBGet module (rewritten)
 - qBittorrent module
 - Transmission (add url, upload local torrent)
 - SABnzbd (drag'n drop to edit que)
-- Stats module is sortable.
+- Stats module (Hardware info, S.M.A.R.T report)
 - CouchPotato
+- Plex
 - KODI/XBMC addons tab, where you can search/execute/enable/disable addons and a volume slider instead of a progress bar
 - Send a nzb from NZB search to NZBGet in addition to SABnzbd.
-- Set wanted category while adding movies in CouchPotato
 
 #### [Misc]
 - Notification if a update is available and autoupdate
@@ -33,8 +58,6 @@ Some of the differences are:
 - Docker support
 - Various fixes
 - Added argsparse (to support python 2.6)
-
-
 
 If you're missing something don't be afraid to make a request :)
 
@@ -56,18 +79,6 @@ INCLUDE THIS IN YOUR ISSUE:
 #### How to enable detailed logs
 1. Shutdown HTPC Manager
 2. Start Htpc.py --loglevel debug (Do NOT start with --debug)
-3. Start HTPC Manager and wait for error to occur again
-
-HTPC Manager
-=====
-
-A python based web application to manage the software on your HTPC. HTPC Manager combines all your favorite software into one slick interface. See [http://htpc.io](http://htpc.io).
-
-![Screenshot](http://htpc.io/img/screenshots/dashboard.png)
+3. Start HTPC Manager and wait for error to occur again/reproduce it
 
 
-## See full installation instructions at [htpc.io](http://htpc.io/)
-
-Requires Python 2.6 or 2.7
-
-Start with ```python Htpc.py```
