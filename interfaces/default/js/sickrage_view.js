@@ -193,10 +193,10 @@ function renderSeason() {
 }
 
 function sickrageStatusLabel(text) {
-    var statusOK = ['Continuing', 'Downloaded', 'HD', 'HD720p', 'HD1080p', 'HD TV', '720p WEB-DL', '1080p WEB-DL'];
-    var statusInfo = ['Snatched'];
-    var statusError = ['Ended'];
-    var statusWarning = ['Skipped'];
+    var statusOK = ['Continuing', 'Downloaded', 'HD', 'HDTV', 'HD720p', 'HD1080p', '720p HDTV', '1080p HDTV', '720p WEB-DL', '1080p WEB-DL', '720p BluRay', '1080p BluRay'];
+    var statusInfo = ['Snatched', 'Snatched (Best)', 'Snatched (Proper)'];
+    var statusError = ['Ended', 'SD'];
+    var statusWarning = ['Skipped', 'Custom', 'Unknown'];
 
     var label = $('<span>').addClass('label').text(text);
 
