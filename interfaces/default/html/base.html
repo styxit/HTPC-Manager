@@ -48,12 +48,12 @@ webdir = htpc.WEBDIR
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other <b class="fa fa-caret-down"></b></a>
                         <ul class="dropdown-menu">
                         % for link in customurls:
-                            <li><a href="${link['url']|h, entity}" target="_blank">${link['name']|h, entity}</a></li>
+                            <li class="nav-menu-item"><a href="${link['url']|h, entity}" target="_blank">${link['name']|h, entity}</a></li>
                         % endfor
                         </ul>
                     </li>
                     % elif len(customurls) > 0:
-                      <li><a href="${customurls[0]['url']|h, entity}" target="_blank">${customurls[0]['name']|h, entity}</a></li>
+                      <li class="nav-menu-item"><a href="${customurls[0]['url']|h, entity}" target="_blank">${customurls[0]['name']|h, entity}</a></li>
                     % endif
                     <!-- start phone tablet -->
                     <li class="hidden-desktop visible-phone visible-tablet">
