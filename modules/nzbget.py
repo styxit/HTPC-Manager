@@ -8,6 +8,7 @@ from urllib2 import urlopen, Request
 from json import loads
 import logging
 import base64
+import re
 from cherrypy.lib.auth2 import require
 from jsonrpclib import jsonrpc
 from htpc.helpers import fix_basepath, striphttp
@@ -112,18 +113,22 @@ class NZBGet(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def AddNzbFromUrl(self, nzb_url= '', nzb_category='', nzb_name='') :
-        if not nzb_url:
-            return
-        self.logger.info("Added %s category %s url %s" %(nzb_name, nzb_category, nzb_url))
+    def AddNzbFromUrl(self, nzb_url='', nzb_category='', nzb_name='', f=''):
+        self.logger.info("Added %s category %s url %s" % (nzb_name, nzb_category, nzb_url))
         try:
             nzbget = jsonrpc.ServerProxy('%s' % self.nzbget_url())
-            nzb = urlopen(nzb_url).read()
-            # If name is missig the link is added manually
-            if not nzb_name:
-                nzb_name = 'Temp Name'
-            nzbget.append(nzb_name, nzb_category, False, base64.standard_b64encode(nzb))
-            return {'status':True}
+            if f:
+                print f
+                # f is already base64encoded
+                nzbget.append(nzb_name, nzb_category, False, f)
+            else:
+                nzb = urlopen(nzb_url).read()
+                # If name is missig the link is added manually
+                if not nzb_name:
+                    nzb_name = 'Temp Name'
+                nzbget.append(nzb_name, nzb_category, False, base64.standard_b64encode(nzb))
+
+            return {'status': True}
         except Exception as e:
             self.logger.error("Failed to add %s to queue %s" % (nzb_name, e))
 
@@ -134,6 +139,24 @@ class NZBGet(object):
     def GetConfig(self):
         nzbget = jsonrpc.ServerProxy('%s' % self.nzbget_url())
         return nzbget.config()
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def GetCategorys(self):
+        nzbget = jsonrpc.ServerProxy('%s' % self.nzbget_url())
+        config = nzbget.config()
+        categorys = []
+        r = re.compile(ur'(Category\d+.name)', re.IGNORECASE)
+        for category in config:
+            if re.match(r, category['Name']):
+                categorys.append(category['Value'])
+        # Add default category
+        categorys.append('')
+        return categorys
+
+
+
 
     @cherrypy.expose()
     @require()

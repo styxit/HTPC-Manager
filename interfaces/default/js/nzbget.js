@@ -1,7 +1,14 @@
 // Globally define download speed in bytes per second
 var downloadSpeed = 0;
-
+var category = []
 $(document).ready(function () {
+    $.get(WEBDIR + 'nzbget/GetCategorys', function(data) {
+        if (data) {
+            category = data;
+            console.log(category)
+        }
+    });
+
     $(window).trigger('hashchange')
     if ($('.nav-tabs li.active a').attr('href') == "#warnings")
         loadWarnings();
@@ -24,19 +31,73 @@ $(document).ready(function () {
             });
         });
 
+    /*
   $('#add_nzb_form').ajaxForm({
         url: WEBDIR + 'nzbget/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
         success: function (result) {
             if (result.status != undefined && result.status) {
-                $('[href=#active]').trigger('click');
+
                 $('#nzb_url').val('');
                 $('#nzb_category').val('');
             }
         }
     });
+    */
+    $("#add_nzb_button").click(function (evt) {
+        evt.preventDefault();
 
+        var nzb_name = '';
+        var nzb_category = $('#nzb_category').val();
+        var nzb_url = $('#nzb_url').val();
+
+
+        if ($("#nzb_url").val().length === 0 && $("#add_nzb_file").val().length === 0) {
+            return;
+        }
+
+        if ($("#add_nzb_file").val().length > 1) {
+
+            var i, file, reader, metainfo;
+            var fileInput = $('input#add_nzb_file');
+            jQuery.each(fileInput[0].files, function (i, file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var contents = e.target.result;
+                    var key = "base64,";
+                    var index = contents.indexOf(key);
+                    if (index > -1) {
+                        metainfo = contents.substring(index + key.length);
+
+                    }
+                    $.post(WEBDIR + "nzbget/AddNzbFromUrl", {
+                        'f': metainfo,
+                        'nzb_name': file.name,
+                        'nzb_category': nzb_category
+                    });
+
+                };
+                reader.readAsDataURL(file);
+            });
+        } else if ($("#nzb_url").val().length > 1) {
+            $.post(WEBDIR + "nzbget/AddNzbFromUrl", {
+                'nzb_url': nzb_url,
+                'nzb_name': '',
+                'nzb_category': nzb_category
+
+            });
+
+            // nzb_url= '', nzb_category='', nzb_name=''
+
+        }
+        $('#add_nzb_file').val('');
+        $("#nzb_url").val('');
+        $('[href=#active]').trigger('click');
+
+    });
+
+    //Check what this does?
     getconfig('#nzb_category', '*');
 
     $('#nzb_set_speed').click(function() {
@@ -137,7 +198,7 @@ function getStatus(initial) {
                 // if server is paused
                 status = 'Paused'
                 queueToggleStatusAction = 'resume';
-                $('#nzb_pause_button').html('<i class="fa fa-play"></i> Resume'); 
+                $('#nzb_pause_button').html('<i class="fa fa-play"></i> Resume');
             } else {
                 status = 'Running'
                 $('#nzb_pause_button').html('<i class="fa fa-pause"></i> Pause')
@@ -159,7 +220,7 @@ function loadQueue(once) {
         dataType: 'json',
         success: function (object) {
             data = object;
-            
+
 
             $('#active_table_body').html('');
 
@@ -200,12 +261,30 @@ function loadQueue(once) {
                 }
                 progress.append(progressBar);
 
+                var i_cat = $('<select>')
+                    .addClass('span2');
+
+                $.each(category, function (i, cat) {
+                    console.log(cat)
+                    var option = $('<option>');
+                    if (job.Category == cat) {
+                        option.attr('selected', true);
+                    }
+                    option.attr('value', cat);
+                    option.html(cat);
+                    i_cat.append(option);
+                });
+
+                i_cat.change(function() {
+                    // add this
+                    //changeCategory(job.nzo_id, $(this).val());
+                });
+
                 if (job.Category != '') {
                     categoryLabel = ' <span class="label" title="Category '+job.Category+'">' + job.Category + '</span>';
                 } else {
                     categoryLabel = '';
                 }
-
                 var row = $('<tr>');
                 row.attr('data-id', job.LastID)
                 // Job status
@@ -213,6 +292,10 @@ function loadQueue(once) {
 
                 // job name + category
                 row.append($('<td>').html(job.NZBName + categoryLabel));
+
+                // new
+                console.log(i_cat)
+                row.append($('<td>').append(i_cat));
 
                 row.append($('<td>').html(progress));
 
@@ -230,7 +313,7 @@ function loadQueue(once) {
                 // Sets name and action based on job.Status
                 actionButton = generateNzbActionButton(job)
                 buttons.append(actionButton);
-                
+
                 deleteButton = $('<a class="nzbget_deleteenzb nzb_action" data-action="delete" data-id="" data-name="">').
                 addClass('btn btn-mini').
                 html('<i class="fa fa-remove"></i>').
@@ -238,7 +321,7 @@ function loadQueue(once) {
                 attr('data-name', job.NZBName).
                 attr('title', 'Delete NZB');
                 buttons.append(deleteButton);
-           
+
                 row.append($('<td>').html(eta + prettySize(queuedSize)).addClass('span3'));
                 row.append($('<td>').html(buttons));
 
@@ -323,6 +406,7 @@ function nzbgetStatusIcon(iconText, white){
   return '';
 }
 
+// this dumps the entire config, grab category server side?
 function getconfig(selector, select) {
     $.ajax({
         url: WEBDIR + 'nzbget/GetConfig',
@@ -330,14 +414,15 @@ function getconfig(selector, select) {
         dataType: 'json',
         success: function (data) {
             console.log(data);
-            var defaultoption = $('<option>'); 
+            var defaultoption = $('<option>');
             defaultoption.attr('value', '');
             defaultoption.html('*');
             $(selector).append(defaultoption);
             $.each(data, function (i, cat) {
-                var re = /(Category\d+\.Name)/; 
+                var re = /(Category\d+\.Name)/;
                 tname = cat.Name
                 if (re.test(tname)) {
+                    //category.push(cat.Name)
 
                     var option = $('<option>');
                     if (select == cat.Name) {
@@ -346,7 +431,7 @@ function getconfig(selector, select) {
                     option.attr('value', cat.Value);
                     option.html(cat.Value);
                     $(selector).append(option);
-                
+
                 }
             });
         }
