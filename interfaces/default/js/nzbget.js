@@ -5,7 +5,6 @@ $(document).ready(function () {
     $.get(WEBDIR + 'nzbget/GetCategorys', function(data) {
         if (data) {
             category = data;
-            console.log(category)
         }
     });
 
@@ -31,27 +30,12 @@ $(document).ready(function () {
             });
         });
 
-    /*
-  $('#add_nzb_form').ajaxForm({
-        url: WEBDIR + 'nzbget/AddNzbFromUrl',
-        type: 'post',
-        dataType: 'json',
-        success: function (result) {
-            if (result.status != undefined && result.status) {
-
-                $('#nzb_url').val('');
-                $('#nzb_category').val('');
-            }
-        }
-    });
-    */
     $("#add_nzb_button").click(function (evt) {
         evt.preventDefault();
 
         var nzb_name = '';
         var nzb_category = $('#nzb_category').val();
         var nzb_url = $('#nzb_url').val();
-
 
         if ($("#nzb_url").val().length === 0 && $("#add_nzb_file").val().length === 0) {
             return;
@@ -88,8 +72,6 @@ $(document).ready(function () {
 
             });
 
-            // nzb_url= '', nzb_category='', nzb_name=''
-
         }
         $('#add_nzb_file').val('');
         $("#nzb_url").val('');
@@ -98,7 +80,7 @@ $(document).ready(function () {
     });
 
     //Check what this does?
-    getconfig('#nzb_category', '*');
+    //getconfig('#nzb_category', '*');
 
     $('#nzb_set_speed').click(function() {
         var speed = ($('#nzb_get_speed').val());
@@ -230,6 +212,7 @@ function loadQueue(once) {
                 $('#active_table_body').append(row);
             }
             $.each(data, function (i, job) {
+                console.log(job)
                 /*
                  * Concat filesizes.
                  * The file sizes consist of two 32bit ints that makeup a 64bit int.
@@ -265,7 +248,6 @@ function loadQueue(once) {
                     .addClass('span2');
 
                 $.each(category, function (i, cat) {
-                    console.log(cat)
                     var option = $('<option>');
                     if (job.Category == cat) {
                         option.attr('selected', true);
@@ -276,8 +258,7 @@ function loadQueue(once) {
                 });
 
                 i_cat.change(function() {
-                    // add this
-                    //changeCategory(job.nzo_id, $(this).val());
+                    changeCategory(job.NZBID, $(this).val(), job.NZBNicename);
                 });
 
                 if (job.Category != '') {
@@ -290,11 +271,9 @@ function loadQueue(once) {
                 // Job status
                 row.append($('<td>').append(nzbgetStatusLabel(status)));
 
-                // job name + category
-                row.append($('<td>').html(job.NZBName + categoryLabel));
 
-                // new
-                console.log(i_cat)
+                row.append($('<td>').html(job.NZBName));
+
                 row.append($('<td>').append(i_cat));
 
                 row.append($('<td>').html(progress));
@@ -378,6 +357,28 @@ function nzbgetStatusLabel(text){
   return label;
 }
 
+
+function changeCategory(nzbid, cat, nzbname) {
+    $.ajax({
+        url: WEBDIR + 'nzbget/ChangeCategory',
+        data: {
+            'nzbid': nzbid,
+            'cat': cat,
+            'nzbname': nzbname
+        },
+        type: 'get',
+        dataType: 'json',
+        success: function (response) {
+            if (response.success) {
+                notify('Change Category', nzbname + ' to ' + cat, 'success');
+            } else {
+                notify('Change Category', nzbname + ' to ' + cat, 'error');
+            }
+
+        }
+    });
+}
+
 function nzbgetStatusIcon(iconText, white){
   var text =[
     'Completed',
@@ -413,7 +414,6 @@ function getconfig(selector, select) {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            console.log(data);
             var defaultoption = $('<option>');
             defaultoption.attr('value', '');
             defaultoption.html('*');
@@ -422,7 +422,6 @@ function getconfig(selector, select) {
                 var re = /(Category\d+\.Name)/;
                 tname = cat.Name
                 if (re.test(tname)) {
-                    //category.push(cat.Name)
 
                     var option = $('<option>');
                     if (select == cat.Name) {
@@ -463,7 +462,7 @@ function generateNzbActionButton(nzb) {
     return button;
 }
 
-
+// really should make one call pr action to support future restriced user
 $(document).on('click', '.nzb_action', function(){
     //var i = $('#cmdinput').val();
     //$(this).data('action')

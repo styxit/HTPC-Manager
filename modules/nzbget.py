@@ -155,6 +155,22 @@ class NZBGet(object):
         categorys.append('')
         return categorys
 
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def ChangeCategory(self, nzbid=None, cat=None, nzbname=None):
+        print "change cat %s %s %s" % (nzbid, cat, nzbname)
+        r = False
+        try:
+            nzbget = jsonrpc.ServerProxy('%s' % self.nzbget_url())
+            if nzbid and cat:
+                print "nzbid %s and cat is %s" % (nzbid, cat)
+                print type(nzbid)
+                r = nzbget.editqueue("GroupSetCategory", 0, cat, [int(nzbid)])
+        except Exception as e:
+            self.logger.error('Failed to set %s on %s' % (cat, nzbname, e))
+        return {'success': r}
+
 
 
 
