@@ -43,7 +43,7 @@ class Sickbeard(object):
         port = str(htpc.settings.get("sickbeard_port", ""))
         basepath = fix_basepath(htpc.settings.get("sickbeard_basepath", "/"))
 
-        url = "http%s://%s::%s%s" % (ssl, host, port, basepath)
+        url = "http%s://%s:%s%s" % (ssl, host, port, basepath)
 
         if htpc.settings.get("sickbeard_reverse_proxy_link"):
             url = htpc.settings.get("sickbeard_reverse_proxy_link")
