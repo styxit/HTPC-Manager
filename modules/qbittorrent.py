@@ -55,6 +55,7 @@ class Qbittorrent(object):
         password = htpc.settings.get('qbittorrent_password', '')
         ssl = 's' if htpc.settings.get('qbittorret_ssl', 0) else ''
         url = 'http%s://%s:%s/' % (ssl, host, port)
+        self.logger.debug(url)
 
         realm = 'Web UI Access'
         authhandler = urllib2.HTTPDigestAuthHandler()
