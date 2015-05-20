@@ -5,6 +5,14 @@ $(document).ready(function () {
     $.get(WEBDIR + 'nzbget/GetCategorys', function(data) {
         if (data) {
             category = data;
+            $.each(data, function (i, cat) {
+                var option = $('<option>');
+                option.attr('value', cat);
+                option.html(cat);
+                $('#nzb_category').append(option);
+
+
+            });
         }
     });
 
@@ -20,15 +28,16 @@ $(document).ready(function () {
             loadHistory();
     });
 
-    $('#nzb_pause_button').click(function () {
-            var clickItem = $(this);
-            clickItem.button('loading');
-            $.ajax({
-                url: WEBDIR + 'nzbget/QueueAction/'+queueToggleStatusAction,
-                dataType: 'json',
-                type: 'get'
-            });
+    $('#nzb_pause_button').click(function (e) {
+        e.preventDefault();
+        var clickItem = $(this);
+        clickItem.button('loading');
+        $.ajax({
+            url: WEBDIR + 'nzbget/QueueAction/'+queueToggleStatusAction,
+            dataType: 'json',
+            type: 'get'
         });
+    });
 
     $("#add_nzb_button").click(function (evt) {
         evt.preventDefault();
@@ -79,10 +88,9 @@ $(document).ready(function () {
 
     });
 
-    //Check what this does?
-    //getconfig('#nzb_category', '*');
 
-    $('#nzb_set_speed').click(function() {
+    $('#nzb_set_speed').click(function(e) {
+        e.preventDefault();
         var speed = ($('#nzb_get_speed').val());
         $.ajax({
             url: WEBDIR + 'nzbget/SetSpeed?speed=' + speed,
@@ -200,19 +208,14 @@ function loadQueue(once) {
         url: WEBDIR + 'nzbget/queue',
         type: 'get',
         dataType: 'json',
-        success: function (object) {
-            data = object;
-
-
+        success: function (data) {
             $('#active_table_body').html('');
-
             if (data.length == 0) {
                 var row = $('<tr>')
                 row.append($('<td>').html('Queue is empty').attr('colspan', 5));
                 $('#active_table_body').append(row);
             }
             $.each(data, function (i, job) {
-                console.log(job)
                 /*
                  * Concat filesizes.
                  * The file sizes consist of two 32bit ints that makeup a 64bit int.
@@ -369,7 +372,7 @@ function changeCategory(nzbid, cat, nzbname) {
         type: 'get',
         dataType: 'json',
         success: function (response) {
-            if (response.success) {
+            if (response) {
                 notify('Change Category', nzbname + ' to ' + cat, 'success');
             } else {
                 notify('Change Category', nzbname + ' to ' + cat, 'error');
@@ -464,26 +467,19 @@ function generateNzbActionButton(nzb) {
 
 // really should make one call pr action to support future restriced user
 $(document).on('click', '.nzb_action', function(){
-    //var i = $('#cmdinput').val();
-    //$(this).data('action')
     var a = $(this).data('action');
     var n = $(this).data('name');
-    param = {'id': $(this).data('id'),
-            'action': $(this).data('action'),
-            'name': $(this).data('name')
-        };
+    param = {'nzbid': $(this).data('id'),
+             'action': $(this).data('action'),
+             'name': $(this).data('name')
+            };
     if (confirm('Are you sure you want to "'+ a + ' '+ n +'" to nzbget?')) {
-    $.getJSON(WEBDIR + "nzbget/IndividualAction/",param, function (response) {
-         /*
-         $.pnotify({
-             title: 'Response',
-             text: response.msg,
-             type: 'success',
-             width: '500px',
-             min_height: '400px'
-         });
-        */
-
-    });
-}
+        $.getJSON(WEBDIR + "nzbget/IndividualAction/",param, function (response) {
+            if (response) {
+                notify(a, n, 'success')
+            } else {
+                notify(a, n, 'error')
+            }
+        });
+    }
 });
