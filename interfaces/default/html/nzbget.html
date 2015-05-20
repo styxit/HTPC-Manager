@@ -14,6 +14,9 @@
             <input class="span5" id="nzb_url" name="nzb_url" type="text" placeholder="Paste NZB url" />
             <select class="span2" name="nzb_category" id="nzb_category"></select>
             <button class="btn btn-success" id="add_nzb_button"><i class="fa fa-plus fa-inverse"></i> Add NZB</button>
+            <!-- Fake click as type=file is ugly in boostrap -->
+            <a class="btn btn-info" onclick="$('#add_nzb_file').click();">Browse</a>
+            <input id="add_nzb_file" style="display:none;" type="file">
             <button class="btn" id="nzb_pause_button"><i class="fa fa-pause"></i> Pause</button>
             <input type="text" class="span1" id="nzb_get_speed" placeholder="Kb/s" value="" />
             <button class="btn" id="nzb_set_speed"><i class="fa fa-arrow-circle-down"></i> Set speed</button>
@@ -31,6 +34,7 @@
                     <tr>
                         <th>Status</th>
                         <th>File</th>
+                        <th>Category</th>
                         <th>Progress</th>
                         <th>Remaining</th>
                         <th>&nbsp;</th>

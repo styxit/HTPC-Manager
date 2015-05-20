@@ -3,11 +3,11 @@
 
 import cherrypy
 import htpc
-from urllib import quote
 from urllib2 import urlopen, Request
 from json import loads
 import logging
 import base64
+import re
 from cherrypy.lib.auth2 import require
 from jsonrpclib import jsonrpc
 from htpc.helpers import fix_basepath, striphttp
@@ -29,7 +29,7 @@ class NZBGet(object):
                 {'type': 'text', 'label': 'User', 'name': 'nzbget_username'},
                 {'type': 'password', 'label': 'Password', 'name': 'nzbget_password'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'nzbget_ssl'},
-                {"type": "text", "label": "Reverse proxy link", "placeholder": "", "desc":"Reverse proxy link ex: https://nzbget.domain.com", "name": "nzbget_reverse_proxy_link"},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://nzbget.domain.com', 'name': 'nzbget_reverse_proxy_link'},
 
             ]
         })
@@ -39,8 +39,6 @@ class NZBGet(object):
     def index(self):
         return htpc.LOOKUP.get_template('nzbget.html').render(scriptname='nzbget', webinterface=self.webinterface())
 
-    @cherrypy.expose()
-    @require()
     def nzbget_url(self):
         host = striphttp(htpc.settings.get('nzbget_host', ''))
         port = str(htpc.settings.get('nzbget_port', ''))
@@ -112,28 +110,66 @@ class NZBGet(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def AddNzbFromUrl(self, nzb_url= '', nzb_category='', nzb_name='') :
-        if not nzb_url:
-            return
-        self.logger.info("Added %s category %s url %s" %(nzb_name, nzb_category, nzb_url))
+    def AddNzbFromUrl(self, nzb_url='', nzb_category='', nzb_name='', f=''):
+        self.logger.info("Added %s category %s url %s" % (nzb_name, nzb_category, nzb_url))
+        r = False
         try:
             nzbget = jsonrpc.ServerProxy('%s' % self.nzbget_url())
-            nzb = urlopen(nzb_url).read()
-            # If name is missig the link is added manually
-            if not nzb_name:
-                nzb_name = 'Temp Name'
-            nzbget.append(nzb_name, nzb_category, False, base64.standard_b64encode(nzb))
-            return {'status':True}
+            if f:
+                # f = nzbfile
+                r = nzbget.append(nzb_name, nzb_category, False, f)
+            else:
+                nzb = urlopen(nzb_url).read()
+                # If name is missig the link is added manually
+                if not nzb_name:
+                    nzb_name = 'Temp Name'
+                r = nzbget.append(nzb_name, nzb_category, False, base64.standard_b64encode(nzb))
+
         except Exception as e:
             self.logger.error("Failed to add %s to queue %s" % (nzb_name, e))
+        return r
 
     #Used to grab the categories from the config
+    #@cherrypy.expose()
+    #@require()
+    #@cherrypy.tools.json_out()
+    #def GetConfig(self):
+    #    nzbget = jsonrpc.ServerProxy('%s' % self.nzbget_url())
+    #    return nzbget.config()
+
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def GetConfig(self):
-        nzbget = jsonrpc.ServerProxy('%s' % self.nzbget_url())
-        return nzbget.config()
+    def GetCategorys(self):
+        self.logger.debug('Fetching categories')
+        categorys = []
+        # Add default category
+        categorys.append('')
+        try:
+            nzbget = jsonrpc.ServerProxy('%s' % self.nzbget_url())
+            config = nzbget.config()
+            r = re.compile(ur'(Category\d+.name)', re.IGNORECASE)
+            for category in config:
+                if re.match(r, category['Name']):
+                    categorys.append(category['Value'])
+        except Exception as e:
+            self.logger.error('Failed to fetch categorys %s' % e)
+
+        return categorys
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def ChangeCategory(self, nzbid=None, cat=None, nzbname=None):
+        self.logger.debug('Change %s nzbname id %s to category %s' % (nzbname, nzbid, cat))
+        r = False
+        try:
+            nzbget = jsonrpc.ServerProxy('%s' % self.nzbget_url())
+            if nzbid and cat:
+                r = nzbget.editqueue("GroupSetCategory", 0, cat, [int(nzbid)])
+        except Exception as e:
+            self.logger.error('Failed to set %s on %s' % (cat, nzbname, e))
+        return r
 
     @cherrypy.expose()
     @require()
@@ -186,23 +222,23 @@ class NZBGet(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def IndividualAction(self, id='', name='', action=''):
+    def IndividualAction(self, nzbid='', name='', action=''):
         try:
-            self.logger.debug("%s %s %s" % (action, name, id))
+            self.logger.debug("%s %s %s" % (action, name, nzbid))
             nzbget = jsonrpc.ServerProxy('%s' % self.nzbget_url())
             if 'resume' in action:
                 action = 'GroupResume'
             elif 'pause' in action:
-                print 'pause is pause'
                 action = 'GroupPause'
             elif 'delete' in action:
                 action = 'GroupDelete'
             elif 'hidehistory' in action:
                 action = 'HistoryDelete'
-            status = nzbget.editqueue(action, 0, '', [int(id)])
+            status = nzbget.editqueue(action, 0, '', [int(nzbid)])
             return status
         except Exception as e:
-            self.logger.error("Failed to %s %s %s %s" % (action, name, id, e))
+            self.logger.error("Failed to %s %s %s %s" % (action, name, nzbid, e))
+            return False
 
     @cherrypy.expose()
     @require()
@@ -214,3 +250,4 @@ class NZBGet(object):
             return nzbget.rate(int(speed))
         except Exception as e:
             self.logger.error("Failed to set speed to %s %s" % (speed, e))
+            return False
