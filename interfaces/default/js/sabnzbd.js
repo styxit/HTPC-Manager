@@ -10,17 +10,26 @@ $(document).ready(function () {
         });
     });
 
-    $('#add_nzb_form').ajaxForm({
-        url: WEBDIR + 'sabnzbd/AddNzbFromUrl',
-        type: 'post',
-        dataType: 'json',
-        success: function (result) {
-            if (result.status != undefined && result.status) {
-                $('[href=#active]').trigger('click');
-                $('#nzb_url').val('');
-                $('#nzb_category').val('');
+    $('#add_nzb_button').click(function (e) {
+        // nzb_url, nzb_category
+        var nzb_url = $('#nzb_url').val()
+        var nzb_category = $('#nzb_category').val()
+        if (!nzb_url && !nzb_category) return;
+        $.ajax({
+            url: WEBDIR + 'sabnzbd/AddNzbFromUrl',
+            data: {'nzb_url': nzb_url , 'nzb_category': nzb_category},
+            type: 'post',
+            dataType: 'json',
+            success: function (result) {
+                if (result.status !== undefined && result.status) {
+                    console.log(result.status)
+                    $('[href=#active]').trigger('click');
+                    $('#nzb_url').val('');
+                    $('#nzb_category').val('');
+                }
             }
-        }
+
+        });
     });
 
     setCategories('#nzb_category', 'Default');
@@ -183,7 +192,6 @@ function changeCategory(id, cat) {
 }
 
 function swap(v1, v2) {
-    console.log(v1, v2);
     $.ajax({
         url: WEBDIR + 'sabnzbd/Swap?v1=' + v1 + '&v2=' + v2,
         type: 'get',
