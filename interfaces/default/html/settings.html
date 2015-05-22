@@ -10,7 +10,7 @@
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#general" data-toggle="tab">General</a></li>
                 <li><a href="#dashboard" data-toggle="tab">Dashboard</a></li>
-                <li><a href="#style" data-toggle="tab">Style</a></li>
+                <li><a href="#theme" data-toggle="tab">Theme</a></li>
                 <li><a href="#other" data-toggle="tab">Other apps</a></li>
                 <li><a href="#users" data-toggle="tab">User management</a></li>
                 <li class="divider-tab"></li>
@@ -29,7 +29,7 @@
                 {'type':'text', 'label':'Webdir *', 'name':'app_webdir', 'value':settings.get('app_webdir', '/')},
                 {'type':'text', 'label':'Username *', 'name':'app_username', 'value':settings.get('app_username')},
                 {'type':'password', 'label':'Password *', 'name':'app_password', 'value':settings.get('app_password')},
-                {'type':'bool', 'label':'Use ssl?', 'name':'app_use_ssl', 'value':settings.get('app_use_ssl'), 'desc': 'By enabling this and leaving SSL cert and key blank HTPC-Manager will renerate cert and key for you'},
+                {'type':'bool', 'label':'Use ssl?', 'name':'app_use_ssl', 'value':settings.get('app_use_ssl'), 'desc': 'By enabling this and leaving SSL cert and key blank HTPC Manager will generate cert and key for you'},
                 {'type':'text', 'label':'SSL Cert', 'name':'app_ssl_cert', 'value':settings.get('app_ssl_cert'), 'desc':''},
                 {'type':'text', 'label':'SSL Key', 'name':'app_ssl_key', 'value':settings.get('app_ssl_key')},
                 {'type':'text', 'label':'Git Path', 'name':'git_path', 'desc':'Only needed if OS is unable to locate git', 'value':settings.get('git_path', 'git')},
@@ -37,10 +37,10 @@
                 {'type':'bool', 'label':'Use  rev proxy headers', 'name':'app_use_proxy_headers', 'desc':'','value':settings.get('app_use_proxy_headers')},
                 {'type':'text', 'label':'Rev proxy headers basepath', 'name':'app_use_proxy_headers_basepath', 'desc':'Advanced option, should be left blank', 'value':settings.get('app_use_proxy_headers_basepath')},
                 {'type': 'select', 'label': 'Branch', 'name': 'branch', 'options':''},
-                {'type':'bool', 'label':'Open Browser', 'name':'openbrowser', 'desc':'Automatically open brower on server start', 'value':settings.get('openbrowser')},
+                {'type':'bool', 'label':'Open Browser', 'name':'openbrowser', 'desc':'Automatically open browser on HTPC Manager start', 'value':settings.get('openbrowser')},
                 {'type':'bool', 'label':'Use robots.txt', 'name':'robots', 'desc':'Stop bots from indexing your site', 'value':settings.get('robots')},
-                {'type':'bool', 'label':'Check for updates', 'name':'app_check_for_updates', 'desc':'Look for updated in the background?', 'value':settings.get('app_check_for_updates')},
-                {'type':'bool', 'label':'Auto update', 'name':'app_auto_update', 'desc':'By enabling this HTPC-Manager will update update', 'value':settings.get('app_auto_update')},
+                {'type':'bool', 'label':'Check for updates', 'name':'app_check_for_updates', 'desc':'HTPC checks for updates in the background', 'value':settings.get('app_check_for_updates')},
+                {'type':'bool', 'label':'Auto update', 'name':'app_auto_update', 'desc':'By enabling this HTPC Manager will update automatically', 'value':settings.get('app_auto_update')},
                 {'type':'bool', 'label':'Enable CDN', 'name':'app_use_cdn', 'desc':'Use CSS/JS files hosted on CDN', 'value':settings.get('app_use_cdn')}
                 ], buttons=[
                         {'name':'Save', 'type':'submit', 'classes':'btn-primary'},
@@ -61,9 +61,8 @@
                                      fields=m.get('fields'))}
                 % endif
             % endfor
-            ${form.buildForm(id='style', classes='form-horizontal tab-pane', legend='Style', fields=[
-                {'type':'select', 'label':'Template', 'name':'app_template', 'options':settings.get_templates()},
-                {'type':'select', 'label':'Theme', 'name':'app_theme', 'options':settings.get_themes(), 'desc':'Changes HTPC-Managers look'}
+            ${form.buildForm(id='theme', classes='form-horizontal tab-pane', legend='Theme', fields=[
+                {'type':'select', 'label':'Theme', 'name':'app_theme', 'options':settings.get_themes(), 'desc':'Changes the appearance of HTPC Manager'}
             ])}
             ${form.buildForm(id='dashboard', classes='form-horizontal tab-pane', legend='Dashboard', fields=[
                 {'type':'bool', 'label':'Show recent movies from KODI', 'name':'dash_rec_movies',
@@ -106,9 +105,9 @@
 
                 <fieldset>
                     <legend>Other apps</legend>
-                    <blockquote>Are you using software that is not supported by HTPC Manager or want to have your self-made dashboard url in the menubar? Add custom URLs to the menubar.
+                    <blockquote>Are you using software that is not supported by HTPC Manager or want to have your self-made dashboard URL in the menubar? Add custom URLs to the menubar.
                     <BR /><BR />
-                    <b>Tip: You can reorder the items by drag&drop</b>
+                    <b>Tip: You can drag & drop items to reorder them</b>
                     </blockquote>
                     <button class="btn btn-small btn-primary add">New link</button>
 

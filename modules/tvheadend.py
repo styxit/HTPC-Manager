@@ -26,7 +26,7 @@ class TVHeadend(object):
                 {'type': 'text', 'label': 'Port *', 'name': 'tvheadend_port'},
                 {'type': 'text', 'label': 'Username', 'name': 'tvheadend_username'},
                 {'type': 'password', 'label': 'Password', 'name': 'tvheadend_password'},
-                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://domain.com/tvh', 'name': 'tvheadend_reverse_proxy_link'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link, e.g. https://domain.com/tvh', 'name': 'tvheadend_reverse_proxy_link'},
 
             ]
         })

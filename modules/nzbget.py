@@ -29,7 +29,7 @@ class NZBGet(object):
                 {'type': 'text', 'label': 'User', 'name': 'nzbget_username'},
                 {'type': 'password', 'label': 'Password', 'name': 'nzbget_password'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'nzbget_ssl'},
-                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://nzbget.domain.com', 'name': 'nzbget_reverse_proxy_link'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link, e.g. https://nzbget.domain.com', 'name': 'nzbget_reverse_proxy_link'},
 
             ]
         })

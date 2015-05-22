@@ -26,7 +26,7 @@ class Sabnzbd(object):
                 {'type': 'text', 'label': 'Basepath', 'name': 'sabnzbd_basepath'},
                 {'type': 'text', 'label': 'API key', 'name': 'sabnzbd_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'sabnzbd_ssl'},
-                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc':'Reverse proxy link ex: https://sab.domain.com', 'name': 'sabnzbd_reverse_proxy_link'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc':'Reverse proxy link, e.g. https://sab.domain.com', 'name': 'sabnzbd_reverse_proxy_link'},
 
             ]
         })

@@ -26,7 +26,7 @@ class Sickrage(object):
                 {'type': 'text', 'label': 'Basepath', 'placeholder': '/sickrage', 'name': 'sickrage_basepath'},
                 {'type': 'text', 'label': 'API key', 'name': 'sickrage_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'sickrage_ssl'},
-                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc':'Reverse proxy link ex: https://sr.domain.com', 'name': 'sickrage_reverse_proxy_link'}
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc':'Reverse proxy link, e.g. https://sr.domain.com', 'name': 'sickrage_reverse_proxy_link'}
             ]
         })
 

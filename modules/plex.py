@@ -62,13 +62,13 @@ class Plex(object):
                 {'type': 'text', 'label': 'Menu name', 'name': 'plex_name'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'plex_host'},
                 {'type': 'text', 'label': 'Port *', 'name': 'plex_port', 'placeholder': '32400'},
-                {'type': 'text', 'label': 'Username (optional)', 'desc': 'Plex Home actived server req username', 'name': 'plex_username'},
-                {'type': 'password', 'label': 'Password (optional)', 'desc': 'Plex Home actived server req password', 'name': 'plex_password'},
+                {'type': 'text', 'label': 'Username (optional)', 'desc': 'Plex Home activated server req username', 'name': 'plex_username'},
+                {'type': 'password', 'label': 'Password (optional)', 'desc': 'Plex Home activated server req password', 'name': 'plex_password'},
                 {'type': 'text', 'label': 'Mac addr.', 'name': 'plex_mac'},
                 {'type': 'bool', 'label': 'Hide watched', 'name': 'plex_hide_watched'},
                 {'type': 'bool', 'label': 'Hide homemovies', 'name': 'plex_hide_homemovies'},
                 {'type': 'bool', 'label': 'Disable image resize', 'name': 'plex_disable_img_resize'},
-                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://plex.mydomain.com', 'name': 'plex_reverse_proxy_link'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link, e.g. https://plex.mydomain.com', 'name': 'plex_reverse_proxy_link'},
                 {'type': 'text', 'label': 'Ignore sections', 'placeholder': 'Movies, TV Shows', 'desc': '', 'name': 'plex_ignore_sections'}
 
             ]

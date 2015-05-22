@@ -39,7 +39,7 @@ Start with ```python Htpc.py```
 - NZBGet module (rewritten)
 - qBittorrent module
 - Transmission (add url, upload local torrent)
-- SABnzbd (drag'n drop to edit que)
+- SABnzbd (drag & drop to edit queue)
 - Stats module (Hardware info, S.M.A.R.T report)
 - CouchPotato
 - Plex
@@ -53,7 +53,7 @@ Start with ```python Htpc.py```
 - The brave and bold can choose which branch they want to use.
 - Added a option for robots.txt for bot crawlers
 - Make ssl cert and key automatically if you don't add a path for it
-- Mask sensitive stuff from the log (username, apikey, password etc)
+- Mask sensitive stuff from the log (username, api key, password etc)
 - Reduced size on static files
 - Docker support
 - Various fixes

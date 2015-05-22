@@ -26,7 +26,7 @@ class Qbittorrent(object):
                 {'type': 'text', 'label': 'Username', 'name': 'qbittorrent_username'},
                 {'type': 'password', 'label': 'Password', 'name': 'qbittorrent_password'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'qbittorrent_ssl'},
-                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc':'Reverse proxy link ex: https://qbt.domain.com', 'name': 'qbittorrent_reverse_proxy_link'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc':'Reverse proxy link, e.g. https://qbt.domain.com', 'name': 'qbittorrent_reverse_proxy_link'},
 
             ]
         })

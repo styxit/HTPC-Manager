@@ -111,7 +111,7 @@ class UTorrent(object):
                 {'type': 'text', 'label': 'Port', 'placeholder': '8080', 'name': 'utorrent_port'},
                 {'type': 'text', 'label': 'Username', 'name': 'utorrent_username'},
                 {'type': 'password', 'label': 'Password', 'name': 'utorrent_password'},
-                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://utorrent.domain.com', 'name': 'utorrent_reverse_proxy_link'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link, e.g. https://utorrent.domain.com', 'name': 'utorrent_reverse_proxy_link'},
 
             ]
         })
