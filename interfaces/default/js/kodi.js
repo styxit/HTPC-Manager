@@ -207,7 +207,7 @@ function loadMovies(options) {
 
                     var src = 'holder.js/100x150/text:No artwork';
                     if (movie.thumbnail != '') {
-                        src = WEBDIR + 'kodi/GetThumb?w=100&h=150&thumb='+encodeURIComponent(movie.thumbnail);
+                        src = WEBDIR + 'kodi/GetThumb?w=225&h=338&thumb='+encodeURIComponent(movie.thumbnail);
                     }
                     movieAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
@@ -281,7 +281,53 @@ function loadMovie(movie) {
         info
     ), buttons);
     $('.modal-fanart').css({
-        'background-image' : 'url('+WEBDIR+'kodi/GetThumb?w=675&h=400&o=10&thumb='+encodeURIComponent(movie.fanart)+')'
+        'background-image' : 'url(' + WEBDIR + 'kodi/GetThumb?w=675&h=400&o=10&thumb='+encodeURIComponent(movie.fanart)+')'
+    });
+}
+
+function loadEpisode(episode) {
+    var poster = WEBDIR + 'kodi/GetThumb?w=200&h=300&thumb='+encodeURIComponent(episode.thumbnail)
+    var info = $('<div>').addClass('modal-episodeinfo');
+    if (episode.streamdetails && episode.streamdetails.video[0]) {
+        var runtime = parseSec(episode.streamdetails.video[0].duration);
+        info.append($('<p>').html('<b>Runtime: </b> ' + runtime));
+    }
+    info.append($('<p>').html('<b>Plot: </b> ' + episode.plot));
+    if (episode.genre) {
+        var genre = episode.genre.join(', ');
+        info.append($('<p>').html('<b>Genre: </b> ' + genre));
+    }
+    if (episode.playcount) {
+        info.append($('<p>').html('<b>Seen: </b>' + episode.playcount + ' times'))
+    }
+    if (episode.file) {
+        info.append($('<p>').html('<b>File: </b>' + episode.file))
+    }
+
+    if (episode.studio) {
+        var studio = episode.studio.join(', ');
+        info.append($('<p>').html('<b>Studio: </b> ' + studio));
+    }
+    if (episode.rating) {
+        info.append($('<span>').raty({
+            readOnly: true,
+            path: null,
+            score: (episode.rating / 2),
+        }));
+    }
+    var buttons = {
+        'Play' : function() {
+            playItem(episode.episodeid, 'episode');
+            hideModal();
+        }
+    }
+
+    showModal(episode.label,  $('<div>').append(
+        $('<img>').attr('src', poster).addClass('thumbnail episode-poster pull-left'), info),
+        buttons);
+
+    $('.modal-fanart').css({
+        'background-image' : 'url('+WEBDIR+'kodi/GetThumb?w=675&h=400&o=10&thumb='+encodeURIComponent(episode.thumbnail)+')'
     });
 }
 
@@ -331,7 +377,7 @@ function loadShows(options) {
                     var showItem = $('<li>').attr('title', show.title);
 
                     var showAnchor = $('<a>').attr('href', '#tvshow-' + show.tvshowid).click(function(e) {
-                        // e.preventDefault();
+                        e.preventDefault();
                         loadEpisodes({'tvshowid':show.tvshowid})
                     });
 
@@ -407,17 +453,17 @@ function loadEpisodes(options) {
 
                     var episodeAnchor = $('<a>').attr('href', '#').click(function(e) {
                         e.preventDefault();
-                        playItem(episode.episodeid, 'episode');
+                        loadEpisode(episode);
                     });
 
                     var src = 'holder.js/150x85/text:No artwork';
                     if (episode.thumbnail != '') {
-                        src = WEBDIR + 'kodi/GetThumb?w=150&h=85&thumb='+encodeURIComponent(episode.thumbnail);
+                        src = WEBDIR + 'kodi/GetThumb?w=375&h=210&thumb='+encodeURIComponent(episode.thumbnail);
                     }
                     episodeAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (episode.playcount >= 1) {
-                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-check-circle fa-inverse watched'));
+                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-check-circle fa-inverse watched-episode'));
                     }
 
                     episodeAnchor.append($('<h6>').addClass('title').html(shortenText(episode.label, 18)));
@@ -752,7 +798,7 @@ function loadNowPlaying() {
                 } else {
                     switch(data.itemInfo.item.type) {
                         case 'episode':
-                            thumbnail.attr('src', WEBDIR + 'kodi/GetThumb?w=150&h=75&thumb='+nowPlayingThumb);
+                            thumbnail.attr('src', WEBDIR + 'kodi/GetThumb?w=150&h=100&thumb='+nowPlayingThumb);
                             thumbnail.attr('width', '150').attr('height', '75');
                             break;
                         case 'movie':
@@ -988,14 +1034,16 @@ function GetAddons() {
                         loadAddons(addon);
                     });
                     var src = 'holder.js/100x150/text:No artwork';
-                    if (addon.thumbnail !== '') {
+                    //Holder.run();
+                    if (addon.thumbnail !== undefined) {
                         src = WEBDIR + 'kodi/GetThumb?w=100&h=150&thumb=' + encodeURIComponent(addon.thumbnail);
                     }
+
                     addonAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
                     addonAnchor.append($('<h6>').addClass('title').html(shortenText(addon.name, 11)));
                     row.append(addonAnchor);
                     $('#addons-grid').append(row);
-
+                    //Holder.run();
                 });
                 $('.spinner').hide();
                 Holder.run();
