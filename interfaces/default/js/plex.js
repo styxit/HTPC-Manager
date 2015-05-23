@@ -103,7 +103,7 @@ function loadMovies(options) {
                     movieAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (movie.playcount >= 1) {
-                        movieAnchor.append($('<i>').attr('title', 'Watched').addClass('fa-inverse fa-check-circle watched'));
+                        movieAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-inverse fa-check-circle watched'));
                     }
 
                     movieAnchor.append($('<h6>').addClass('title').html(shortenText(movie.title, 12)));
@@ -258,7 +258,7 @@ function loadShows(options) {
                     showAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (show.playcount >= show.itemcount) {
-                        showAnchor.append($('<i>').attr('title', 'Watched').addClass('fa-inverse fa-check-circle watched'));
+                        showAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-inverse fa-check-circle watched'));
                     }
 
                     showAnchor.append($('<h6>').addClass('title').html(shortenText(show.title, 11)));
@@ -333,7 +333,7 @@ function loadEpisodes(options) {
                     episodeAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (episode.playcount >= 1) {
-                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('fa-inverse fa-check-circle watched_episode'));
+                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-inverse fa-check-circle watched_episode'));
                     }
 
                     episodeAnchor.append($('<h6>').addClass('title').html(shortenText(episode.label, 18)));

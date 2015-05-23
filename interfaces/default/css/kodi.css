@@ -5,6 +5,7 @@ a:Hover {
     position: relative;
 	float: left;
 }
+#addons-grid img.thumbnail,
 #movie-grid img.thumbnail,
 #show-grid img.thumbnail {
     height: 150px;
@@ -24,10 +25,18 @@ a:Hover {
     height: 75px;
     width: 75px;
 }
+
 .watched {
     position: absolute;
     top: 138px;
     right: 5px;
+    width: 16px;
+    height: 16px;
+}
+.watched-episode {
+    position: absolute;
+    top: 74px;
+    right: 4px;
     width: 16px;
     height: 16px;
 }
@@ -98,7 +107,14 @@ h6.title {
     height: 300px;
     width: 200px;
 }
+.modal .episode-poster {
+    height: 100px;
+    width: 150px;
+}
 .modal .modal-movieinfo {
+    margin-left: 171px;
+}
+.modal .modal-episodeinfo {
     margin-left: 171px;
 }
 .modal-body {
@@ -137,7 +153,9 @@ h6.title {
 	.modal .modal-movieinfo {
 		margin-left: 0px;
 	}
-
+    .modal .modal-episodeinfo {
+        margin-left: 0px;
+    }
     .dropdown-menu {
         right:initial!important;
         left: 0 !important;

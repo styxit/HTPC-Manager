@@ -6,7 +6,6 @@ import htpc
 import logging
 import requests
 from cherrypy.lib.auth2 import require
-
 from urllib import urlencode
 from json import loads
 from htpc.helpers import get_image, striphttp
@@ -27,7 +26,7 @@ class Headphones(object):
                 {'type': 'text', 'label': 'Basepath', 'name': 'headphones_basepath'},
                 {'type': 'text', 'label': 'API key', 'name': 'headphones_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'headphones_ssl'},
-                {"type": "text", "label": "Reverse proxy link", "placeholder": "", "desc":"Reverse proxy link ex: https://domain.com/hp", "name": "headphones_reverse_proxy_link"}
+                {'type': 'text', "label": 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://domain.com/hp', 'name': 'headphones_reverse_proxy_link'}
 
             ]
         })
@@ -37,7 +36,6 @@ class Headphones(object):
     def index(self):
         template = htpc.LOOKUP.get_template('headphones.html')
         settings = htpc.settings
-        url = self._build_url()
 
         return template.render(
             scriptname='headphones',
@@ -56,7 +54,7 @@ class Headphones(object):
     @require()
     def GetThumb(self, url=None, thumb=None, h=None, w=None, o=100):
         """ Parse thumb to get the url and send to htpc.proxy.get_image """
-        self.logger.debug("Trying to fetch image via %s", url)
+        self.logger.debug("Trying to fetch image via %s" % url)
         if url is None and thumb is None:
             # To stop if the image is missing
             return
@@ -75,6 +73,7 @@ class Headphones(object):
             a['can_download'] = True if a['Status'] not in ('Downloaded', 'Snatched', 'Wanted') else False
 
         template = htpc.LOOKUP.get_template('headphones_view_artist.html')
+
         return template.render(
             scriptname='headphones_view_artist',
             artist_id=artist_id,
@@ -140,7 +139,6 @@ class Headphones(object):
             api_key=api_key or htpc.settings.get('headphones_apikey'),
             command=command,
         )
-
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
@@ -273,7 +271,7 @@ class Headphones(object):
             if img or text:
                 json = False
             result = ''
-            self.logger.info('calling api @ %s' % url)
+            self.logger.debug('calling api @ %s' % url)
             response = requests.get(url, timeout=30, verify=False)
 
             if response.status_code != 200:
@@ -290,6 +288,7 @@ class Headphones(object):
                 result = response.json()
 
             self.logger.debug('Response: %s' % result)
+
             return result
 
         except Exception as e:
