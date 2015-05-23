@@ -30,8 +30,8 @@ class Vnstat(object):
             "fields": [
                 {"type": "bool", "label": "Enable", "name": "vnstat_enable"},
                 {"type": "text", "label": "Menu name", "name": "vnstat_name"},
-                {"type": "bool", "label": "Use SSH?", 'desc': 'Check this if vnstat is running on a different computer', "name": "vnstat_use_ssh"},
-                {"type": "text", "label": "Vnstat DB location", "placeholder": "", "name": "vnstat_db"},
+                {"type": "bool", "label": "Use SSH?", 'desc': 'Check this if vnStat is running on a different computer', "name": "vnstat_use_ssh"},
+                {"type": "text", "label": "vnStat DB location", "placeholder": "", "name": "vnstat_db"},
                 {"type": "text", "label": "Interface", "placeholder": "eth0", "desc": "Fetching speed from this interface", "name": "vnstat_interface"},
                 {"type": "text", "label": "IP / Host", "placeholder": "localhost", "name": "vnstat_host"},
                 {"type": "text", "label": "Port", "name": "vnstat_port"},

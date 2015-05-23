@@ -27,7 +27,7 @@ class Sonarr(object):
                 {'type': 'text', 'label': 'Basepath', 'placeholder': '/sonarr', 'name': 'sonarr_basepath'},
                 {'type': 'text', 'label': 'API', 'name': 'sonarr_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'sonarr_ssl'},
-                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://sonarr.domain.com', 'name': 'sonarr_reverse_proxy_link'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link, e.g. https://sonarr.domain.com', 'name': 'sonarr_reverse_proxy_link'},
 
             ]
         })

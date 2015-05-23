@@ -22,7 +22,7 @@ class Squeezebox(object):
                 {'type': 'text', 'label': 'Port *', 'name': 'squeezebox_port'},
                 {'type': 'text', 'label': 'Username', 'name': 'squeezebox_username'},
                 {'type': 'password', 'label': 'Password', 'name': 'squeezebox_password'},
-                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://domain.com/sq', 'name': 'squeezebox_reverse_proxy_link'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link, e.g. https://domain.com/sq', 'name': 'squeezebox_reverse_proxy_link'},
 
             ]
         })
