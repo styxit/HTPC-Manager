@@ -91,8 +91,8 @@ webdir = htpc.WEBDIR
                 </ul>
 
                 <div class="mobile-search hidden-desktop visible-phone visible-tablet">
-                    %if s.get('nzbsearch_enable'):
-                        <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}search/" method="get">
+                    %if s.get('newznab_enable'):
+                        <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}newznab/" method="get">
                     %else:
                         <form class="navbar-form pull-right disabled formsearch">
                     %endif
@@ -102,8 +102,8 @@ webdir = htpc.WEBDIR
 
                 <!-- end phone tablet -->
                 <div class="pull-right hidden-tablet hidden-phone visible-desktop">
-                    %if s.get('nzbsearch_enable'):
-                    <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}search/" method="get" class="navbar-form pull-right" id="menu-search">
+                    %if s.get('newznab_enable'):
+                    <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}newznab/" method="get" class="navbar-form pull-right" id="menu-search">
                     %else:
                     <form class="navbar-form pull-right disabled formsearch" id="menu-search">
                     %endif
@@ -174,7 +174,7 @@ ${self.body()}
 <script>
     menus = {}
     %for m in htpc.MODULES:
-       %if s.get(m.get('id')+'_enable') and m.get('id') == 'nzbsearch' and not s.get('newznab_show_in_menu'):
+       %if s.get(m.get('id')+'_enable') and m.get('id') == 'newznab' and not s.get('newznab_show_in_menu'):
             <% continue %>
         %endif
         %if s.get(m.get('id')+'_enable'):

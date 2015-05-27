@@ -1,4 +1,5 @@
 $(document).ready(function () {
+    // Replace this and use the mako?
     get_branches()
     // Activates the tooltips
     $('.settingstooltip').tooltip({placement: 'right'})
@@ -76,6 +77,7 @@ $(document).ready(function () {
             btn.addClass('btn-danger').append(' ').append($('<i>').addClass('fa fa-exclamation-circle fa-inverse'));
         });
     });
+
     $('input, radio, select, button').bind('change input', function (e) {
         $('.btn-test').button('reset').removeClass('btn-success btn-danger');
     });
@@ -102,12 +104,16 @@ $(document).ready(function () {
                     notify('myPlex', data, 'info');
                 });
             }
+            // flaky? why
+            if ($('#newznab_indexer_id').is(":visible")) {
+                newznab_update_indexer(0);
+            }
 
         }).done(function () {
                 notify('Settings', msg, 'info');
                 // Force reload without cache
                 setTimeout(function () {
-                    window.location.reload(true);
+                    //window.location.reload(true);
                 }, 1000);
 
             });
@@ -129,7 +135,7 @@ $(document).ready(function () {
         $('button:reset:visible').html('Clear').removeClass('btn-danger').unbind();
         var item = $(this);
         var id = item.val();
-        if (id === 0) $('button:reset:visible').trigger('click');
+        if (id == 0) $('button:reset:visible').trigger('click');
         $.get(WEBDIR + 'kodi/getserver?id=' + id, function (data) {
             if (data === null) return;
             $('#kodi_server_name').val(data.name);
@@ -158,7 +164,7 @@ $(document).ready(function () {
         $('button:reset:visible').html('Clear').removeClass('btn-danger').unbind();
         var item = $(this);
         var id = item.val();
-        if (id === 0) $('button:reset:visible').trigger('click');
+        if (id == 0) $('button:reset:visible').trigger('click');
         $.get(WEBDIR + 'users/getuser?id=' + id, function (data) {
             if (data === null) return;
             $('#users_user_username').val(data.username);
@@ -178,12 +184,43 @@ $(document).ready(function () {
     });
     users_update_user(0);
 
+    $('input.enable-module').trigger('change');
+    $('#newznab_indexer_id').change(function () {
+        $('button:reset:visible').html('Clear').removeClass('btn-danger').unbind();
+        var item = $(this);
+        var id = item.val();
+        if (id == 0) $('button:reset:visible').trigger('click');
+        $.get(WEBDIR + 'newznab/getindexer?id=' + id, function (data) {
+            console.log(data);
+            if (data === null) return;
+            $('#newznab_indexer_name').val(data['name']);
+            $('#newznab_indexer_host').val(data['host']);
+            $('#newznab_indexer_apikey').val(data.apikey);
+            if (data.use_ssl == 'on') {
+                $('#newznab_indexer_ssl').attr('checked', true);
+            } else {
+                $('#newznab_indexer_ssl').attr('checked', false);
+            }
+
+            $("button:reset:visible").html('Delete').addClass('btn-danger').click(function (e) {
+                var name = item.find('option:selected').text();
+                if (!confirm('Delete ' + name)) return;
+                $.get(WEBDIR + 'newznab/delindexer?id=' + id, function (data) {
+                    notify('Settings', name + ' deleted', 'info');
+                    $(this).val(0);
+                    item.find('option[value=' + id + ']').remove();
+                    $('button:reset:visible').html('Clear').removeClass('btn-danger').unbind();
+                });
+            });
+        });
+    });
+    newznab_update_indexer(0)
+
     $('#gdm_plex_servers').change(function () {
         var item = $(this);
         var id = item.val();
         $.get(WEBDIR + 'plex/GetServers?id=' + id, function (data) {
             if (data === null) return;
-            console.log(data.servers.serverName);
             $('#plex_name').val(data.servers.serverName);
             $('#plex_host').val(data.servers.ip);
             $('#plex_port').val(data.servers.port);
@@ -192,11 +229,10 @@ $(document).ready(function () {
     gdm_plex_servers(0);
 
     $('input.enable-module').trigger('change');
-        $('#tvs').change(function () {
+    $('#tvs').change(function () {
         var item = $(this);
         var id = item.val();
         $.get(WEBDIR + 'samsungtv/findtv?id=' + id, function (data) {
-            console.log(data)
             if (data === null) return;
             $('#samsungtv_name').val(data.tv_model);
             $('#samsungtv_host').val(data.host);
@@ -240,6 +276,18 @@ function users_update_user(id) {
             var option = $('<option>').text(item.name).val(item.id);
             if (id == item.id) option.attr('selected', 'selected');
             users.append(option);
+        });
+    }, 'json');
+}
+
+function newznab_update_indexer(id) {
+    $.get(WEBDIR + 'newznab/getindexer', function (data) {
+        if (data === null) return;
+        var indexers = $('#newznab_indexer_id').empty().append($('<option>').text('New').val(0));
+        $.each(data.indexers, function (i, item) {
+            var option = $('<option>').text(item.name).val(item.id);
+            if (id == item.id) option.attr('selected', 'selected');
+            indexers.append(option);
         });
     }, 'json');
 }
