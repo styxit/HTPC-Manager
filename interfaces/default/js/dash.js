@@ -79,8 +79,15 @@ function loadRecentTVshows () {
             var itemDiv = $('<div>').addClass('item carousel-item')
 
             if (i == 0) itemDiv.addClass('active')
+           
+	    var imgp;
+	    if (episode.thumbnail) {
+	    	imgp = episode.thumbnail;
+	    } else {
+	    	imgp = episode.fanart
+	    }
 
-            var src = WEBDIR + "kodi/GetThumb?h=240&w=430&thumb="+encodeURIComponent(episode.fanart)
+            var src = WEBDIR + "kodi/GetThumb?h=240&w=430&thumb="+encodeURIComponent(imgp)
             itemDiv.attr('style', 'background-image: url("' + src + '")')
 
             itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
