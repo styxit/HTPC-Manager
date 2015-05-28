@@ -72,8 +72,8 @@ def load_modules():
     htpc.ROOT.deluge = Deluge()
     from modules.squeezebox import Squeezebox
     htpc.ROOT.squeezebox = Squeezebox()
-    from modules.search import Search
-    htpc.ROOT.search = Search()
+    from modules.newznab import Newznab
+    htpc.ROOT.newznab = Newznab()
     from modules.utorrent import UTorrent
     htpc.ROOT.utorrent = UTorrent()
     from modules.nzbget import NZBGet

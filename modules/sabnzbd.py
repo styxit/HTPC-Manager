@@ -105,7 +105,7 @@ class Sabnzbd(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def AddNzbFromUrl(self, nzb_url, nzb_category=''):
+    def AddNzbFromUrl(self, nzb_url, nzb_category='', nzb_name=''):
         self.logger.debug('Adding nzb from url')
         if nzb_category:
             nzb_category = '&cat=' + nzb_category

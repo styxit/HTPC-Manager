@@ -3,8 +3,10 @@
 
 import cherrypy
 import htpc
-from urllib2 import urlopen, Request
-from json import loads
+#from urllib2 import urlopen, Request
+import requests
+from requests.auth import HTTPBasicAuth
+#from json import loads
 import logging
 import base64
 import re
@@ -86,14 +88,23 @@ class NZBGet(object):
 
         url = 'http%s://%s:%s%sjsonrpc/version' % (ssl, striphttp(nzbget_host), nzbget_port, nzbget_basepath)
         try:
+            if nzbget_username and nzbget_password:
+                r = requests.get(url, timeout=10, auth=(nzbget_username, nzbget_password))
+            else:
+                r = requests.get(url, timeout=10)
+
+            return r.json()
+
+            """
             request = Request(url)
             if nzbget_username and nzbget_password:
                 base64string = base64.encodestring(nzbget_username + ':' + nzbget_password).replace('\n', '')
                 request.add_header("Authorization", "Basic %s" % base64string)
             self.logger.debug("Fetching information from: " + url)
             return loads(urlopen(request, timeout=10).read())
+            """
         except:
-            self.logger.error("Unable to contact nzbget via " + url)
+            self.logger.error("Unable to contact nzbget via %s" % url)
             return
 
     @cherrypy.expose()
@@ -119,23 +130,22 @@ class NZBGet(object):
                 # f = nzbfile
                 r = nzbget.append(nzb_name, nzb_category, False, f)
             else:
-                nzb = urlopen(nzb_url).read()
-                # If name is missig the link is added manually
+                sess = requests.Session()
+                nzb = sess.get(nzb_url, timeout=30)
+
                 if not nzb_name:
-                    nzb_name = 'Temp Name'
+                    try:
+                        # Try to get the filename from the download
+                        # TODO check if x-dnzb-name is on all indexers
+                        nzb_name = nzb.headers.get('content-disposition').split('filename=')[1].replace('.nzb', '').replace('"', '')
+                    except:
+                        pass
+                nzb = nzb.content
                 r = nzbget.append(nzb_name, nzb_category, False, base64.standard_b64encode(nzb))
 
         except Exception as e:
-            self.logger.error("Failed to add %s to queue %s" % (nzb_name, e))
+            self.logger.error("Failed to add %s %s to queue %s" % (nzb_name, nzb_url, e))
         return r
-
-    #Used to grab the categories from the config
-    #@cherrypy.expose()
-    #@require()
-    #@cherrypy.tools.json_out()
-    #def GetConfig(self):
-    #    nzbget = jsonrpc.ServerProxy('%s' % self.nzbget_url())
-    #    return nzbget.config()
 
     @cherrypy.expose()
     @require()
