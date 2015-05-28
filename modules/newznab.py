@@ -91,7 +91,7 @@ class Newznab(object):
     @require()
     def delindexer(self, id):
         """ Delete a server """
-        self.logger.debug("Deleting indexer " + str(id))
+        self.logger.debug("Deleting indexer %s" % id)
         NewznabIndexers.delete(id)
         self.changeindexer()
         return
@@ -183,29 +183,31 @@ class Newznab(object):
     @cherrypy.expose()
     @require()
     def thumb(self, url, h=None, w=None, o=100, category=None):
-        #host = htpc.settings.get('newznab_host', '').replace('https://', '').replace('http://', '')
-        #ssl = 's' if htpc.settings.get('newznab_ssl', 0) else ''
 
         if url.startswith('rageid'):
-
             if category:
                 try:
+                    print category
                     cat = category.split('>')[0].lower().strip()
                     if cat == 'tv':
-                        print "thumb dick"
-                        url = 'http://images.tvrage.com/shows/3/%s.jpg' % url[6:]
+                        try:
+                            # Get the image path from tvrage
+                            q_tvrage = 'http://services.tvrage.com/feeds/full_show_info.php?sid=%s' % url[6:]
+                            r = requests.get(q_tvrage)
+                            url = xmltodict.parse(r.content)['Show']['image']
+
+                        except Exception as e:
+                            print 'error %s' % e
                 except:
                     cat = 'tv'
             else:
                 cat = 'tv'
 
-            #if host.startswith('www.usenet-crawler'):
-            #    url = 'http%s://%s/covers/%s/%s.jpg' % (ssl, cat, url[6:])
+            if 'www.usenet-crawler' in url:
+                url = 'https://www.usenet-crawler/covers/%s/%s.jpg' % (cat, url[6:])
 
-            #if host.startswith('api.dognzb'):
-            #    url = 'http%s://dognzb.cr/content/covers/%s/%s.jpg' % (ssl, cat, url[6:])
-
-            #if http://images.tvrage.com/shows/3/2980.jpg
+            if 'api.dognzb' in url:
+                url = 'https://dognzb.cr/content/covers/%s/%s.jpg' % (cat, url[6:])
 
         return get_image(url, h, w, o)
 
@@ -221,14 +223,14 @@ class Newznab(object):
     @cherrypy.tools.json_out()
     def getclients(self):
         l = []
-        nzbget = {"client": "nzbget",
+        nzbget = {"client": "NZBGet",
                   "icon": "../img/nzbget.png",
                   "active": 0
         }
         if htpc.settings.get("nzbget_enable"):
             nzbget["active"] = 1
 
-        sab = {"client": "sabnzbd",
+        sab = {"client": "SABnzbd",
                "icon": "../img/sabnzbd.png",
                "active": 0
         }
@@ -250,11 +252,11 @@ class Newznab(object):
     @require()
     @cherrypy.tools.json_out()
     def search(self, q='', cat='', indexer='all', **kwargs):
-        self.logger.debug("search q %s cat %s indexer %s" % (q, cat, indexer))
+        self.logger.debug("Searching for %s category %s on indexer %s" % (q, cat, indexer))
         if cat:
             cat = '&cat=' + cat
 
-        sess = FuturesSession()
+        sess = FuturesSession(max_workers=8)
         job_list = []
 
         if indexer == 'all':

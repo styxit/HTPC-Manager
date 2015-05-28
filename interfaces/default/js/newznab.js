@@ -24,87 +24,6 @@ function getCategories() {
     });
 }
 
-/*
-function search(query, catid, indexer) {
-    if (query==undefined) return;
-    $('.spinner').show()
-    $.ajax({
-        url: WEBDIR + 'newznab/search?q='+query+'&cat='+catid + '&indexer='+ indexer,
-        type: 'get',
-        timeout: 60000,
-        dataType: 'json',
-        beforeSend: function () {
-            $('#results_table_body').empty();
-            $('.spinner').show();
-        },
-        success: function (d) {
-            console.log(d);
-            var stop = 0;
-            $('.spinner').hide();
-            if (d === null) return;
-            //list of dicts
-            $.each(d, function (i, data) {
-            $.each(data, function (i, indexer) {
-                if (indexer.title) {
-                    var indexername = indexer.title;
-                } else {
-                    var indexername = indexer.title;
-                }
-
-                $.each(indexer.item, function (i, item) {
-                if (item.description == undefined) {
-                    var item = indexer.item;
-                    stop = 1;
-                }
-                var attributes = []
-                $.each(item.attr, function(a, attr) {
-                    var name = attr['@attributes']['name'];
-                    var value = attr['@attributes']['value'];
-                    attributes[name] = value.replace(/\|/g,', ');
-                });
-                item.attr = attributes;
-
-                var row = $('<tr>');
-                var itemlink = $('<a>').attr('href','#').text(item.description).click(function(){
-                    showDetails(item);
-                    return false;
-                });
-                row.append($('<td>').append(indexername));
-                row.append($('<td>').append(itemlink));
-                var cat = $('<a>').attr('href','#').text(item.category).click(function(){
-                    $('#catid option:contains("'+item.category+'")').attr('selected', 'selected');
-                    $('#searchform').submit();
-                    return false;
-                });
-
-                var usenetdate;
-                if (item.attr['usenetdate']) {
-                    var age = moment(item.attr['usenetdate']).format("YYYY-MM-DD")
-                    var temp = moment().diff(age, 'days')
-                    usenetdate = temp + ' d'
-
-                } else {
-                    usenetdate = 'N/A'
-                }
-                row.append($('<td>').append(cat));
-                row.append($('<td>').addClass('right').html(usenetdate));
-                row.append($('<td>').addClass('right').html(bytesToSize(item.attr['size'], 2)));
-
-                // Make a group of nzbclient buttons
-                row.append($('<td>').append(anc(item)));
-
-                $('#results_table_body').append(row);
-                if (stop) return false;
-            });
-        });
-        });
-        }
-
-    });
-    $('table').trigger("update");
-    $('.spinner').hide();
-}
-*/
 
 function search(query, catid, indexer) {
     if (query == undefined) return;
@@ -125,10 +44,13 @@ function search(query, catid, indexer) {
             //list of dicts
             $.each(d, function (i, data) {
                 $.each(data, function (i, indexer) {
+                    var indexername;
+                    // if there are not indexer.item this acts as python continue
+                    if (indexer.item == undefined) return true;
                     if (indexer.title) {
-                        var indexername = indexer.title;
+                        indexername = indexer.title;
                     } else {
-                        var indexername = indexer.title;
+                        indexername = indexer.description;
                     }
 
                     $.each(indexer.item, function (i, item) {
@@ -175,6 +97,9 @@ function search(query, catid, indexer) {
                         row.append($('<td>').append(anc(item)));
 
                         $('#results_table_body').append(row);
+                        $('.spinner').hide();
+                        // update tablesorter, sort on age
+                        $('#results_table_body').parent().trigger('update').trigger("sorton", [[[3, 0]]]);
                         if (stop) return false;
                     });
                 });
@@ -182,8 +107,8 @@ function search(query, catid, indexer) {
         }
 
     });
-    $('table').trigger("update");
-    $('.spinner').hide();
+
+
 }
 
 function get_clients() {
@@ -207,7 +132,7 @@ function anc(nzb) {
 		        "height": "24px"
 		    }).click(function () {
 		        sendToclient(nzb, client);
-		    }).append($('<i>').addClass('rg rg-' + client.client + '-c'));
+		    }).append($('<i>').addClass('rg rg-' + client.client.toLowerCase() + '-c'));
 
 		    b.append(button);
 
@@ -238,6 +163,8 @@ function showDetails(data) {
         modalTitle = data.attr['artist'] + ' - ' + data.attr['album'];
     }
 
+
+
     var modalImage = '';
     if (data.attr["coverurl"]) {
         var url = WEBDIR + 'newznab/thumb?url='+data.attr['coverurl']+'&w=200&h=300&category=';
@@ -250,20 +177,26 @@ function showDetails(data) {
     }
 
     var modalInfo = $('<div>').addClass('modal-movieinfo');
+     //
+    $.each(data['attr'], function(lol, test){
+        alert(test);
+        modalInfo.append($('<p>').html('<b>Genre:</b> ' + test));
+
+    })
     if(data.attr['imdbtagline']) {
         modalInfo.append($('<p>').html(data.attr['imdbtagline']));
     }
     if(data.attr['genre']) {
         modalInfo.append($('<p>').html('<b>Genre:</b> ' + data.attr['genre']));
     }
-    /*
+    //
     if(data.attr['imdbdirector']) {
         modalInfo.append($('<p>').html('<b>Director:</b> ' + data.attr['imdbdirector']));
     }
     if(data.attr['imdbactors']) {
         modalInfo.append($('<p>').html('<b>Actors:</b> ' + data.attr['imdbactors']));
     }
-    */
+
     var posted;
     if (data.attr['usenetdate']) {
         posted = moment(data.attr['usenetdate']).fromNow()
@@ -308,7 +241,7 @@ function showDetails(data) {
 
     var modalButtons = {}
     $.each(clients, function(i, v){
-        if (v.active === 1 && v.client === "nzbget") {
+        if (v.active === 1 && v.client === "NZBGet") {
             $.extend(modalButtons,{
             'NZBget' : function() {
                 sendToGet(data)
@@ -317,7 +250,7 @@ function showDetails(data) {
             });
 
         }
-        if (v.active === 1 && v.client === "sabnzbd") {
+        if (v.active === 1 && v.client === "SABnzbd") {
             $.extend(modalButtons,{
             'SABnzbd' : function() {
                 sendToSab(data)
@@ -354,7 +287,7 @@ function showDetails(data) {
     }
 
     if (data.attr['backdropurl']) {
-        var url = WEBDIR + 'search/thumb?url='+data.attr['backdropurl']+'&w=675&h=400&o=20';
+        var url = WEBDIR + 'newznab/thumb?url='+data.attr['backdropurl']+'&w=675&h=400&o=20';
         $('.modal-fanart').css({
             'background' : '#ffffff url('+url+') top center no-repeat',
             'background-size' : '100%'
@@ -368,7 +301,8 @@ function sendToSab(item) {
         url: WEBDIR + 'sabnzbd/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
-        data: {nzb_url: item.link},
+        data: {nzb_url: item.link,
+               nzb_name: item.description},
         success: function (result) {
             notify('', 'Sent ' + item.description+ ' to SabNZBd', 'info');
         }
@@ -380,33 +314,36 @@ function sendToGet(item) {
         url: WEBDIR + 'nzbget/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
-        data: {nzb_url: item.link},
+        data: {nzb_url: item.link,
+               nzb_name: item.description},
         success: function (result) {
-            notify('', 'Sent ' + item.description+ ' to NzbGet', 'info');
+            notify('', 'Sent ' + item.description + ' to NzbGet', 'info');
         }
     });
 }
 
 function sendToclient(item, client) {
     return $.ajax({
-        url: WEBDIR + client.client + '/AddNzbFromUrl',
+        url: WEBDIR + client.client.toLowerCase() + '/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
-        data: {nzb_url: item.link},
+        data: {nzb_url: item.link,
+               nzb_name: item.description},
         success: function (result) {
-            notify('', 'Sent ' + item.description+ ' to ' + client.client, 'info');
+            state = (result) ? 'success' : 'error';
+            notify('', 'Sent ' + item.description+ ' to ' + client.client, state);
         }
     });
 }
 
 function getindexer(id) {
-    $.get(WEBDIR + 'newznab/getindexer', function (data) {
-        if (data === null) return;
-        var idx = $('#formindexer').empty().append($('<option>').text('New').val(0));
-        $.each(data.indexers, function (i, item) {
-            var option = $('<option>').text(item.name).val(item.id);
-            if (id == item.id) option.attr('selected', 'selected');
-            idx.append(option);
+        $.get(WEBDIR + 'newznab/getindexer', function(data) {
+        if (data==null) return;
+        var indexers = $('#formindexer').empty().append($('<option>').text('All').val('all'));
+        $.each(data.indexers, function(i, item) {
+            var indexer = $('<option>').text(item.name).val(item.name);
+            if (item.name == 'all') indexer.attr('selected','selected');
+            indexers.append(indexer);
         });
     }, 'json');
 }
@@ -417,17 +354,11 @@ $(document).ready(function () {
         search($('#query').val(), $('#catid').val(), $('#formindexer').val());
         return false;
     });
+    // for navbar search, defaults to all
     if ($('#query').val()) $('#searchform').submit();
 
     getCategories();
+    getindexer();
 
-    $.get(WEBDIR + 'newznab/getindexer', function(data) {
-        if (data==null) return;
-        var indexers = $('#formindexer').empty().append($('<option>').text('All').val('all'));
-        $.each(data.indexers, function(i, item) {
-            var indexer = $('<option>').text(item.name).val(item.name);
-            if (item.name == 'all') indexer.attr('selected','selected');
-            indexers.append(indexer);
-        });
-    }, 'json');
+
 });
