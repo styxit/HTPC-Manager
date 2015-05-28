@@ -191,7 +191,6 @@ $(document).ready(function () {
         var id = item.val();
         if (id == 0) $('button:reset:visible').trigger('click');
         $.get(WEBDIR + 'newznab/getindexer?id=' + id, function (data) {
-            console.log(data);
             if (data === null) return;
             $('#newznab_indexer_name').val(data['name']);
             $('#newznab_indexer_host').val(data['host']);

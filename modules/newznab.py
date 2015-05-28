@@ -7,7 +7,7 @@ from htpc.helpers import get_image
 import urllib2
 from json import loads
 import logging
-from cherrypy.lib.auth2 import require
+from cherrypy.lib.auth2 import require, member_of
 import requests
 import concurrent.futures as cf
 from requests_futures.sessions import FuturesSession
@@ -18,7 +18,7 @@ import xmltodict
 
 
 class NewznabIndexers(SQLObject):
-    """ SQLObject class for kodi_servers table """
+    """ SQLObject class for NewznabIndexers table """
     name = StringCol()
     host = StringCol()
     apikey = StringCol()
@@ -68,7 +68,7 @@ class Newznab(object):
     @cherrypy.tools.json_out()
     def getindexer(self, id=None):
         if id:
-            """ Get kodi server info """
+            """ Get NewznabIndexers server info """
             try:
                 indexers = NewznabIndexers.selectBy(id=id).getOne()
                 return dict((c, getattr(indexers, c)) for c in indexers.sqlmeta.columns)
@@ -88,7 +88,7 @@ class Newznab(object):
         return {'current': current, 'indexers': all_indexers}
 
     @cherrypy.expose()
-    @require()
+    @require(member_of("admin"))
     def delindexer(self, id):
         """ Delete a server """
         self.logger.debug("Deleting indexer %s" % id)
@@ -97,7 +97,7 @@ class Newznab(object):
         return
 
     @cherrypy.expose()
-    @require()
+    @require(member_of("admin"))
     @cherrypy.tools.json_out()
     def changeindexer(self, id=0):
         try:
@@ -116,7 +116,7 @@ class Newznab(object):
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
-    @require()
+    @require(member_of("admin"))
     def setindexer(self, **kw):
         """
         newznab_enable='',
@@ -187,7 +187,6 @@ class Newznab(object):
         if url.startswith('rageid'):
             if category:
                 try:
-                    print category
                     cat = category.split('>')[0].lower().strip()
                     if cat == 'tv':
                         try:
@@ -197,7 +196,7 @@ class Newznab(object):
                             url = xmltodict.parse(r.content)['Show']['image']
 
                         except Exception as e:
-                            print 'error %s' % e
+                            self.logger.error('failed to fetch image url from tvrage %s' % e)
                 except:
                     cat = 'tv'
             else:
@@ -224,14 +223,12 @@ class Newznab(object):
     def getclients(self):
         l = []
         nzbget = {"client": "NZBGet",
-                  "icon": "../img/nzbget.png",
                   "active": 0
         }
         if htpc.settings.get("nzbget_enable"):
             nzbget["active"] = 1
 
         sab = {"client": "SABnzbd",
-               "icon": "../img/sabnzbd.png",
                "active": 0
         }
         if htpc.settings.get("sabnzbd_enable"):
@@ -293,29 +290,22 @@ class Newznab(object):
 
     def fetch(self, cmd):
         try:
-            l = list(NewznabIndexers.select())
-            if l:
-                # grab the first indexer
-                indexer = l[0]
-                host = striphttp(indexer.host).rstrip('/')
-                ssl = 's' if indexer.use_ssl == 'on' else ''
-                apikey = indexer.apikey
-            else:
-                self.logger.error('No indexers in the db, please add one.')
-                return
+            indexer = NewznabIndexers.select(limit=1).getOne()
+            host = striphttp(indexer.host).rstrip('/')
+            ssl = 's' if indexer.use_ssl == 'on' else ''
+            apikey = indexer.apikey
 
-            url = 'http' + ssl + '://' + host + '/api?o=json&apikey=' + apikey + '&t=' + cmd
+        except SQLObjectNotFound:
+            self.logger.warning("No configured Indexers. Please add one")
+            return
 
-            self.logger.debug("Fetching information from: %s" % url)
-            try:
-                # some newznab providers are insanely slow
-                r = requests.get(url, timeout=160)
-                return r.json()
-            except Exception as err:
-                self.logger.error("HTTP Error Code Received: %s" % err)
-                return
+        url = 'http' + ssl + '://' + host + '/api?o=json&apikey=' + apikey + '&t=' + cmd
+
+        self.logger.debug("Fetching information from: %s" % url)
+        try:
+            # some newznab providers are insanely slow
+            r = requests.get(url, timeout=160)
+            return r.json()
         except Exception as e:
             self.logger.error("Unable to fetch information from: %s %s" % (url, e))
             return
-
-

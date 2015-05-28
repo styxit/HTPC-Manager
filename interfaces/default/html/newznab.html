@@ -3,7 +3,7 @@
 <div class="container-fluid">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="http://${settings.get('newznab_host')}" target="_blank">${settings.get('newznab_name', 'Search')}</a>
+            ${settings.get('newznab_name', 'Newznab')}
         </h1>
         <form action="" id="searchform" class="well form-inline disabled">
             <input class="span6" id="query" name="query" type="text" value="${query}" placeholder="Search term" />

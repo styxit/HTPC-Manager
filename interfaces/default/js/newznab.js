@@ -7,16 +7,16 @@ function getCategories() {
             if (data == null) return false;
 
             var select = $('#catid').html('');
-            select.append($('<option>').html('Everything').attr('value',''));
+            select.append($('<option>').html('Everything').attr('value', ''));
             $.each(data.category, function (c, cat) {
                 var option = $('<option>').html(cat["@attributes"]["name"]);
-                option.attr('value',cat["@attributes"]["id"])
+                option.attr('value', cat["@attributes"]["id"])
                 select.append(option)
                 $.each(cat.subcat, function (s, sub) {
                     if (sub["@attributes"] == undefined) sub = cat.subcat;
-                    var name = cat["@attributes"]["name"]+'-'+sub["@attributes"]["name"]
-                    var option = $('<option>').html('&nbsp;&nbsp;'+name);
-                    option.attr('value',sub["@attributes"]["id"])
+                    var name = cat["@attributes"]["name"] + '-' + sub["@attributes"]["name"]
+                    var option = $('<option>').html('&nbsp;&nbsp;' + name);
+                    option.attr('value', sub["@attributes"]["id"])
                     select.append(option)
                 });
             });
@@ -54,7 +54,6 @@ function search(query, catid, indexer) {
                     }
 
                     $.each(indexer.item, function (i, item) {
-                        //console.log(item)
                         if (item.description == undefined) {
                             var item = indexer.item;
                             stop = 1;
@@ -99,7 +98,11 @@ function search(query, catid, indexer) {
                         $('#results_table_body').append(row);
                         $('.spinner').hide();
                         // update tablesorter, sort on age
-                        $('#results_table_body').parent().trigger('update').trigger("sorton", [[[3, 0]]]);
+                        $('#results_table_body').parent().trigger('update').trigger("sorton", [
+                            [
+                                [3, 0]
+                            ]
+                        ]);
                         if (stop) return false;
                     });
                 });
@@ -126,15 +129,15 @@ function anc(nzb) {
         if (client.active === 1) {
             // If any active clients add 1 to n
             n += 1;
-		    var button = $('<button>').addClass("btn btn-mini rg-client").attr('title', 'Send to ' + client.client)
-		        .css({
-		        "cursor": "pointer",
-		        "height": "24px"
-		    }).click(function () {
-		        sendToclient(nzb, client);
-		    }).append($('<i>').addClass('rg rg-' + client.client.toLowerCase() + '-c'));
+            var button = $('<button>').addClass("btn btn-mini rg-client").attr('title', 'Send to ' + client.client)
+                .css({
+                "cursor": "pointer",
+                    "height": "24px"
+            }).click(function () {
+                sendToclient(nzb, client);
+            }).append($('<i>').addClass('rg rg-' + client.client.toLowerCase() + '-c'));
 
-		    b.append(button);
+            b.append(button);
 
         }
     });
@@ -143,7 +146,7 @@ function anc(nzb) {
     var browserdl = $('<button>').addClass("btn btn-mini rg-client").attr('title', 'Download NZB to browser')
         .css({
         "cursor": "pointer",
-        "height": "24px"
+            "height": "24px"
     }).click(function () {
         downloadFile(nzb.link);
     }).append($('<i>').addClass('fa fa-download rg-client'));
@@ -154,11 +157,10 @@ function anc(nzb) {
 }
 
 function showDetails(data) {
-    console.log(data);
     var modalTitle = data.description;
     if (data.attr['imdbtitle']) {
         modalTitle = data.attr['imdbtitle'];
-        if (data.attr['imdbyear'])  modalTitle += ' (' + data.attr['imdbyear'] + ')';
+        if (data.attr['imdbyear']) modalTitle += ' (' + data.attr['imdbyear'] + ')';
     } else if (data.attr['artist'] && data.attr['album']) {
         modalTitle = data.attr['artist'] + ' - ' + data.attr['album'];
     }
@@ -167,33 +169,28 @@ function showDetails(data) {
 
     var modalImage = '';
     if (data.attr["coverurl"]) {
-        var url = WEBDIR + 'newznab/thumb?url='+data.attr['coverurl']+'&w=200&h=300&category=';
+        var url = WEBDIR + 'newznab/thumb?url=' + data.attr['coverurl'] + '&w=200&h=300&category=';
         var modalImage = $('<div>').addClass('thumbnail pull-left');
         modalImage.append($('<img>').attr('src', url));
     } else if (data.attr["rageid"]) {
-        var url = WEBDIR + 'newznab/thumb?url=rageid'+data.attr['rageid']+'&w=200&h=300&category='+ data.category;
+        var url = WEBDIR + 'newznab/thumb?url=rageid' + data.attr['rageid'] + '&w=200&h=300&category=' + data.category;
         var modalImage = $('<div>').addClass('thumbnail pull-left');
         modalImage.append($('<img>').attr('src', url));
     }
 
     var modalInfo = $('<div>').addClass('modal-movieinfo');
-     //
-    $.each(data['attr'], function(lol, test){
-        alert(test);
-        modalInfo.append($('<p>').html('<b>Genre:</b> ' + test));
 
-    })
-    if(data.attr['imdbtagline']) {
+    if (data.attr['imdbtagline']) {
         modalInfo.append($('<p>').html(data.attr['imdbtagline']));
     }
-    if(data.attr['genre']) {
+    if (data.attr['genre']) {
         modalInfo.append($('<p>').html('<b>Genre:</b> ' + data.attr['genre']));
     }
     //
-    if(data.attr['imdbdirector']) {
+    if (data.attr['imdbdirector']) {
         modalInfo.append($('<p>').html('<b>Director:</b> ' + data.attr['imdbdirector']));
     }
-    if(data.attr['imdbactors']) {
+    if (data.attr['imdbactors']) {
         modalInfo.append($('<p>').html('<b>Actors:</b> ' + data.attr['imdbactors']));
     }
 
@@ -203,24 +200,25 @@ function showDetails(data) {
     } else {
         posted = 'N/A'
     }
-    modalInfo.append($('<p>').html('<b>Posted:</b> ' +  posted));
+    modalInfo.append($('<p>').html('<b>Posted:</b> ' + posted));
     modalInfo.append($('<p>').html('<b>Size:</b> ' + bytesToSize(data.attr['size'])));
     modalInfo.append($('<p>').html('<b>Grabs:</b> ' + data.attr['grabs']));
-    modalInfo.append($('<p>').html('<b>Files:</b> ' + data.attr['files']));
+    if (data.attr['files']) {
+        modalInfo.append($('<p>').html('<b>Files:</b> ' + data.attr['files']));
+    }
 
     if (data.attr['password']) {
         var password = data.attr['password'];
         if (password == 0) {
-        password = 'No';
-    }
-        else {
-        password = 'Yes';
-    }
-     modalInfo.append($('<p>').html('<b>Password:</b> ' + password));
+            password = 'No';
+        } else {
+            password = 'Yes';
+        }
+        modalInfo.append($('<p>').html('<b>Password:</b> ' + password));
     }
 
 
-    if(data.attr['imdbscore']) {
+    if (data.attr['imdbscore']) {
         var rating = $('<span>').raty({
             readOnly: true,
             path: null,
@@ -228,10 +226,10 @@ function showDetails(data) {
         })
         modalInfo.append(rating);
     }
-    if(data.attr['label']) {
+    if (data.attr['label']) {
         modalInfo.append($('<p>').html('<b>Label:</b> ' + data.attr['label']));
     }
-    if(data.attr['tracks']) {
+    if (data.attr['tracks']) {
         modalInfo.append($('<p>').html('<b>Tracks:</b> ' + data.attr['tracks']));
     }
 
@@ -240,21 +238,21 @@ function showDetails(data) {
     modalBody.append(modalInfo);
 
     var modalButtons = {}
-    $.each(clients, function(i, v){
+    $.each(clients, function (i, v) {
         if (v.active === 1 && v.client === "NZBGet") {
-            $.extend(modalButtons,{
-            'NZBget' : function() {
-                sendToGet(data)
-                hideModal();
+            $.extend(modalButtons, {
+                'NZBget': function () {
+                    sendToGet(data)
+                    hideModal();
                 }
             });
 
         }
         if (v.active === 1 && v.client === "SABnzbd") {
-            $.extend(modalButtons,{
-            'SABnzbd' : function() {
-                sendToSab(data)
-                hideModal();
+            $.extend(modalButtons, {
+                'SABnzbd': function () {
+                    sendToSab(data)
+                    hideModal();
                 }
             });
 
@@ -263,34 +261,34 @@ function showDetails(data) {
     })
 
     // manual download to the browser
-    $.extend(modalButtons,{
-            'Download NZB' : function() {
-                downloadFile(data.link);
-            }
+    $.extend(modalButtons, {
+        'Download NZB': function () {
+            downloadFile(data.link);
+        }
     });
 
     if (data.attr['imdb']) {
         var link = 'http://www.imdb.com/title/tt' + data.attr['imdb'] + '/';
-        $.extend(modalButtons,{
-            'IMDb' : function() {
-                window.open(link,'IMDb')
+        $.extend(modalButtons, {
+            'IMDb': function () {
+                window.open(link, 'IMDb')
             }
         });
     }
     if (data.attr['rageid']) {
         var link = 'http://www.tvrage.com/shows/id-' + data.attr['rageid'];
-        $.extend(modalButtons,{
-            'TVRage' : function() {
-                window.open(link,'TVRage')
+        $.extend(modalButtons, {
+            'TVRage': function () {
+                window.open(link, 'TVRage')
             }
         });
     }
 
     if (data.attr['backdropurl']) {
-        var url = WEBDIR + 'newznab/thumb?url='+data.attr['backdropurl']+'&w=675&h=400&o=20';
+        var url = WEBDIR + 'newznab/thumb?url=' + data.attr['backdropurl'] + '&w=675&h=400&o=20';
         $('.modal-fanart').css({
-            'background' : '#ffffff url('+url+') top center no-repeat',
-            'background-size' : '100%'
+            'background': '#ffffff url(' + url + ') top center no-repeat',
+                'background-size': '100%'
         });
     }
     showModal(modalTitle, modalBody, modalButtons);
@@ -301,10 +299,12 @@ function sendToSab(item) {
         url: WEBDIR + 'sabnzbd/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
-        data: {nzb_url: item.link,
-               nzb_name: item.description},
+        data: {
+            nzb_url: item.link,
+            nzb_name: item.description
+        },
         success: function (result) {
-            notify('', 'Sent ' + item.description+ ' to SabNZBd', 'info');
+            notify('', 'Sent ' + item.description + ' to SabNZBd', 'info');
         }
     });
 }
@@ -314,8 +314,10 @@ function sendToGet(item) {
         url: WEBDIR + 'nzbget/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
-        data: {nzb_url: item.link,
-               nzb_name: item.description},
+        data: {
+            nzb_url: item.link,
+            nzb_name: item.description
+        },
         success: function (result) {
             notify('', 'Sent ' + item.description + ' to NzbGet', 'info');
         }
@@ -327,22 +329,24 @@ function sendToclient(item, client) {
         url: WEBDIR + client.client.toLowerCase() + '/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
-        data: {nzb_url: item.link,
-               nzb_name: item.description},
+        data: {
+            nzb_url: item.link,
+            nzb_name: item.description
+        },
         success: function (result) {
             state = (result) ? 'success' : 'error';
-            notify('', 'Sent ' + item.description+ ' to ' + client.client, state);
+            notify('', 'Sent ' + item.description + ' to ' + client.client, state);
         }
     });
 }
 
 function getindexer(id) {
-        $.get(WEBDIR + 'newznab/getindexer', function(data) {
-        if (data==null) return;
+    $.get(WEBDIR + 'newznab/getindexer', function (data) {
+        if (data == null) return;
         var indexers = $('#formindexer').empty().append($('<option>').text('All').val('all'));
-        $.each(data.indexers, function(i, item) {
+        $.each(data.indexers, function (i, item) {
             var indexer = $('<option>').text(item.name).val(item.name);
-            if (item.name == 'all') indexer.attr('selected','selected');
+            if (item.name == 'all') indexer.attr('selected', 'selected');
             indexers.append(indexer);
         });
     }, 'json');
@@ -350,7 +354,7 @@ function getindexer(id) {
 
 $(document).ready(function () {
     var clients = get_clients()
-    $('#searchform').submit(function() {
+    $('#searchform').submit(function () {
         search($('#query').val(), $('#catid').val(), $('#formindexer').val());
         return false;
     });
