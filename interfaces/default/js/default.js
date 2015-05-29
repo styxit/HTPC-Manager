@@ -267,3 +267,9 @@ $('.dropdown-toggle').click(function(e) {
     }
   }, this), 0);
 });
+// Pad numbers with leading zero, e.g. S1E1 becomes S01E01, useful for episode numbering
+Number.prototype.pad = function(size) {
+      var s = String(this);
+      while (s.length < (size || 2)) {s = "0" + s;}
+      return s;
+    }

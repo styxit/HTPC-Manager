@@ -169,3 +169,6 @@ table th.tablesorter-header {
 .rg-client {
 	font-size: 18px !important;
 }
+.tooltip-inner {
+	white-space: pre-wrap !important;
+}
