@@ -318,10 +318,12 @@ function loadsonarrCalendar(options) {
         $.each(result, function (i, cal) {
           if (i >= 5) return
             var name = $('<a>').attr('href', 'sonarr/View/' + cal.seriesId + '/' + cal.series.tvdbId + '#' + cal.seasonNumber).html(cal.series.title)
-            var row = $('<tr>');
+            var number
+            var row = $('<tr>')
+            var img = makeIcon('fa fa-info-circle', cal.overview);
             row.append(
             $('<td>').append(name),
-            $('<td>').text(cal.title),
+            $('<td>').html('S' + pad(cal.seasonNumber, 2) + 'E' + pad(cal.episodeNumber, 2) + '&nbsp').append(img),
             $('<td>').text(moment(cal.airDateUtc).fromNow())
             )
 

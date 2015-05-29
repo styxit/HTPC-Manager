@@ -199,6 +199,7 @@ function calendar() {
             var img = makeIcon('fa fa-info-circle', cal.overview);
             row.append(
             $('<td>').append(name),
+            $('<td>').text('S' + pad(cal.seasonNumber, 2) + 'E' + pad(cal.episodeNumber, 2)),
             $('<td>').html(cal.title + '&nbsp').append(img),
             $('<td>').text(moment(cal.airDateUtc).calendar()));
             $('#calendar_table_body').append(row);
