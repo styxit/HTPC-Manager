@@ -318,11 +318,13 @@ function loadWarnings() {
         type: 'get',
         dataType: 'json',
         success: function (data) {
+            $('#warning_table_body').html('');
             if (!data) {
                 var row = $('<tr>')
                 row.append($('<td>').html('No warnings'));
                 $('#warning_table_body').append(row);
             }
+
             $.each(data, function (i, warning) {
                 var myDate = new Date( warning.Time *1000);
                 var row = $('<tr>')

@@ -140,7 +140,6 @@ class Newznab(object):
             if k in ["newznab_enable", "newznab_name", "newznab_show_in_menu"]:
                 htpc.settings.set(k, v)
 
-        self.logger.debug(kw)
         # Clean hostname
         host = striphttp(kw.get('newznab_indexer_host')).rstrip('/')
 
@@ -241,9 +240,8 @@ class Newznab(object):
     def cb(self, sess, resp):
         try:
             resp.data = resp.json()
-        except:
-            # lets assume its xml
-            resp.data = loads(xmltodict.parse(resp.content))
+        except Exception as e:
+            pass
 
     @cherrypy.expose()
     @require()
@@ -275,15 +273,30 @@ class Newznab(object):
         future = []
 
         for url in job_list:
-            future.append(sess.get(url, timeout=60, background_callback=self.cb))
+            try:
+                t = sess.get(url, timeout=60)
+            except Exception as e:
+                self.logger.error('%s when fetching %s' % (e, url))
+                continue
+
+            future.append(t)
 
         for future in cf.as_completed(future):
             if future.exception() is not None:
-                self.logger.error('Failed to fetch results %s' % future.exception())
             else:
                 f = []
                 res = future.result()
-                f.append(res.json()['channel'])
+                try:
+                    f.append(res.json()['channel'])
+                except ValueError:
+                    # Cant decode json. Many indexers defaults to xml on errors
+                    error = xmltodict.parse(res.content)
+                    # See if the error msg exist
+                    if error['error']['@description']:
+                        self.logger.error('%s %s' % (error['error']['@description'], res.url))
+                    else:
+                        self.logger.error('%s' % error)
+
                 result.append(f)
 
         return result
