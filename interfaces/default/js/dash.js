@@ -323,7 +323,7 @@ function loadsonarrCalendar(options) {
             var img = makeIcon('fa fa-info-circle', cal.overview);
             row.append(
             $('<td>').append(name),
-            $('<td>').html('S' + cal.seasonNumber.pad() + 'E' + cal.episodeNumber.pad() + '&nbsp').append(img),
+            $('<td>').html('S' + pad(cal.seasonNumber, 2) + 'E' + pad(cal.episodeNumber, 2) + '&nbsp').append(img),
             $('<td>').text(moment(cal.airDateUtc).fromNow())
             )
 
