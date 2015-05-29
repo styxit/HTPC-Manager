@@ -283,6 +283,7 @@ class Newznab(object):
 
         for future in cf.as_completed(future):
             if future.exception() is not None:
+                self.logger.error('Failed to fetch results %s' % (future.exception()))
             else:
                 f = []
                 res = future.result()
