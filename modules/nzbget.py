@@ -95,14 +95,6 @@ class NZBGet(object):
 
             return r.json()
 
-            """
-            request = Request(url)
-            if nzbget_username and nzbget_password:
-                base64string = base64.encodestring(nzbget_username + ':' + nzbget_password).replace('\n', '')
-                request.add_header("Authorization", "Basic %s" % base64string)
-            self.logger.debug("Fetching information from: " + url)
-            return loads(urlopen(request, timeout=10).read())
-            """
         except:
             self.logger.error("Unable to contact nzbget via %s" % url)
             return
@@ -117,6 +109,18 @@ class NZBGet(object):
             return nzbget.history()
         except Exception as e:
             self.logger.error("Failed to get history %s" % e)
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def Swap(self, nzbid=None, oldpos=None, newpos=None):
+        self.logger.debug('Moving %s from %s to %s' % (nzbid, oldpos, newpos))
+        try:
+            nzbget = jsonrpc.ServerProxy('%s' % self.nzbget_url())
+            relpos = int(newpos) - int(oldpos)
+            return nzbget.editqueue("GroupMoveOffset", relpos, "", [int(nzbid)])
+        except Exception as e:
+            self.logger.error("Failed to move %s from %s to %s %s" % (nzbid, oldpos, newpos, e))
 
     @cherrypy.expose()
     @require()

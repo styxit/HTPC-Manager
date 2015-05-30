@@ -99,15 +99,30 @@ $(document).ready(function () {
         });
     });
 
+    loadQueue(1);
+    $("#active_table_body").sortable({
+        start: function (event, ui) {
+            nzbget_old_index = ui.item.index();
+        },
+        stop: function (event, ui) {
+            var nzbget_new = ui.item.index();
+            var nzbid = ui.item.attr('data-id')
+            swap(nzbid, nzbget_old_index, nzbget_new)
+        }
+
+
+    }).disableSelection();
+
     getStatus(1);
     setInterval(function() {
         getStatus(0);
     }, 5000);
 
-    loadQueue(1);
+
     setInterval(function() {
         loadQueue(0);
     }, 5000);
+
 });
 
 function loadHistory() {
@@ -381,6 +396,14 @@ function changeCategory(nzbid, cat, nzbname) {
             }
 
         }
+    });
+}
+
+function swap(nzbid, oldpos, newpos) {
+    $.ajax({
+        url: WEBDIR + 'nzbget/Swap?nzbid=' + nzbid + '&oldpos=' + oldpos + '&newpos=' + newpos,
+        type: 'get',
+        dataType: 'json'
     });
 }
 

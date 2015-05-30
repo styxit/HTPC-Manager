@@ -42,22 +42,17 @@ $(document).ready(function () {
             dataType: 'json'
         });
     });
+
     loadQueue(1);
-    var foo = document.getElementById("active_table_body");
-    Sortable.create(foo, {
-                    animation: 150,
-                    onEnd: function(evt){ swap(evt.item["attributes"]["data-nzo-id"]["value"], evt.newIndex);}
-                });
-
-
+    // drag and drop to reorder q
+    $("#active_table_body").sortable({
+        stop: function (event, ui) {
+            swap(ui.item.attr('data-nzo-id'), ui.item.index())
+        }
+    }).disableSelection();
 
     setInterval(function() {
         loadQueue(0);
-        Sortable.create(foo, {
-                    animation: 150,
-                    onEnd: function(evt){ swap(evt.item["attributes"]["data-nzo-id"]["value"], evt.newIndex);}
-        });
-
     }, 5000);
     loadHistory();
     loadWarnings();

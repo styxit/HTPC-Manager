@@ -104,7 +104,6 @@ $(document).ready(function () {
                     notify('myPlex', data, 'info');
                 });
             }
-            // flaky? why
             if ($('#newznab_indexer_id').is(":visible")) {
                 newznab_update_indexer(0);
             }
@@ -113,7 +112,7 @@ $(document).ready(function () {
                 notify('Settings', msg, 'info');
                 // Force reload without cache
                 setTimeout(function () {
-                    //window.location.reload(true);
+                    window.location.reload(true);
                 }, 1000);
 
             });

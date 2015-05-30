@@ -291,13 +291,15 @@ class Newznab(object):
                     f.append(res.json()['channel'])
                 except ValueError:
                     # Cant decode json. Many indexers defaults to xml on errors
-                    error = xmltodict.parse(res.content)
-                    # See if the error msg exist
-                    if error['error']['@description']:
-                        self.logger.error('%s %s' % (error['error']['@description'], res.url))
-                    else:
-                        self.logger.error('%s' % error)
-
+                    try:
+                        error = xmltodict.parse(res.content)
+                        # See if the error msg exist
+                        if error['error']['@description']:
+                            self.logger.error('%s %s' % (error['error']['@description'], res.url))
+                        else:
+                            self.logger.error('%s' % error)
+                    except Exception as e:
+                        self.logger.error('%s' % e)
                 result.append(f)
 
         return result
