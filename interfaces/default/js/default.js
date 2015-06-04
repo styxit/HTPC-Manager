@@ -267,3 +267,54 @@ $('.dropdown-toggle').click(function(e) {
     }
   }, this), 0);
 });
+
+// Should more all helpers to this file
+// Converts bytes to filesize in kb,mb,gb
+function getReadableFileSizeString(fileSizeInBytes) {
+    var i = -1;
+    var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB'];
+    do {
+        fileSizeInBytes = fileSizeInBytes / 1024;
+        i++;
+    } while (fileSizeInBytes > 1024);
+    return fileSizeInBytes.toFixed(1) + byteUnits[i];
+};
+
+
+// For hdd. Converts bytes to filesize in kb,mb,gb
+ function getReadableFileSizeStringHDD(fileSizeInBytes) {
+    var i = -1;
+    var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB'];
+    do {
+        fileSizeInBytes = fileSizeInBytes / 1000;
+        i++;
+    } while (fileSizeInBytes > 1000);
+    return fileSizeInBytes.toFixed(1) + byteUnits[i];
+};
+
+/**
+ * Converts seconds to readable time. used by deluge
+ */
+function getReadableTime(timeInSeconds) {
+  if (timeInSeconds < 1) {
+    return '00:00:00';
+  }
+
+  var days = parseInt( timeInSeconds / 86400 ) % 7;
+  var hours = parseInt( timeInSeconds / 3600 ) % 24;
+  var minutes = parseInt( timeInSeconds / 60 ) % 60;
+  var seconds = parseInt(timeInSeconds % 60);
+
+  // Add leading 0 and : to seconds
+  seconds = ':'+ (seconds  < 10 ? "0" + seconds : seconds);
+
+  if (days < 1) {
+    days = '';
+  } else {
+    days = days + 'd ';
+    // remove seconds if the eta is 1 day or more
+    seconds = '';
+  }
+  return days + hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + seconds;
+};
+

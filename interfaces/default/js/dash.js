@@ -79,7 +79,7 @@ function loadRecentTVshows () {
             var itemDiv = $('<div>').addClass('item carousel-item')
 
             if (i == 0) itemDiv.addClass('active')
-           
+
 	    var imgp;
 	    if (episode.thumbnail) {
 	    	imgp = episode.thumbnail;
@@ -376,59 +376,41 @@ function loadNextAiredSickrage(options) {
 function loadsysinfo(options) {
     start_refresh('sysinfo','loadsysinfo');
     $.getJSON(WEBDIR + 'stats/sysinfodash', function(result) {
-        var row = $('<tr>');
-        row.append(
-            $('<td>').text("CPU"),
-            $('<td>').text('I: '+ result.cpu.idle + ' %'),
-            $('<td>').text('S: '+ result.cpu.system + ' %'),
-            $('<td>').text('U: '+ result.cpu.user + ' %')
+        $('#dash_sysinfo_table_body').append(
+            $('<tr>').append(
+                $('<td>').html('CPU'),
+                $('<td>').addClass('span4').html("<div class=progress><div class=bar style=width:" + result.cpu.user.toFixed(1) + "%><span class=sr-only>User: "+ result.cpu.user.toFixed(1) +"%</span></div><div class='bar bar-warning' style=width:" + result.cpu.system.toFixed(1) + "%><span class=sr-only>System: "+ result.cpu.system.toFixed(1) +"%</span></div><div class='bar bar-success' style=width:" + (100 - (result.cpu.user + result.cpu.system)).toFixed(1) + "%><span class=sr-only>Idle: " + result.cpu.idle.toFixed(1) +"%</span></div></div>")
+            ),
+            $('<tr>').append(
+                $('<td>').html('MEM'),
+                $('<td>').addClass('span4').html("<div class=progress><div class=bar style=width:" + result.virtual.percent + "%><span class=sr-only>Used: "+ getReadableFileSizeString((result.virtual.total - result.virtual.available))+"</span></div><div class='bar bar-success' style=width:" + (100 - result.virtual.percent) + "% ><span class=sr-only>Free: " + getReadableFileSizeString(result.virtual.available) +"</span></div>")
+            ),
+
+            $('<tr>').append(
+                $('<td>').text('IP'),
+                $('<td>').append(
+                    $('<div>').append(
+                        $('<div class="pull-left">').html(result.localip),
+                        $('<div class="pull-right">').html(result.externalip)
+                    )
+                )
+            ),
+
+            $('<tr>').append(
+                $('<td>').text('Network'),
+                $('<td>').append(
+                    $('<div>').append(
+                        $('<div class="pull-left">').html('<i class="fa fa-arrow-down"></i> ' + getReadableFileSizeString(result.network.bytes_recv)),
+                        $('<div class="pull-right">').html('<i class="fa fa-arrow-up"></i> ' + getReadableFileSizeString(result.network.bytes_sent))
+                    )
+                )
+            )
+
+            // add one more with current user and login?
         )
-        $('#dash_sysinfo_table_body').append(row);
-        row = $('<tr>');
-        row.append(
-            $('<td>').text("MEM"),
-            $('<td>').text('U: '+ result.vmem.percent + ' %'),
-            $('<td>').text('A: '+ bytesToSize(result.vmem.available)),
-            $('<td>').text('T: '+ bytesToSize(result.vmem.total))
-        )
-        $('#dash_sysinfo_table_body').append(row);
-        row = $('<tr>');
-        row.append(
-            $('<td>').text("IP"),
-            $('<td>').attr("colspan",3).html('<div>L: ' + result.localip + '</div>' +
-                                            '<div>E: ' + result.externalip + '</div>')
-        )
-        $('#dash_sysinfo_table_body').append(row);
+
     }).always(function() {
-        $.ajax({
-            url: WEBDIR + 'vnstat/oneline',
-            type: 'GET',
-            timeout: 10000,
-            success: function(result) {
-                if (result) {
-                    var bwtot = (parseFloat(result.download_speed, 10) + parseFloat(result.upload_speed, 10)).toFixed(2);
-                    row = $('<tr>').addClass("hidden-phone");
-                    row.append(
-                        $('<td>').text("Speed"),
-                        $('<td>').text('D: '+ result.download_speed),
-                        $('<td>').text('U: '+ result.upload_speed),
-                        $('<td>').text('T: '+ bwtot + ' kbits/s')
-                    )
-                    $('#dash_sysinfo_table_body').append(row);
-                    row = $('<tr>').addClass("hidden-phone");
-                    row.append(
-                        $('<td>').text("BW"),
-                        $('<td>').attr("colspan",3).html('<div>DL CM: ' + result.rx_current_month + '</div>' +'<div>DL AT: ' + result.alltime_total_traffic + '</div>')
-                    )
-                    $('#dash_sysinfo_table_body').append(row);
-
-                }
-
-            }
-
-        }).always(function() {
-            end_refresh('sysinfo');
-        });
+        end_refresh('sysinfo');
     });
 }
 
@@ -441,7 +423,7 @@ function loaddiskinfo() {
         'success': function (response) {
             $.each(response, function (i, disk) {
                 var row = $('<tr>');
-                var progress =     "<div class='progress' style=margin-bottom:0px><div class=bar style=width:" + disk.percent + "%><span class=sr-only>"+ getReadableFileSizeStringHDD(disk.used) +"</span></div><div class='bar bar-success' style=width:" + (100 - disk.percent) + "% ><span class=sr-only>" + getReadableFileSizeStringHDD(disk.free) +"</span></div>";
+                var progress = "<div class='progress' style=margin-bottom:0px><div class=bar style=width:" + disk.percent + "%><span class=sr-only>"+ getReadableFileSizeStringHDD(disk.used) +"</span></div><div class='bar bar-success' style=width:" + (100 - disk.percent) + "% ><span class=sr-only>" + getReadableFileSizeStringHDD(disk.free) +"</span></div>";
                 row.append(
                 $('<td>').addClass('stats_disk_mountpoint').text(disk.mountpoint),
                 $('<td>').addClass('stats_disk_progress span4').html(progress),

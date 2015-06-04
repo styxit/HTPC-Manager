@@ -5,7 +5,6 @@ import time
 import json
 from datetime import datetime
 import socket
-import urllib2
 import platform
 from subprocess import PIPE
 import cherrypy
@@ -25,10 +24,10 @@ except ImportError:
     importPsutil = False
 
 importpySMART = False
-importpySMARTerror = ""
+importpySMARTerror = ''
 try:
     import pySMART
-    importpySMARTerror = ""
+    importpySMARTerror = ''
     importpySMART = True
 
 except Exception as e:
@@ -39,7 +38,7 @@ except Exception as e:
 if importpySMART:
     if pySMART.utils.admin() is False:
         importpySMART = False
-        importpySMARTerror = "Python should be executed as an administrator to smartmontools to work properly. Please, try to run python with elevated credentials."
+        importpySMARTerror = 'Python should be executed as an administrator to smartmontools to work properly. Please, try to run python with elevated credentials.'
         logger.error(importpySMARTerror)
 
 
@@ -75,7 +74,7 @@ class Stats(object):
         if importPsutil and psutil.version_info >= (0, 7):
             pass
         else:
-            self.logger.error("Psutil is outdated, needs atleast version 0,7")
+            self.logger.error('Psutil is outdated, needs atleast version 0,7')
 
         return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats',
                                                              importPsutil=importPsutil,
@@ -85,8 +84,7 @@ class Stats(object):
 
     @cherrypy.expose()
     @require()
-    @cherrypy.tools.json_out()
-    def uptime(self):
+    def uptime(self, dash=False):
         try:
             if psutil.version_info >= (2, 0, 0):
                 b = psutil.boot_time()
@@ -97,10 +95,14 @@ class Stats(object):
             boot = str(boot)
             uptime = boot[:-7]
             d['uptime'] = uptime
-            return d
+            if dash is True:
+                return uptime
+            else:
+                cherrypy.response.headers['Content-Type'] = 'application/json'
+                return json.dumps(d)
 
         except Exception as e:
-            self.logger.error("Could not get uptime %s" % e)
+            self.logger.error('Could not get uptime %s' % e)
 
     @cherrypy.expose()
     @require()
@@ -156,7 +158,7 @@ class Stats(object):
                     rr = l
 
             except Exception as e:
-                self.logger.error("Could not get disk info %s" % e)
+                self.logger.error('Could not get disk info %s' % e)
 
             return l
 
@@ -196,7 +198,7 @@ class Stats(object):
                     rr = l
 
             except Exception as e:
-                self.logger.error("Could not get disk info %s" % e)
+                self.logger.error('Could not get disk info %s' % e)
 
             return rr
 
@@ -204,25 +206,30 @@ class Stats(object):
     @require()
     @cherrypy.tools.json_out()
     def sysinfodash(self):
-        """ used for the dash """
+        ''' used for the dash '''
         d = {}
         # Cpu stuff
         cpu = psutil.cpu_times_percent(interval=0.1, percpu=False)
         cpu = cpu._asdict()
-        d["cpu"] = {"user": cpu["user"],
-                    "system": cpu["system"],
-                    "idle": cpu["idle"]
+        d['cpu'] = {'user': cpu['user'],
+                    'system': cpu['system'],
+                    'idle': cpu['idle']
                     }
 
         # Virtual memory
         vmem = psutil.virtual_memory()
         vmem = vmem._asdict()
-        d["vmem"] = {"total": vmem["total"],
-                     "percent": vmem["percent"],
-                     "available": vmem["available"]
-                     }
-        d["localip"] = self.get_local_ip(dash=True)
-        d["externalip"] = self.get_external_ip(dash=True)
+        d['virtual'] = {'total': vmem['total'],
+                        'percent': vmem['percent'],
+                        'available': vmem['available']
+                        }
+        d['localip'] = self.get_local_ip(dash=True)
+        d['externalip'] = self.get_external_ip(dash=True)
+        nw_psutil = psutil.net_io_counters()
+        dnw_psutil = nw_psutil._asdict()
+        d['network'] = dnw_psutil
+        d['uptime'] = self.uptime(dash=True)
+        d['user'] = self.get_user(dash=True)
 
         return d
 
@@ -276,7 +283,7 @@ class Stats(object):
             return cpu
 
         except Exception as e:
-            self.logger.error("Error trying to pull cpu percent: %s" % e)
+            self.logger.error('Error trying to pull cpu percent: %s' % e)
 
     # Not in use atm.
     @cherrypy.expose()
@@ -289,7 +296,7 @@ class Stats(object):
             return dcpu
 
         except Exception as e:
-            self.logger.error("Error trying to pull cpu times: %s" % e)
+            self.logger.error('Error trying to pull cpu times: %s' % e)
 
     # Not in use
     @cherrypy.expose()
@@ -305,13 +312,12 @@ class Stats(object):
             return dcpu
 
         except Exception as e:
-            self.logger.error("Error trying to pull cpu cores %s" % e)
+            self.logger.error('Error trying to pull cpu cores %s' % e)
 
     # Fetches info about the user that is logged in.
     @cherrypy.expose()
     @require()
-    @cherrypy.tools.json_out()
-    def get_user(self):
+    def get_user(self, dash=False):
         try:
             for user in psutil.get_users():
                 duser = user._asdict()
@@ -319,10 +325,14 @@ class Stats(object):
                 td = str(td)
                 td = td[:-7]
                 duser['started'] = td
-            return duser
+            if dash:
+                return duser
+            else:
+                cherrypy.response.headers['Content-Type'] = 'application/json'
+                return json.dumps(duser)
 
         except Exception as e:
-            self.logger.error("Pulling logged in info %s" % e)
+            self.logger.error('Pulling logged in info %s' % e)
 
     @cherrypy.expose()
     @require()
@@ -335,22 +345,22 @@ class Stats(object):
             d['localip'] = local_ip
 
         except Exception as e:
-            self.logger.error("Pulling  local ip %s" % e)
+            self.logger.error('Pulling  local ip %s' % e)
 
         if dash:
             return local_ip
         else:
-            cherrypy.response.headers['Content-Type'] = "application/json"
+            cherrypy.response.headers['Content-Type'] = 'application/json'
             return json.dumps(d)
 
     def _get_external_ip(self, dash=False):
         try:
-            self.logger.debug("Checking external ip")
-            s = urllib2.urlopen('http://myexternalip.com/raw').read()
-            return s.strip()
+            self.logger.debug('Checking external ip')
+            s = requests.get('http://myexternalip.com/raw')
+            return s.content.strip()
         except Exception as e:
-            self.logger.error("Pulling external ip %s" % e)
-            return ""
+            self.logger.error('Pulling external ip %s' % e)
+            return ''
 
     @cherrypy.expose()
     @require()
@@ -368,13 +378,13 @@ class Stats(object):
             if dash:
                 return self.last_check_ip
             else:
-                cherrypy.response.headers['Content-Type'] = "application/json"
-                return json.dumps({"externalip": self.last_check_ip})
+                cherrypy.response.headers['Content-Type'] = 'application/json'
+                return json.dumps({'externalip': self.last_check_ip})
         else:
             if dash:
                 return self.last_check_ip
-            cherrypy.response.headers['Content-Type'] = "application/json"
-            return json.dumps({"externalip": self.last_check_ip})
+            cherrypy.response.headers['Content-Type'] = 'application/json'
+            return json.dumps({'externalip': self.last_check_ip})
 
     @cherrypy.expose()
     @require()
@@ -392,7 +402,7 @@ class Stats(object):
             return d
 
         except Exception as e:
-            self.logger.error("Pulling system info %s" % e)
+            self.logger.error('Pulling system info %s' % e)
 
     @cherrypy.expose()
     @require()
@@ -404,7 +414,7 @@ class Stats(object):
             return dnw_psutil
 
         except Exception as e:
-            self.logger.error("Pulling network info %s" % e)
+            self.logger.error('Pulling network info %s' % e)
 
     @cherrypy.expose()
     @require()
@@ -416,7 +426,7 @@ class Stats(object):
             return dmem
 
         except Exception as e:
-            self.logger.error("Pulling physical memory %s" % e)
+            self.logger.error('Pulling physical memory %s' % e)
 
     @cherrypy.expose()
     @require()
@@ -428,7 +438,7 @@ class Stats(object):
             return dmem
 
         except Exception as e:
-            self.logger.error("Pulling swap memory %s" % e)
+            self.logger.error('Pulling swap memory %s' % e)
 
     # Fetches settings in the db, is used for some styling, like bars or tables
     @cherrypy.expose()
@@ -446,13 +456,13 @@ class Stats(object):
             d['stats_ignore_filesystem'] = htpc.settings.get('stats_ignore_filesystem')
 
         except Exception as e:
-            self.logger.error("Getting stats settings %s" % e)
+            self.logger.error('Getting stats settings %s' % e)
 
         return d
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    @require(member_of("admin"))
+    @require(member_of('admin'))
     def command(self, cmd=None, pid=None, signal=None):
         dmsg = {}
         try:
@@ -493,10 +503,10 @@ class Stats(object):
                 return dmsg
 
         except Exception as e:
-            self.logger.error("Error trying to %s %s" % (cmd, e))
+            self.logger.error('Error trying to %s %s' % (cmd, e))
 
     @cherrypy.expose()
-    @require(member_of("admin"))
+    @require(member_of('admin'))
     @cherrypy.tools.json_out()
     def cmdpopen(self, cmd=None):
         d = {}
@@ -524,7 +534,7 @@ class Stats(object):
     @require()
     @cherrypy.tools.json_out()
     def smart_info(self):
-    	if importpySMART == True:
+        if importpySMART is True:
             try:
                 from pySMART import DeviceList
                 devlist = DeviceList()
@@ -536,37 +546,38 @@ class Stats(object):
                     x = 0
                     for atts in hds.attributes:
                         if hasattr(atts, 'name'):
-                            a[x] = {"id": atts.num,
-                                    "name": atts.name,
-                                    "cur": atts.value,
-                                    "wst": atts.worst,
-                                    "thr": atts.thresh,
-                                    "raw": atts.raw,
-                                    "flags": atts.flags,
-                                    "type": atts.type,
-                                    "updated": atts.updated,
-                                    "when_fail": atts.when_failed
+                            a[x] = {'id': atts.num,
+                                    'name': atts.name,
+                                    'cur': atts.value,
+                                    'wst': atts.worst,
+                                    'thr': atts.thresh,
+                                    'raw': atts.raw,
+                                    'flags': atts.flags,
+                                    'type': atts.type,
+                                    'updated': atts.updated,
+                                    'when_fail': atts.when_failed
                                     }
                             if atts.name == 'Temperature_Celsius':
                                 temp = atts.raw
                             x = x + 1
                     if x > 0:
-                        d[i] = {"assessment": hds.assessment,
-                                    "firmware": hds.firmware,
-                                    "interface": hds.interface,
-                                    "is_ssd": hds.is_ssd,
-                                    "model": hds.model,
-                                    "name": hds.name,
-                                    "serial": hds.serial,
-                                    "supports_smart": hds.supports_smart,
-                                    "capacity": hds.capacity,
-                                    "temperature": temp,
-                                    "attributes": a
-                                    }
-                        i = i + 1
+                        d[i] = {'assessment': hds.assessment,
+                                'firmware': hds.firmware,
+                                'interface': hds.interface,
+                                'is_ssd': hds.is_ssd,
+                                'model': hds.model,
+                                'name': hds.name,
+                                'serial': hds.serial,
+                                'supports_smart': hds.supports_smart,
+                                'capacity': hds.capacity,
+                                'temperature': temp,
+                                'attributes': a
+                                }
+
+                        i += 1
                 return d
             except Exception as e:
-                self.logger.error("Pulling S.M.A.R.T. data %s" % e)
+                self.logger.error('Pulling S.M.A.R.T. data %s' % e)
 
     @cherrypy.expose()
     @require()

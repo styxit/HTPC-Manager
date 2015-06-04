@@ -78,7 +78,7 @@
 
 }
 
-.dash-row-edit { 
+.dash-row-edit {
     min-height: 150px !important;
     border: 1px solid !important;
     border-color: #FF0000 !important;
@@ -90,6 +90,7 @@
     float: right !important;
 }
 
+/*
 #dash_sysinfo_table_body div{
     width:50%;
     display:inline-block
@@ -99,10 +100,14 @@
     text-align: center !important;
 }
 
+
 #dash_sysinfo_table_body tr td:first-of-type{
     text-align: left !important;
 }
-
+*/
+#dash_sysinfo_table_body .progress{
+    margin-bottom:0px !important;
+}
 #editButtons{
     display: None;
 }

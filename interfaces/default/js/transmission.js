@@ -199,45 +199,6 @@ function getStatus(){
 }
 
 /**
- * Converts bytes to readable filesize in kb, MB, GB etc.
- */
-function getReadableFileSizeString(fileSizeInBytes) {
-    var i = -1;
-    var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB'];
-    do {
-        fileSizeInBytes = fileSizeInBytes / 1024;
-        i++;
-    } while (fileSizeInBytes > 1024);
-    return Math.round(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
-};
-
-/**
- * Converts seconds to readable time.
- */
-function getReadableTime(timeInSeconds) {
-  if (timeInSeconds < 1) {
-    return '0:00:00';
-  }
-
-  var days = parseInt( timeInSeconds / 86400 ) % 7;
-  var hours = parseInt( timeInSeconds / 3600 ) % 24;
-  var minutes = parseInt( timeInSeconds / 60 ) % 60;
-  var seconds = parseInt(timeInSeconds % 60);
-
-  // Add leading 0 and : to seconds
-  seconds = ':'+ (seconds  < 10 ? "0" + seconds : seconds);
-
-  if (days < 1) {
-    days = '';
-  } else {
-    days = days + 'd ';
-    // remove seconds if the eta is 1 day or more
-    seconds = '';
-  }
-  return days + hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + seconds;
-};
-
-/**
  * Get textual representation of torrent status
  *
  * Since torrent status is retured as integer by the Transmission API the number must be mapped to a string

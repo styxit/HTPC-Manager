@@ -54,28 +54,6 @@ if (importPsutil) {
     }, 10000);
 }
 
-// For hdd. Converts bytes to filesize in kb,mb,gb
- function getReadableFileSizeStringHDD(fileSizeInBytes) {
-    var i = -1;
-    var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB'];
-    do {
-        fileSizeInBytes = fileSizeInBytes / 1000;
-        i++;
-    } while (fileSizeInBytes > 1000);
-    return fileSizeInBytes.toFixed(1) + byteUnits[i];
-};
-
-// Converts bytes to filesize in kb,mb,gb
-function getReadableFileSizeString(fileSizeInBytes) {
-    var i = -1;
-    var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB'];
-    do {
-        fileSizeInBytes = fileSizeInBytes / 1024;
-        i++;
-    } while (fileSizeInBytes > 1024);
-    return fileSizeInBytes.toFixed(1) + byteUnits[i];
-};
-
 // Makes the harddisk lists
 function get_diskinfo() {
     $.ajax({
@@ -149,7 +127,7 @@ function processes() {
 
 function uptime() {
     $.getJSON(WEBDIR + "stats/uptime", function (data) {
-	    $("#uptime").text("Uptime: "+ data.uptime);
+	    $("#uptime").text("Uptime: "+ pad(data.uptime, 8));
     });
 }
 
@@ -163,12 +141,6 @@ function get_local_ip() {
     $.getJSON(WEBDIR + "stats/get_local_ip", function (response) {
         $(".tlip").text(response.localip);
     });
-}
-
-function nw_table() {
-    $.getJSON(WEBDIR + 'stats/nw_table', function (response) {
-        //
-    })
 }
 
 // Not in use
@@ -197,7 +169,7 @@ function network_usage_table() {
 
 function get_user() {
     $.getJSON(WEBDIR + "stats/get_user", function (response) {
-        $("#system_user").text(response.name +" logged in " + response.started + " ago")
+        $("#system_user").text(response.name +" logged in " + pad(response.started, 8) + " ago")
     });
 }
 
@@ -359,7 +331,7 @@ function smart() {
                 $('.smart_three').append(row);
                 parent_id = row_id
                 row_id = row_id + 1
-                row = $('<tr>');                
+                row = $('<tr>');
                 row.addClass('treegrid-' + row_id).addClass('treegrid-parent-' + parent_id);
                 row.append(
                 $('<td>').text(""),
@@ -381,7 +353,7 @@ function smart() {
                 $('<td>').text(""));
                 $('.smart_three').append(row);
                 $.each(drives.attributes, function (x, attr) {
-                    row = $('<tr>');                
+                    row = $('<tr>');
                     row.append(
                     $('<td>').text(attr.id),
                     $('<td>').text(attr.name),
