@@ -18,6 +18,11 @@ $(document).ready(function () {
         cancelAddShow();
     });
 
+    $('#postprocess').click(function(e) {
+            e.preventDefault();
+            Postprocess();
+    });
+
 });
 
 function loadShows() {
@@ -325,4 +330,22 @@ function sickbeardStatusIcon(iconText, white){
     return icon;
   }
   return '';
+}
+
+function Postprocess() {
+    var data = {};
+    p = prompt('Write path to processfolder or leave blank for default path');
+    if (p || p.length >= 0) {
+        data.path = p;
+
+        $.get(WEBDIR + 'sickbeard/Postprocess', data, function(r) {
+            state = (r.length) ? 'success' : 'error';
+            // Stop the notify from firing on cancel
+            if (p !== null) {
+                path = (p.length === 0) ? 'Default folder' : p;
+                notify('sickrage', 'Postprocess ' + path, state);
+            }
+        });
+
+    }
 }
