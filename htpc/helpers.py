@@ -28,14 +28,14 @@ logger = logging.getLogger('helpers')
 
 
 def get_image(url, height=None, width=None, opacity=100, auth=None, headers=None):
-    """ Load image form cache if possible, else download. Resize if needed """
+    ''' Load image form cache if possible, else download. Resize if needed '''
     opacity = float(opacity)
     logger = logging.getLogger('htpc.helpers')
 
     # Create image directory if it doesnt exist
     imgdir = os.path.join(htpc.DATADIR, 'images/')
     if not os.path.exists(imgdir):
-        logger.debug("Creating image directory at " + imgdir)
+        logger.debug('Creating image directory at ' + imgdir)
         os.makedirs(imgdir)
 
     # Create a hash of the path to use as filename
@@ -46,16 +46,15 @@ def get_image(url, height=None, width=None, opacity=100, auth=None, headers=None
 
     # If there is no local copy of the original
     if not os.path.isfile(image):
-        logger.debug("No local image found for " + image + ". Downloading")
+        logger.debug('No local image found for ' + image + '. Downloading')
         download_image(url, image, auth, headers)
 
     # Check if resize is needed
     if (height and width) or (opacity < 100):
 
         if PIL:
-            # Set filename for resized file
+            # Set a filename for resized file
             resized = '%s_w%s_h%s_o_%s' % (image, width, height, opacity)
-
 
             # If there is no local resized copy
             if not os.path.isfile(resized):
@@ -80,28 +79,28 @@ def get_image(url, height=None, width=None, opacity=100, auth=None, headers=None
 
 
 def download_image(url, dest, auth=None, headers=None):
-    """ Download image and save to disk """
+    ''' Download image and save to disk '''
     logger = logging.getLogger('htpc.helpers')
-    logger.debug("Downloading image from %s to %s" % (url, dest))
+    logger.debug('Downloading image from %s to %s' % (url, dest))
 
     try:
         request = Request(url)
 
-        if (auth):
-            request.add_header("Authorization", "Basic %s" % auth)
+        if auth:
+            request.add_header('Authorization', 'Basic %s' % auth)
 
-        if (headers):
+        if headers:
             for key, value in headers.iteritems():
                 request.add_header(key, value)
 
-        with open(dest, "wb") as local_file:
+        with open(dest, 'wb') as local_file:
             local_file.write(urlopen(request).read())
-    except Exception:
-        pass
+    except Exception as e:
+        logger.error('Failed to download %s to %s %s' % (url, dest, e))
 
 
 def resize_image(img, height, width, opacity, dest):
-    """ Resize image, set opacity and save to disk """
+    ''' Resize image, set opacity and save to disk '''
     size = int(width), int(height)
     imagetype = imghdr.what(img)
 
@@ -117,14 +116,16 @@ def resize_image(img, height, width, opacity, dest):
         # apply overlay to resized image
         im = Image.blend(overlay, im, enhance)
 
-    if imagetype == 'jpeg':
+    if imagetype.lower() == 'jpeg' or 'jpg':
         im.save(dest, 'JPEG', quality=95)
-    im.save(dest, imagetype)
+    else:
+        im.save(dest, imagetype)
+
     return dest
 
 
 def fix_basepath(s):
-    """ Removes whitespace and adds / on each end """
+    ''' Removes whitespace and adds / on each end '''
     if s:
         s.strip(' ')
         s = s.replace('/', '')
@@ -143,16 +144,18 @@ def striphttp(s):
         s = s.replace('http://', '')
         return s
     else:
-        return ""
+        return ''
 
-def timt_func(func):
+
+def timeit_func(func):
     @wraps(func)
     def inner(*args, **kwargs):
         start = time.time()
         res = func(*args)
-        print "%s took %s" % (func.__name__, time.time() - start)
+        print '%s took %s' % (func.__name__, time.time() - start)
         return res
     return inner
+
 
 def remove_dict_dupe_from_list(l, key):
     getvals = itemgetter(key)
@@ -162,17 +165,18 @@ def remove_dict_dupe_from_list(l, key):
         result.append(g.next())
     return result
 
+
 def create_https_certificates(ssl_cert, ssl_key):
-    """
+    '''
     Create self-signed HTTPS certificares and store in paths 'ssl_cert' and 'ssl_key'
-    """
+    '''
     try:
         from OpenSSL import crypto
         from certgen import createKeyPair, createCertRequest, createCertificate, TYPE_RSA, serial
 
     except Exception, e:
         logger.error(e)
-        logger.error("You need pyopenssl and OpenSSL to make a cert")
+        logger.error('You need pyopenssl and OpenSSL to make a cert')
         return False
 
     # Create the CA Certificate
@@ -190,7 +194,7 @@ def create_https_certificates(ssl_cert, ssl_key):
         open(ssl_key, 'w').write(crypto.dump_privatekey(crypto.FILETYPE_PEM, pkey))
         open(ssl_cert, 'w').write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
     except Exception as e:
-        logger.error("Error creating SSL key and certificate %s" % e)
+        logger.error('Error creating SSL key and certificate %s' % e)
         return False
 
     return True
@@ -198,7 +202,8 @@ def create_https_certificates(ssl_cert, ssl_key):
 
 def joinArgs(args):
     ''' stolen for plexapi '''
-    if not args: return ''
+    if not args:
+        return ''
     arglist = []
     for key in sorted(args, key=lambda x: x.lower()):
         value = str(args[key])

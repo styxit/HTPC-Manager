@@ -141,9 +141,12 @@ class NZBGet(object):
                     try:
                         # Try to get the filename from the download
                         # TODO check if x-dnzb-name is on all indexers
+                        nzb_name = nzb.headers.get('x-dnzb-name')
+                    except Exception as e:
+                        self.logger.error('%s' % e)
+                        self.logger.debug('Trying to parse the nzbname from content-disposition')
                         nzb_name = nzb.headers.get('content-disposition').split('filename=')[1].replace('.nzb', '').replace('"', '')
-                    except:
-                        pass
+
                 nzb = nzb.content
                 r = nzbget.append(nzb_name, nzb_category, False, base64.standard_b64encode(nzb))
 

@@ -242,7 +242,7 @@ class GitUpdater():
             self.latestHash = latest
             return latest
         except Exception as e:
-            self.logger.error("Failed to get last commit from github")
+            self.logger.error("Failed to get last commit from github %s" % e)
             return False
 
     def current(self):
@@ -296,7 +296,7 @@ class GitUpdater():
             if htpc.settings.get('git_cleanup') and not htpc.DEBUG:
                 self.logger.debug("Clean up after git")
                 self.git_exec(self.git, 'reset --hard')
-                # Note to self rtfm before you run git commands, just wiped the data dir...
+                # Note to self: rtfm before you run git commands, just wiped the data dir...
                 # This command removes all untracked files and files and the files in .gitignore
                 # except from the content of htpc.DATADIR and VERSION.txt
                 self.git_exec(self.git, 'clean -d -fx -e %s -e VERSION.txt -e userdata/' % htpc.DATADIR)
@@ -310,7 +310,7 @@ class GitUpdater():
         """ Tool for running git program on system """
         try:
             proc = subprocess.Popen(gp + " " + args, stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT, shell=True, cwd=htpc.RUNDIR)
+                                    stderr=subprocess.STDOUT, shell=True, cwd=htpc.RUNDIR)
             output, err = proc.communicate()
             exitcode = proc.returncode
 
@@ -361,9 +361,8 @@ class SourceUpdater():
                 return False
 
         """ Get version from version file """
-        fp = open(self.versionFile, 'r')
-        currentVersion = fp.read().strip(' \n\r')
-        fp.close()
+        with open(self.versionFile, 'r') as fp:
+            currentVersion = fp.read().strip(' \n\r')
 
         self.logger.debug('Current version: ' + currentVersion)
 
@@ -394,7 +393,6 @@ class SourceUpdater():
 
         versionfile = self.current()
         current_branch = htpc.settings.get('branch', 'master2')
-        #current_branch = htpc.settings.get('branch', 'Unknown')
         # should return sha on success not True False
         if not isinstance(self.current(), bool):
             try:
@@ -500,7 +498,7 @@ class SourceUpdater():
     def __updateSourcecode(self):
         # Find the extracted dir
         sourceUpdateFolder = [x for x in os.listdir(self.updateDir) if
-                                   os.path.isdir(os.path.join(self.updateDir, x))]
+                              os.path.isdir(os.path.join(self.updateDir, x))]
 
         if len(sourceUpdateFolder) != 1:
             # There can only be one folder in sourceUpdateFolder
@@ -539,9 +537,8 @@ class SourceUpdater():
 
         Used when checking for update the next time.
         """
-        versionFileHandler = open(self.versionFile, 'wb')
-        versionFileHandler.write(newVersion)
-        versionFileHandler.close()
+        with open(self.versionFile, 'wb') as versionFileHandler:
+            versionFileHandler.write(newVersion)
 
     def __finishUpdate(self):
         """ Remove leftover files after the update """
@@ -551,12 +548,12 @@ class SourceUpdater():
             self.logger.debug('Removing update archive')
             try:
                 os.remove(self.updateFile)
-            except:
-                pass
+            except OSError as e:
+                self.logger.error('Failed to remove %s %s' % (self.updateFile, e))
 
         if os.path.isdir(self.updateDir):
             self.logger.debug('Removing update code folder')
             try:
                 shutil.rmtree(self.updateDir)
-            except:
-                pass
+            except OSError as e:
+                self.logger.error('Failed to remove %s %s' % (self.updateDir, e))
