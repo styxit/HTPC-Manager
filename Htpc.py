@@ -11,8 +11,6 @@ import sys
 import htpc
 import webbrowser
 import locale
-from threading import Thread
-import logging
 
 
 def parse_arguments():
@@ -43,6 +41,8 @@ def parse_arguments():
                         help='Resets the username and password to HTPC Manager')
     parser.add_argument('--loglevel', default='info',
                         help='Set a loglevel. Allowed values: debug, info, warning, error, critical')
+    parser.add_argument('--nocolor', action='store_true', default=False,
+                        help='Disable colored terminal text')
     return parser.parse_args()
 
 
@@ -106,7 +106,6 @@ def load_modules():
 
 def init_sched():
     from apscheduler.schedulers.background import BackgroundScheduler
-    from apscheduler.triggers.interval import IntervalTrigger
     htpc.SCHED = BackgroundScheduler()
     htpc.SCHED.start()
 
@@ -182,12 +181,6 @@ def main():
     if not htpc.WEBDIR.endswith('/'):
         htpc.WEBDIR += '/'
 
-    # Initialize Scheduler
-    init_sched()
-
-    # Inititialize root and settings page
-    load_modules()
-
     htpc.TEMPLATE = os.path.join(htpc.RUNDIR, 'interfaces/',
                                  htpc.settings.get('app_template', 'default'))
     htpc.LOOKUP = TemplateLookup(directories=[os.path.join(htpc.TEMPLATE, 'html/')])
@@ -216,6 +209,8 @@ def main():
         htpc.USERNAME = htpc.settings.set('app_username', '')
         htpc.PASSWORD = htpc.settings.set('app_password', '')
 
+    htpc.NOCOLOR = args.nocolor
+
     # Open webbrowser
     if args.openbrowser or htpc.settings.get('openbrowser') and not htpc.DEBUG:
         browser_ssl = 's' if htpc.SSLCERT and htpc.SSLKEY else ''
@@ -226,7 +221,7 @@ def main():
         openbrowser = 'http%s://%s:%s%s' % (browser_ssl, str(browser_host), htpc.PORT, htpc.WEBDIR[:-1])
         webbrowser.open(openbrowser, new=2, autoraise=True)
 
-    #Select if you want to control processes and open from HTPC Manager
+    # Select if you want to control processes and open from HTPC Manager
     htpc.SHELL = args.shell
 
     # Select whether to run as daemon
@@ -234,6 +229,12 @@ def main():
 
     # Set Application PID
     htpc.PID = args.pid
+
+    # Initialize Scheduler
+    init_sched()
+
+    # Inititialize root and settings page
+    load_modules()
 
     # Start the server
     from htpc.server import start

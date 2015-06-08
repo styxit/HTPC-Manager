@@ -9,7 +9,9 @@ import cherrypy
 import htpc
 import logging
 import logging.handlers
+import sys
 from settings import Setting
+import colorama
 
 
 class Log:
@@ -20,7 +22,13 @@ class Log:
         htpc.LOGGER = logging.getLogger()
 
         self.blacklistwords = BlackListFilter()
-        self.logch = logging.StreamHandler()
+
+        # Disable colored stdout byt --nocolor
+        if htpc.NOCOLOR:
+            self.logch = logging.StreamHandler()
+        else:
+            self.logch = ColorizingStreamHandler(sys.stdout)
+
         self.logfh = logging.handlers.RotatingFileHandler(self.logfile, maxBytes=25000000, backupCount=2)
 
         logformatter = logging.Formatter('%(asctime)s :: %(name)s :: %(levelname)s :: %(message)s', "%Y-%m-%d %H:%M:%S")
@@ -55,7 +63,7 @@ class Log:
         logging.getLogger("paramiko").setLevel(logging.CRITICAL)
 
         # apscheduler
-        #logging.getLogger("apscheduler.scheduler").setLevel(logging.CRITICAL)
+        # logging.getLogger("apscheduler.scheduler").setLevel(logging.CRITICAL)
 
         htpc.LOGGER.addHandler(self.logch)
         htpc.LOGGER.addHandler(self.logfh)
@@ -122,3 +130,38 @@ class BlackListFilter(logging.Filter):
                 except:
                     pass
             return True
+
+
+class ColorizingStreamHandler(logging.StreamHandler):
+    color_map = {
+        logging.DEBUG: colorama.Fore.CYAN,
+        logging.WARNING: colorama.Fore.YELLOW,
+        logging.ERROR: colorama.Fore.RED,
+        logging.CRITICAL: colorama.Back.RED,
+    }
+
+    def __init__(self, stream, color_map=None):
+        logging.StreamHandler.__init__(self, colorama.AnsiToWin32(stream).stream)
+        if color_map is not None:
+            self.color_map = color_map
+
+    @property
+    def is_tty(self):
+        isatty = getattr(self.stream, 'isatty', None)
+        return isatty and isatty()
+
+    def format(self, record):
+        message = logging.StreamHandler.format(self, record)
+        if self.is_tty:
+            # Don't colorize a traceback
+            parts = message.split('\n', 1)
+            parts[0] = self.colorize(parts[0], record)
+            message = '\n'.join(parts)
+        return message
+
+    def colorize(self, message, record):
+        try:
+            return (self.color_map[record.levelno] + message +
+                    colorama.Style.RESET_ALL)
+        except KeyError:
+            return message
