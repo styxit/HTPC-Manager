@@ -3,21 +3,28 @@
 
 import htpc
 import cherrypy
-import urllib2
-import urllib
 import json
 import logging
+import time
+import math
 from cherrypy.lib.auth2 import require
-from htpc.helpers import striphttp
+from htpc.helpers import striphttp, sizeof
+import requests
+from requests.auth import HTTPDigestAuth
 
 
 class Qbittorrent(object):
+    session = requests.Session()
+
     def __init__(self):
         self.logger = logging.getLogger('modules.qbittorrent')
+        self.newapi = False
+        self.authenticated = False
+        self.testapi = None
         htpc.MODULES.append({
             'name': 'qBittorrent',
             'id': 'qbittorrent',
-            #'test': htpc.WEBDIR + 'qbittorrent/ping',
+            'test': htpc.WEBDIR + 'qbittorrent/ping',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'qbittorrent_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'qbittorrent_name'},
@@ -26,7 +33,7 @@ class Qbittorrent(object):
                 {'type': 'text', 'label': 'Username', 'name': 'qbittorrent_username'},
                 {'type': 'password', 'label': 'Password', 'name': 'qbittorrent_password'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'qbittorrent_ssl'},
-                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc':'Reverse proxy link, e.g. https://qbt.domain.com', 'name': 'qbittorrent_reverse_proxy_link'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://qbt.domain.com', 'name': 'qbittorrent_reverse_proxy_link'},
 
             ]
         })
@@ -45,77 +52,145 @@ class Qbittorrent(object):
             url = htpc.settings.get('qbittorrent_reverse_proxy_link')
         return url
 
-    #Get url from settings and handles auth
-    @cherrypy.expose()
-    @require()
     def qbturl(self):
         host = striphttp(htpc.settings.get('qbittorrent_host', ''))
         port = htpc.settings.get('qbittorrent_port', '')
-        username = htpc.settings.get('qbittorrent_username', '')
-        password = htpc.settings.get('qbittorrent_password', '')
         ssl = 's' if htpc.settings.get('qbittorret_ssl', 0) else ''
         url = 'http%s://%s:%s/' % (ssl, host, port)
-        self.logger.debug(url)
-
-        realm = 'Web UI Access'
-        authhandler = urllib2.HTTPDigestAuthHandler()
-        authhandler.add_password(realm, url, username, password)
-        opener = urllib2.build_opener(authhandler)
-        urllib2.install_opener(opener)
-
         return url
 
-    #Fetches torrentlist from the client
     @cherrypy.expose()
     @require()
-    def fetch(self):
-        result = None
-
+    def login(self):
+        self.logger.debug('Trying to login to qbittorrent')
         try:
-            url = self.qbturl()
-            result = urllib2.urlopen(url + 'json/torrents/').read()
+            d = {'username': htpc.settings.get('qbittorrent_username', ''),
+                 'password': htpc.settings.get('qbittorrent_password', '')
+                 }
+            # F33d da cookie monster
+            r = self.session.post(self.qbturl() + 'login', data=d)
+            if r.content == 'Ok.':
+                self.authenticated = True
+                self.newapi = True
+            else:
+                self.logger.error('Check your username and password')
+            return r.content
+        except Exception as e:
+            self.logger.error('Failed to auth with new api %s' % e)
+            return
+
+    def _fetch(self, u, post=False, params={}, data=None):
+        host = striphttp(htpc.settings.get('qbittorrent_host', ''))
+        port = htpc.settings.get('qbittorrent_port', '')
+        ssl = 's' if htpc.settings.get('qbittorret_ssl', 0) else ''
+        url = 'http%s://%s:%s/' % (ssl, host, port)
+        username = htpc.settings.get('qbittorrent_username', '')
+        password = htpc.settings.get('qbittorrent_password', '')
+
+        url += u
+
+        if self.testapi is None:
+            self.ping()
+
+        if self.newapi:
+            if self.authenticated is False:
+                self.login()
+
+        if post:
+            if self.newapi:
+                r = self.session.post(url, data=data)
+            else:
+                r = self.session.post(url, data=data, auth=HTTPDigestAuth(username, password))
+        else:
+            if self.newapi:
+                r = self.session.get(url)
+            else:
+                r = self.session.get(url, auth=HTTPDigestAuth(username, password))
+
+        return r
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def fetch(self):
+        try:
+            if self.newapi:
+                result = self._fetch('query/torrents?filter=all&sort=size&reverse=false')
+                torrents = result.json()
+                l = []
+                for torrent in torrents:
+                    t = {}
+                    for k, v in torrent.items():
+                        t[k] = v
+                        if k == 'size':
+                            t['size'] = sizeof(int(v))
+                        if k == 'eta':
+                            eta = time.strftime('%H:%M:%S', time.gmtime(v))
+                            if eta == '00:00:00':
+                                eta = u'\u221E'
+                            t['eta'] = eta
+                        if k == 'ratio':
+                            t['ratio'] = math.ceil(v)
+                    l.append(t)
+
+                return l
+            else:
+                result = self._fetch('json/torrents')
+                # r.json() does not like the infinity
+                return json.loads(result.content)
 
         except Exception as e:
             self.logger.error("Couldn't get torrents %s" % e)
 
-        return result
-
-    # Gets total download and upload speed
     @cherrypy.expose()
     @require()
+    @cherrypy.tools.json_out()
     def get_speed(self):
+        ''' Get total download and upload speed '''
         try:
-            url = self.qbturl()
-            result = urllib2.urlopen(url + 'json/transferInfo/').read()
-            result = json.JSONDecoder('UTF-8').decode(result)
+            d = {}
+            if not self.newapi:
+                result = self._fetch('json/transferInfo/')
+                result = result.json()
 
-            speeddown = result['dl_info']
-            speedup = result['up_info']
+                speeddown = result['dl_info']
+                speedup = result['up_info']
 
-            list_of_down = speeddown.split()
-            list_of_up = speedup.split()
+                list_of_down = speeddown.split()
+                list_of_up = speedup.split()
 
-            ds = list_of_down[1] + ' ' + list_of_down[2]
-            dlstat = list_of_down[5] + ' ' + list_of_down[6]
-            us = list_of_up[1] + ' ' + list_of_up[2]
-            ulstat = list_of_down[5] + ' ' + list_of_down[6]
+                ds = list_of_down[1] + ' ' + list_of_down[2]
+                dlstat = list_of_down[5] + ' ' + list_of_down[6]
+                us = list_of_up[1] + ' ' + list_of_up[2]
+                ulstat = list_of_down[5] + ' ' + list_of_down[6]
 
-            d = {
-                'qbittorrent_speed_down': ds,
-                'qbittorrent_speed_up': us,
-                'qbittorrent_total_dl': dlstat,
-                'qbittorrent_total_ul': ulstat
-            }
+                d = {
+                    'qbittorrent_speed_down': ds,
+                    'qbittorrent_speed_up': us,
+                    'qbittorrent_total_dl': dlstat,
+                    'qbittorrent_total_ul': ulstat
+                }
+            else:
+                # new api stuff
+                result = self._fetch('query/transferInfo')
+                result = result.json()
 
-            return json.dumps(d)
+                d = {
+                    'qbittorrent_speed_down': sizeof(result['dl_info_speed']),
+                    'qbittorrent_speed_up': sizeof(result['up_info_speed']),
+                    'qbittorrent_total_dl': sizeof(result['dl_info_data']),
+                    'qbittorrent_total_ul': sizeof(result['up_info_data'])
+                }
+
+            return d
 
         except Exception as e:
             self.logger.error("Couldn't get total download and uploads speed %s" % e)
 
     def get_global_dl_limit(self):
         try:
-            result = urllib2.urlopen(self.qbturl() + 'command/getGlobalDlLimit/').read()
-            speed = int(result)
+            result = self._fetch('command/getGlobalDlLimit/')
+            speed = int(result.content)
             speed /= 1024
             return speed
         except Exception as e:
@@ -123,31 +198,32 @@ class Qbittorrent(object):
 
     def get_global_ul_limit(self):
         try:
-            result = urllib2.urlopen(self.qbturl() + 'command/getGlobalUpLimit').read()
-            speed = int(result)
+            result = self._fetch('command/getGlobalUpLimit')
+
+            speed = int(result.content)
             speed /= 1024
             return speed
         except Exception as e:
-            self.logger.error("Couldn't get upload download limit")
+            self.logger.error("Couldn't get global upload limit %s" % e)
 
-    @cherrypy.expose
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
     def get_global_limit(self):
         try:
             d = {}
             d['dl_limit'] = self.get_global_dl_limit()
             d['ul_limit'] = self.get_global_ul_limit()
-            return json.dumps(d)
+            return d
         except Exception as e:
             self.logger.debug("Couldn't get global upload and download limits %s" % e)
 
-    # Handles pause, resume, delete singel torrents
     @cherrypy.expose()
     @require()
     def command(self, cmd=None, hash=None, name=None, dlurl=None):
+        ''' Handles pause, resume, delete singel torrents '''
         try:
             self.logger.debug('%s %s' % (cmd, name))
-            url = self.qbturl()
-            url += 'command/%s/' % cmd
             data = {}
 
             if cmd == 'delete':
@@ -156,40 +232,40 @@ class Qbittorrent(object):
             elif cmd == 'download':
                 data['urls'] = dlurl
 
-            elif cmd == 'resumeall' or 'pauseall':
-                return urllib2.urlopen(url + cmd)
+            elif cmd == 'resumeall' or cmd == 'pauseall':
+                # this does not work, bug in qbt see https://github.com/qbittorrent/qBittorrent/issues/3016
+                if self.newapi:
+                    cmd = cmd[:-3] + 'All'
+
             else:
                 data['hash'] = hash
 
-            if cmd == 'resumeall' or 'pauseall':
-                urllib2.urlopen(url + cmd)
+            url = 'command/%s' % cmd
 
-            data = urllib.urlencode(data)
-
-            return urllib2.urlopen(url, data).read()
+            # data is form encode..
+            r = self._fetch(url, post=True, data=data)
+            return r.content
 
         except Exception as e:
             self.logger.error('Failed at %s %s %s %s' % (cmd, name, hash, e))
 
-    #Torrent search send to torrent
     @cherrypy.expose()
     @require()
     def to_client(self, link, torrentname, **kwargs):
+        ''' Is used by torrent search '''
         try:
-            url = self.qbturl()
-            url += 'command/download/'
+            url = 'command/download/'
             data = {}
             data['urls'] = link
-            params = urllib.urlencode(data)
-            result = urllib2.urlopen(url, params).read()
+            return self._fetch(url, data=data, post=True)
             self.logger.info('%s %s is sendt to qBittorrent' % (torrentname, link))
         except Exception as e:
             self.logger.error('Failed to send %s %s to qBittorrent %s' % (link, torrentname, e))
 
-    # Sets global upload and download speed
     @cherrypy.expose()
     @require()
     def set_speedlimit(self, type=None, speed=None):
+        ''' Sets global upload and download speed '''
         try:
             self.logger.debug('Setting %s to %s' % (type, speed))
             speed = int(speed)
@@ -199,16 +275,58 @@ class Qbittorrent(object):
             else:
                 speed = speed * 1024
 
-            url = self.qbturl()
-            url += 'command/' + type + '/'
+            url = 'command/' + type + '/'
 
             data = {}
             data['limit'] = speed
-            data = urllib.urlencode(data)
 
-            urllib2.urlopen(url, data)
-
-            return urllib2.urlopen(url, data).read()
+            r = self._fetch(url, data=data, post=True)
+            return r.content
 
         except Exception as e:
             self.logger.error('Failed to set %s to %s %s' % (type, speed, e))
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def ping(self, qbittorrent_host='', qbittorrent_port='', qbittorrent_username='', qbittorrent_password='', qbittorrent_ssl=False, **kw):
+        self.logger.debug('Trying to connect to qBittorret')
+        host = qbittorrent_host or htpc.settings.get('qbittorrent_host')
+        port = qbittorrent_port or htpc.settings.get('qbittorrent_port')
+        username = qbittorrent_username or htpc.settings.get('qbittorrent_username')
+        password = qbittorrent_password or htpc.settings.get('qbittorrent_password')
+        ssl = 's' if qbittorrent_ssl or htpc.settings.get('qbittorrent_ssl') else ''
+
+        url = 'http%s://%s:%s/' % (ssl, host, port)
+
+        self.newapi = False
+        self.authenticated = False
+        try:
+
+            # We assume that its atleast 3.2 if this works.
+            r = requests.get(url + 'version/api', timeout=10)
+            self.logger.debug('Trying to connect with new API %s' % r.url)
+            # Old api returns a empty page
+            if r.content != '' and r.ok:
+                self.newapi = r.content
+                self.testapi = True
+                return r.content
+            else:
+                raise requests.ConnectionError
+
+        except Exception as e:
+            self.logger.debug('Failed to figure out what api version, trying old API')
+            try:
+                r = requests.post(url + 'json/torrents', auth=HTTPDigestAuth(username, password), timeout=10)
+                if r.ok:
+                    self.logger.debug('Old API works %s' % r.url)
+                    # Disable new api stuff
+                    self.testapi = True
+                    self.newapi = False
+                    self.authenticated = False
+
+            except Exception as e:
+                self.newapi = False
+                self.authenticated = False
+                self.logger.debug('Failed to contact qBittorrent via old and newapi')
+                self.logger.error('Cant contact qBittorrent, check you settings and try again %s' % e)
