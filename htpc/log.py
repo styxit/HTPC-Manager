@@ -11,6 +11,7 @@ import logging
 import logging.handlers
 import sys
 from settings import Setting
+from cherrypy.lib.auth2 import require, member_of
 import colorama
 
 
@@ -72,11 +73,13 @@ class Log:
         htpc.LOGGER.info("Loglevel set to " + htpc.LOGLEVEL)
 
     @cherrypy.expose()
+    @require()
     def index(self):
         """ Show log """
         return htpc.LOOKUP.get_template('log.html').render(scriptname='log')
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def getlog(self, lines=10, level=2):
         """ Get log as JSON """
@@ -97,6 +100,7 @@ class Log:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    @require(member_of('admin'))
     def deletelog(self):
         try:
             open(self.logfile, 'w').close()
