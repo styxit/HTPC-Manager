@@ -48,6 +48,7 @@ function search(query) {
             return;
         }
 
+        byteSizeOrdering()
         $.each(response, function (index, torrent) {
             tr = $('<tr>');
             link = $('<a target="_blank">').attr('href', torrent.BrowseURL).text(torrent.ReleaseName)
@@ -55,7 +56,6 @@ function search(query) {
             tr.append(
             $('<td>').append($('<i>').addClass('rg rg-provider rg-' + torrent.Provider + '-c')), // provider icon
             $('<td>').append(link),
-            //$('<td class="span3 torrentsearch_releasename">').text(torrent.ReleaseName),
             $('<td>').addClass('torrentsearch_seeders').text(torrent.Seeders),
             $('<td>').addClass('torrentsearch_leechers').text(torrent.Leechers),
             $('<td>').addClass('torrentsearch_size">').text(bytesToSize(torrent.Size, 2)),

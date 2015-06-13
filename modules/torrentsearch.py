@@ -9,6 +9,7 @@ from ts import norbits
 from ts import yts
 from ts import ka
 from ts import getstrike
+from ts import ptp
 from cherrypy.lib.auth2 import require
 
 
@@ -22,13 +23,17 @@ class Torrentsearch(object):
                 {'type': 'bool', 'label': 'Enable', 'name': 'torrentsearch_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'torrentsearch_name'},
                 {'type': 'bool', 'label': 'Enable BTN', 'name': 'torrents_btn_enabled'},
-                {'type': 'text', 'label': 'BTN apikey', 'name': 'torrentsearch_btn_apikey'},
+                {'type': 'password', 'label': 'BTN apikey', 'name': 'torrentsearch_btn_apikey'},
                 {'type': 'bool', 'label': 'Norbits', 'name': 'torrents_norbits_enabled'},
                 {'type': 'text', 'label': 'Norbits username', 'name': 'torrents_norbits_username'},
-                {'type': 'text', 'label': 'Norbits passkey', 'name': 'torrents_norbits_passkey'},
+                {'type': 'password', 'label': 'Norbits passkey', 'name': 'torrents_norbits_passkey'},
                 {'type': 'bool', 'label': 'YTS', 'name': 'torrents_yts_enabled'},
                 {'type': 'bool', 'label': 'KAT', 'name': 'torrents_ka_enabled'},
                 {'type': 'bool', 'label': 'Strike', 'name': 'torrents_getstrike_enabled'},
+                {'type': 'bool', 'label': 'PTP', 'name': 'torrents_ptp_enabled'},
+                {'type': 'text', 'label': 'PTP username', 'name': 'torrents_ptp_username'},
+                {'type': 'password', 'label': 'PTP password', 'name': 'torrents_ptp_password'},
+                {'type': 'password', 'label': 'PTP passkey', 'name': 'torrents_ptp_passkey'},
             ]
         })
 
@@ -54,6 +59,9 @@ class Torrentsearch(object):
             r += self.search_ka(query)
         if htpc.settings.get('torrents_getstrike_enabled'):
             r += self.search_getstrike(query, 'all')
+        if htpc.settings.get('torrents_ptp_enabled'):
+            r += self.search_ptp(query, 'movie')
+        self.logger.debug('Found %s torrents in total' % len(r))
         return r
 
     def btn(self, query=None):
@@ -99,6 +107,9 @@ class Torrentsearch(object):
 
         if htpc.settings.get('torrents_getstrike_enabled') == 1:
             torrentproviders.append('getstrike')
+
+        if htpc.settings.get('torrents_ptp_enabled') == 1:
+            torrentproviders.append('ptp')
 
         return torrentproviders
 
@@ -165,3 +176,6 @@ class Torrentsearch(object):
 
     def search_getstrike(self, q, cat):
         return getstrike.search(q, cat)
+
+    def search_ptp(self, q, cat):
+        return ptp.search(q, cat)
