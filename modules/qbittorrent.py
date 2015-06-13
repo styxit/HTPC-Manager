@@ -70,6 +70,7 @@ class Qbittorrent(object):
             # F33d da cookie monster
             r = self.session.post(self.qbturl() + 'login', data=d)
             if r.content == 'Ok.':
+                self.logger.debug('Successfully logged in with new api')
                 self.authenticated = True
                 self.newapi = True
             else:
@@ -98,14 +99,14 @@ class Qbittorrent(object):
 
         if post:
             if self.newapi:
-                r = self.session.post(url, data=data)
+                r = self.session.post(url, data=data, verify=False)
             else:
-                r = self.session.post(url, data=data, auth=HTTPDigestAuth(username, password))
+                r = self.session.post(url, data=data, verify=False, auth=HTTPDigestAuth(username, password))
         else:
             if self.newapi:
-                r = self.session.get(url)
+                r = self.session.get(url, verify=False)
             else:
-                r = self.session.get(url, auth=HTTPDigestAuth(username, password))
+                r = self.session.get(url, verify=False, auth=HTTPDigestAuth(username, password))
 
         return r
 
@@ -304,7 +305,7 @@ class Qbittorrent(object):
         try:
 
             # We assume that its atleast 3.2 if this works.
-            r = requests.get(url + 'version/api', timeout=10)
+            r = requests.get(url + 'version/api', timeout=10, verify=False)
             self.logger.debug('Trying to connect with new API %s' % r.url)
             # Old api returns a empty page
             if r.content != '' and r.ok:
@@ -317,7 +318,7 @@ class Qbittorrent(object):
         except Exception as e:
             self.logger.debug('Failed to figure out what api version, trying old API')
             try:
-                r = requests.post(url + 'json/torrents', auth=HTTPDigestAuth(username, password), timeout=10)
+                r = requests.post(url + 'json/torrents', auth=HTTPDigestAuth(username, password), timeout=10, verify=False)
                 if r.ok:
                     self.logger.debug('Old API works %s' % r.url)
                     # Disable new api stuff
