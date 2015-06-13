@@ -46,7 +46,7 @@ class Qbittorrent(object):
     def webinterface(self):
         host = striphttp(htpc.settings.get('qbittorrent_host', ''))
         port = htpc.settings.get('qbittorrent_port', '')
-        ssl = 's' if htpc.settings.get('qbittorret_ssl', 0) else ''
+        ssl = 's' if htpc.settings.get('qbittorrent_ssl', 0) else ''
         url = 'http%s://%s:%s/' % (ssl, host, port)
         if htpc.settings.get('qbittorrent_reverse_proxy_link'):
             url = htpc.settings.get('qbittorrent_reverse_proxy_link')
@@ -55,7 +55,7 @@ class Qbittorrent(object):
     def qbturl(self):
         host = striphttp(htpc.settings.get('qbittorrent_host', ''))
         port = htpc.settings.get('qbittorrent_port', '')
-        ssl = 's' if htpc.settings.get('qbittorret_ssl', 0) else ''
+        ssl = 's' if htpc.settings.get('qbittorrent_ssl', 0) else ''
         url = 'http%s://%s:%s/' % (ssl, host, port)
         return url
 
@@ -68,7 +68,7 @@ class Qbittorrent(object):
                  'password': htpc.settings.get('qbittorrent_password', '')
                  }
             # F33d da cookie monster
-            r = self.session.post(self.qbturl() + 'login', data=d)
+            r = self.session.post(self.qbturl() + 'login', data=d, verify=False)
             if r.content == 'Ok.':
                 self.logger.debug('Successfully logged in with new api')
                 self.authenticated = True
@@ -83,7 +83,7 @@ class Qbittorrent(object):
     def _fetch(self, u, post=False, params={}, data=None):
         host = striphttp(htpc.settings.get('qbittorrent_host', ''))
         port = htpc.settings.get('qbittorrent_port', '')
-        ssl = 's' if htpc.settings.get('qbittorret_ssl', 0) else ''
+        ssl = 's' if htpc.settings.get('qbittorrent_ssl') else ''
         url = 'http%s://%s:%s/' % (ssl, host, port)
         username = htpc.settings.get('qbittorrent_username', '')
         password = htpc.settings.get('qbittorrent_password', '')
@@ -303,7 +303,6 @@ class Qbittorrent(object):
         self.newapi = False
         self.authenticated = False
         try:
-
             # We assume that its atleast 3.2 if this works.
             r = requests.get(url + 'version/api', timeout=10, verify=False)
             self.logger.debug('Trying to connect with new API %s' % r.url)
