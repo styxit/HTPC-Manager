@@ -20,6 +20,10 @@ html, body {
     }
 }
 
+h1.page-header.page-title {
+    margin: -10px -20px 20px;
+}
+
 /*
 .label {
     min-height: 0px !important;
