@@ -11,6 +11,7 @@ import logging
 import logging.handlers
 import sys
 from settings import Setting
+from cherrypy.lib.static import serve_download
 from cherrypy.lib.auth2 import require, member_of
 import colorama
 
@@ -24,7 +25,7 @@ class Log:
 
         self.blacklistwords = BlackListFilter()
 
-        # Disable colored stdout byt --nocolor
+        # Disable colored stdout by --nocolor
         if htpc.NOCOLOR:
             self.logch = logging.StreamHandler()
         else:
@@ -69,8 +70,8 @@ class Log:
         htpc.LOGGER.addHandler(self.logch)
         htpc.LOGGER.addHandler(self.logfh)
 
-        htpc.LOGGER.info("Welcome to HTPC Manager!")
-        htpc.LOGGER.info("Loglevel set to " + htpc.LOGLEVEL)
+        htpc.LOGGER.info("Welcome to Hellowlol's HTPC Manager fork")
+        htpc.LOGGER.info("Loglevel set to %s" % htpc.LOGLEVEL)
 
     @cherrypy.expose()
     @require()
@@ -104,9 +105,19 @@ class Log:
     def deletelog(self):
         try:
             open(self.logfile, 'w').close()
-            return "Log file deleted"
+            return 'Log file deleted'
         except Exception, e:
-            return "Cannot delete log file: " + str(e)
+            return 'Cannot delete log file: %s' % e
+
+    @cherrypy.expose()
+    @require(member_of('admin'))
+    def downloadlog(self):
+        try:
+            htpc.LOGGER.flush()
+        except:
+            pass
+
+        return serve_download(self.logfile, name='htpcmanager.txt')
 
 
 class BlackListFilter(logging.Filter):

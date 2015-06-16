@@ -15,6 +15,12 @@ $(document).ready(function () {
         }
     })
 
+    // Activates the tooltips
+    $('.settingstooltip').tooltip({placement: 'right'})
+    $('.settingstooltip-left').tooltip({placement: 'left'})
+    $('.settingstooltip-top').tooltip({placement: 'top'})
+    $('.settingstooltip-bottom').tooltip({placement: 'bottom'})
+
     $('a[data-toggle="tab"]').on('click', function(e) {
         var yScroll = $(window).scrollTop()
         location.hash = $(e.target).attr('href')

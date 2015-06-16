@@ -23,12 +23,17 @@ settings = self.attr.settings
                     </select>
                 </div>
                 <div class="btn-group">
-                    <a href="#" id="refreshlog" class="ajax-link btn">
+                    <a href="#" id="refreshlog" data-original-title="Refresh log" class="ajax-link btn settingstooltip">
                         <i class="fa fa-refresh"></i>
                     </a>
                 </div>
                 <div class="btn-group">
-                    <a href="deletelog" id="deletelog" class="ajax-confirm btn" title="Clear log">
+                    <a href="downloadlog" id="downloadlog" data-original-title="Download the log" class="btn settingstooltip">
+                        <i class="fa fa-download"></i>
+                    </a>
+                </div>
+                <div class="btn-group">
+                    <a href="deletelog" id="deletelog" data-original-title="Delete the log" class="ajax-confirm btn settingstooltip-left" title="Clear log">
                         <i class="fa fa-trash-o"></i>
                     </a>
                 </div>
