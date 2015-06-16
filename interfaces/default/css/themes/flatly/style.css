@@ -1,5 +1,5 @@
 html, body {
-    background: #eee url('../../../img/bodybg.jpg');
+  background-color: #E0E0E0;
 }
 
 .content {
@@ -22,6 +22,27 @@ html, body {
 
 h1.page-header.page-title {
     margin: -10px -20px 20px;
+    color: rgb(77, 77, 77);
+}
+
+h3 a {
+    color: rgb(77, 77, 77);
+}
+
+ul.dropdown-menu.pull-right {
+  color: white;
+}
+
+i.fa.fa-wrench {
+    color: white;
+}
+
+i.fa.fa-caret-down {
+    color: white
+}
+
+h1.page-header.page-title a {
+    color: inherit;
 }
 
 /*
