@@ -4,8 +4,7 @@
 import cherrypy
 import htpc
 from urllib import quote, urlencode
-from urllib2 import urlopen
-from json import loads
+import requests
 import logging
 from cherrypy.lib.auth2 import require
 from htpc.helpers import fix_basepath, get_image, striphttp
@@ -71,11 +70,12 @@ class Sickrage(object):
 
             url = 'http%s://%s:%s%sapi/%s/?cmd=sb.ping' % (ssl, striphttp(sickrage_host), sickrage_port, sickrage_basepath, sickrage_apikey)
 
-            self.logger.debug('Trying to contact sickrage via ' + url)
-            response = loads(urlopen(url, timeout=10).read())
-            if response.get('result') == 'success':
+            self.logger.debug('Trying to contact sickrage via %s' % url)
+            response = requests.get(url, timeout=10, verify=False)
+            ret = response.json()
+            if ret.get('result') == 'success':
                 self.logger.debug('Sickrage connectivity test success')
-                return response
+                return ret
         except:
             self.logger.error('Unable to contact sickrage via %s' % url)
             return
@@ -238,7 +238,8 @@ class Sickrage(object):
                 # Cache the images
                 return get_image(url)
 
-            return loads(urlopen(url, timeout=timeout).read())
+            res = requests.get(url, timeout=timeout, verify=False)
+            return res.json()
         except Exception as e:
             self.logger.error('Unable to fetch information')
             self.logger.error(url)

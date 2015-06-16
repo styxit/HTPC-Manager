@@ -192,9 +192,6 @@ class UTorrent(object):
 
         return d
 
-
-
-
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
