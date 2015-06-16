@@ -3,21 +3,15 @@
 
 import cherrypy
 import htpc
-import urllib2
-import gzip
-import socket
-from json import loads, dumps
+import requests
+from json import dumps
 import logging
-import cookielib
-from StringIO import StringIO
 from cherrypy.lib.auth2 import require
 from htpc.helpers import fix_basepath, striphttp
 
 
 class Deluge(object):
-
-    cookieJar = cookielib.CookieJar()
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
+    session = requests.Session()
 
     def __init__(self):
         self.logger = logging.getLogger('modules.deluge')
@@ -111,7 +105,6 @@ class Deluge(object):
         removeDataBool = bool(int(removeData))
         return self.fetch('core.remove_torrent', [torrentId, removeDataBool])
 
-    #Used for torrent search
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
@@ -133,49 +126,32 @@ class Deluge(object):
         except Exception as e:
             self.logger.debug('Failed adding %s to deluge %s %s' % (torrentname, link, e))
 
-    # Wrapper to access the Deluge Api
-    # If the first call fails, there probably is no valid Session ID so we try it again
     def fetch(self, method, arguments=None):
         """ Do request to Deluge api """
         if arguments is None:
             arguments = []
 
+        host = striphttp(htpc.settings.get('deluge_host', ''))
+        port = htpc.settings.get('deluge_port', '')
+        deluge_basepath = fix_basepath(htpc.settings.get('deluge_basepath', '/'))
+        ssl = 's' if htpc.settings.get('deluge_ssl') else ''
+
+        url = 'http%s://%s:%s%sjson' % (ssl, host, port, deluge_basepath)
+
         self.logger.debug("Request deluge method: %s arguments %s" % (method, arguments))
-
-        # format post data
-        data = {'id': 1, 'method': method, 'params': arguments}
-
-        response = self.read_data(data)
-        self.logger.debug("response is %s" % response)
-        if response and response['error']:
-            self.auth()
-            response = self.read_data(data)
-            self.logger.debug("response is %s" % response)
-        return response
-
-    def auth(self):
-        self.read_data({"method": "auth.login", "params": [htpc.settings.get('deluge_password', '')], "id": 1})
-
-    def read_data(self, data):
         try:
-            self.logger.debug("Read data from server")
-            host = striphttp(htpc.settings.get('deluge_host', ''))
-            port = htpc.settings.get('deluge_port', '')
-            deluge_basepath = fix_basepath(htpc.settings.get('deluge_basepath', '/'))
-            ssl = 's' if htpc.settings.get('deluge_ssl') else ''
+            # format post data
+            data = {'id': 1, 'method': method, 'params': arguments}
 
-            url = 'http%s://%s:%s%sjson' % (ssl, host, port, deluge_basepath)
-            self.logger.debug('read data url is %s' % url)
+            response = self.session.post(url, data=dumps(data), verify=False)
+            result = response.json()
+            self.logger.debug("response is %s" % response.content)
+            if result and result['error']:
+                self.logger.debug('Authenticating')
+                self.session.post(url, data=dumps({"method": "auth.login", "params": [htpc.settings.get('deluge_password', '')], "id": 1}), verify=False)
+                response = self.session.post(url, data=dumps(data), verify=False)
 
-            post_data = dumps(data)
-            buf = StringIO(self.opener.open(url, post_data, 1).read())
-            f = gzip.GzipFile(fileobj=buf)
-            response = loads(f.read())
-            self.logger.debug("response for %s is %s" % (data, response))
-            return response
-        except urllib2.URLError:
-            self.logger.error("can't connect with %s" % data)
-            return {'result': {}, 'error': "can't connect with %s" % data}
-        except socket.timeout:
-            self.logger.error("timeout when connect with %s" % data)
-            return {'result': {}, 'error': "can't connect with %s" % data}
+            self.logger.debug("response is %s" % response.text)
+            return result
+        except Exception as e:
+            self.logger.error('Failed to fetch method %s  arguments %s %s' % (method, arguments, e))
