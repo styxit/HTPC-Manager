@@ -121,8 +121,6 @@ def main():
     htpc.RUNDIR = os.path.dirname(os.path.abspath(sys.argv[0]))
     sys.path.insert(0, os.path.join(htpc.RUNDIR, 'libs'))
 
-    htpc.SYS_ENCODING = None
-
     try:
         locale.setlocale(locale.LC_ALL, "")
         htpc.SYS_ENCODING = locale.getpreferredencoding()

@@ -128,14 +128,7 @@ class BlackListFilter(logging.Filter):
         if htpc.DEBUG:
             return True
         else:
-            fl = Setting.select().orderBy(Setting.q.key)
-            bl = []
-            for i in fl:
-                if i.key.endswith("_apikey") or i.key.endswith("_username") or i.key.endswith("_password") or i.key.endswith("_passkey"):
-                    if len(i.val) > 1:
-                        bl.append(i.val)
-
-            for item in bl:
+            for item in htpc.BLACKLISTWORDS:
                 try:
                     if item in record.msg or item in "".join(record.args):
                         # hack to make logging happy
