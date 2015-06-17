@@ -65,7 +65,7 @@ def start():
         })
 
     # Set server environment to production unless when debugging
-    if not htpc.DEBUG:
+    if not htpc.DEV:
         cherrypy.config.update({
             'environment': 'production'
         })

@@ -10,7 +10,6 @@ import htpc
 import logging
 import logging.handlers
 import sys
-from settings import Setting
 from cherrypy.lib.static import serve_download
 from cherrypy.lib.auth2 import require, member_of
 import colorama
@@ -37,7 +36,7 @@ class Log:
         self.logch.setFormatter(logformatter)
         self.logfh.setFormatter(logformatter)
 
-        if htpc.LOGLEVEL == 'debug' or htpc.DEBUG:
+        if htpc.LOGLEVEL == 'debug' or htpc.DEV:
             loglevel = logging.DEBUG
         elif htpc.LOGLEVEL == 'info':
             loglevel = logging.INFO
@@ -125,7 +124,7 @@ class BlackListFilter(logging.Filter):
         pass
 
     def filter(self, record):
-        if htpc.DEBUG:
+        if htpc.DEV:
             return True
         else:
             for item in htpc.BLACKLISTWORDS:

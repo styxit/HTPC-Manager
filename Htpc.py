@@ -11,6 +11,7 @@ import sys
 import htpc
 import webbrowser
 import locale
+import logging
 
 
 def parse_arguments():
@@ -32,7 +33,9 @@ def parse_arguments():
     parser.add_argument('--pid', default=False,
                         help='Generate PID file at location')
     parser.add_argument('--debug', action='store_true', default=False,
-                        help='Used while developing, prints debug messages uncensored and more..')
+                        help='This parameter has been deprecated')
+    parser.add_argument('--dev', action='store_true', default=False,
+                        help='Used while developing, prints debug messages uncensored, autoreload etc')
     parser.add_argument('--openbrowser', action='store_true', default=False,
                         help='Open the browser on server start')
     parser.add_argument('--webdir', default=None,
@@ -150,8 +153,8 @@ def main():
 
     from mako.lookup import TemplateLookup
 
-    # Enable debug mode if needed
-    htpc.DEBUG = args.debug
+    # Enable dev mode if needed
+    htpc.DEV = args.dev
 
     # Set default database and overwrite if supplied through commandline
     htpc.DB = os.path.join(htpc.DATADIR, 'database.db')
@@ -213,7 +216,7 @@ def main():
     htpc.NOCOLOR = args.nocolor
 
     # Open webbrowser
-    if args.openbrowser or htpc.settings.get('openbrowser') and not htpc.DEBUG:
+    if args.openbrowser or htpc.settings.get('openbrowser') and not htpc.DEV:
         browser_ssl = 's' if htpc.SSLCERT and htpc.SSLKEY else ''
         if htpc.settings.get('app_host') == '0.0.0.0':
             browser_host = 'localhost'
@@ -236,6 +239,10 @@ def main():
 
     # Inititialize root and settings page
     load_modules()
+
+    if args.debug:
+        logger = logging.getLogger('root')
+        logger.warning('Commandline parameter --debug has has been deprecated')
 
     # Start the server
     from htpc.server import start

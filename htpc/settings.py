@@ -61,7 +61,6 @@ class Settings(object):
             setting.val = val
             self.updatebl()
         except SQLObjectNotFound:
-
             Setting(key=key, val=val)
             self.updatebl()
 
