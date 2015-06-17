@@ -39,7 +39,7 @@ def parse_arguments():
                         help='Use a custom webdir')
     parser.add_argument('--resetauth', action='store_true', default=False,
                         help='Resets the username and password to HTPC Manager')
-    parser.add_argument('--loglevel', default='info',
+    parser.add_argument('--loglevel',
                         help='Set a loglevel. Allowed values: debug, info, warning, error, critical')
     parser.add_argument('--nocolor', action='store_true', default=False,
                         help='Disable colored terminal text')
@@ -155,9 +155,6 @@ def main():
     # Enable debug mode if needed
     htpc.DEBUG = args.debug
 
-    # Set loglevel
-    htpc.LOGLEVEL = args.loglevel.lower()
-
     # Set default database and overwrite if supplied through commandline
     htpc.DB = os.path.join(htpc.DATADIR, 'database.db')
     if args.db:
@@ -166,6 +163,12 @@ def main():
     # Load settings from database
     from htpc.settings import Settings
     htpc.settings = Settings()
+
+    # Set default loglevel
+    htpc.LOGLEVEL = htpc.settings.get('app_loglevel', 'info')
+    if args.loglevel:
+        htpc.LOGLEVEL = args.loglevel.lower()
+        htpc.settings.set('app_loglevel', args.loglevel.lower())
 
     # Check for SSL
     htpc.USE_SSL = htpc.settings.get('app_use_ssl')

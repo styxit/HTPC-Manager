@@ -32,6 +32,8 @@
                 {'type':'bool', 'label':'Use ssl?', 'name':'app_use_ssl', 'value':settings.get('app_use_ssl'), 'desc': 'By enabling this and leaving SSL cert and key blank HTPC Manager will generate cert and key for you'},
                 {'type':'text', 'label':'SSL Cert', 'name':'app_ssl_cert', 'value':settings.get('app_ssl_cert'), 'desc':''},
                 {'type':'text', 'label':'SSL Key', 'name':'app_ssl_key', 'value':settings.get('app_ssl_key')},
+                {'type':'select', 'label':'Log level', 'name':'app_loglevel', 'options':settings.get_loglvl(), 'desc':''},
+
                 {'type':'text', 'label':'Git Path', 'name':'git_path', 'desc':'Only needed if OS is unable to locate git', 'value':settings.get('git_path', 'git')},
                 {'type':'bool', 'label':'Git Cleanup?', 'name':'git_cleanup', 'desc':'Removes untracked files and performs a hard reset on git branch automatically to help resolve update issues', 'value':settings.get('git_cleanup')},
                 {'type':'bool', 'label':'Use  rev proxy headers', 'name':'app_use_proxy_headers', 'desc':'','value':settings.get('app_use_proxy_headers')},

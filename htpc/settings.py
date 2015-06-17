@@ -69,6 +69,14 @@ class Settings:
             templates.append({'name': template, 'value': template, 'selected': current})
         return templates
 
+    def get_loglvl(self):
+        """ Get a list of available templates """
+        loglvl = []
+        for lvl in ['info', 'debug', 'warning', 'error']:
+            current = bool(lvl == self.get('app_loglevel', 'info'))
+            loglvl.append({'name': lvl, 'value': lvl, 'selected': current})
+        return loglvl
+
     def get_themes(self):
         """ Get a list of available themes """
         path = os.path.join(htpc.TEMPLATE, "css/themes/")

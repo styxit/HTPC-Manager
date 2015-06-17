@@ -101,6 +101,19 @@ class Deluge(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
+    def daemon(self, status, port):
+        print "daemon"
+        print status
+        print port
+        if status == 'start':
+            action = 'web.start_daemon'
+        else:
+            action = 'web.stop_daemon'
+        return self.fetch(action, [int(port)])
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
     def remove(self, torrentId, removeData):
         removeDataBool = bool(int(removeData))
         return self.fetch('core.remove_torrent', [torrentId, removeDataBool])
