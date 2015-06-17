@@ -19,7 +19,7 @@ class Setting(SQLObject):
     val = StringCol()
 
 
-class Settings:
+class Settings(object):
     """ Main class """
 
     def __init__(self):
@@ -28,6 +28,7 @@ class Settings:
         self.logger.debug('Connecting to database: ' + htpc.DB)
         sqlhub.processConnection = connectionForURI('sqlite:' + htpc.DB)
         Setting.createTable(ifNotExists=True)
+
 
     @cherrypy.expose()
     @require(member_of("admin"))
@@ -58,8 +59,19 @@ class Settings:
         try:
             setting = Setting.selectBy(key=key).getOne()
             setting.val = val
+            self.updatebl()
         except SQLObjectNotFound:
             Setting(key=key, val=val)
+            self.updatebl()
+
+    def updatebl(self):
+        fl = Setting.select().orderBy(Setting.q.key)
+        bl = []
+        for i in fl:
+            if i.key.endswith("_apikey") or i.key.endswith("_username") or i.key.endswith("_password") or i.key.endswith("_passkey"):
+                if len(i.val) > 1:
+                    bl.append(i.val)
+        htpc.BLACKLISTWORDS = bl
 
     def get_templates(self):
         """ Get a list of available templates """
@@ -68,6 +80,14 @@ class Settings:
             current = bool(template == self.get('app_template', 'default'))
             templates.append({'name': template, 'value': template, 'selected': current})
         return templates
+
+    def get_loglvl(self):
+        """ Get a list of available templates """
+        loglvl = []
+        for lvl in ['info', 'debug', 'warning', 'error']:
+            current = bool(lvl == self.get('app_loglevel', 'info'))
+            loglvl.append({'name': lvl, 'value': lvl, 'selected': current})
+        return loglvl
 
     def get_themes(self):
         """ Get a list of available themes """

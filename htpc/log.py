@@ -10,7 +10,6 @@ import htpc
 import logging
 import logging.handlers
 import sys
-from settings import Setting
 from cherrypy.lib.static import serve_download
 from cherrypy.lib.auth2 import require, member_of
 import colorama
@@ -37,7 +36,7 @@ class Log:
         self.logch.setFormatter(logformatter)
         self.logfh.setFormatter(logformatter)
 
-        if htpc.LOGLEVEL == 'debug' or htpc.DEBUG:
+        if htpc.LOGLEVEL == 'debug' or htpc.DEV:
             loglevel = logging.DEBUG
         elif htpc.LOGLEVEL == 'info':
             loglevel = logging.INFO
@@ -125,17 +124,10 @@ class BlackListFilter(logging.Filter):
         pass
 
     def filter(self, record):
-        if htpc.DEBUG:
+        if htpc.DEV:
             return True
         else:
-            fl = Setting.select().orderBy(Setting.q.key)
-            bl = []
-            for i in fl:
-                if i.key.endswith("_apikey") or i.key.endswith("_username") or i.key.endswith("_password") or i.key.endswith("_passkey"):
-                    if len(i.val) > 1:
-                        bl.append(i.val)
-
-            for item in bl:
+            for item in htpc.BLACKLISTWORDS:
                 try:
                     if item in record.msg or item in "".join(record.args):
                         # hack to make logging happy

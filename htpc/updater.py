@@ -206,7 +206,7 @@ class Updater(object):
         else:
             htpc.UPDATE_AVAIL = False
         # Since im stupid, protect me please.. srsly its for myself.
-        if htpc.UPDATE_AVAIL and htpc.settings.get("app_auto_update", False) and not htpc.DEBUG:
+        if htpc.UPDATE_AVAIL and htpc.settings.get("app_auto_update", False) and not htpc.DEV:
             self.logger.debug("Auto updating now!")
             Thread(target=self.updateEngine.update).start()
 
@@ -293,7 +293,7 @@ class GitUpdater():
         elif 'Aborting.' in output:
             self.logger.error("Update aborted.")
         else:
-            if htpc.settings.get('git_cleanup') and not htpc.DEBUG:
+            if htpc.settings.get('git_cleanup') and not htpc.DEV:
                 self.logger.debug("Clean up after git")
                 self.git_exec(self.git, 'reset --hard')
                 # Note to self: rtfm before you run git commands, just wiped the data dir...
