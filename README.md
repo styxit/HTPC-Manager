@@ -14,7 +14,7 @@ Start with ```python Htpc.py```
 - Headphones
 - Samsung TV remote
 - SickRage module
-- Torrent search (BTN, Norbits, KAT and YTS)
+- Torrent search (BTN, Norbits, KAT, PTP and YTS)
 - vnStat
 - Mylar
 
@@ -57,6 +57,7 @@ Start with ```python Htpc.py```
 - Reduced size on static files
 - Docker support
 - Various fixes
+- Download log
 - Added argsparse (to support python 2.6)
 
 If you're missing something don't be afraid to make a request :)
@@ -65,7 +66,14 @@ See here for full list:
 https://github.com/Hellowlol/HTPC-Manager/compare/styxit:master...master2
 
 #### SO YOU FOUND A BUG? GREAT!
-INCLUDE THIS IN YOUR ISSUE:
+
+Before you open a new issue make sure you:
+- Check this if issue solved before
+- Are using the master2 branch (all other branches should be considered experimental)
+- Update to the lastest version
+- Have restart HTPC Manager
+
+If you still have problems: INCLUDE THIS IN YOUR ISSUE
  - Branch
  - Commit hash
  - Your operating system and python version
@@ -74,7 +82,7 @@ INCLUDE THIS IN YOUR ISSUE:
  - What did you expect to happen?
  - If it's a visual bug, screenshot or it didn't happen!
  - Which browser, including version
- - Link to a copy/paste of your logfile with clear debug info of the error on [PASTEBIN](http://www.pastebin.com)
+ - Link to a copy/paste of your ENTIRE logfile (with loglevel debug!), please write the linenumber where the error occure [PASTEBIN](http://www.pastebin.com) NO logs == NO help
 
 #### How to enable detailed logs
 1. Shutdown HTPC Manager
