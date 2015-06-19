@@ -29,7 +29,7 @@ class Mylar(object):
                 {'type': 'text', 'label': 'Basepath', 'name': 'mylar_basepath'},
                 {'type': 'text', 'label': 'API key', 'name': 'mylar_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'mylar_ssl'},
-                {"type": "text", "label": "Reverse proxy link", "placeholder": "", "desc": "Reverse proxy link ex: https://hp.domain.com", "name": "headphones_reverse_proxy_link"}
+                {"type": "text", "label": "Reverse proxy link", "placeholder": "", "desc": "Reverse proxy link ex: https://hp.domain.com", "name": "mylar_reverse_proxy_link"}
 
             ]
         })
