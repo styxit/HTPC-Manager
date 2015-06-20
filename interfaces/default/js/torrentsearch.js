@@ -48,7 +48,7 @@ function search(query) {
             return;
         }
 
-        byteSizeOrdering()
+
         $.each(response, function (index, torrent) {
             tr = $('<tr>');
             link = $('<a target="_blank">').attr('href', torrent.BrowseURL).text(torrent.ReleaseName)
@@ -58,7 +58,7 @@ function search(query) {
             $('<td>').append(link),
             $('<td>').addClass('torrentsearch_seeders').text(torrent.Seeders),
             $('<td>').addClass('torrentsearch_leechers').text(torrent.Leechers),
-            $('<td>').addClass('torrentsearch_size">').text(bytesToSize(torrent.Size, 2)),
+            $('<td>').addClass('torrentsearch_size">').text(humanFileSize(torrent.Size, 2)),
             $('<td>').addClass('hidden-phone torrentsearch_source').text(torrent.Source),
             $('<td>').addClass('hidden-phone torrentsearch_resolution').text(torrent.Resolution),
             $('<td>').addClass('hidden-phone torrentsearch_container').text(torrent.Container),
@@ -71,9 +71,11 @@ function search(query) {
         });
     // Letting sort plugin know that there was a ajax call
     $('.spinner').hide();
+    byteSizeOrdering()
     $('.torrent_search_table').trigger('update');
     // sort on seeds 0 based 0 1 2
     $('table').trigger("sorton", [[[2,1]]]);
+
 
     });
 }
