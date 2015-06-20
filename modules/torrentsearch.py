@@ -10,12 +10,14 @@ from ts import yts
 from ts import ka
 from ts import getstrike
 from ts import ptp
+from ts import rarbg
 from cherrypy.lib.auth2 import require
 
 
 class Torrentsearch(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.torrentsearch')
+        self.rb = rarbg.Rarbg()
         htpc.MODULES.append({
             'name': 'Torrent Search',
             'id': 'torrentsearch',
@@ -34,6 +36,7 @@ class Torrentsearch(object):
                 {'type': 'text', 'label': 'PTP username', 'name': 'torrents_ptp_username'},
                 {'type': 'password', 'label': 'PTP password', 'name': 'torrents_ptp_password'},
                 {'type': 'password', 'label': 'PTP passkey', 'name': 'torrents_ptp_passkey'},
+                {'type': 'bool', 'label': 'Rarbg', 'name': 'torrents_rarbg_enabled'}
             ]
         })
 
@@ -61,6 +64,8 @@ class Torrentsearch(object):
             r += self.search_getstrike(query, 'all')
         if htpc.settings.get('torrents_ptp_enabled'):
             r += self.search_ptp(query, 'movie')
+        if htpc.settings.get('torrents_rarbg_enabled'):
+            r += self.search_rarbg(query, None)
         self.logger.debug('Found %s torrents in total' % len(r))
         return r
 
@@ -179,3 +184,6 @@ class Torrentsearch(object):
 
     def search_ptp(self, q, cat):
         return ptp.search(q, cat)
+
+    def search_rarbg(self, q, cat):
+        return self.rb.search(q, cat)
