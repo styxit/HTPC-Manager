@@ -10,6 +10,7 @@ from subprocess import PIPE
 import cherrypy
 import htpc
 import logging
+import os
 import requests
 from cherrypy.lib.auth2 import require, member_of
 
@@ -250,7 +251,9 @@ class Stats(object):
                 r_time = str(r_time)[:-7]
                 p.dict['r_time'] = r_time
                 # fix for windows process name
-                p.dict['name'] = psutil._psplatform.cext.proc_name(p.pid)
+                if os.name == 'nt':
+                    p.dict['name'] = psutil._psplatform.cext.proc_name(p.pid)
+
                 try:
                     procs_status[p.dict['status']] += 1
                 except KeyError:
@@ -324,6 +327,7 @@ class Stats(object):
                 td = str(td)
                 td = td[:-7]
                 duser['started'] = td
+
             if dash:
                 return duser
             else:
