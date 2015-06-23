@@ -213,7 +213,7 @@ class Plex(object):
 
             return {'episodes': sorted(episodes, key=lambda k: k['addedAt'], reverse=True)[:int(limit)]}
         except Exception as e:
-            self.logger.error('Unable to fetch episodes! %s Exception: %s' % (section, e))
+            self.logger.error('Unable to fetch episodes! Exception: %s' % e)
             return
 
     @cherrypy.expose()
