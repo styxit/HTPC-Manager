@@ -15,12 +15,20 @@ from cherrypy.lib.auth2 import require, member_of
 
 logger = logging.getLogger('modules.stats')
 
+importPsutil = False
+importPsutilerror = ''
 try:
     import psutil
     importPsutil = True
+    if psutil.version_info < (3, 0, 0):
+        importPsutilerror = 'Successfully imported psutil %s, upgrade to 3.0.0 or higher' % str(psutil.version_info)
+        logger.error(importPsutilerror)
+        importPsutil = False
+
 
 except ImportError:
-    logger.error("Could't import psutil. See https://raw.githubusercontent.com/giampaolo/psutil/master/INSTALL.rst")
+    importPsutilerror = 'Could not import psutil see <a href="https://github.com/giampaolo/psutil/blob/master/INSTALL.rst">install guide</a>.'
+    logger.error(importPsutilerror)
     importPsutil = False
 
 importpySMART = False
@@ -70,14 +78,9 @@ class Stats(object):
     @cherrypy.expose()
     @require()
     def index(self):
-        # Since many linux repos still have psutil version 0.5
-        if importPsutil and psutil.version_info >= (0, 7):
-            pass
-        else:
-            self.logger.error('Psutil is outdated, needs atleast version 0,7')
-
         return htpc.LOOKUP.get_template('stats.html').render(scriptname='stats',
                                                              importPsutil=importPsutil,
+                                                             importPsutilerror=importPsutilerror,
                                                              cmdline=htpc.SHELL,
                                                              importpySMART=importpySMART,
                                                              importpySMARTerror=importpySMARTerror)
@@ -86,10 +89,7 @@ class Stats(object):
     @require()
     def uptime(self, dash=False):
         try:
-            if psutil.version_info >= (2, 0, 0):
-                b = psutil.boot_time()
-            else:
-                b = psutil.get_boot_time()
+            b = psutil.boot_time()
             d = {}
             boot = datetime.now() - datetime.fromtimestamp(b)
             boot = str(boot)
@@ -243,12 +243,14 @@ class Stats(object):
         procs_status = {}
         for p in psutil.process_iter():
             try:
-                p.dict = p.as_dict(['username', 'get_memory_percent', 'create_time',
-                                    'get_cpu_percent', 'name', 'status', 'pid', 'get_memory_info'])
+                p.dict = p.as_dict(['username', 'memory_percent', 'create_time',
+                                    'cpu_percent', 'name', 'status', 'pid', 'memory_info'], ad_value='N/A')
                 # Create a readable time
                 r_time = datetime.now() - datetime.fromtimestamp(p.dict['create_time'])
                 r_time = str(r_time)[:-7]
                 p.dict['r_time'] = r_time
+                # fix for windows process name
+                p.dict['name'] = psutil._psplatform.cext.proc_name(p.pid)
                 try:
                     procs_status[p.dict['status']] += 1
                 except KeyError:
@@ -304,10 +306,7 @@ class Stats(object):
     @cherrypy.tools.json_out()
     def num_cpu(self):
         try:
-            if psutil.version_info >= (2, 0, 0):
-                cpu = psutil.cpu_count(logical=False)
-            else:
-                cpu = psutil.NUM_CPUS
+            cpu = psutil.cpu_count(logical=False)
             dcpu = cpu._asdict()
             return dcpu
 
@@ -319,7 +318,7 @@ class Stats(object):
     @require()
     def get_user(self, dash=False):
         try:
-            for user in psutil.get_users():
+            for user in psutil.users():
                 duser = user._asdict()
                 td = datetime.now() - datetime.fromtimestamp(duser['started'])
                 td = str(td)
@@ -344,14 +343,14 @@ class Stats(object):
             local_ip = (ip.getsockname()[0])
             d['localip'] = local_ip
 
+            if dash:
+                return local_ip
+            else:
+                cherrypy.response.headers['Content-Type'] = 'application/json'
+                return json.dumps(d)
+
         except Exception as e:
             self.logger.error('Pulling  local ip %s' % e)
-
-        if dash:
-            return local_ip
-        else:
-            cherrypy.response.headers['Content-Type'] = 'application/json'
-            return json.dumps(d)
 
     def _get_external_ip(self, dash=False):
         try:
@@ -559,7 +558,7 @@ class Stats(object):
                                     }
                             if atts.name == 'Temperature_Celsius':
                                 temp = atts.raw
-                            x = x + 1
+                            x += 1
                     if x > 0:
                         d[i] = {'assessment': hds.assessment,
                                 'firmware': hds.firmware,

@@ -99,26 +99,39 @@ function processes() {
         'dataType': 'json',
         'success': function (response) {
             $('.procspinner')
-            byteSizeOrdering()
             $('#proclist').html("");
             $('#error_message').text("");
 
             $.each(response, function (i, proc) {
+                var pmc
+                var meminfo
+                if (proc.memory_percent == 'N/A') {
+                    pmc = 'N/A'
+                } else {
+                    pmc = proc.memory_percent.toFixed(2) + '%'
+                }
+                if (proc.memory_info == 'N/A') {
+                    meminfo = 'N/A'
+                } else {
+                    meminfo = getReadableFileSizeString(proc.memory_info[0])
+                }
                 var row = $('<tr>');
                 row.append(
                 $('<td>').addClass('processes-name').text(proc.name),
                 $('<td>').addClass('processes-pid').text(proc.pid),
                 $('<td>').addClass('processes-status hidden-phone').text(proc.status),
                 $('<td>').addClass('processes-username hidden-phone').text(proc.username),
-                $('<td>').addClass('processes-memory-percent').text(proc.memory_percent.toFixed(2) + '%'),
-                $('<td>').addClass('processes-memory-info').text(getReadableFileSizeString(proc.memory_info[0])),
+                $('<td>').addClass('processes-memory-percent').text(pmc),
+                $('<td>').addClass('processes-memory-info').text(meminfo),
                 $('<td>').addClass('processes-runningtime').text(proc.r_time),
                 $('<td>').addClass('processes-percent').text(proc.cpu_percent+ '%'),
                 $('<td>').append('<a href="#" class="btn btn-mini cmd" data-cmd="kill" data-name='+proc.name+' data-pid='+proc.pid+'><i class="fa fa-times"></i></a>'));
                 $('#proclist').append(row);
 
             })
-            $('table').trigger("update");
+            // disable sort for now as the n/a fucks up the parser
+            //byteSizeOrdering()
+            //$('table').trigger("update");
         },
 
 
