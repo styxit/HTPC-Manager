@@ -49,11 +49,11 @@ function make_current_month(d) {
 function find_last_30_days() {
     var today = new Date();
     var year = today.getFullYear();
-    var month = today.getMonth();
+    var month = today.getMonth() + 1;
     var date = today.getDate();
     var daylist = [];
     for (var i = 0; i < 30; i++) {
-        var day = new Date(year, month - 1, date + i);
+        var day = new Date(year, month - 1, date - i);
         daylist.push(day.toLocaleDateString());
     }
     return daylist;
