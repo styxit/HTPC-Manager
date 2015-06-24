@@ -127,8 +127,9 @@ def resize_image(img, height, width, opacity, dest):
 def fix_basepath(s):
     ''' Removes whitespace and adds / on each end '''
     if s:
-        s.strip(' ')
-        s = s.replace('/', '')
+        s = s.strip()
+        s = s.rstrip('/')
+        s = s.lstrip('/')
     if not s.startswith('/'):
         s = '/' + s
     if not s.endswith('/'):
