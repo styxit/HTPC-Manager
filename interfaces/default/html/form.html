@@ -21,8 +21,8 @@ settings =  htpc.settings
             <div class="controls">
                 % if field.get('type') in ['text', 'password']:
                 <% value = field.get('value') if field.get('value') else settings.get(field.get('name')) %>
-                <% placeholder = field.get('placeholder') if field.get('placeholder') else '' %>
-                <input type="${field.get('type')}" name="${field.get('name')|h, entity}" id="${field.get('name')|h, entity}" placeholder="${placeholder|h, entity}" value="${value|h, entity}"/>
+                ##<% placeholder = field.get('placeholder') if field.get('placeholder') else '' %>
+                <input type="${field.get('type')}" name="${field.get('name')|h, entity}" id="${field.get('name')|h, entity}"  value="${value|h, entity}"/>
                 % elif field.get('type') == 'bool':
                 <% checked = field.get('checked') if field.get('checked') else settings.get(field.get('name')) %>
                 <input type="checkbox" name="${field.get('name')|h, entity}" id="${field.get('name')|h, entity}"${

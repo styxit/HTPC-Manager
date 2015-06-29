@@ -14,7 +14,7 @@ Start with ```python Htpc.py```
 - Headphones
 - Samsung TV remote
 - SickRage module
-- Torrent search (BTN, Norbits, KAT, PTP and YTS)
+- Torrent search (BTN, Norbits, KAT, rarbg, PTP and YTS)
 - vnStat
 - Mylar
 
@@ -37,7 +37,7 @@ Start with ```python Htpc.py```
 #### [Improvements]
 - Pretty much every module has been improved in some way or another
 - NZBGet module (rewritten)
-- qBittorrent module
+- qBittorrent module (rewritten)
 - Transmission (add url, upload local torrent)
 - SABnzbd (drag & drop to edit queue)
 - Stats module (Hardware info, S.M.A.R.T report)
@@ -86,7 +86,7 @@ If you still have problems: INCLUDE THIS IN YOUR ISSUE
 
 #### How to enable detailed logs
 1. Shutdown HTPC Manager
-2. Start Htpc.py --loglevel debug (Do NOT start with --debug)
+2. Start Htpc.py --loglevel debug (Do NOT start with --dev)
 3. Start HTPC Manager and wait for error to occur again/reproduce it
 
 
