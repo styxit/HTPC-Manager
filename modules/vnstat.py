@@ -31,10 +31,10 @@ class Vnstat(object):
                 {"type": "bool", "label": "Enable", "name": "vnstat_enable"},
                 {"type": "text", "label": "Menu name", "name": "vnstat_name"},
                 {"type": "bool", "label": "Use SSH?", 'desc': 'Check this if vnStat is running on a different computer', "name": "vnstat_use_ssh"},
-                {"type": "text", "label": "vnStat DB location", "placeholder": "", "name": "vnstat_db"},
-                {"type": "text", "label": "Interface", "placeholder": "eth0", "desc": "Fetching speed from this interface", "name": "vnstat_interface"},
+                {"type": "text", "label": "vnStat DB location", "placeholder": "", "name": "vnstat_db", 'desc': 'Only set this if you have changed the default db location'},
+                {"type": "text", "label": "Interface", "placeholder": "eth0", "desc": "Only grab data from this interface, if omitted it will return all interfaces except from speed witch uses default tr interface", "name": "vnstat_interface"},
                 {"type": "text", "label": "IP / Host", "placeholder": "localhost", "name": "vnstat_host"},
-                {"type": "text", "label": "Port", "name": "vnstat_port"},
+                {"type": "text", "label": "Port", "name": "vnstat_port", "desc": "Default ssh port is 22"},
                 {"type": "text", "label": "Username", "name": "vnstat_username"},
                 {"type": "password", "label": "Password", "name": "vnstat_password"},
 
@@ -93,12 +93,13 @@ class Vnstat(object):
                 returncode = proc.returncode
 
                 if output and returncode == 0:
+
                     if '--xml' in cmd:
                         return xmltodict.parse(output.strip())
                     else:
                         return output.strip()
                 else:
-                    self.logger.error("Failed to run %s from shell" % cmd)
+                    self.logger.error("Failed to run %s from shell output %s returncode %s" % (cmd, output, returncode))
 
     @cherrypy.expose()
     @require()

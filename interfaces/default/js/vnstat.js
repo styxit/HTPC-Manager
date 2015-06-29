@@ -1,5 +1,5 @@
 // I feel like the entire thing is just one major fucking hack...
-
+var dump
 var usage_total = {
     "tx": 0,
     "rx": 0,
@@ -21,10 +21,9 @@ $(function() {
     get_currentspeed()
     setInterval(function() {
         get_currentspeed()
-    }, 10000);
+    }, 15000);
 
 });
-
 
 function make_total(d) {
     usage_total.rx += parseInt(d.rx, 10);
@@ -56,7 +55,7 @@ function find_last_30_days() {
         var day = new Date(year, month - 1, date - i);
         daylist.push(day.toLocaleDateString());
     }
-    return daylist;
+    return daylist.reverse();
 }
 
 function find_last_12_months() {
@@ -79,11 +78,11 @@ function find_last_12_months() {
 
 function find_last_24_hours() {
     var today = new Date();
-
     var current_hour = today.getHours();
     var hours = [],
         i;
     var hour = ["00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"];
+
     for (i = 0; i < 24; i++) {
         hours.push(hour[current_hour]);
         current_hour--;
@@ -96,6 +95,36 @@ function find_last_24_hours() {
 }
 
 function makeArray(ary) {
+    var d = {};
+    var data = [];
+    var dtx = [];
+    var drx = [];
+    var dt = [];
+
+
+    $.each(ary, function(i, a) {
+        //the xml is sorted in 0 based index where 0 is current day/month etc
+        if (i == a["@id"]) {
+            // all xml results are in kibi convert to gib
+            var rx = parseInt(a.rx, 10) / 1024 / 1024;
+            var tx = parseInt(a.tx, 10) / 1024 / 1024;
+            dtx.push(tx);
+            drx.push(rx);
+            dt.push((rx + tx));
+        }
+
+    });
+
+    d.dtx = dtx.reverse();
+    d.drx = drx.reverse();
+    d.dt = dt.reverse();
+
+    return d;
+
+}
+
+function makeArray3(ary) {
+    // months
     var d = {};
     var data = [];
     var dtx = [];
@@ -115,14 +144,65 @@ function makeArray(ary) {
 
     });
 
-    d.dtx = dtx;
-    d.drx = drx;
-    d.dt = dt;
+    // needs to add trash data to the missing months
+    if (ary.length < 11) {
+        for (ii = 0; ii < ary.length; ii++) {
+            dtx.push(0)
+            drx.push(0)
+            dt.push(0)
+        }
+    }
 
+    d.dtx = dtx.reverse();
+    d.drx = drx.reverse();
+    d.dt = dt.reverse();
     return d;
 
 }
 
+function makeArray2(ary) {
+    // Hours
+    var d = {};
+    var data = [];
+    var dtx = [];
+    var drx = [];
+    var dt = [];
+    var today = new Date();
+    var current_hour = today.getHours();
+
+
+
+    var today = new Date();
+    var current_hour = today.getHours();
+    $.each(ary, function(i, a) {
+        // id == hours minus minutes id = 1700 (or 16 depending on tick)
+        if (i == a["@id"]) {
+            // all xml results are in kibi convert to gib
+            var rx = parseInt(a.rx, 10) / 1024 / 1024;
+            var tx = parseInt(a.tx, 10) / 1024 / 1024;
+            dtx.push(tx);
+            drx.push(rx);
+            dt.push((rx + tx));
+        }
+
+    });
+    // poor mans sort....
+    var ddtx = dtx.slice(0, current_hour)
+    var ddrx = drx.slice(0, current_hour)
+    var ddt = dt.slice(0, current_hour)
+    var ddtx_leftover =  dtx.slice(current_hour, dtx.length)
+    var ddrx_leftover =  drx.slice(current_hour, drx.length)
+    var ddt_leftover = dt.slice(current_hour, dt.length)
+    var c_ddtx = ddtx_leftover.concat(ddtx)
+    var c_ddrx = ddrx_leftover.concat(ddrx)
+    var c_ddt = ddt_leftover.concat(ddt)
+
+    d.dtx = c_ddtx
+    d.drx = c_ddrx
+    d.dt = c_ddt
+    return d;
+
+}
 // Grabs current speed
 function get_currentspeed() {
     $.get(WEBDIR + 'vnstat/tr', function(data) {
@@ -141,6 +221,7 @@ function ajaxload() {
         url: WEBDIR + 'vnstat/dumpdb',
         async: false,
         success: function(data) {
+            dump = data
             var t = $('.content');
             var interf = data["vnstat"]["interface"];
                 // check if its a dict or list
@@ -151,7 +232,7 @@ function ajaxload() {
             var usage_all_interfaces;
             $.each(interf, function(ii, dd) {
                 var date = new Date();
-                    // Find current month
+                // Find current month
                 var current_month = (date.getMonth() + 1);
                 // find last month
                 var last_month_ = date.setMonth(date.getMonth() - 1);
@@ -201,47 +282,40 @@ function ajaxload() {
     var tr_total = $('<tr>').html('<td>Total</td><td>' + getReadableFileSizeString(usage_total.rx) + '</td><td>' + getReadableFileSizeString(usage_total.tx) + '</td><td>' + getReadableFileSizeString(usage_total.rx + usage_total.tx) + '</td>');
     $('#bw_table_body').append(tr_this_month, tr_last_month, tr_total);
 
-    loaddb();
+    if (dump) {
+        loaddb(dump);
+    }
+
 }
 
+function loaddb(data) {
+    var interf = data["vnstat"]["interface"];
+    if (typeof (data.vnstat["interface"].id) !== 'undefined') {
+        interf = [data["vnstat"]["interface"]];
+    }
 
-function loaddb() {
-    $.ajax({
-        url: WEBDIR + 'vnstat/dumpdb',
-        async: false,
-        success: function(data) {
-            var interf = data["vnstat"]["interface"];
-            if (typeof(data.vnstat["interface"].id) !== 'undefined') {
-                interf = [data["vnstat"]["interface"]];
-            }
+    $.each(interf, function (n, ainterf) {
+        var z = ainterf;
+        var interfaceid = z.id;
+        var created = z.created.date;
+        var date = moment(created.day + created.month + created.year, "DD.MM.YYYY").format('DD.MM.YYYY');
 
-            $.each(interf, function(n, ainterf) {
-                var z = ainterf;
-                var interfaceid = z.id;
-                var created = z.created.date;
-                var date = moment(created.day + created.month + created.year, "DD.MM.YYYY").format('DD.MM.YYYY');
+        var traffic = z.traffic;
+        var months = traffic.months.month;
+        var days = traffic.days.day;
+        var hour = traffic.hours.hour;
 
-                var traffic = z.traffic;
-                var months = traffic.months.month;
-                var days = traffic.days.day;
-                var hour = traffic.hours.hour;
+        var twelve = makeArray3(months);
+        var dday = makeArray(days);
+        var hour2 = makeArray2(hour);
 
-                var twelve = makeArray(months);
-                var dday = makeArray(days);
-                var hour2 = makeArray(hour);
+        makechart("month", interfaceid, twelve);
+        makechart("day", interfaceid, dday);
+        makechart("hour", interfaceid, hour2);
 
-                makechart("month", interfaceid, twelve);
-                makechart("day", interfaceid, dday);
-                makechart("hour", interfaceid, hour2);
-
-
-            });
-
-        },
-        complete: function() {
-            $('.spinner').hide();
-        }
     });
+
+    $('.spinner').hide();
 }
 
 function makechart(selector, interfaceid, d) {
@@ -275,7 +349,7 @@ function makechart(selector, interfaceid, d) {
                 pointHighlightFill: "#fff",
                 pointHighlightStroke: "rgba(220,220,220,1)",
                 // reverse the data so its the same way as a the chart
-                data: d.drx.reverse(),
+                data: d.drx,
                 title: "Download",
          },
             {
@@ -287,7 +361,7 @@ function makechart(selector, interfaceid, d) {
                 pointStrokeColor: "#fff",
                 pointHighlightFill: "#fff",
                 pointHighlightStroke: "rgba(151,187,205,1)",
-                data: d.dtx.reverse(),
+                data: d.dtx,
                 title: "Upload",
          },
             {
@@ -298,7 +372,7 @@ function makechart(selector, interfaceid, d) {
                 pointStrokeColor: "#fff",
                 pointHighlightFill: "#fff",
                 pointHighlightStroke: "rgba(151,187,205,1)",
-                data: d.dt.reverse(),
+                data: d.dt,
                 title: "Total",
          }
      ]
@@ -323,14 +397,4 @@ function makechart(selector, interfaceid, d) {
         annotateLabel: "<%=(v1 == '' ? '' : v1) + (v1!='' && v2 !='' ? ' -  ' : '')+(v2 == '' ? '' : v2)+(v1!='' || v2 !='' ? ': ' : ' ') + v3.toFixed(2)%>",
     };
     new Chart(ctx).Line(data, options);
-}
-
-function getReadableFileSizeString(fileSizeInBytes) {
-    var i = 0;
-    var byteUnits = [' KB', ' MB', ' GB', ' TB', ' PB'];
-    do {
-        fileSizeInBytes = fileSizeInBytes / 1024;
-        i++;
-    } while (fileSizeInBytes > 1024);
-    return fileSizeInBytes.toFixed(2) + byteUnits[i];
 }
