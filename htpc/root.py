@@ -106,3 +106,7 @@ class Root(object):
     def save_menu(self, menu_order=0):
         htpc.settings.set("menu_order", urllib.unquote(menu_order).decode('utf-8'))
         return "Menu order saved."
+
+    @cherrypy.expose()
+    def about(self):
+        return htpc.LOOKUP.get_template('about.html').render(scriptname='about')

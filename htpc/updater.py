@@ -41,6 +41,8 @@ class Updater(object):
         self.updateEngineName = 'Unknown'
         # Set update engine. Use git updater or update from source.
         self.updateEngine = self.getEngine()
+        htpc.BRANCH = self.updateEngine.current_branch_name()
+        htpc.UPDATERTYPE = self.updateEngineName
         # Check for updates automatically
         htpc.SCHED.add_job(self.update_needed, trigger=IntervalTrigger(hours=6))
 
@@ -57,7 +59,7 @@ class Updater(object):
             return GitUpdater()
         else:  # Otherwise update from Sourece
             self.logger.info('Using SourceUpdater engine')
-            self.updateEngineName = 'Source'
+            htpc.UPDATERTYPE = self.updateEngineName
             return SourceUpdater()
 
     def test_git(self):

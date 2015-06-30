@@ -74,9 +74,7 @@ Before you open a new issue make sure you:
 - Have restart HTPC Manager
 
 If you still have problems: INCLUDE THIS IN YOUR ISSUE
- - Branch
- - Commit hash
- - Your operating system and python version
+ - Screenshot of the about page
  - What did you do?
  - What happened?
  - What did you expect to happen?

@@ -244,6 +244,8 @@ def main():
         logger = logging.getLogger('root')
         logger.warning('Commandline parameter --debug has has been deprecated')
 
+    htpc.ARGS = sys.argv
+
     # Start the server
     from htpc.server import start
     start()
