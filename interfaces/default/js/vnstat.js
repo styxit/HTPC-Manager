@@ -26,22 +26,26 @@ $(function() {
 });
 
 function make_total(d) {
-    usage_total.rx += parseInt(d.rx, 10);
-    usage_total.tx += parseInt(d.tx, 10);
-    usage_total.total += parseInt(d.rx + d.tx, 10);
+    // convert kib to bytes
+    usage_total.rx += (parseInt(d.rx, 10) * 1024);
+    usage_total.tx += (parseInt(d.tx, 10) * 1024);
+    usage_total.total += (parseInt(d.rx + d.tx, 10) * 1024);
 
 }
 
 function make_last_month(d) {
-    usage_last_month.rx += parseInt(d.rx, 10);
-    usage_last_month.tx += parseInt(d.tx, 10);
-    usage_last_month.total += parseInt(d.tx + d.rx, 10);
+    // convert kib to bytes
+    usage_last_month.rx += (parseInt(d.rx, 10) * 1024);
+    usage_last_month.tx += (parseInt(d.tx, 10) * 1024);
+    usage_last_month.total += (parseInt(d.tx + d.rx, 10) * 1024);
+
 }
 
 function make_current_month(d) {
-    usage_current_month.rx += parseInt(d.rx, 10);
-    usage_current_month.tx += parseInt(d.tx, 10);
-    usage_current_month.total += parseInt(d.tx + d.rx, 10);
+    // convert kib to bytes
+    usage_current_month.rx += (parseInt(d.rx, 10) * 1024);
+    usage_current_month.tx += (parseInt(d.tx, 10) * 1024);
+    usage_current_month.total += (parseInt(d.tx + d.rx, 10) * 1024);
 
 }
 
@@ -65,7 +69,7 @@ function find_last_12_months() {
     var months = [],
         i;
     var month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    for (i = 0; i < 12; i++) {
+    for (var i = 0; i < 12; i++) {
         months.push(month[aMonth]);
         aMonth--;
         if (aMonth < 0) {
@@ -83,7 +87,7 @@ function find_last_24_hours() {
         i;
     var hour = ["00:00", "01:00", "02:00", "03:00", "04:00", "05:00", "06:00", "07:00", "08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00", "21:00", "22:00", "23:00"];
 
-    for (i = 0; i < 24; i++) {
+    for (var i = 0; i < 24; i++) {
         hours.push(hour[current_hour]);
         current_hour--;
         if (current_hour < 0) {
@@ -145,8 +149,8 @@ function makeArray3(ary) {
     });
 
     // needs to add trash data to the missing months
-    if (ary.length < 11) {
-        for (ii = 0; ii < ary.length; ii++) {
+    if (ary.length < 12) {
+        for (t = 0; t < (12 - ary.length); t++) {
             dtx.push(0)
             drx.push(0)
             dt.push(0)
@@ -156,6 +160,7 @@ function makeArray3(ary) {
     d.dtx = dtx.reverse();
     d.drx = drx.reverse();
     d.dt = dt.reverse();
+
     return d;
 
 }
@@ -244,6 +249,7 @@ function ajaxload() {
                 }
 
                 make_total(dd.traffic.total);
+                // each interfaces months
                 $.each(shitty_months, function(iii, ddd) {
                     if (ddd.date.month == current_month) {
                         make_current_month(ddd);
