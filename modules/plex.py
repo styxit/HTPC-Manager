@@ -8,9 +8,11 @@ import socket
 import struct
 from json import loads
 from urllib2 import Request, urlopen
+import urllib
 from htpc.helpers import get_image, striphttp, joinArgs
 import logging
 import urllib
+import urlparse
 import base64
 import platform
 from cherrypy.lib.auth2 import require
@@ -157,6 +159,7 @@ class Plex(object):
                                         genre.append(attrib['tag'])
 
                                 jmovie['genre'] = [genre]
+                                jmovie['type'] = movie['_elementType']
 
                                 movies.append(jmovie)
 
@@ -206,6 +209,8 @@ class Plex(object):
                                 if 'addedAt'in episode:
                                     jepisode['addedAt'] = episode['addedAt']
 
+                                jepisode['type'] = episode['_elementType']
+
                                 episodes.append(jepisode)
                             except Exception as e:
                                 self.logger.debug("Failed looping ep %s %s" % (episode, e))
@@ -234,6 +239,7 @@ class Plex(object):
 
                             jalbum['title'] = album['title']
                             jalbum['id'] = album['ratingKey']
+                            jalbum['type'] = album['_elementType']
 
                             if 'thumb'in album:
                                 jalbum['thumbnail'] = album['thumb']
@@ -279,10 +285,10 @@ class Plex(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def GetMovies(self, start=0, end=0, hidewatched=0):
+    def GetMovies(self, start=0, end=0, hidewatched=0, f=''):
         ''' Get a list movies '''
         self.logger.debug('Fetching Movies')
-
+        #self.logger.debug("dickz %r" % f)
         try:
             plex_host = htpc.settings.get('plex_host', 'localhost')
             plex_port = htpc.settings.get('plex_port', '32400')
@@ -297,11 +303,14 @@ class Plex(object):
             else:
                 hidewatched = 'all'
 
+            f = self._filter(f)
+            self.logger.debug('_filter response was %s' % f)
+
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())['_children']:
                 if self.check_ignore(section['title']):
                     if section['type'] == 'movie':
                         if section['agent'] != 'com.plexapp.agents.none' or not plex_hide_homemovies:
-                            for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], hidewatched), headers=self.getHeaders())).read())['_children']:
+                            for movie in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], f), headers=self.getHeaders())).read())['_children']:
                                 if movie['title'] not in dupe_check:
                                     dupe_check.append(movie['title'])
 
@@ -309,6 +318,7 @@ class Plex(object):
                                     genre = []
                                     jmovie['playcount'] = 0
                                     jmovie['id'] = int(movie['ratingKey'])
+                                    jmovie['dumpz'] = movie
 
                                     # To fix sorting we add that to title to title sort
                                     if 'titleSort' not in movie:
@@ -348,7 +358,9 @@ class Plex(object):
                                         if attrib['_elementType'] == 'Genre':
                                             genre.append(attrib['tag'])
 
-                                    if len(genre) != 0:
+                                    jmovie['type'] = movie['_elementType']
+
+                                    if len(genre):
                                         jmovie['genre'] = genre
 
                                     movies.append(jmovie)
@@ -372,13 +384,13 @@ class Plex(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def GetShows(self, start=0, end=0, hidewatched=0):
+    def GetShows(self, start=0, end=0, hidewatched=0, f=''):
         ''' Get a list of shows '''
         try:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
-            tvShows = []
             limits = {}
+            tvShows = []
             dupe_check = []
             sortedshows = []
 
@@ -387,15 +399,19 @@ class Plex(object):
             else:
                 hidewatched = 'all'
 
+            f = self._filter(f)
+            self.logger.debug('_filter response was %s' % f)
+
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())['_children']:
                 if self.check_ignore(section['title']):
                     if section['type'] == 'show':
                         try:
-                            for tvShow in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], hidewatched), headers=self.getHeaders())).read())['_children']:
+                            for tvShow in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], f), headers=self.getHeaders())).read())['_children']:
                             # Only allow unique showname in dupecheck
                                 if tvShow['title'] not in dupe_check:
                                     dupe_check.append(tvShow['title'])
                                     jshow = {}
+                                    jshow['type'] = tvShow['_elementType']
                                     jshow['itemcount'] = 0
                                     jshow['playcount'] = 0
 
@@ -450,7 +466,7 @@ class Plex(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def GetArtists(self, start=0, end=0):
+    def GetArtists(self, start=0, end=0, f=''):
         ''' Get a list of recently added artists '''
         try:
             plex_host = htpc.settings.get('plex_host', '')
@@ -460,12 +476,16 @@ class Plex(object):
             dupe_check = []
             sortedartist = []
 
+            f = self._filter(f)
+            self.logger.debug('_filter response was %s' % f)
+
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())['_children']:
                 if self.check_ignore(section['title']):
                     if section['type'] == 'artist':
-                        for artist in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all' % (plex_host, plex_port, section['key']), headers=self.getHeaders())).read())['_children']:
+                        for artist in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], f), headers=self.getHeaders())).read())['_children']:
                             if artist['title'] not in dupe_check:
                                 jartist = {}
+                                jartist['type'] = artist['_elementType']
                                 dupe_check.append(artist['title'])
                                 # Since titleSort only exist in titles like the xx etc
                                 # Set title as titlesort
@@ -474,7 +494,7 @@ class Plex(object):
 
                                 if 'titleSort' in artist:
                                     jartist['titlesort'] = artist['titleSort']
-                                
+
                                 jartist['title'] = artist['title']
                                 jartist['id'] = artist['ratingKey']
 
@@ -492,13 +512,13 @@ class Plex(object):
 
             return {'limits': limits, 'artists': sortedartist[int(start):int(end)]}
         except Exception as e:
-            self.logger.error('Unable to fetch all artists! %s Exception: %s' % (section, e))
+            self.logger.error('Unable to fetch all artists! Exception: %s' % e)
             return
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def GetAlbums(self, start=0, end=0, artistid=''):
+    def GetAlbums(self, start=0, end=0, artistid='', f=''):
         ''' Get a list of Albums '''
         try:
             plex_host = htpc.settings.get('plex_host', '')
@@ -506,10 +526,19 @@ class Plex(object):
             albums = []
             limits = {}
 
+            if f == '':
+                f = 'albums'
+            else:
+                f = self._filter(f)
+
+            if 'type=9' not in f and f != 'albums':
+                f += '&type=9'
+            self.logger.debug('_filter response was %s' % f)
+
             for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=self.getHeaders())).read())['_children']:
                 if self.check_ignore(section['title']):
                     if section['type'] == 'artist':
-                        for album in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/albums' % (plex_host, plex_port, section['key']), headers=self.getHeaders())).read())['_children']:
+                        for album in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], f), headers=self.getHeaders())).read())['_children']:
                             if (str(album['parentRatingKey']) == artistid) or (artistid == ''):
                                 jalbum = {}
 
@@ -550,7 +579,7 @@ class Plex(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def GetSongs(self, start=0, end=0, albumid=''):
+    def GetSongs(self, start=0, end=0, albumid='', f=''):
         ''' Get a list of songs '''
         try:
             plex_host = htpc.settings.get('plex_host', '')
@@ -558,6 +587,14 @@ class Plex(object):
             songs = []
             limits = {}
             checked_path = []
+
+            if f == '':
+                f = 'all?type=10'
+            else:
+                f = self._filter(f)
+
+            if 'type=10' not in f:
+                f += '&type=10'
 
             if albumid != '':
                 request = self.JsonLoader(urlopen(Request('http://%s:%s/library/metadata/%s/children' % (plex_host, plex_port, albumid), headers=self.getHeaders())).read())
@@ -586,11 +623,13 @@ class Plex(object):
                     # Only check file paths once!
                     if section['title'] not in htpc.settings.get('plex_ignore_sections', '').split():
                         if section['type'] == 'artist':
-
-                            for song in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/search?type=10' % (plex_host, plex_port, section['key']), headers=self.getHeaders())).read())['_children']:
+                            self.logger.debug('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], f))
+                            for song in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], f), headers=self.getHeaders())).read())['_children']:
                                 jsong = {}
-
-                                jsong['artist'] = song['grandparentTitle']
+                                jsong['dumpz'] = song
+                                if 'grandparentTitle' or 'title' in song:
+                                    jsong['artist'] = song['title']
+                                #jsong['artist'] = song['grandparentTitle'] or song['title']
                                 jsong['label'] = song['title']
 
                                 jsong['album'] = song['parentTitle']
@@ -1025,6 +1064,7 @@ class Plex(object):
         self.logger.debug('Playing %s on %s type %s offset %s' % (item, playerip, type, offset))
         # Ripped a lot for plexapi so all credits goes there, the parameters are very picky...
         # The maybe swich to the api?
+        # add type later
         try:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
@@ -1063,3 +1103,68 @@ class Plex(object):
             self.logger.debug('Exception: %s' % e)
             self.logger.error('Unable to play %s on player %s type %s offset %s' % (item, playerip, type, offset))
             return 'error'
+
+    def _filter(self, s):
+        self.logger.debug('called _filter %s' % s)
+        if s == '':
+            return 'all'
+        # allow foreign
+        s = s.encode(encoding="UTF-8", errors='replace').strip()
+        if len(s):
+            # Check for control chars and default to title
+            if not '=' in s and not '<' in s and not '>' in s and not '!' in s:
+                return 'all?title=%s' % urllib.quote_plus(s)
+            else:
+                s = urlparse.parse_qsl(s)
+                d = dict(s)
+                for k, v in d.items():
+                    if k == 'genre':
+                        gen = {
+                                'action': 235,
+                                'action film': 776,
+                                'adventure': 78,
+                                'animation': 263,
+                                'comedy': 391,
+                                'comedy music': 7558,
+                                'crime': 348,
+                                'documentary': 2905,
+                                'drama': 169,
+                                'family': 264,
+                                'fantacy': 79,
+                                'forein': 3312,
+                                'history': 170,
+                                'horror': 303,
+                                'music': 2361,
+                                'musical': 7556,
+                                'musical drama': 7557,
+                                'mystery': 195,
+                                'romance': 519,
+                                'romance film': 7555,
+                                'science fiction': 80,
+                                'slapstick': 777,
+                                'thriller': 196,
+                                'war': 659,
+                                'western': 1705,
+
+
+                        }
+                        d[k] = gen[v]
+                    if k == 'type':
+                        # doesnt really do anything. you dont get appropriate response unless you
+                        # are on the correct tab, would work on a general tab
+                        gen = {
+                                'artist': 8,
+                                'artists': 8,
+                                'tvshows': 2,
+                                'tvshow': 2,
+                                'movies': 1,
+                                'movie': 1,
+                                'album': 9,
+                                'albums': 9,
+                                'track': 10,
+                                'tracks': 10
+                        }
+                        d[k] = gen[v]
+
+
+                return 'all?%s' % urllib.urlencode(d)

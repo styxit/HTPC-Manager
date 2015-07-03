@@ -26,6 +26,11 @@ $(document).ready(function() {
         }
     });
 
+    $(".search").on('input', function (e) {
+        searchString = $(this).val();
+        reloadTab()
+    });
+
     // Toggle whether to show already seen episodes
     $('#hidewatched').click(function(e) {
         e.preventDefault();
@@ -522,6 +527,8 @@ function loadSongs(options) {
     }
     $.extend(sendData, songsLoad.options)
 
+    console.log('sendData loadSongs', sendData)
+
     $('.spinner').show();
     songsLoad.request = $.ajax({
         url: WEBDIR + 'plex/GetSongs',
@@ -662,7 +669,7 @@ function loadNowPlaying() {
 
 
 function reloadTab() {
-    var options = {};
+    var options = {'f': searchString};
 
     if ($('#movies').is(':visible')) {
         loadMovies(options);
@@ -676,7 +683,7 @@ function reloadTab() {
     } else if ($('#albums').is(':visible')) {
         loadAlbums(options);
     } else if ($('#songs').is(':visible')) {
-        loadSongs();
+        loadSongs(options);
 }
 }
 
