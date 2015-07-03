@@ -118,6 +118,15 @@ function makeArray(ary) {
         }
 
     });
+    
+    // Trafficless days doesnt seems to work in .conf
+    if (ary.length < 30) {
+        for (t = 0; t < (30 - ary.length); t++) {
+            dtx.push(0)
+            drx.push(0)
+            dt.push(0)
+        }
+    }
 
     d.dtx = dtx.reverse();
     d.drx = drx.reverse();
