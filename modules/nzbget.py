@@ -157,6 +157,17 @@ class NZBGet(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
+    def ForceScan(self):
+        self.logger.debug('Scan incoming directory')
+        try:
+            nzbget = jsonrpc.ServerProxy('%s' % self.nzbget_url())
+            return nzbget.scan()
+        except Exception as e:
+            self.logger.error('Failed while scanning incoming directory %s' % e)
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
     def GetCategorys(self):
         self.logger.debug('Fetching categories')
         categorys = []

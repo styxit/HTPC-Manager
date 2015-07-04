@@ -88,7 +88,15 @@ $(document).ready(function () {
 
     });
 
-
+    $('#nzb_force_scan').click(function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: WEBDIR + 'nzbget/ForceScan',
+            type: 'post',
+            dataType: 'json'
+        });
+    });
+	
     $('#nzb_set_speed').click(function(e) {
         e.preventDefault();
         var speed = ($('#nzb_get_speed').val());
