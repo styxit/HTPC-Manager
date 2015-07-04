@@ -41,6 +41,7 @@ class Updater(object):
         self.updateEngineName = 'Unknown'
         # Set update engine. Use git updater or update from source.
         self.updateEngine = self.getEngine()
+        htpc.CURRENT_HASH = self.updateEngine.current()
         htpc.BRANCH = self.updateEngine.current_branch_name()
         htpc.UPDATERTYPE = self.updateEngineName
         # Check for updates automatically
