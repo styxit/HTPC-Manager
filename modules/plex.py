@@ -11,14 +11,11 @@ from urllib2 import Request, urlopen
 import urllib
 from htpc.helpers import get_image, striphttp, joinArgs
 import logging
-import urllib
 import urlparse
 import base64
 import platform
 from cherrypy.lib.auth2 import require
 import requests
-import platform
-import socket
 from uuid import getnode
 
 # Only imported to check if pil is installed
@@ -288,7 +285,6 @@ class Plex(object):
     def GetMovies(self, start=0, end=0, hidewatched=0, f=''):
         ''' Get a list movies '''
         self.logger.debug('Fetching Movies')
-        #self.logger.debug("dickz %r" % f)
         try:
             plex_host = htpc.settings.get('plex_host', 'localhost')
             plex_port = htpc.settings.get('plex_port', '32400')
@@ -1106,65 +1102,82 @@ class Plex(object):
 
     def _filter(self, s):
         self.logger.debug('called _filter %s' % s)
+        default = 'all'
         if s == '':
-            return 'all'
+            return default
         # allow foreign
         s = s.encode(encoding="UTF-8", errors='replace').strip()
         if len(s):
             # Check for control chars and default to title
-            if not '=' in s and not '<' in s and not '>' in s and not '!' in s:
+            if '=' not in s and '<' not in s and '>' not in s and '!' not in s:
                 return 'all?title=%s' % urllib.quote_plus(s)
             else:
                 s = urlparse.parse_qsl(s)
-                d = dict(s)
-                for k, v in d.items():
-                    if k == 'genre':
-                        gen = {
-                                'action': 235,
-                                'action film': 776,
-                                'adventure': 78,
-                                'animation': 263,
-                                'comedy': 391,
-                                'comedy music': 7558,
-                                'crime': 348,
-                                'documentary': 2905,
-                                'drama': 169,
-                                'family': 264,
-                                'fantacy': 79,
-                                'forein': 3312,
-                                'history': 170,
-                                'horror': 303,
-                                'music': 2361,
-                                'musical': 7556,
-                                'musical drama': 7557,
-                                'mystery': 195,
-                                'romance': 519,
-                                'romance film': 7555,
-                                'science fiction': 80,
-                                'slapstick': 777,
-                                'thriller': 196,
-                                'war': 659,
-                                'western': 1705,
+                # returns empty list if it fails
+                if not len(s):
+                    return default
+                else:
+                    d = dict(s)
+                    for k, v in d.items():
+                        if v == '':
+                            return default
+
+                        if k == 'genre':
+                            gen = {
+                                    'action': 235,
+                                    'action film': 776,
+                                    'adventure': 78,
+                                    'animation': 263,
+                                    'comedy': 391,
+                                    'comedy music': 7558,
+                                    'crime': 348,
+                                    'documentary': 2905,
+                                    'drama': 169,
+                                    'family': 264,
+                                    'fantacy': 79,
+                                    'forein': 3312,
+                                    'history': 170,
+                                    'horror': 303,
+                                    'music': 2361,
+                                    'musical': 7556,
+                                    'musical drama': 7557,
+                                    'mystery': 195,
+                                    'romance': 519,
+                                    'romance film': 7555,
+                                    'science fiction': 80,
+                                    'slapstick': 777,
+                                    'thriller': 196,
+                                    'war': 659,
+                                    'western': 1705,
 
 
-                        }
-                        d[k] = gen[v]
-                    if k == 'type':
-                        # doesnt really do anything. you dont get appropriate response unless you
-                        # are on the correct tab, would work on a general tab
-                        gen = {
-                                'artist': 8,
-                                'artists': 8,
-                                'tvshows': 2,
-                                'tvshow': 2,
-                                'movies': 1,
-                                'movie': 1,
-                                'album': 9,
-                                'albums': 9,
-                                'track': 10,
-                                'tracks': 10
-                        }
-                        d[k] = gen[v]
+                            }
+                            t = gen.get(v, None)
+                            if t is not None:
+                                d[k] = gen[v]
+                            else:
+                                return default
+
+                        if k == 'type':
+                            # doesnt really do anything. you dont get appropriate response unless you
+                            # are on the correct tab, would work on a general tab
+                            gen = {
+                                    'artist': 8,
+                                    'artists': 8,
+                                    'tvshows': 2,
+                                    'tvshow': 2,
+                                    'movies': 1,
+                                    'movie': 1,
+                                    'album': 9,
+                                    'albums': 9,
+                                    'track': 10,
+                                    'tracks': 10
+                            }
+                            t = gen.get(v, None)
+                            if t is not None:
+                                d[k] = gen[v]
+                            else:
+                                return default
 
 
-                return 'all?%s' % urllib.urlencode(d)
+                    return 'all?%s' % urllib.urlencode(d)
