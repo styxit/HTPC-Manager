@@ -1107,7 +1107,14 @@ class Plex(object):
             return default
         # allow foreign
         s = s.encode(encoding="UTF-8", errors='replace').strip()
-        if len(s):
+
+        try:
+            ok = len(s)
+        except TypeError as e:
+            self.logger.debug('converted %s to string %s' % (s, e))
+            ok = len(str(s))
+
+        if ok:
             # Check for control chars and default to title
             if '=' not in s and '<' not in s and '>' not in s and '!' not in s:
                 return 'all?title=%s' % urllib.quote_plus(s)

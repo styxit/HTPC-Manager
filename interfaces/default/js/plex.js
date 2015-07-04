@@ -14,7 +14,7 @@ $(document).ready(function() {
 
     // Load data on tab display
     $('a[data-toggle=\'tab\']').click(function(e) {
-        $('#search').val('');
+        $('.search').val('');
         searchString = '';
     }).on('shown', reloadTab);
     $(window).trigger('hashchange')
