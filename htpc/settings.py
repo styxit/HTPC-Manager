@@ -133,7 +133,8 @@ class Settings(object):
             return {'failed': e}
 
     @cherrypy.expose()
+    #@cherrypy.tools.json_out()
     @require(member_of("admin"))
-    def test(self):
+    def test(self, *args, **kw):
         """ Used for testing stuff """
-        return "testing rollback"
+        return 'test'

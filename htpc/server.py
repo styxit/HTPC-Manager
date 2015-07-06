@@ -141,13 +141,14 @@ def start():
             'tools.gzip.on': True,
             'tools.gzip.mime_types': ['text/html', 'text/plain', 'text/css', 'text/javascript', 'application/json', 'application/javascript'],
             'tools.secureheaders.on': True
+
         },
         '/js': {
             'tools.caching.on': True,
             'tools.caching.force': True,
-            'tools.caching.delay': 0,
+            'tools.caching.delay': 60 * 60 * 24 * 30,
             'tools.expires.on': True,
-            'tools.expires.secs': 60 * 60 * 24 * 7,
+            'tools.expires.secs': 60 * 60 * 24 * 30,
             'tools.staticdir.on': True,
             'tools.auth.on': False,
             'tools.sessions.on': False,
@@ -156,9 +157,9 @@ def start():
         '/css': {
             'tools.caching.on': True,
             'tools.caching.force': True,
-            'tools.caching.delay': 0,
+            'tools.caching.delay': 60 * 60 * 24 * 30,
             'tools.expires.on': True,
-            'tools.expires.secs': 60 * 60 * 24 * 7,
+            'tools.expires.secs': 60 * 60 * 24 * 30,
             'tools.staticdir.on': True,
             'tools.auth.on': False,
             'tools.sessions.on': False,
@@ -167,9 +168,9 @@ def start():
         '/img': {
             'tools.caching.on': True,
             'tools.caching.force': True,
-            'tools.caching.delay': 0,
+            'tools.caching.delay': 60 * 60 * 24 * 30,
             'tools.expires.on': True,
-            'tools.expires.secs': 60 * 60 * 24 * 7,
+            'tools.expires.secs': 60 * 60 * 24 * 30,
             'tools.staticdir.on': True,
             'tools.auth.on': False,
             'tools.sessions.on': False,
@@ -178,14 +179,13 @@ def start():
         '/favicon.ico': {
             'tools.caching.on': True,
             'tools.caching.force': True,
-            'tools.caching.delay': 0,
             'tools.expires.on': True,
-            'tools.expires.secs': 60 * 60 * 24 * 7,
+            'tools.expires.secs': 60 * 60 * 24 * 30,
             'tools.staticfile.on': True,
             'tools.auth.on': False,
             'tools.sessions.on': False,
             'tools.staticfile.filename': favicon
-        },
+        }
     }
 
     # Start the CherryPy server

@@ -15,6 +15,7 @@ Used as reference:
 - https://github.com/midgetspy/Sick-Beard/
 """
 import os
+import time
 from threading import Thread
 import urllib2
 import subprocess
@@ -304,6 +305,7 @@ class GitUpdater():
                 # except from the content of htpc.DATADIR and VERSION.txt
                 self.git_exec(self.git, 'clean -d -fx -e %s -e VERSION.txt -e userdata/' % htpc.DATADIR)
             self.logger.warning('Restarting HTPC Manager after update.')
+            htpc.settings.set('app_updated_at', time.time())
             # Restart HTPC Manager to make sure all new code is loaded
             do_restart()
 
@@ -466,6 +468,7 @@ class SourceUpdater():
 
         # Restart HTPC Manager to make sure all new code is loaded
         self.logger.warning('Restarting HTPC Manager after update.')
+        htpc.settings.set('app_updated_at', time.time())
         do_restart()
 
     def __downloadTar(self, url, destination):

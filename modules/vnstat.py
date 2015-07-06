@@ -11,6 +11,7 @@ import subprocess
 import re
 import json
 from itertools import chain
+from htpc.helpers import serve_template
 
 try:
     import paramiko
@@ -23,20 +24,20 @@ except ImportError:
 class Vnstat(object):
     def __init__(self):
         self.version_ = None
-        self.logger = logging.getLogger("modules.vnstat")
+        self.logger = logging.getLogger('modules.vnstat')
         htpc.MODULES.append({
-            "name": "vnStat",
-            "id": "vnstat",
-            "fields": [
-                {"type": "bool", "label": "Enable", "name": "vnstat_enable"},
-                {"type": "text", "label": "Menu name", "name": "vnstat_name"},
-                {"type": "bool", "label": "Use SSH?", 'desc': 'Check this if vnStat is running on a different computer', "name": "vnstat_use_ssh"},
-                {"type": "text", "label": "vnStat DB location", "placeholder": "", "name": "vnstat_db", 'desc': 'Only set this if you have changed the default db location'},
-                {"type": "text", "label": "Interface", "placeholder": "eth0", "desc": "Only grab data from this interface, if omitted it will return all interfaces except from speed witch uses default tr interface", "name": "vnstat_interface"},
-                {"type": "text", "label": "IP / Host", "placeholder": "localhost", "name": "vnstat_host"},
-                {"type": "text", "label": "Port", "name": "vnstat_port", "desc": "Default ssh port is 22"},
-                {"type": "text", "label": "Username", "name": "vnstat_username"},
-                {"type": "password", "label": "Password", "name": "vnstat_password"},
+            'name': 'vnStat',
+            'id': 'vnstat',
+            'fields': [
+                {'type': 'bool', 'label': 'Enable', 'name': 'vnstat_enable'},
+                {'type': 'text', 'label': 'Menu name', 'name': 'vnstat_name'},
+                {'type': 'bool', 'label': 'Use SSH?', 'desc': 'Check this if vnStat is running on a different computer', 'name': 'vnstat_use_ssh'},
+                {'type': 'text', 'label': 'vnStat DB location', 'placeholder': '', 'name': 'vnstat_db', 'desc': 'Only set this if you have changed the default db location'},
+                {'type': 'text', 'label': 'Interface', 'placeholder': 'eth0', 'desc': 'Only grab data from this interface, if omitted it will return all interfaces except from speed witch uses default tr interface', 'name': 'vnstat_interface'},
+                {'type': 'text', 'label': 'IP / Host', 'placeholder': 'localhost', 'name': 'vnstat_host'},
+                {'type': 'text', 'label': 'Port', 'name': 'vnstat_port', 'desc': 'Default ssh port is 22'},
+                {'type': 'text', 'label': 'Username', 'name': 'vnstat_username'},
+                {'type': 'password', 'label': 'Password', 'name': 'vnstat_password'},
 
             ]
         })
@@ -44,7 +45,7 @@ class Vnstat(object):
     @cherrypy.expose()
     @require()
     def index(self):
-        return htpc.LOOKUP.get_template('vnstat.html').render(scriptname='vnstat', importParamiko=importParamiko)
+        return serve_template('vnstat.html', scriptname='vnstat', importParamiko=importParamiko)
 
     @cherrypy.expose()
     @require()
@@ -63,9 +64,9 @@ class Vnstat(object):
                 return
 
             if htpc.settings.get('vnstat_db', ''):
-                cmd = "vnstat --dbdir %s %s" % (htpc.settings.get('vnstat_db', ''), parameters)
+                cmd = 'vnstat --dbdir %s %s' % (htpc.settings.get('vnstat_db', ''), parameters)
             else:
-                cmd = "vnstat %s" % parameters
+                cmd = 'vnstat %s' % parameters
 
             # Force windows users to use paramiko as here isnt any native ssh.
             if htpc.settings.get('vnstat_use_ssh') or platform.system() == 'win32':
@@ -99,7 +100,7 @@ class Vnstat(object):
                     else:
                         return output.strip()
                 else:
-                    self.logger.error("Failed to run %s from shell output %s returncode %s" % (cmd, output, returncode))
+                    self.logger.error('Failed to run %s from shell output %s returncode %s' % (cmd, output, returncode))
 
     @cherrypy.expose()
     @require()
@@ -128,20 +129,20 @@ class Vnstat(object):
             # with --xml is returns shit
             vnstat = self.run('--oneline')
             l = vnstat.replace('\n', '').split(';')
-            d = {"rxtoday": l[3],
-                 "txtoday": l[4],
-                 "totaltoday": l[5],
-                 "average_download_today": l[6],
-                 "timestamp_current_month": l[7],
-                 "rx_current_month": l[8],
-                 "tx_current_month": l[9],
-                 "total_current_month": l[10],
-                 "average_upload_today": l[11],
-                 "alltime_total_rx": l[12],
-                 "alltime_total_tx": l[13],
-                 "alltime_total_traffic": l[14]
+            d = {'rxtoday': l[3],
+                 'txtoday': l[4],
+                 'totaltoday': l[5],
+                 'average_download_today': l[6],
+                 'timestamp_current_month': l[7],
+                 'rx_current_month': l[8],
+                 'tx_current_month': l[9],
+                 'total_current_month': l[10],
+                 'average_upload_today': l[11],
+                 'alltime_total_rx': l[12],
+                 'alltime_total_tx': l[13],
+                 'alltime_total_traffic': l[14]
 
-            }
+                 }
             # combine dicts
             info = dict(chain(d.items(), speed.items()))
             return info
@@ -182,7 +183,7 @@ class Vnstat(object):
         if dash:
             return {'download_speed': rx, 'upload_speed': tx}
         else:
-            cherrypy.response.headers['Content-Type'] = "application/json"
+            cherrypy.response.headers['Content-Type'] = 'application/json'
             return json.dumps({'rx': rx, 'tx': tx})
 
     @cherrypy.expose()

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import time
 
 """ Initiate global variables """
 RUNDIR = None
@@ -33,3 +34,4 @@ SYS_ENCODING = None
 DEV = None
 BRANCH = None
 UPDATERTYPE = None
+UPDATED_AT = 0

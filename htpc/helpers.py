@@ -13,6 +13,8 @@ import time
 from functools import wraps
 from operator import itemgetter
 import itertools
+from mako import exceptions
+from mako.lookup import TemplateLookup
 
 try:
     import Image
@@ -24,7 +26,7 @@ except ImportError:
     except ImportError:
         PIL = False
 
-logger = logging.getLogger('helpers')
+logger = logging.getLogger('htpc.helpers')
 
 
 def get_image(url, height=None, width=None, opacity=100, auth=None, headers=None):
@@ -218,3 +220,18 @@ def sizeof(num):
                 return '%3.2f %s' % (num, x)
             num /= 1024.0
         return '%3.2f %s' % (num, 'TB')
+
+
+def serve_template(name, **kwargs):
+    try:
+        loc = os.path.join(htpc.RUNDIR, 'interfaces/',
+                           htpc.settings.get('app_template', 'default'))
+
+        template = TemplateLookup(directories=[os.path.join(loc, 'html/')])
+
+        return template.get_template(name).render(**kwargs)
+
+    except Exception as e:
+        logger.error('%s' % exceptions.text_error_template())
+        if htpc.DEV or htpc.LOGLEVEL == 'debug':
+            return exceptions.html_error_template().render()

@@ -1,8 +1,18 @@
 <%!
-import htpc
+import htpc, time, cherrypy
 settings = htpc.settings
 webdir = htpc.WEBDIR
-%><% s = self.attr.settings %><!DOCTYPE html>
+
+%>
+<% s = self.attr.settings %>
+<%
+   ## used to override cache for 24 hours after a update
+   if float(htpc.settings.get('app_updated_at', 1.0)) <= (time.time() + 129600) and settings.get('app_disable_cache_on_update', True) is True:
+        nocache = '?t=' + str(time.time())
+   else:
+        nocache = ''
+%>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -23,11 +33,11 @@ webdir = htpc.WEBDIR
 	    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
 	    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
     % endif
-    <link href="${htpc.WEBDIR}css/rg-icons.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/rg-icons.min.css${nocache}" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/base.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css" rel="stylesheet">
-    <link href="${self.attr.webdir}css/${scriptname}.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/base.css${nocache}" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css${nocache}" rel="stylesheet">
+    <link href="${self.attr.webdir}css/${scriptname}.css${nocache}" rel="stylesheet">
     <script type="text/javascript">var WEBDIR="${htpc.WEBDIR}";</script>
 </head>
 
@@ -215,7 +225,7 @@ ${self.body()}
 <script src="${htpc.WEBDIR}js/libs/download.js"></script>
 <script src="${htpc.WEBDIR}js/libs/jquery.treegrid.min.js"></script>
 <script src="${htpc.WEBDIR}js/libs/jquery.treegrid.bootstrap2.js"></script>
-<script src="${htpc.WEBDIR}js/default.js"></script>
-<script src="${htpc.WEBDIR}js/${scriptname}.js"></script>
+<script src="${htpc.WEBDIR}js/default.js${nocache}"></script>
+<script src="${htpc.WEBDIR}js/${scriptname}.js${nocache}"></script>
 </body>
 </html>
