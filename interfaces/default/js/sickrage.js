@@ -10,7 +10,6 @@ $(document).ready(function() {
     loadShows();
     showstats();
 
-
     $('#add_show_button').click(function() {
         $(this).attr('disabled', true);
         searchTvDb($('#add_show_name').val());
@@ -56,17 +55,16 @@ function loadShows() {
                     $('<td>').html(sickrageStatusLabel(tvshow.quality)));
                 $('#tvshows_table_body').append(row);
             });
-            $('#tvshows_table_body').parent().trigger('update');
-            $('#tvshows_table_body').parent().trigger("sorton", [
-                [
-                    [0, 1]
-                ]
-            ]);
+
+            //$('#tsickrage').trigger('update')
+
         },
         complete: function() {
             $('.spinner').hide();
+            $('#tsickrage').trigger('update')
         }
     });
+
 }
 
 //modal

@@ -32,22 +32,22 @@
 			<br>
 			<i>Both magnet URLs and (server located) .torrent files are accepted.</i>
 	  </div>
-
-      <table class="table table-striped table-hover">
-        <thead>
-          <tr>
-            <th>File</th>
-            <th class="span1">Ratio</th>
-            <th class="span1">ETA</th>
-            <th class="span2">Status</th>
-            <th class="span3">Progress</th>
-            <th class="span1"></th>
-          </tr>
-        </thead>
-        <tbody id="torrent-queue">
-        </tbody>
-      </table>
-
-      <i class="fa fa-spinner fa-pulse"></i>
+      <div class="ofa">
+        <table class="table table-striped table-hover table-sortable" data-sortlist="[[1,0]]">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th class="span1">Ratio</th>
+              <th class="span1">ETA</th>
+              <th class="span2">Status</th>
+              <th class="span3">Progress</th>
+              <th class="span1"></th>
+            </tr>
+          </thead>
+          <tbody id="torrent-queue">
+          </tbody>
+        </table>
+        <div class="spinner"></div>
+    </div> <!-- ofa -->
     </div>
 </div>

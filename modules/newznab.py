@@ -312,6 +312,7 @@ class Newznab(object):
                     else:
                         f.append(provider_res['channel'])
                 except ValueError:
+                    self.logger.error('Cant decode json')
                     # Cant decode json. Many indexers defaults to xml on errors
                     try:
                         error = xmltodict.parse(res.content)
@@ -321,7 +322,7 @@ class Newznab(object):
                         else:
                             self.logger.error('%s' % error)
                     except Exception as e:
-                        self.logger.error('%s' % e)
+                        self.logger.error('%s %s' % (e, res.content))
                 result.append(f)
 
         return result

@@ -225,3 +225,17 @@ table th.tablesorter-header {
     border-bottom: 0;
   }
 }
+
+/* for tablesorter boostrap theme icons */
+.tablesorter-bootstrap .tablesorter-header i.tablesorter-icon {
+  font-size: 11px;
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  margin-top: -7px; /* half the icon height; older IE doesn't like this */
+  width: 14px;
+  height: 14px;
+  background-repeat: no-repeat;
+  line-height: 14px;
+  display: inline-block;
+}

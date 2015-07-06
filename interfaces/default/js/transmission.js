@@ -3,6 +3,7 @@ var transmissionConnectionError = false;
 
 $(document).ready(function(){
   $('.spinner').show();
+  $(window).trigger('hashchange');
   getTorrents();
   getStatus();
   session();
@@ -150,6 +151,7 @@ function getTorrents(){
           $('#torrent-queue').append(tr);
         });
         $('.spinner').hide();
+        $('#torrent-queue').parent().trigger('update');
       }
     }
   });

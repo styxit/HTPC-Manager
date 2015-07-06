@@ -57,6 +57,7 @@ $(document).ready(function () {
     loadHistory();
     loadWarnings();
 
+
     // reload tab content on tab click
     $('#tab-history').click(function() {
         loadHistory();
@@ -159,9 +160,14 @@ function loadHistory() {
                 row.append($('<td>').append(retryImage));
 
                 $('#history_table_body').append(row);
+
             });
         }
+
+    }).done(function() {
+        $('.table-sortable').trigger('update');
     });
+
 }
 
 function removeQueueItem(id) {
@@ -280,6 +286,8 @@ function loadQueue(once) {
 
                 $('#active_table_body').append(row);
             });
+
+            $('#active_table_body').parent().trigger('update');
 
             // Set diskspace
             freePercentDisk1 =  Math.ceil((data.diskspace1 / data.diskspacetotal1) * 100);

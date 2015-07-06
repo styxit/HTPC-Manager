@@ -105,11 +105,14 @@ function processes() {
             $.each(response, function (i, proc) {
                 var pmc
                 var meminfo
-                if (proc.memory_percent == 'N/A') {
+                // why the fuck dont you work...
+
+                if (proc.memory_percent === "N/A" || proc.memory_percent === 'undefined') {
                     pmc = 'N/A'
                 } else {
                     pmc = proc.memory_percent.toFixed(2) + '%'
                 }
+
                 if (proc.memory_info == 'N/A') {
                     meminfo = 'N/A'
                 } else {
@@ -131,7 +134,7 @@ function processes() {
             })
             // disable sort for now as the n/a fucks up the parser
             //byteSizeOrdering()
-            //$('table').trigger("update");
+            //$('.table-sortable').trigger("update");
         },
 
 

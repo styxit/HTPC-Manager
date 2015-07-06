@@ -81,6 +81,7 @@ function get_torrents() {
                 $("#qbt_rp_icon").removeClass("fa fa-play").addClass("fa fa-pause");
             }
             $('.spinner').hide();
+            $('#torrents-queue').parent().trigger('update');
 
         }
     });
@@ -180,14 +181,17 @@ function get_global_limit() {
 // Loads the moduleinfo
 $(document).ready(function () {
     $('.spinner').show();
+    // to kick off tablesorter
+    $(window).trigger('hashchange')
     get_torrents();
     get_speed();
     get_global_limit();
+
     setInterval(function () {
         get_torrents();
         get_speed();
         get_global_limit();
-    }, 4000);
+    }, 10000);
 
 });
 

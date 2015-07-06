@@ -35,6 +35,8 @@ webdir = htpc.WEBDIR
     % endif
     <link href="${htpc.WEBDIR}css/rg-icons.min.css${nocache}" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/filter.formatter.css" rel="stylesheet">
+    <!--<link href="${htpc.WEBDIR}css/theme.bootstrap2.css"> <!-- tablesorter theme -->
     <link href="${htpc.WEBDIR}css/base.css${nocache}" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css${nocache}" rel="stylesheet">
     <link href="${self.attr.webdir}css/${scriptname}.css${nocache}" rel="stylesheet">
@@ -211,7 +213,11 @@ ${self.body()}
 	<!--<script src="${htpc.WEBDIR}js/libs/jquery.form.js"></script>-->
 	<!--<script src="${htpc.WEBDIR}js/libs/jquery.cookie.min.js"></script>-->
 	<!--<script src="${htpc.WEBDIR}js/libs/jquery.metadata.js"></script>-->
-	<script src="${htpc.WEBDIR}js/libs/jquery.tablesorter.min.js"></script>
+    <!--      Table sorter stuff                                                                  -->
+	<script src="${htpc.WEBDIR}js/libs/jquery.tablesorter.combined.js"></script>
+    <script src="${htpc.WEBDIR}js/libs/parsers/parser-ignore-articles.js"></script>
+    <!-- end tablesorter -->
+
 	<script src="${htpc.WEBDIR}js/libs/bootstrap.min.js"></script>
 	<script src="${htpc.WEBDIR}js/libs/holder.js"></script>
 	<script src="${htpc.WEBDIR}js/libs/moment.js"></script>

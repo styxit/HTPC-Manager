@@ -3,6 +3,7 @@ var delugeConnectionError = true;
 
 $(document).ready(function () {
     $('.spinner').show();
+    $(window).trigger('hashchange');
     login();
     // Torrent button ajax load
     $(document.body).off('click', '.ajax-btn');
@@ -127,6 +128,7 @@ function getTorrents() {
                     $('#torrent-queue').append(tr);
                 }
                 $('.spinner').hide();
+                $('#torrent-queue').parent().trigger('update');
             }
         }
     });

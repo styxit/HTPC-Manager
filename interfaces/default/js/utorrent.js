@@ -1,5 +1,6 @@
 $(document).ready(function () {
     $('.spinner').show();
+    $(window).trigger('hashchange');
     getTorrents();
     get_speed_limit()
     //setAddTorrentModal();
@@ -16,7 +17,6 @@ $(document).ready(function () {
 
     $('#add_torrent_button').click(function() {
         var l = $('#add_torrent_url').val()
-        console.log(l)
         if (l.length) {
             addUrl(l)
         }
@@ -171,6 +171,7 @@ function getTorrents() {
                 $('#queue_download').text(getReadableFileSizeString(dl_speed_sum) + '/s');
                 $('#queue_upload').text(getReadableFileSizeString(up_speed_sum) + '/s');
                 $('.spinner').hide();
+                $('#torrents').trigger('update');
             }
             else if (response.result == 500) {
                 $('#error_message').text("Impossible to connect to uTorrent. Maybe the remote port changed ?");
@@ -256,7 +257,6 @@ function get_speed_limit() {
         'url': WEBDIR + 'utorrent/get_speed_limit',
             'dataType': 'json',
             'success': function (response) {
-                console.log(response);
                 $('#utorrent_speed_down').attr("placeholder", response.dl + ' kB/s');
                 $('#utorrent_speed_up').attr("placeholder", response.ul + ' kB/s');
             }

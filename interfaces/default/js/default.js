@@ -4,16 +4,96 @@ $(document).ready(function () {
     path = window.location.pathname.split('/')
     $('#nav-'+path[1]).addClass('active')
 
-    $('.carousel').carousel()
-    $(".table-sortable").tablesorter()
-    $('.tabs').tab()
-    $(window).on('hashchange', function() {
-        if (location.hash) {
-            $('a[href='+location.hash+']').tab('show');
-        } else {
-            $('a[data-toggle="tab"]:first').tab('show')
+    tablesorterOptions = {
+        debug: true,
+        theme: 'bootstrap',
+        //widthFixed: true,
+        headerTemplate: '{content} {icon}',
+        //debug: true,
+        ignoreCase: true,
+        filter_ignoreCase: true,
+        widgets : [ "uitheme", "filter", "zebra" ],
+        widgetOptions : {
+          filter_columnFilters: false,
+          filter_hideFilters : true
+
         }
-    })
+    };
+
+
+    $.tablesorter.themes.bootstrap = {
+      table        : 'table table-bordered table-striped',
+      caption      : 'caption',
+      // header class names
+      header       : 'bootstrap-header', // give the header a gradient background (theme.bootstrap_2.css)
+      sortNone     : '',
+      sortAsc      : '',
+      sortDesc     : '',
+      active       : '', // applied when column is sorted
+      hover        : '', // custom css required - a defined bootstrap style may not override other classes
+      // icon class names
+      icons        : '', // add "icon-white" to make them white; this icon class is added to the <i> in the header
+      iconSortNone : 'fa fa-sort', // class name added to icon when column is not sorted
+      iconSortAsc  : 'fa fa-chevron-up', // class name added to icon when column has ascending sort
+      iconSortDesc : 'fa fa-chevron-down', // class name added to icon when column has descending sort
+      filterRow    : '', // filter row class; use widgetOptions.filter_cssFilter for the input/select element
+      footerRow    : '',
+      footerCells  : '',
+      even         : '', // even row zebra striping
+      odd          : ''  // odd row zebra striping
+    };
+
+    $('.carousel').carousel()
+
+    $(window).on('hashchange', function () {
+        if (location.hash) {
+            $('a[href=' + location.hash + ']').tab('show', filter_cb(location.hash));
+        } else {
+            if ($('a[data-toggle="tab"]').length > 0) {
+                $('a[data-toggle="tab"]:first').tab('show', filter_cb());
+            }
+            // To enable tables that are not in a tab and exclude tabs
+            if ($('a[data-toggle="tab"]').length === 0 && $('.table-sortable').length > 0) {
+                // Allow search on everything in the table
+                $('.search').attr('data-column', "all");
+                $('.search').attr('placeholder', "Search table");
+                // add def options
+                $('.table-sortable').tablesorter(tablesorterOptions);
+                // Enable search
+                $.tablesorter.filter.bindSearch($('.table-sortable'), $('.search'), false);
+
+            }
+        }
+
+    });
+
+
+    function filter_cb(loc) {
+        // call back for tabs, active tablesorter
+        // there must be a better way..
+        var t;
+        // loc.hash == id
+        if (!loc) {
+            // lets try to find the first tab
+             $t = $('.tab-pane.active').find('table')
+
+        } else {
+            $t = $(loc).find('table')
+        }
+
+        // piggyback on old class
+        if ($t.hasClass('table-sortable')) {
+            if ($t.length) {
+                // Allow search on everything in the table
+                $('.search').attr('data-column', "all")
+                $('.search').attr('placeholder', "Search table")
+                // add def options
+                $t.tablesorter(tablesorterOptions);
+                // Enable search
+                $.tablesorter.filter.bindSearch( $t, $('.search'), false)
+            }
+        }
+    }
 
     // Activates the tooltips
     $('.settingstooltip').tooltip({placement: 'right'})

@@ -68,7 +68,7 @@ class Qbittorrent(object):
                  'password': htpc.settings.get('qbittorrent_password', '')
                  }
             # F33d da cookie monster
-            r = self.session.post(self.qbturl() + 'login', data=d, verify=False)
+            r = self.session.post(self.qbturl() + 'login', data=d, verify=False, timeout=5)
             if r.content == 'Ok.':
                 self.logger.debug('Successfully logged in with new api')
                 self.authenticated = True
@@ -99,14 +99,14 @@ class Qbittorrent(object):
 
         if post:
             if self.newapi:
-                r = self.session.post(url, data=data, verify=False)
+                r = self.session.post(url, data=data, verify=False, timeout=8)
             else:
-                r = self.session.post(url, data=data, verify=False, auth=HTTPDigestAuth(username, password))
+                r = self.session.post(url, data=data, verify=False, timeout=8, auth=HTTPDigestAuth(username, password))
         else:
             if self.newapi:
-                r = self.session.get(url, verify=False)
+                r = self.session.get(url, verify=False, timeout=8)
             else:
-                r = self.session.get(url, verify=False, auth=HTTPDigestAuth(username, password))
+                r = self.session.get(url, verify=False, timeout=8, auth=HTTPDigestAuth(username, password))
 
         return r
 
@@ -234,7 +234,8 @@ class Qbittorrent(object):
                 data['urls'] = dlurl
 
             elif cmd == 'resumeall' or cmd == 'pauseall':
-                # this does not work, bug in qbt see https://github.com/qbittorrent/qBittorrent/issues/3016
+                # this does not work, bug in qbt see
+                # https://github.com/qbittorrent/qBittorrent/issues/3016
                 if self.newapi:
                     cmd = cmd[:-3] + 'All'
 
@@ -304,7 +305,7 @@ class Qbittorrent(object):
         self.authenticated = False
         try:
             # We assume that its atleast 3.2 if this works.
-            r = requests.get(url + 'version/api', timeout=10, verify=False)
+            r = requests.get(url + 'version/api', timeout=8, verify=False)
             self.logger.debug('Trying to connect with new API %s' % r.url)
             # Old api returns a empty page
             if r.content != '' and r.ok:

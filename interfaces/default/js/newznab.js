@@ -96,17 +96,19 @@ function search(query, catid, indexer) {
                         row.append($('<td>').append(anc(item)));
 
                         $('#results_table_body').append(row);
-                        $('.spinner').hide();
-                        // update tablesorter, sort on age
-                        $('#results_table_body').parent().trigger('update').trigger("sorton", [
-                            [
-                                [3, 0]
-                            ]
-                        ]);
+
                         if (stop) return false;
                     });
                 });
             });
+
+            $('.spinner').hide();
+            // update tablesorter, sort on age
+            $('#results_table_body').parent().trigger('update').trigger("sorton", [
+                [
+                    [3, 0]
+                ]
+            ]);
         }
 
     });
@@ -353,6 +355,7 @@ function getindexer(id) {
 }
 
 $(document).ready(function () {
+    $(window).trigger('hashchange');
     var clients = get_clients()
     $('#searchform').submit(function () {
         search($('#query').val(), $('#catid').val(), $('#formindexer').val());
