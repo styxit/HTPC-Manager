@@ -320,8 +320,16 @@ class Newznab(object):
         self.logger.debug("Fetching information from: %s" % url)
         try:
             # some newznab providers are insanely slow
-            r = requests.get(url, timeout=160)
+            r = requests.get(url, timeout=20)
             return r.json()
+        except ValueError as e:
+            self.logger.error('%s' % e)
+            try:
+                self.logger.debug('Trying to convert xml to json')
+                r = requests.get(url, timeout=20)
+                return xmltodict.parse(r.content)
+            except:
+                self.logger.error('Failed to contert xml to js')
         except Exception as e:
             self.logger.error("Unable to fetch information from: %s %s" % (url, e))
             return
