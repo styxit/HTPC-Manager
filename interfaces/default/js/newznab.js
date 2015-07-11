@@ -9,14 +9,14 @@ function getCategories() {
             var select = $('#catid').html('');
             select.append($('<option>').html('Everything').attr('value', ''));
             $.each(data.category, function (c, cat) {
-                var option = $('<option>').html(cat["@attributes"]["name"]);
-                option.attr('value', cat["@attributes"]["id"])
+                var option = $('<option>').html(cat["@name"]);
+                option.attr('value', cat["@id"])
                 select.append(option)
                 $.each(cat.subcat, function (s, sub) {
-                    if (sub["@attributes"] == undefined) sub = cat.subcat;
-                    var name = cat["@attributes"]["name"] + '-' + sub["@attributes"]["name"]
+                    if (sub['@name'] == undefined) sub = cat.subcat
+                    var name = cat["@name"] + ' > ' + sub["@name"]
                     var option = $('<option>').html('&nbsp;&nbsp;' + name);
-                    option.attr('value', sub["@attributes"]["id"])
+                    option.attr('value', sub["@id"])
                     select.append(option)
                 });
             });

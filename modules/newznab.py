@@ -214,7 +214,9 @@ class Newznab(object):
     @cherrypy.tools.json_out()
     def getcategories(self, **kwargs):
         self.logger.debug("Fetching available categories")
-        return self.fetch('caps')['categories']
+        xml = self.fetchxml('caps')
+        if xml:
+            return xml['caps']['categories']
 
     @cherrypy.expose()
     @require()
@@ -304,6 +306,7 @@ class Newznab(object):
 
         return result
 
+    # leave this for now
     def fetch(self, cmd):
         try:
             indexer = NewznabIndexers.select(limit=1).getOne()
@@ -330,6 +333,35 @@ class Newznab(object):
                 return xmltodict.parse(r.content)
             except:
                 self.logger.error('Failed to contert xml to js')
+        except Exception as e:
+            self.logger.error("Unable to fetch information from: %s %s" % (url, e))
+            return
+
+    def fetchxml(self, cmd):
+        ''' convert xml to python object '''
+        try:
+            indexer = NewznabIndexers.select(limit=1).getOne()
+            host = striphttp(indexer.host).rstrip('/')
+            ssl = 's' if indexer.use_ssl == 'on' else ''
+            apikey = indexer.apikey
+
+        except SQLObjectNotFound:
+            self.logger.warning("No configured Indexers. Please add one")
+            return
+
+        url = 'http' + ssl + '://' + host + '/api?o=xml&apikey=' + apikey + '&t=' + cmd
+
+        self.logger.debug("Fetching information from: %s" % url)
+        try:
+            # some newznab providers are insanely slow
+            r = requests.get(url, timeout=20)
+            if r.status_code == requests.codes.ok:
+                xml = xmltodict.parse(r.content)
+                if xml.get('error'):
+                    self.logger.error('%s %s' % (url, xml['error']['@description']))
+                else:
+                    return xml
+
         except Exception as e:
             self.logger.error("Unable to fetch information from: %s %s" % (url, e))
             return
