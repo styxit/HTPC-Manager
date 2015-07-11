@@ -5,7 +5,6 @@ import cherrypy
 import htpc
 from htpc.helpers import get_image
 import urllib2
-from json import loads
 import logging
 from cherrypy.lib.auth2 import require, member_of
 import requests
@@ -158,6 +157,9 @@ class Newznab(object):
                         use_ssl=kw.get('newznab_indexer_ssl'),
                         apiurl=apiurl)
 
+                if kw.get('newznab_indexer_apikey') not in htpc.BLACKLISTWORDS:
+                    htpc.BLACKLISTWORDS.append(kw.get('newznab_indexer_apikey'))
+
                 self.changeindexer(indexer.id)
                 return 1
             except Exception as e:
@@ -165,6 +167,10 @@ class Newznab(object):
                 self.logger.error("Unable to create newznab indexer in database")
                 return 0
         else:
+            # Dont allow empty indexer be saved to db
+            if host == '':
+                self.logger.error('You must provide a url to the indexers %s' % kw.get('newznab_indexer_name', ''))
+                return 0
             self.logger.debug("Updating newznab indexer %s in database" % kw.get('newznab_indexer_name'))
             try:
                 indexer = NewznabIndexers.selectBy(id=kw.get('newznab_indexer_id')).getOne()
@@ -276,6 +282,7 @@ class Newznab(object):
 
         for url in job_list:
             try:
+                self.logger.debug('Fetching search results from %s' % url)
                 t = sess.get(url, timeout=60)
             except Exception as e:
                 self.logger.error('%s when fetching %s' % (e, url))
@@ -290,7 +297,20 @@ class Newznab(object):
                 f = []
                 res = future.result()
                 try:
-                    f.append(res.json()['channel'])
+                    provider_res = res.json()
+
+                    # Check for errors:
+                    if provider_res.get('error'):
+                        self.logger.error('Faile to fetch search results from %s. Error msg %s' % (res.url, provider_res.get['error']['@description']))
+
+                    # this will still not work unless they provide some more info
+                    if isinstance(provider_res, list) and 'spotweb' in res.url:
+                        shittyspots = {'description': 'spotweb',
+                                       'item': provider_res}
+                        f.append(shittyspots)
+
+                    else:
+                        f.append(provider_res['channel'])
                 except ValueError:
                     # Cant decode json. Many indexers defaults to xml on errors
                     try:
@@ -351,7 +371,7 @@ class Newznab(object):
 
         url = 'http' + ssl + '://' + host + '/api?o=xml&apikey=' + apikey + '&t=' + cmd
 
-        self.logger.debug("Fetching information from: %s" % url)
+        self.logger.debug("Fetching category information from: %s" % url)
         try:
             # some newznab providers are insanely slow
             r = requests.get(url, timeout=20)

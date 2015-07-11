@@ -28,7 +28,7 @@ class Settings(object):
         self.logger.debug('Connecting to database: ' + htpc.DB)
         sqlhub.processConnection = connectionForURI('sqlite:' + htpc.DB)
         Setting.createTable(ifNotExists=True)
-
+        self.updatebl()
 
     @cherrypy.expose()
     @require(member_of("admin"))
@@ -59,18 +59,25 @@ class Settings(object):
         try:
             setting = Setting.selectBy(key=key).getOne()
             setting.val = val
+            # each time we save something to the db we want to blacklist it
             self.updatebl()
         except SQLObjectNotFound:
             Setting(key=key, val=val)
             self.updatebl()
 
     def updatebl(self):
+        from modules.newznab import NewznabIndexers
         fl = Setting.select().orderBy(Setting.q.key)
         bl = []
         for i in fl:
             if i.key.endswith("_apikey") or i.key.endswith("_username") or i.key.endswith("_password") or i.key.endswith("_passkey"):
                 if len(i.val) > 1:
                     bl.append(i.val)
+        nab = NewznabIndexers.select().orderBy(NewznabIndexers.q.apikey)
+        for ii in nab:
+            if len(ii.apikey) > 1:
+                bl.append(ii.apikey)
+
         htpc.BLACKLISTWORDS = bl
 
     def get_templates(self):

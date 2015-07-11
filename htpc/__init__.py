@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import time
 
 """ Initiate global variables """
 RUNDIR = None
