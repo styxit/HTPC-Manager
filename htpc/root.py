@@ -13,6 +13,7 @@ import logging
 import urllib
 from threading import Thread
 from cherrypy.lib.auth2 import *
+from htpc.helpers import serve_template
 
 
 def do_restart():
@@ -108,5 +109,12 @@ class Root(object):
         return "Menu order saved."
 
     @cherrypy.expose()
+    @require()
+    def iframe(self, link='', **kwargs):
+        print link
+        return serve_template('iframe.html', scriptname='iframe', link=link)
+
+    @cherrypy.expose()
+    @require()
     def about(self):
         return htpc.LOOKUP.get_template('about.html').render(scriptname='about')
