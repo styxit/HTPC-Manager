@@ -66,14 +66,16 @@ class Settings(object):
             self.updatebl()
 
     def updatebl(self):
+        # fix me
         from modules.newznab import NewznabIndexers
+        NewznabIndexers.createTable(ifNotExists=True)
         fl = Setting.select().orderBy(Setting.q.key)
         bl = []
         for i in fl:
             if i.key.endswith("_apikey") or i.key.endswith("_username") or i.key.endswith("_password") or i.key.endswith("_passkey"):
                 if len(i.val) > 1:
                     bl.append(i.val)
-        nab = NewznabIndexers().select().orderBy(NewznabIndexers.q.apikey)
+        nab = NewznabIndexers.select().orderBy(NewznabIndexers.q.apikey)
         for ii in nab:
             if len(ii.apikey) > 1:
                 bl.append(ii.apikey)
