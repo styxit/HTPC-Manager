@@ -239,3 +239,8 @@ table th.tablesorter-header {
   line-height: 14px;
   display: inline-block;
 }
+
+/* filters out unwanted search results, used by tablesorter */
+.filtered {
+ display: none;
+}

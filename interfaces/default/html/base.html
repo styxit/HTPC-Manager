@@ -28,15 +28,15 @@ webdir = htpc.WEBDIR
 	    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css" rel="stylesheet">
 	    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/minified/jquery-ui.min.css" rel="stylesheet">
 	    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/css/filter.formatter.min.css" rel="stylesheet">
     % else:
 	    <link href="${htpc.WEBDIR}css/bootstrap-responsive.min.css" rel="stylesheet">
 	    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
 	    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
+        <link href="${htpc.WEBDIR}css/filter.formatter.css" rel="stylesheet">
     % endif
     <link href="${htpc.WEBDIR}css/rg-icons.min.css${nocache}" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/filter.formatter.css" rel="stylesheet">
-    <!--<link href="${htpc.WEBDIR}css/theme.bootstrap2.css"> <!-- tablesorter theme -->
     <link href="${htpc.WEBDIR}css/base.css${nocache}" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css${nocache}" rel="stylesheet">
     <link href="${self.attr.webdir}css/${scriptname}.css${nocache}" rel="stylesheet">
@@ -199,29 +199,35 @@ ${self.body()}
 % if s.get('app_use_cdn', 0):
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <!-- dont remove this until squeezebox is checked -->
 	<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.09/jquery.form.min.js"></script>-->
 	<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>-->
 	<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.1.10/js/jquery.metadata.js"></script>-->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.1.10/js/jquery.tablesorter.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/js/jquery.tablesorter.combined.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/js/parsers/parser-ignore-articles.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/holder/1.9/holder.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.2/moment.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
 % else:
 	<script src="${htpc.WEBDIR}js/libs/jquery.min.js"></script>
 	<script src="${htpc.WEBDIR}js/libs/jquery-ui.min.js"></script>
+
+    <!-- Leave this until squeezebox is checked -->
 	<!--<script src="${htpc.WEBDIR}js/libs/jquery.form.js"></script>-->
 	<!--<script src="${htpc.WEBDIR}js/libs/jquery.cookie.min.js"></script>-->
 	<!--<script src="${htpc.WEBDIR}js/libs/jquery.metadata.js"></script>-->
-    <!--      Table sorter stuff                                                                  -->
-	<script src="${htpc.WEBDIR}js/libs/jquery.tablesorter.combined.js"></script>
-    <script src="${htpc.WEBDIR}js/libs/parsers/parser-ignore-articles.js"></script>
-    <!-- end tablesorter -->
+
 
 	<script src="${htpc.WEBDIR}js/libs/bootstrap.min.js"></script>
 	<script src="${htpc.WEBDIR}js/libs/holder.js"></script>
 	<script src="${htpc.WEBDIR}js/libs/moment.js"></script>
 	<script src="${htpc.WEBDIR}js/libs/jquery.ui.touch-punch.min.js"></script>
+    <!-- Table sorter stuff  -->
+    <script src="${htpc.WEBDIR}js/libs/jquery.tablesorter.combined.min.js"></script>
+    <script src="${htpc.WEBDIR}js/libs/parsers/parser-ignore-articles.js"></script>
+    <!-- end tablesorter -->
+
 % endif
 <script src="${htpc.WEBDIR}js/libs/jquery.raty.js"></script>
 <script src="${htpc.WEBDIR}js/libs/jquery.pnotify.min.js"></script>
