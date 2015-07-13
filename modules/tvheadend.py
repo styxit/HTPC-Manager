@@ -8,7 +8,6 @@ import urllib2
 import urllib
 import base64
 import json
-import time
 from cherrypy.lib.auth2 import require
 
 
@@ -38,7 +37,7 @@ class TVHeadend(object):
 
     def webinterface(self):
         ip = htpc.settings.get('tvheadend_host')
-        port = htpc.settings,get('tvheadend_port')
+        port = htpc.settings.get('tvheadend_port')
         url = 'http://%s:%s/' % (ip, port)
 
         if htpc.settings.get('tvheadend_reverse_proxy_link'):
@@ -49,8 +48,8 @@ class TVHeadend(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def GetEPG(self, strLimit = "300", strChannel = ""):
-        return self.fetch("epg", { 'limit': strLimit, 'start': "0", 'channel': strChannel })
+    def GetEPG(self, strLimit="300", strChannel=""):
+        return self.fetch("epg", {'limit': strLimit, 'start': "0", 'channel': strChannel })
 
     @cherrypy.expose()
     @require()
@@ -62,24 +61,24 @@ class TVHeadend(object):
     @require()
     @cherrypy.tools.json_out()
     def GetChannelTags(self):
-        return self.fetch("channeltags", { 'op': 'listTags' })
+        return self.fetch("channeltags", {'op': 'listTags'})
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def DVRAdd(self, strEventID = ""):
-        return self.fetch("dvr", { 'eventId': strEventID, 'op': "recordEvent" })
+        return self.fetch("dvr", {'eventId': strEventID, 'op': "recordEvent"})
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def DVRDel(self, strEntryID = ""):
-        return self.fetch("dvr", { 'entryId': strEntryID, 'op': "cancelEntry" })
+        return self.fetch("dvr", {'entryId': strEntryID, 'op': "cancelEntry"})
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def DVRList(self, strType = ""):
+    def DVRList(self, strType=""):
         return self.fetch("dvrlist_" + strType, None)
 
     def fetch(self, strQuery, rgpData):
