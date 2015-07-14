@@ -4,6 +4,24 @@ $(document).ready(function () {
     path = window.location.pathname.split('/')
     $('#nav-'+path[1]).addClass('active')
 
+    // Handle other links check if it should open i
+    // iframe or not
+    $('li.nav-menu-item').click(function (e) {
+        e.preventDefault();
+        var url = $(this).find("a").attr("href")
+
+        if (pybooltojsbool(ALLOWIFRAME) === false) {
+            // Open link in a new tab
+            window.open(url);
+
+        } else {
+            // open in iframe
+            location.href = WEBDIR + 'iframe/' + encodeURIComponent(url)
+
+        }
+
+    });
+
     tablesorterOptions = {
         debug: true,
         theme: 'bootstrap',
@@ -425,3 +443,15 @@ function getReadableTime(timeInSeconds) {
   return days + hours + ":" + (minutes < 10 ? "0" + minutes : minutes) + seconds;
 };
 
+function pybooltojsbool(s) {
+    // Allow "0" as db is a string col
+    if (s == "1") {
+        return true
+    } else if (s == 'True') {
+        return true
+    } else if (s == 'False') {
+        return false
+    } else if (s == 0) {
+        return false
+    }
+}

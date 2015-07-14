@@ -1,15 +1,14 @@
 <%!
-import htpc, time, cherrypy
+import htpc, time
 settings = htpc.settings
 webdir = htpc.WEBDIR
 
 %>
 <% s = self.attr.settings %>
 <%
-   ## used to override cache for 24 hours after a update
-   if float(htpc.settings.get('app_updated_at', 1.0)) <= (time.time() + 129600) and settings.get('app_disable_cache_on_update', True) is True:
+    if float(htpc.settings.get('app_updated_at', 1.0)) <= (time.time() + 129600) and settings.get('app_disable_cache_on_update', True) is True:
         nocache = '?t=' + str(time.time())
-   else:
+    else:
         nocache = ''
 %>
 <!DOCTYPE html>
@@ -41,6 +40,7 @@ webdir = htpc.WEBDIR
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css${nocache}" rel="stylesheet">
     <link href="${self.attr.webdir}css/${scriptname}.css${nocache}" rel="stylesheet">
     <script type="text/javascript">var WEBDIR="${htpc.WEBDIR}";</script>
+    <script type="text/javascript">var ALLOWIFRAME="${s.get('app_open_otherlink_in_iframe', 'false')}"</script>
 </head>
 
 <body>
