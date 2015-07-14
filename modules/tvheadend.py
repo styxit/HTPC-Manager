@@ -101,7 +101,7 @@ class TVHeadend(object):
 
         url = "http://%s:%s/%s" % (htpc.settings.get("tvheadend_host", ""), htpc.settings.get("tvheadend_port", ""), strQuery)
         self.logger.debug('url: %s' % url)
-        self.logger.debug('data: %s' % data)
+        self.logger.debug('encoded: %s' % strData)
         try:
 
             pRequest = urllib2.Request("http://%s:%s/%s" % (htpc.settings.get("tvheadend_host", ""), htpc.settings.get("tvheadend_port", ""), strQuery), data = strData, headers = rgpHeaders)
