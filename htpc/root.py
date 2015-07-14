@@ -111,7 +111,6 @@ class Root(object):
     @cherrypy.expose()
     @require()
     def iframe(self, link='', **kwargs):
-        print link
         return serve_template('iframe.html', scriptname='iframe', link=link)
 
     @cherrypy.expose()
