@@ -6,7 +6,7 @@ function parseJSON(strQuery, pCallback) {
 			$(".spinner").hide();
 			return;
 		}
-	
+
 		pCallback(pResult);
 		$(".spinner").hide();
 	});
@@ -25,7 +25,7 @@ function showEPG(pChannel) {
 				.append("<th>End</th>")
 				.append("<th>Actions</th>")
 			);
-			
+
 			$.each(pResult.entries, function(nIndex, pEntry) {
 				strTable.append($("<tr>")
 					.append($("<td>").text(pEntry.title))
@@ -39,7 +39,7 @@ function showEPG(pChannel) {
 					));
 			});
 
-		showModal(pChannel.name, strTable, 
+		showModal(pChannel.name, strTable,
 			{
 				/*'Watch' : function() {
 					strTable.html("<video controls autoplay>"
@@ -60,15 +60,16 @@ function getChannelTags() {
 					.attr("href", "#tag-" + pEntry.identifier)
 					.attr("data-toggle", "tab")
 						.text(pEntry.name)));
-			
+
 			// Add tab pane
 			var strTabPane = $("<div>").attr("id", "tag-" + pEntry.identifier)
 				.attr("class", "tab-pane");
-				
+
 			$(".tab-content").append(strTabPane.append($("<ul>").attr("id", "tag-" + pEntry.identifier + "-grid").attr("class", "thumbnails")));
 		});
+		getChannels();
 	});
-	
+
 	$(window).trigger("hashchange");
 }
 
@@ -77,20 +78,20 @@ function getChannels() {
 		$.each(pResult.entries, function(nIndex, pEntry) {
 			var strHTML = $("<div>").attr("class", "channel");
 			var pHTMLEntry = null;
-			
+
 			if (pEntry.icon != undefined) {
 				pHTMLEntry = $("<img>").attr("src", pEntry.icon);
 			}
 			else {
 				pHTMLEntry = $("<a>").text(pEntry.name);
 			}
-			
+
 			pHTMLEntry.click(function (pEvent) {
 				showEPG(pEntry);
 			});
-			
+
 			strHTML.append(pHTMLEntry);
-			
+
 			$.each(pEntry.tags, function(nIndex, nTag) {
 				$("#tag-" + nTag + "-grid").append($("<li>").append(strHTML));
 			});
@@ -109,18 +110,18 @@ function parseRecordings(strType) {
 				.append("<th>Status</th>")
 				.append("<th>Actions</th>")
 			);
-		
+
 	parseJSON("DVRList/" + strType, function(pResult) {
 		$.each(pResult.entries, function(nIndex, pEntry) {
 			strTable.append($("<tr>").attr("id", "recording-" + pEntry.id)
-				.append($("<td>").text(pEntry.channel))		
+				.append($("<td>").text(pEntry.channel))
 				.append($("<td>").text(pEntry.title))
 				.append($("<td>").text(convertTimestamp(pEntry.start)))
 				.append($("<td>").text(convertTimestamp(pEntry.end)))
 				.append($("<td>").text(pEntry.status))
 				.append($("<td>").append($("<a>").text("DEL").click(function(pEvent) {
 						pEvent.preventDefault();
-						
+
 						parseJSON("DVRDel/" + pEntry.id, function(pResult) {
 							if (pResult.success == 1) {
 								$("#recording-" + pEntry.id).fadeOut();
@@ -130,7 +131,7 @@ function parseRecordings(strType) {
 			);
 		});
 	});
-	
+
 	$("#recordings").append("<h2>" + strType.charAt(0).toUpperCase() + strType.slice(1) + " recordings</h2>")
 		.append(strTable);
 }

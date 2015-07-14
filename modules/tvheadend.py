@@ -55,7 +55,7 @@ class TVHeadend(object):
     @require()
     @cherrypy.tools.json_out()
     def GetChannels(self):
-        return self.fetch("api/channel/grid", None)
+        return self.fetch("api/channel/grid", { 'dir': 'ASC', 'sort': 'tags', 'limit': 1000})
 
     @cherrypy.expose()
     @require()
@@ -66,13 +66,13 @@ class TVHeadend(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def DVRAdd(self, strEventID = ""):
+    def DVRAdd(self, strEventID=""):
         return self.fetch("dvr", {'eventId': strEventID, 'op': "recordEvent"})
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def DVRDel(self, strEntryID = ""):
+    def DVRDel(self, strEntryID=""):
         return self.fetch("dvr", {'entryId': strEntryID, 'op': "cancelEntry"})
 
     @cherrypy.expose()
@@ -82,9 +82,16 @@ class TVHeadend(object):
         return self.fetch("dvrlist_" + strType, None)
 
     def fetch(self, strQuery, rgpData):
-        rgpHeaders = {
-            'Authorization': "Basic %s" % base64.encodestring("%s:%s" % (htpc.settings.get("tvheadend_username", ""), htpc.settings.get("tvheadend_password", ""))).replace("\n", "")
-        }
+        rgpHeaders = {}
+        username = htpc.settings.get("tvheadend_username", "")
+        password = htpc.settings.get("tvheadend_password", "")
+
+        if username and password:
+            rgpHeaders['Authorization'] = 'Basic %s' % base64.encodestring('%s:%s' % (username, password)).strip('\n')
+
+        # Lame debug to get as much info as possible
+        self.logger.debug('strQuery: %s' % strQuery)
+        self.logger.debug('rgpData: %s' % rgpData)
 
         strResponse = None
         strData = None
@@ -92,10 +99,13 @@ class TVHeadend(object):
         if rgpData is not None:
             strData = urllib.urlencode(rgpData)
 
+        url = "http://%s:%s/%s" % (htpc.settings.get("tvheadend_host", ""), htpc.settings.get("tvheadend_port", ""), strQuery)
+        self.logger.debug('url: %s' % url)
+        self.logger.debug('data: %s' % data)
         try:
+
             pRequest = urllib2.Request("http://%s:%s/%s" % (htpc.settings.get("tvheadend_host", ""), htpc.settings.get("tvheadend_port", ""), strQuery), data = strData, headers = rgpHeaders)
             strResponse = urllib2.urlopen(pRequest).read()
-        except urllib2.HTTPError, e:
-            print e
-
-        return json.loads(strResponse)
+            return json.loads(strResponse)
+        except Exception as e:
+            self.logger.error('%s %s failed error: %s' % strQuery, rgpData, e)
