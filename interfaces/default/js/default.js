@@ -6,7 +6,7 @@ $(document).ready(function () {
 
     // Handle other links check if it should open i
     // iframe or not
-    $('li.nav-menu-item').click(function (e) {
+    $('#nav-menu.li.nav-menu-item').click(function (e) {
         e.preventDefault();
         var url = $(this).find("a").attr("href")
 
