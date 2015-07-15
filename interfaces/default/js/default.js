@@ -6,20 +6,20 @@ $(document).ready(function () {
 
     // Handle other links check if it should open i
     // iframe or not
-    $('.other-link-item').click(function (e) {
-        e.preventDefault();
+	$('.other-link-item').click(function (e) {
+		e.preventDefault();
+		window.open(url);
+	});
+	
+    $('.other-link-item').mousedown(function(e){
         var url = $(this).find("a").attr("href")
-
-        if (pybooltojsbool(ALLOWIFRAME) === false) {
+        if (pybooltojsbool(ALLOWIFRAME) === true && e.which==1) { //if iframe is on and left click
+			// open in iframe
+            location.href = WEBDIR + 'iframe/' + encodeURIComponent(url)
+        } else {
             // Open link in a new tab
             window.open(url);
-
-        } else {
-            // open in iframe
-            location.href = WEBDIR + 'iframe/' + encodeURIComponent(url)
-
         }
-
     });
 
     tablesorterOptions = {
