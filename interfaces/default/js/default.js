@@ -6,7 +6,7 @@ $(document).ready(function () {
 
     // Handle other links check if it should open i
     // iframe or not
-    $('#nav-menu.li.nav-menu-item').click(function (e) {
+    $('.other-link-item').click(function (e) {
         e.preventDefault();
         var url = $(this).find("a").attr("href")
 
@@ -449,7 +449,11 @@ function pybooltojsbool(s) {
         return true
     } else if (s == 'True') {
         return true
+    } else if (s == 'true') {
+        return true
     } else if (s == 'False') {
+        return false
+    } else if (s == 'false') {
         return false
     } else if (s == 0) {
         return false
