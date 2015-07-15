@@ -26,10 +26,20 @@ settings = self.attr.settings
                 </div>
             </div>
             %endif
-            %if settings.get('dash_rec_music', 0):
-            <div class="span4 dash-module" id="dash_rec_music">
+			%if settings.get('dash_rec_music_old', 0):
+            <div class="span4 dash-module" id="dash_rec_music_old">
                 <h3><a href="kodi/#music">Latest Music</a></h3>
                 <ul id="albums-content" class="media-list"></ul>
+            </div>
+            %endif
+			%if settings.get('dash_rec_music', 0):
+            <div class="span4 dash-module" id="dash_rec_music">
+                <h3><a href="kodi/#music">Latest Albums</a></h3>
+                <div id="music-carousel" class="carousel slide hide">
+                    <div class="carousel-inner"></div>
+                    <a class="carousel-control left" href="#music-carousel" data-slide="prev">&lsaquo;</a>
+                    <a class="carousel-control right" href="#music-carousel" data-slide="next">&rsaquo;</a>
+                </div>
             </div>
             %endif
             %if settings.get('dash_rec_movies_plex', 0):
@@ -222,7 +232,10 @@ settings = self.attr.settings
     if (${int(settings.get('dash_sabnzbd', 0))}){
         modules['dash_sabnzbd'] = "loadDownloadHistory";
     }
-    if (${int(settings.get('dash_rec_music', 0))}){
+    if (${int(settings.get('dash_rec_music_old', 0))}){
+        modules['dash_rec_music_old'] = "loadRecentAlbumsOld";
+    }
+	if (${int(settings.get('dash_rec_music', 0))}){
         modules['dash_rec_music'] = "loadRecentAlbums";
     }
     if (${int(settings.get('dash_rec_tv', 0))}){
