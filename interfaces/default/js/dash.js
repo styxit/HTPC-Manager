@@ -105,7 +105,7 @@ function loadRecentTVshows () {
         $('#tvshow-carousel').show()
     })
 }
-function loadRecentAlbums () {
+function loadRecentAlbumsOld () {
     if (!$('#albums-content').length) return
     $.getJSON(WEBDIR + 'kodi/GetRecentAlbums/4', function (data) {
         if (data === null || data.limits.total === 0) return
@@ -132,6 +132,36 @@ function loadRecentAlbums () {
         })
         Holder.run()
         $('#albums-content').parent().show()
+    })
+}
+
+function loadRecentAlbums () {
+    if (!$('#music-carousel').length) return
+    $.getJSON(WEBDIR + 'kodi/GetRecentAlbums/5',function (data) {
+        if (data === null || data.limits.total === 0) return
+        $.each(data.albums, function (i, album) {
+            var itemDiv = $('<div>').addClass('item carousel-item stretchedbg')
+
+            if (i === 0) itemDiv.addClass('active')
+            var src = WEBDIR + 'kodi/GetThumb?h=480&w=480&thumb='+encodeURIComponent(album.thumbnail)
+            itemDiv.attr('style', 'background-image: url("' + src + '")')
+
+            itemDiv.append($('<div>').addClass('carousel-caption').click(function() {
+                location.href = WEBDIR +'kodi/#music'
+            }).hover(function() {
+                var text = $(this).children('p').stop().slideToggle()
+            })
+			
+			.append(
+                $('<h4>').html(album.label + ' (' + album.year + ')'),
+                $('<p>').html(
+                    '<b>Artist</b>: ' + album.artist[0] + '<br />'
+                ).hide()
+            )
+			)
+            $('#music-carousel .carousel-inner').append(itemDiv)
+        })
+        $('#music-carousel').show()
     })
 }
 
