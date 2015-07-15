@@ -222,7 +222,7 @@ class Headphones(object):
     @cherrypy.expose()
     @require()
     def ForceSearch(self):
-        return self.fetch('forceSearch', text=True)
+        return self.fetcfh('forceSearch', text=True)
 
     @cherrypy.expose()
     @require()
@@ -275,6 +275,7 @@ class Headphones(object):
             response = requests.get(url, timeout=30, verify=False)
 
             if response.status_code != 200:
+                response.raise_for_status()
                 self.logger.error('failed to contact headphones')
                 return
 
@@ -294,17 +295,20 @@ class Headphones(object):
         except Exception as e:
             self.logger.error("Error calling api %s: %s" % (url, e))
 
-    @cherrypy.tools.json_out()
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
     @require()
     def ping(self,
              headphones_enable, headphones_name,
              headphones_host, headphones_port,
              headphones_basepath,
              headphones_apikey,
-             headphones_ssl=False):
+             headphones_ssl=False,
+             **kwargs):
 
-        url = self._build_url(
+        self.logger.debug('Attemping to ping headphones')
+
+        url = Headphones._build_url(
             headphones_ssl,
             headphones_host,
             headphones_port,

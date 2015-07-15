@@ -11,13 +11,13 @@ function loadWantedAlbums () {
             if (i === 0) itemDiv.addClass('active')
 
             var tt;
-            if (albums.ReleaseDate.length) {
+            if (albums.ReleaseDate != null) {
                 // release date should be (yyyy) or empty string
                 tt = ' (' + albums.ReleaseDate.substring(0,4) + ') '
             } else {
                     tt = '  '
             }
-            if (albums.ArtistName === 'None') {
+            if (albums.ArtistName === 'None' || albums.ArtistName == null ) {
                 // to remove None..
                 albums.ArtistName = ''
             }
