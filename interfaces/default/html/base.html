@@ -74,7 +74,7 @@ webdir = htpc.WEBDIR
                         <a href="${htpc.WEBDIR}about"><i class="fa fa-info-circle"></i>  About</a>
                     </li>
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a class="dash-edit" href="#"><i id="" class="fa fa-arrows"></i> Edit Dash</a>
+                        <a class="dash-edit" href="#"><i class="fa fa-arrows"></i> Edit Dash</a>
                     </li>
                     <!-- Didnt find a good way to add this in mobile/tablet view.
                     <li class="hidden-desktop visible-phone visible-tablet">
@@ -117,7 +117,7 @@ webdir = htpc.WEBDIR
                 <!-- end phone tablet -->
                 <div class="pull-right hidden-tablet hidden-phone visible-desktop">
                     %if s.get('newznab_enable'):
-                    <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}newznab/" method="get" class="navbar-form pull-right" id="menu-search">
+                    <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}newznab/" method="get" id="menu-search">
                     %else:
                     <form class="navbar-form pull-right disabled formsearch" id="menu-search">
                     %endif
