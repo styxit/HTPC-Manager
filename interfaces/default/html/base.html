@@ -7,7 +7,7 @@ webdir = htpc.WEBDIR
 <%
     if settings.get('app_disable_cache_on_update', True) is True:
         ## lets not use time.time() unless we really have to..
-        if float(htpc.settings.get('app_updated_at', 1.0)) <= (time.time() + 129600):
+        if int(htpc.settings.get('app_updated_at', 1)) <= (time.time() + 129600):
             nocache = '?' + str(time.time())
     else:
         nocache = ''
