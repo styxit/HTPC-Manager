@@ -146,7 +146,7 @@ def start():
         '/js': {
             'tools.caching.on': True,
             'tools.caching.force': True,
-            'tools.caching.delay': 60 * 60 * 24 * 30,
+            'tools.caching.delay': 0,
             'tools.expires.on': True,
             'tools.expires.secs': 60 * 60 * 24 * 30,
             'tools.staticdir.on': True,
@@ -157,7 +157,7 @@ def start():
         '/css': {
             'tools.caching.on': True,
             'tools.caching.force': True,
-            'tools.caching.delay': 60 * 60 * 24 * 30,
+            'tools.caching.delay': 0,
             'tools.expires.on': True,
             'tools.expires.secs': 60 * 60 * 24 * 30,
             'tools.staticdir.on': True,
@@ -168,7 +168,7 @@ def start():
         '/img': {
             'tools.caching.on': True,
             'tools.caching.force': True,
-            'tools.caching.delay': 60 * 60 * 24 * 30,
+            'tools.caching.delay': 0,
             'tools.expires.on': True,
             'tools.expires.secs': 60 * 60 * 24 * 30,
             'tools.staticdir.on': True,
