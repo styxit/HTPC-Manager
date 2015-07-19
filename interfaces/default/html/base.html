@@ -56,6 +56,15 @@ webdir = htpc.WEBDIR
             <a href="${htpc.WEBDIR}"><i class="rg rg-htpc brand"></i></a>
             <div class="nav-collapse">
                 <ul class="nav" id="nav-menu">
+                    <div class="mobile-search hidden-desktop visible-phone visible-tablet">
+                        %if s.get('newznab_enable'):
+                            <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}newznab/" method="get">
+                        %else:
+                            <form class="navbar-form pull-right disabled formsearch">
+                        %endif
+                            <input type="text" name="query" id="search" class="span6 search" accesskey="s" placeholder="Search">
+                        </form>
+                    </div>
                     <% customurls = s.getUrls() %>
                     % if len(customurls) > 1:
                     <li class="dropdown" id="nav-menu-others">
@@ -103,18 +112,8 @@ webdir = htpc.WEBDIR
                     </li>
 
                 </ul>
-
-                <div class="mobile-search hidden-desktop visible-phone visible-tablet">
-                    %if s.get('newznab_enable'):
-                        <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}newznab/" method="get">
-                    %else:
-                        <form class="navbar-form pull-right disabled formsearch">
-                    %endif
-                        <input type="text" name="query" id="search" class="span6 search" accesskey="s" placeholder="Search">
-                    </form>
-                </div>
-
                 <!-- end phone tablet -->
+
                 <div class="pull-right hidden-tablet hidden-phone visible-desktop">
                     %if s.get('newznab_enable'):
                     <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}newznab/" method="get" id="menu-search">

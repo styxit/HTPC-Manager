@@ -10,7 +10,7 @@ $(document).ready(function () {
 		e.preventDefault();
 		window.open(url);
 	});
-	
+
     $('.other-link-item').mousedown(function(e){
         var url = $(this).find("a").attr("href")
         if (pybooltojsbool(ALLOWIFRAME) === true && e.which==1) { //if iframe is on and left click
@@ -243,7 +243,7 @@ $(document).ready(function () {
     for (menu_item in menus) {  //build aditional items not in menu_order
         menu_ordered += menus[menu_item];
     }
-    $("#nav-menu").prepend(menu_ordered) // prepend to others dropdown item
+    $(".mobile-search").after(menu_ordered)
 })
 
 function byteSizeOrdering() {
