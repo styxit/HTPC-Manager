@@ -151,7 +151,7 @@ function loadRecentAlbums () {
             }).hover(function() {
                 var text = $(this).children('p').stop().slideToggle()
             })
-			
+
 			.append(
                 $('<h4>').html(album.label + ' (' + album.year + ')'),
                 $('<p>').html(
@@ -588,16 +588,16 @@ function new_row(){
 function enable_sortable() {
    $(".dash-row").sortable({
         connectWith: '.dash-row',
+        helper: "clone",
         //receive: This event is triggered when a
         //connected sortable list has received an item from another list.
         receive: function(event, ui) {
             // so if > 3
             if ($(this).children().length > 3) {
-                //ui.sender: will cancel the change.
-                //Useful in the 'receive' callback.
                 $(ui.sender).sortable('cancel');
             }
         }
+
     }).disableSelection();
 }
 
