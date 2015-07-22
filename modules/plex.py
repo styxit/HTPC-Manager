@@ -80,22 +80,21 @@ class Plex(object):
         ''' Tests settings, returns server name on success and null on fail '''
         try:
             self.logger.debug('Testing Plex connectivity')
-            url = 'http://%s:%s' % (plex_host, plex_port)
+            url = 'http://%s:%s' % (striphttp(plex_host), plex_port)
             self.logger.debug('Trying to contact Plex via %s' % url)
             request = loads(urlopen(Request(url, headers=self.getHeaders())).read())
             self.logger.info('Connected to the Plex Media Server %s at %s' % (request.get('friendlyName'), url))
             return True
-        except:
-            self.logger.error('Unable to contact Plex via %s' % url)
+        except Exception as e:
+            self.logger.debug('headers %s' % self.getHeaders())
+            self.logger.error('Unable to contact Plex via %s error %s' % (url, e))
             return
 
     @cherrypy.expose()
     @require()
     def index(self):
-        return htpc.LOOKUP.get_template('plex.html').render(scriptname='plex')
+        return htpc.LOOKUP.get_template('plex.html').render(scriptname='plex', webinterface=self.webinterface())
 
-    @cherrypy.expose()
-    @require()
     def webinterface(self):
         ''' Generate page from template '''
         plex_host = striphttp(htpc.settings.get('plex_host', 'localhost'))
@@ -104,7 +103,7 @@ class Plex(object):
         url = 'http://%s:%s/web' % (plex_host, plex_port)
 
         if htpc.settings.get('plex_reverse_proxy_link'):
-            url = htpc.settings.get('plex_reverse_proxy_link') 
+            url = htpc.settings.get('plex_reverse_proxy_link')
 
         return url
 
