@@ -11,6 +11,10 @@ webdir = htpc.WEBDIR
             nocache = '?' + str(time.time())
     else:
         nocache = ''
+    if htpc.LOGLEVEL in ['debug', 'error', 'warning']:
+        jslogconsole = 1
+    else:
+        jslogconsole = 0
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,6 +28,7 @@ webdir = htpc.WEBDIR
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
     <script type="text/javascript">var WEBDIR="${htpc.WEBDIR}";</script>
     <script type="text/javascript">var ALLOWIFRAME="${s.get('app_open_otherlink_in_iframe', 'false')}"</script>
+    <script type="text/javascript">var JSLOGCONSOLE="${jslogconsole}"</script>
     <link href="${htpc.WEBDIR}css/bootstrap-slider.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/bootstrap.min.css" rel="stylesheet">
     % if s.get('app_use_cdn', 0):

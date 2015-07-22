@@ -11,6 +11,27 @@ $(document).ready(function () {
 		window.open(url);
 	});
 
+    // use something like this? https://github.com/csnover/TraceKit
+
+    window.onerror = function (message, file, line) {
+        var e = {
+                'message': message,
+                'page': window.location.href,
+                'file': file,
+                'line': line
+        };
+
+            if (JSLOGCONSOLE == 0) {
+                return false
+            } else {
+                $.post(WEBDIR + "log/logit", e, function (data) {
+                });
+                return true
+            }
+            return true
+        };
+
+
     $('.other-link-item').mousedown(function(e){
         var url = $(this).find("a").attr("href")
         if (pybooltojsbool(ALLOWIFRAME) === true && e.which==1) { //if iframe is on and left click
@@ -145,9 +166,12 @@ $(document).ready(function () {
     $('a.ajax-confirm').click(function (e) {
         e.preventDefault()
         var link = $(this)
-        if (confirm(link.attr('title') + '?')) {
+        // to support tooltip
+        var t = (link.attr('title') == '') ? link.attr('data-original-title') : link.attr('title');
+
+        if (confirm(t + '?')) {
             $.getJSON(link.attr('href'), function(data){
-                notify(link.attr('title'), data, 'info')
+                notify(t, data, 'info')
             })
         }
     })

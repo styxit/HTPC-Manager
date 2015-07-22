@@ -99,6 +99,16 @@ class Log:
         return content
 
     @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def logit(self, **kw):
+        ''' Used to log console errors '''
+        self.logger = logging.getLogger('webui.console.errors')
+        if kw:
+            self.logger.error("%s" % kw)
+            return kw
+
+    @cherrypy.expose()
     @cherrypy.tools.json_out()
     @require(member_of('admin'))
     def deletelog(self):
