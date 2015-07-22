@@ -650,7 +650,7 @@ class Plex(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def GetEpisodes(self, start=0, end=0, tvshowid=None, hidewatched=0):
+    def GetEpisodes(self, start=0, end=0, tvshowid=None, hidewatched=0, f=''):
         ''' Get information about a single TV Show '''
         self.logger.debug('Loading information for TVID %s' % tvshowid)
         try:
