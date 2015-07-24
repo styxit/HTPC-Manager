@@ -68,19 +68,37 @@ class Settings(object):
     def updatebl(self):
         # fix me
         from modules.newznab import NewznabIndexers
+        from modules.kodi import KodiServers
+        from htpc.manageusers import Manageusers
         NewznabIndexers.createTable(ifNotExists=True)
-        fl = Setting.select().orderBy(Setting.q.key)
+        KodiServers.createTable(ifNotExists=True)
+        Manageusers.createTable(ifNotExists=True)
+
         bl = []
+
+        fl = Setting.select().orderBy(Setting.q.key)
         for i in fl:
             if i.key.endswith("_apikey") or i.key.endswith("_username") or i.key.endswith("_password") or i.key.endswith("_passkey"):
                 if len(i.val) > 1:
                     bl.append(i.val)
-        nab = NewznabIndexers.select().orderBy(NewznabIndexers.q.apikey)
-        for ii in nab:
-            if len(ii.apikey) > 1:
-                bl.append(ii.apikey)
+
+        indexers = NewznabIndexers.select().orderBy(NewznabIndexers.q.apikey)
+        for indexer in indexers:
+            if len(indexer.apikey) > 1:
+                bl.append(indexer.apikey)
+
+        kodi = KodiServers.select().orderBy(KodiServers.q.password)
+        for k in kodi:
+            if len(k.password) > 1:
+                bl.append(k.password)
+
+        users = Manageusers.select().orderBy(Manageusers.q.username)
+        for user in users:
+            if len(user.password) > 1:
+                bl.append(user.password)
 
         htpc.BLACKLISTWORDS = bl
+        return bl
 
     def get_templates(self):
         """ Get a list of available templates """

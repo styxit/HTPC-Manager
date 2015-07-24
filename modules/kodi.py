@@ -159,7 +159,7 @@ class Kodi(object):
     @require()
     @cherrypy.tools.json_out()
     def setserver(self, kodi_server_id, kodi_server_name, kodi_server_host, kodi_server_port,
-            kodi_server_username=None, kodi_server_password=None, kodi_server_mac=None, kodi_server_starterport=''):
+                  kodi_server_username=None, kodi_server_password=None, kodi_server_mac=None, kodi_server_starterport=''):
         """ Create a server if id=0, else update a server """
         if kodi_server_starterport == '':
             kodi_server_starterport = None
@@ -174,8 +174,10 @@ class Kodi(object):
                         username=kodi_server_username,
                         password=kodi_server_password,
                         mac=kodi_server_mac,
-						starterport=kodi_server_starterport)
+                        starterport=kodi_server_starterport)
+
                 self.changeserver(server.id)
+                htpc.BLACKLISTWORDS.append(kodi_server_password)
                 return 1
             except Exception, e:
                 self.logger.debug("Exception: " + str(e))

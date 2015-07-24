@@ -24,9 +24,8 @@ class Users(object):
                 {'type': 'select',
                  'label': 'User',
                  'name': 'users_user_id',
-                 'options': [
-                    {'name': 'New', 'value': 0}
-                ]},
+                 'options': [{'name': 'New', 'value': 0}]
+                },
                 {'type': 'text',
                  'label': 'Username',
                  'name': 'users_user_username'},
@@ -38,17 +37,12 @@ class Users(object):
                  'name': 'users_user_role',
                  'desc': 'Admin users can change settings whilst normal users can only view pages.',
                  'options': [
-                    {'name': 'user', 'value': 'user'},
-                    {'name': 'admin', 'value': 'admin'}
+                        {'name': 'user', 'value': 'user'},
+                        {'name': 'admin', 'value': 'admin'}
                     ]
                 }
             ]
         })
-
-    @cherrypy.expose()
-    @require(member_of("admin"))
-    def index(self):
-        return htpc.LOOKUP.get_template('manageusers.html').render(scriptname='manageusers')
 
     @cherrypy.expose()
     @require(member_of("admin"))
@@ -57,9 +51,12 @@ class Users(object):
             self.logger.debug('Creating Manage users in db')
             try:
                 Manageusers(username=users_user_username,
-                    password=users_user_password,
-                    role=users_user_role)
+                            password=users_user_password,
+                            role=users_user_role)
+
+                htpc.BLACKLISTWORDS.append(users_user_password)
                 return 'hack'
+
             except Exception, e:
                 self.logger.debug('Failed to create %s %s' % (users_user_username, e))
                 return

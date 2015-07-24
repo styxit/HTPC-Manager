@@ -99,8 +99,8 @@ class Mylar(object):
     def webinterface():
         url = Mylar._build_url()
 
-        if htpc.settings.get('headphones_reverse_proxy_link'):
-            url = htpc.settings.get('headphones_reverse_proxy_link')
+        if htpc.settings.get('mylar_reverse_proxy_link'):
+            url = htpc.settings.get('mylar_reverse_proxy_link')
 
         return url
 
