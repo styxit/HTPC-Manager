@@ -229,14 +229,14 @@ class Kodi(object):
 
     @cherrypy.expose()
     @require()
-    def GetThumb(self, thumb=None, h=None, w=None, o=100):
+    def GetThumb(self, thumb=None, h=None, w=None, o=100, mode=None):
         """ Parse thumb to get the url and send to htpc.proxy.get_image """
         url = self.url('/images/DefaultVideo.png')
         if thumb:
             url = self.url('/image/' + quote(thumb))
 
-        self.logger.debug("Trying to fetch image via %s", url)
-        return get_image(url, h, w, o, self.auth())
+        self.logger.debug("Trying to fetch image via %s" % url)
+        return get_image(url, h, w, o, mode, self.auth())
 
     @cherrypy.expose()
     @require()
@@ -542,11 +542,13 @@ class Kodi(object):
                 playerprop = ['speed', 'position', 'time', 'totaltime',
                               'percentage', 'subtitleenabled', 'currentsubtitle',
                               'subtitles', 'currentaudiostream', 'audiostreams']
-                itemprop = ['thumbnail', 'showtitle', 'season', 'episode', 'year', 'fanart']
+
+                itemprop = ['title', 'season', 'episode', 'duration', 'showtitle',
+                            'fanart', 'tvshowid', 'plot', 'thumbnail', 'year']
 
             elif player['type'] == 'audio':
                 playerprop = ['speed', 'position', 'time', 'totaltime', 'percentage']
-                itemprop = ['thumbnail', 'title', 'artist', 'album', 'year', 'fanart']
+                itemprop = ['title', 'duration', 'fanart', 'artist', 'albumartist', 'album', 'track', 'artistid', 'albumid', 'thumbnail', 'year']
 
             app = kodi.Application.GetProperties(properties=['muted', 'volume'])
             player = kodi.Player.GetProperties(playerid=playerid, properties=playerprop)
@@ -554,7 +556,6 @@ class Kodi(object):
 
             return {'playerInfo': player, 'itemInfo': item, 'app': app}
         except IndexError:
-            self.logger.debug("Nothing current playing.")
             return
         except Exception, e:
             self.logger.exception(e)
@@ -786,16 +787,14 @@ class Kodi(object):
 
     def url(self, path='', auth=False):
         """ Generate a URL for the RPC based on kodi settings """
-        self.logger.debug("Generate URL to call kodi")
         url = self.current.host + ':' + str(self.current.port) + path
         if auth and self.current.username and self.current.password:
             url = self.current.username + ':' + self.current.password + '@' + url
 
-        self.logger.debug("URL: http://%s", url)
+        self.logger.debug("URL: http://%s" % url)
         return 'http://' + url
 
     def auth(self):
         """ Generate a base64 HTTP auth string based on settings """
-        self.logger.debug("Generating authentication string")
         if self.current.username and self.current.password:
             return base64.encodestring('%s:%s' % (self.current.username, self.current.password)).strip('\n')

@@ -29,7 +29,7 @@ except ImportError:
 logger = logging.getLogger('htpc.helpers')
 
 
-def get_image(url, height=None, width=None, opacity=100, auth=None, headers=None):
+def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, headers=None):
     ''' Load image form cache if possible, else download. Resize if needed '''
     opacity = float(opacity)
     logger = logging.getLogger('htpc.helpers')
@@ -47,28 +47,31 @@ def get_image(url, height=None, width=None, opacity=100, auth=None, headers=None
     image = os.path.join(imgdir, imghash)
 
     # If there is no local copy of the original
+    # download it
     if not os.path.isfile(image):
         logger.debug('No local image found for ' + image + '. Downloading')
-        download_image(url, image, auth, headers)
+        image = download_image(url, image, auth, headers)
 
     # Check if resize is needed
-    if (height and width) or (opacity < 100):
+    if (height and width) or (opacity < 100) or mode:
 
         if PIL:
             # Set a filename for resized file
-            resized = '%s_w%s_h%s_o_%s' % (image, width, height, opacity)
+            resized = '%s_w%s_h%s_o_%s_%s' % (image, width, height, opacity, mode)
 
             # If there is no local resized copy
             if not os.path.isfile(resized):
                 # try to resize, if we cant return original image
                 try:
-                    resize_image(image, height, width, opacity, resized)
+                    image = resize_image(image, height, width, opacity, mode, resized)
                 except Exception as e:
                     logger.debug('%s returning orginal image %s' % (e, url))
                     return serve_file(path=image, content_type='image/png')
 
-            # Serve the resized file
-            image = resized
+            # If the resized image is already cached
+            if os.path.isfile(resized):
+                image = resized
+
         else:
             logger.error("Can't resize when PIL is missing on system!")
             if (opacity < 100):
@@ -97,26 +100,35 @@ def download_image(url, dest, auth=None, headers=None):
 
         with open(dest, 'wb') as local_file:
             local_file.write(urlopen(request).read())
+
+        return dest
+
     except Exception as e:
         logger.error('Failed to download %s to %s %s' % (url, dest, e))
 
 
-def resize_image(img, height, width, opacity, dest):
+def resize_image(img, height, width, opacity, mode, dest):
     ''' Resize image, set opacity and save to disk '''
-    size = int(width), int(height)
     imagetype = imghdr.what(img)
-
     im = Image.open(img)
-    im = im.resize(size, Image.ANTIALIAS)
+
+    # Only resize if needed
+    if height is not None or width is not None:
+        size = int(width), int(height)
+        im = im.resize(size, Image.ANTIALIAS)
 
     # Apply overlay if opacity is set
-    opacity = float(opacity)
     if (opacity < 100):
         enhance = opacity / 100
         # Create white overlay image
         overlay = Image.new('RGB', size, '#FFFFFF')
         # apply overlay to resized image
         im = Image.blend(overlay, im, enhance)
+
+    # See http://effbot.org/imagingbook/concepts.htm
+    # for the different modes
+    if mode:
+        im = im.convert(str(mode))
 
     if imagetype.lower() == 'jpeg' or 'jpg':
         im.save(dest, 'JPEG', quality=95)
