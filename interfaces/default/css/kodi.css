@@ -89,6 +89,7 @@ h6.title {
 	height: 25px !important;
 	margin: 0px !important;
 	cursor: pointer;
+	background-color: #222222 !important;
 }
 #nowplaying {
     background-size: 100%;
