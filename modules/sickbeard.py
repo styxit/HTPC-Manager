@@ -14,7 +14,7 @@ class Sickbeard(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.sickbeard')
         htpc.MODULES.append({
-            'name': 'Sickbeard',
+            'name': 'Sick Beard',
             'id': 'sickbeard',
             'test': htpc.WEBDIR + 'sickbeard/ping',
             'fields': [

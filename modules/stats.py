@@ -57,8 +57,8 @@ class Stats(object):
         self.last_check = None
         self.last_check_ip = None
         htpc.MODULES.append({
-            'name': 'Computer stats',
-            'description': 'This module can show stats about you computer, CPU/HDD space, hardware info',
+            'name': 'System Info',
+            'description': '<div class="alert alert-block alert-info"><i class="fa fa-info-circle fa-fw"></i> This module shows stats about your HTPC, including CPU usage, HDD space and hardware info.</div>',
             'id': 'stats',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'stats_enable'},

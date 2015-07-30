@@ -19,7 +19,7 @@ class Torrentsearch(object):
         self.logger = logging.getLogger('modules.torrentsearch')
         self.rb = rarbg.Rarbg()
         htpc.MODULES.append({
-            'name': 'Torrent Search',
+            'name': 'Torrents',
             'id': 'torrentsearch',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'torrentsearch_enable'},

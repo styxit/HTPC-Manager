@@ -16,7 +16,7 @@ class Users(object):
         Manageusers.createTable(ifNotExists=True)
         htpc.MODULES.append({
             'name': 'Manage users',
-            'description': 'Add more users to HTPC Manager. Make sure you enable authentication and have provided a master username and password in General settings, otherwise authentication will not be used.',
+            'description': '<div class="alert alert-block alert-danger"><i class="fa fa-exclamation-triangle fa-fw"></i> Make sure you enable authentication and provide a master username and password in General settings, otherwise authentication will not be used.</div>',
             'isThirdParty': False,
             'id': 'users',
             'action': htpc.WEBDIR + 'users/setusers',

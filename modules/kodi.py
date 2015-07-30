@@ -41,7 +41,7 @@ class Kodi(object):
             pass
 
         htpc.MODULES.append({
-            'name': 'KODI',
+            'name': 'Kodi',
             'id': 'kodi',
             'fields': [
                 {'type': 'bool',
@@ -60,7 +60,7 @@ class Kodi(object):
         })
 
         htpc.MODULES.append({
-            'name': 'KODI Servers',
+            'name': 'Kodi Servers',
             'id': 'kodi_update_server',
             'action': htpc.WEBDIR + 'kodi/setserver',
             'test': htpc.WEBDIR + 'kodi/ping',
