@@ -5,20 +5,22 @@
         <h1 class="page-header page-title">
             <a href="${webinterface}" target="_blank" title="Open original CouchPotato interface">${settings.get('couchpotato_name', 'CouchPotato')}</a>
             <div class="btn-group pull-right">
-                 <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i>
-	                <i class="fa fa-caret-down"></i></a>
+                 <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wrench fa-lg"></i>
+	                <i class="fa fa-chevron-down"></i></a>
                     <ul class="dropdown-menu pull-right"> <!-- Skeleton -->
-                        <li><a href="Restart" class="ajax-confirm" title="Restart Couchpotato"><i class="fa fa-refresh"></i> Restart</a></li>
-                        <li><a href="Shutdown" class="ajax-confirm" title="Shutdown Couchpotato"><i class="fa fa-power-off"></i> Shutdown</a></li>
-                        <li><a id= "cp_update" href="#" title="Update Couchpotato"><i class="fa fa-eye"></i> Update</a></li>
-                        <li><a href="SearchAllWanted" class="ajax-confirm" title="Search all wanted movies"><i class="fa fa-search"></i> Search all wanted movies</a></li>
-                        <li><a id="postprocess" href="#" title="Postprocess"><i class="fa fa-hdd-o"></i> Postprocess</a></li>
+                        <li><a href="SearchAllWanted" class="ajax-confirm" title="Search all wanted movies"><i class="fa fa-search fa-fw"></i> Search all wanted movies</a></li>
+                        <li><a id="postprocess" href="#" title="Postprocess"><i class="fa fa-hdd-o fa-fw"></i> Postprocess</a></li>
+                        <li class="divider"></li>                        
+                        <li><a id= "cp_update" href="#" title="Update Couchpotato"><i class="fa fa-eye fa-fw"></i> Update</a></li>
+                        <li class="divider"></li>                        
+                        <li><a href="Restart" class="ajax-confirm" title="Restart Couchpotato"><i class="fa fa-refresh fa-fw"></i> Restart</a></li>
+                        <li><a href="Shutdown" class="ajax-confirm" title="Shutdown Couchpotato"><i class="fa fa-power-off fa-fw"></i> Shutdown</a></li>
                     </ul>
             </div>
         </h1>
         <form id="searchform" class="well form-inline">
             <input type="text" id="moviename" class="span6"  placeholder="Add new movie" />
-            <button type="submit" class="btn btn-success"><i class="fa fa-search"></i> Search</button>
+            <button type="submit" class="btn btn-success"><i class="fa fa-search fa-fw"></i> Search</button>
         </form>
         <ul class="cp_nav nav nav-tabs">
 			<li><a href="#library" data-toggle="tab">Library</a></li>
@@ -27,8 +29,8 @@
             <li><a href="#dashboardsoon" data-toggle="tab">Available soon</a></li>
             <!--<li><a href="#charts" data-toggle="tab">Charts</a></li>-->
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Charts
-                <i class="fa fa-caret-down"></i></a>
+                <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Charts
+                <i class="fa fa-chevron-down"></i></a>
                 <ul class="cp_chart_dropdown dropdown-menu">
                     <!--<li><a href="#artists" data-toggle="tab">Artists</a></li>-->
                     <!--<li><a href="#albums" data-toggle="tab">Albums</a></li>-->

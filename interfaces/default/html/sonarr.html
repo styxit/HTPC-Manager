@@ -5,30 +5,30 @@
         <h1 class="page-header page-title">
             <a href="${webinterface}" target="_blank" title="Open original Sonarr interface">${settings.get('sonarr_name', 'Sonarr')}</a>
             <div class="btn-group pull-right">
-                    <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i>
-                    <i class="fa fa-caret-down"></i></a>
-                    <ul class="dropdown-menu pull-right"> <!-- Skeleton -->
-                        <li><a href="Command?method=restart" class="ajax-confirm" title="Restart sonarr"><i class="fa fa-refresh"></i> Restart</a></li>
-                        <li><a href="Command/?method=shutdown" class="ajax-confirm" title="Shutdown sonarr"><i class="fa fa-power-off"></i> Shutdown</a></li>
-                        <li><a id="scanfolder" href="#" title="Scan DroneFactoryFolder"><i class="fa fa-search"></i> Scan DroneFactoryFolder</a></li>
-                    </ul>
-                </div>
+                <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wrench fa-lg"></i>
+                <i class="fa fa-chevron-down fa-fw"></i></a>
+                <ul class="dropdown-menu pull-right"> <!-- Skeleton -->
+                    <li><a id="scanfolder" href="#" title="Scan DroneFactoryFolder"><i class="fa fa-search fa-fw"></i> Scan DroneFactory Folder</a></li>
+                    <li class="divider"></li>
+                    <li><a href="Command?method=restart" class="ajax-confirm" title="Restart Sonarr"><i class="fa fa-refresh fa-fw"></i> Restart</a></li>
+                    <li><a href="Command/?method=shutdown" class="ajax-confirm" title="Shutdown Sonarr"><i class="fa fa-power-off fa-fw"></i> Shutdown</a></li>
+                </ul>
+            </div>
         </h1>
         <div class="well form-inline">
             <input class="span6" id="add_show_name" name="add_show_name" type="text" />
             <select class="span4" style="display:none;" id="add_show_select" name="add_show_select"></select>
             <select class="span2" style="display:none;" id="add_show_quality" name="add_show_quality"></select>
             <select class="span2" style="display:none;" id="add_show_folder" name="add_show_folder"></select>
-            <label style="display:none;" class="checkbox sonarr_checkboxs">
+            
+            <label style="display:none;padding-left: 5px;padding-right: 5px;" class="checkbox sonarr_checkboxs"> Season folders:
                 <input type="checkbox" class="sonarr_checkboxs" style="display:none;" id="add_show_seasonfolder" name="add_show_seasonfolder" value="on" checked>
-                Season folder
             </label>
-            <label style="display:none;" class="checkbox sonarr_checkboxs">
+            <label style="display:none;padding-left: 5px;padding-right: 5px;" class="checkbox sonarr_checkboxs"> Specials:
                 <input type="checkbox" class="sonarr_checkboxs" style="display:none;" id="add_show_specials" name="add_show_specials">
-                Specials
             </label>
-            <button class="btn btn-success" type="button" id="add_show_button"><i class="fa fa-plus fa-inverse"></i> Add show</button>
-            <button class="btn btn-success hide" type="button" id="add_tvdbid_button"><i class="fa fa-check fa-inverse"></i> Add show</button>
+            <button class="btn btn-success" type="button" id="add_show_button"><i class="fa fa-plus fa-inverse fa-fw"></i> Add show</button>
+            <button class="btn btn-success hide" type="button" id="add_tvdbid_button"><i class="fa fa-check fa-inverse fa-fw"></i> Add show</button>
             <button class="btn hide" type="button" id="cancel_show_button"> Cancel</button>
         </div>
         <ul class="nav nav-tabs">

@@ -5,21 +5,23 @@
         <h1 class="page-header page-title">
             <a href="${webinterface}" target="_blank" title="Open original SickRage interface">${settings.get('sickrage_name', 'SickRage')}</a>
             <div class="btn-group pull-right">
-                 <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i>
-	                 <i class="fa fa-caret-down"></i></a>
+                 <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wrench fa-lg"></i>
+	                 <i class="fa fa-chevron-down fa-fw"></i></a>
                     <ul class="dropdown-menu pull-right"> <!-- Skeleton -->
-                        <li><a href="Restart" class="ajax-confirm" title="Restart SickRage"><i class="fa fa-refresh"></i> Restart</a></li>
-                        <li><a href="Shutdown" class="ajax-confirm" title="Shutdown SickRage"><i class="fa fa-power-off"></i> Shutdown</a></li>
-                        <!--<li><a id="update_sb" href="#" title="Update sickbeard"><i class="fa fa-refresh"></i> Update</a></li>-->
-                        <li><a id="postprocess" href="#" title="Postprocess"><i class="fa fa-hdd-o"></i> Postprocess</a></li>
+                    	<li><a id="postprocess" href="#" title="Postprocess"><i class="fa fa-hdd-o fa-fw"></i> Postprocess</a></li>
+                    	<li class="divider"></li>
+                    	<!--<li><a id="update_sb" href="#" title="Update sickbeard"><i class="fa fa-refresh fa-fw"></i> Update</a></li>
+                    	<li class="divider"></li>-->
+                        <li><a href="Restart" class="ajax-confirm" title="Restart SickRage"><i class="fa fa-refresh fa-fw"></i> Restart</a></li>
+                        <li><a href="Shutdown" class="ajax-confirm" title="Shutdown SickRage"><i class="fa fa-power-off fa-fw"></i> Shutdown</a></li>
                     </ul>
             </div>
         </h1>
         <div class="well form-inline">
             <input class="span6" id="add_show_name" name="add_show_name" type="text"/>
             <select class="span6" style="display:none;" id="add_show_select" name="add_show_select"></select>
-            <button class="btn btn-success" type="button" id="add_show_button"><i class="fa fa-plus fa-inverse"></i> Add show</button>
-            <button class="btn btn-succmess hide" type="button" id="add_tvdbid_button"><i class="fa fa-check"></i> Add show</button>
+            <button class="btn btn-success" type="button" id="add_show_button"><i class="fa fa-plus fa-inverse fa-fw"></i> Add show</button>
+            <button class="btn btn-succmess hide" type="button" id="add_tvdbid_button"><i class="fa fa-check fa-fw"></i> Add show</button>
             <button class="btn hide" type="button" id="cancel_show_button"> Cancel</button>
         </div>
         <ul class="nav nav-tabs">

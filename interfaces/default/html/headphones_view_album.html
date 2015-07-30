@@ -4,14 +4,15 @@
         <h1 class="page-header page-title" data-artistid="${artist_id}" data-albumid="${album_id}" data-albumimg="${album['ArtworkURL']}">
             <span class="headphones_albumname">${album['AlbumTitle']}</span>
             <div class="btn-group show-options-menu pull-right">
-                <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-cogs"></i>
-                    <i class="fa fa-caret-down"></i>
+                <a class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" href="#">
+                    <i class="fa fa-cogs fa-lg"></i>
+                    <i class="fa fa-chevron-down fa-fw"></i>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="${self.attr.webdir}headphones/QueueAlbum/${album_id}&new=True" class="ajax-link"><i class="fa fa-search"></i> Force Check </a></li>
-                    <li><a href="${self.attr.webdir}headphones/QueueAlbum/${album_id}" class="ajax-link"><i class="fa fa-heart"></i> Wanted Album </a></li>
-                    <li><a href="${self.attr.webdir}headphones/UnqueueAlbum/${album_id}" class="ajax-link"><i class="fa fa-step-forward"></i> Skip Album </a></li>
+                    <li><a href="${self.attr.webdir}headphones/QueueAlbum/${album_id}&new=True" class="ajax-link"><i class="fa fa-search fa-fw"></i> Force Check </a></li>
+                    <li class="divider"></li>
+                    <li><a href="${self.attr.webdir}headphones/QueueAlbum/${album_id}" class="ajax-link"><i class="fa fa-heart fa-fw"></i> Wanted Album </a></li>
+                    <li><a href="${self.attr.webdir}headphones/UnqueueAlbum/${album_id}" class="ajax-link"><i class="fa fa-step-forward fa-fw"></i> Skip Album </a></li>
                 </ul>
             </div>
         </h1>

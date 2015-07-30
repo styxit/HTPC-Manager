@@ -9,14 +9,15 @@
         <h1 class="page-header page-title" data-comicid="${comic_id}" data-comicimg="${comicimg}">
             <span class="mylar_comicname">${comic['ComicName']}</span>
             <div class="btn-group show-options-menu pull-right">
-                <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-wrench"></i>&nbsp;<span class="fa fa-caret"></span>
+                <a class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" href="#">
+                    <i class="fa fa-wrench fa-lg"></i>&nbsp;<span class="fa fa-chevron-down fa-fw"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="${self.attr.webdir}mylar/RefreshComic/${comic_id}" class="ajax-link"><i class="fa fa-refresh"></i> Refresh</a></li>
-                    <li><a href="${self.attr.webdir}mylar/DeleteComic/${comic_id}" class="ajax-link"><i class="fa fa-trash"></i> Delete</a></li>
-                    <li><a href="${self.attr.webdir}mylar/PauseComic/${comic_id}" class="ajax-link"><i class="fa fa-pause"></i> Pause</a></li>
-                    <li><a href="${self.attr.webdir}mylar/ResumeComic/${comic_id}" class="ajax-link"><i class="fa fa-play"></i> Resume</a></li>
+                    <li><a href="${self.attr.webdir}mylar/RefreshComic/${comic_id}" class="ajax-link"><i class="fa fa-refresh fa-fw"></i> Refresh</a></li>
+                    <li><a href="${self.attr.webdir}mylar/DeleteComic/${comic_id}" class="ajax-link"><i class="fa fa-trash fa-fw"></i> Delete</a></li>
+                    <li class="divider"></li>
+                    <li><a href="${self.attr.webdir}mylar/PauseComic/${comic_id}" class="ajax-link"><i class="fa fa-pause fa-fw"></i> Pause</a></li>
+                    <li><a href="${self.attr.webdir}mylar/ResumeComic/${comic_id}" class="ajax-link"><i class="fa fa-play fa-fw"></i> Resume</a></li>
                 </ul>
             </div>
         </h1>
@@ -99,15 +100,15 @@
                             <div class="btn-group">
                             ## % if issue['can_download'] is True:
                             <a class="btn btn-mini btn-search" title="Set as wanted">
-                                <i class="fa fa-heart"></i>
+                                <i class="fa fa-heart fa-fw"></i>
                             </a>
                             ## % endif
                             <a class="btn btn-mini unque-issue-mylar" title="Set as skipped">
-                                <i class="fa fa-step-forward"></i>
+                                <i class="fa fa-step-forward fa-fw"></i>
                             </a>
                             % if issue['Status'] == 'Downloaded':
                                 <a href="${self.attr.webdir}mylar/DownloadIssue?issueid=${issue['IssueID']}&name=${issue['Location']}"class="btn btn-mini" title="Download to browser" download="${issue['Location']}">
-                                    <i class="fa fa-download"></i>
+                                    <i class="fa fa-download fa-fw"></i>
                                 </a>
                             % endif
 

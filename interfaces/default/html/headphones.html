@@ -4,17 +4,17 @@
         <h1 class="page-header page-title">
             <a href="${url}" target="_blank" title="Open original Headphones interface">${name}</a>
             <div class="btn-group show-options-menu pull-right">
-                <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-wrench"></i>
-                    <i class="fa fa-caret-down"></i>
+                <a class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" href="#">
+                    <i class="fa fa-wrench fa-lg"></i>
+                    <i class="fa fa-chevron-down"></i>
                 </a>
                 <ul class="dropdown-menu">
                     <!--  finished the commands below-->
-                    <li><a href="ShutDown" title="Shutdown Headphones" class="ajax-confirm headphones_shutdown"><i class="fa fa-power-off"></i> Shutdown</a></li>
-                    <li><a href="ReStart" title="Restart Headphones" class="ajax-confirm headphones_restart"><i class="fa fa-refresh"></i> Restart</a></li>
-                    <li><a href="UpDate" title="Update Headphones" class="ajax-confirm"><i class="fa fa-eye"></i> Update</a></li>
-                    <li><a href="ForceProcess" title="Force Process Headphones" class="headphones_forceprocess"><i class="fa fa-hdd-o"></i> Force Process</a></li>
-                    <li><a href="ForceSearch" title="Force Search Headphones" class="ajax-confirm "><i class="fa fa-search"></i> Force Search</a></li>
+                    <li><a href="ForceSearch" title="Force Search Headphones" class="ajax-confirm "><i class="fa fa-search fa-fw"></i> Force Search</a></li>
+                    <li><a href="ForceProcess" title="Force Process Headphones" class="headphones_forceprocess"><i class="fa fa-hdd-o fa-fw"></i> Force Process</a></li>
+                    <li class="divider"></li>                        
+                    <li><a href="ReStart" title="Restart Headphones" class="ajax-confirm headphones_restart"><i class="fa fa-refresh fa-fw"></i> Restart</a></li>
+                    <li><a href="ShutDown" title="Shutdown Headphones" class="ajax-confirm headphones_shutdown"><i class="fa fa-power-off fa-fw"></i> Shutdown</a></li>
                 </ul>
             </div>
         </h1>
@@ -25,8 +25,8 @@
                 <option name="artist" value="artistId" data-id="artistId">Artist</option>
                 <option name="album" value="albumId" data-id="albumId">Album</option>
             </select>
-            <button class="btn btn-success" type="button" id="add_artist_button"><i class="fa fa-search fa-inverse"></i> Search</button>
-            <button class="btn btn-success hide" type="button" id="add_artistid_button"><i class="fa fa-check fa-inverse"></i> Add</button>
+            <button class="btn btn-success" type="button" id="add_artist_button"><i class="fa fa-search fa-inverse fa-fw"></i> Search</button>
+            <button class="btn btn-success hide" type="button" id="add_artistid_button"><i class="fa fa-check fa-inverse fa-fw"></i> Add</button>
             <button class="btn hide" type="button" id="cancel_artist_button"> Cancel</button>
         </div>
         <ul class="nav nav-tabs">

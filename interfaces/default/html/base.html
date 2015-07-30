@@ -30,14 +30,13 @@ webdir = htpc.WEBDIR
     <script type="text/javascript">var ALLOWIFRAME="${s.get('app_open_otherlink_in_iframe', 'false')}"</script>
     <script type="text/javascript">var JSLOGCONSOLE="${jslogconsole}"</script>
     <link href="${htpc.WEBDIR}css/bootstrap-slider.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/bootstrap.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','obsidian')}/bootstrap.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','obsidian')}/bootstrap-responsive.min.css" rel="stylesheet">
     % if s.get('app_use_cdn', 0):
-	    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.min.css" rel="stylesheet">
 	    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/minified/jquery-ui.min.css" rel="stylesheet">
-	    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+	    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/css/filter.formatter.min.css" rel="stylesheet">
     % else:
-	    <link href="${htpc.WEBDIR}css/bootstrap-responsive.min.css" rel="stylesheet">
 	    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
 	    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
         <link href="${htpc.WEBDIR}css/filter.formatter.css" rel="stylesheet">
@@ -45,13 +44,10 @@ webdir = htpc.WEBDIR
     <link href="${htpc.WEBDIR}css/rg-icons.min.css${nocache}" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/base.css${nocache}" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css${nocache}" rel="stylesheet">
     <link href="${self.attr.webdir}css/${scriptname}.css${nocache}" rel="stylesheet">
-
 </head>
 
 <body>
-
 <div class="navbar navbar-fixed-top navbar-inverse">
     <div class="navbar-inner">
         <div class="container-fluid">
@@ -73,8 +69,8 @@ webdir = htpc.WEBDIR
                     <% customurls = s.getUrls() %>
                     % if len(customurls) > 1:
                     <li class="dropdown" id="nav-menu-others">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other <b class="fa fa-caret-down"></b></a>
-                        <ul class="dropdown-menu">
+                        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Other &nbsp<b class="fa fa-chevron-down fa-fw"></b></a>
+                        <ul class="dropdown-menu" id="dropdown-menu-others">
                         % for link in customurls:
                             <li class="nav-menu-item other-link-item"><a href="${link['url']|h, entity}" target="_blank">${link['name']|h, entity}</a></li>
                         % endfor
@@ -85,37 +81,38 @@ webdir = htpc.WEBDIR
                     % endif
                     <!-- start phone tablet -->
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="${htpc.WEBDIR}about"><i class="fa fa-info-circle"></i>  About</a>
+                        <a href="${htpc.WEBDIR}about"><i class="fa fa-info-circle fa-fw"></i>  About</a>
                     </li>
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a class="dash-edit" href="#"><i class="fa fa-arrows"></i> Edit Dash</a>
+                        <a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="fa fa-cog fa-fw"></i> Settings</a>
+                    </li>
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a href="#" class="btn-check-update"><i class="fa fa-eye fa-fw"></i> Check for update</a>
+                    </li>
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a href="${htpc.WEBDIR}log/" id="btn-log"><i class="fa fa-list fa-fw"></i> Log</a>
+                    </li>
+                    <li class="hidden-desktop visible-phone visible-tablet divider"></li>
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a class="dash-edit" href="#"><i id="" class="fa fa-arrows fa-fw"></i> Edit Dash</a>
                     </li>
                     <!-- Didnt find a good way to add this in mobile/tablet view.
                     <li class="hidden-desktop visible-phone visible-tablet">
                         <a href="#" class="btn-menuorder"><i class="fa fa-unsorted"></i> Edit Menu</a>
                     </li>
                     -->
-                    <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="#" class="btn-check-update"><i class="fa fa-eye"></i> Check for updates</a>
-                    </li>
-                    <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="fa fa-cog"></i> Settings</a>
-                    </li>
-                    <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="${htpc.WEBDIR}log/" id="btn-log"><i class="fa fa-list"></i> Log</a>
-                    </li>
+                    <li class="hidden-desktop visible-phone visible-tablet divider"></li>
                     % if htpc.AUTH:
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC Manager"><i class="fa fa-sign-out"></i> Logout</a>
+                        <a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC Manager"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                     </li>
                     % endif
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC Manager"><i class="fa fa-refresh"></i> Restart</a>
+                        <a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC Manager"><i class="fa fa-refresh fa-fw"></i> Restart</a>
                     </li>
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="${htpc.WEBDIR}shutdown" class="confirm" title="Shutdown HTPC Manager"><i class="fa fa-power-off"></i> Shutdown</a>
+                        <a href="${htpc.WEBDIR}shutdown" class="confirm" title="Shutdown HTPC Manager"><i class="fa fa-power-off fa-fw"></i> Shutdown</a>
                     </li>
-
                 </ul>
                 <!-- end phone tablet -->
 
@@ -127,27 +124,29 @@ webdir = htpc.WEBDIR
                     %endif
                     <input type="text" name="query" id="search" class="span3 search" accesskey="s" placeholder="Search">
                         <div class="btn-group" id="menu-settings">
-                          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+                          <a class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" href="#">
                             <i class="fa fa-bars fa-inverse"></i>
                           </a>
                           <ul class="dropdown-menu pull-right">
-                            <li><a href="${htpc.WEBDIR}about"><i class="fa fa-info-circle"></i> About</a></li>
-                            <li><a href="#" class="btn-check-update"><i class="fa fa-eye"></i> Check for updates</a></li>
-                            <li><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="fa fa-cog"></i> Settings</a></li>
-                            <li><a class="dash-edit" href="${htpc.WEBDIR}#edit"><i class="fa fa-arrows"></i> Edit Dash</a></li>
-                            <li><a href="#" class="btn-menuorder"><i class="fa fa-sort"></i> Edit Menu</a></li>
-                            <li><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="fa fa-list"></i> Log</a></li>
+                            <li><a href="${htpc.WEBDIR}about"><i class="fa fa-info-circle fa-fw"></i> About</a></li>
+                            <li><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="fa fa-cog fa-fw"></i> Settings</a></li>
+                            <li><a href="#" class="btn-check-update"><i class="fa fa-eye fa-fw"></i> Check for update</a></li>
+                            <li><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="fa fa-list fa-fw"></i> Log</a></li>
+                            <li class="divider"></li>
+                            <li><a href="${htpc.WEBDIR}#edit" class="dash-edit"><i class="fa fa-arrows fa-fw"></i> Edit Dash</a></li>
+                            <li><a href="#" class="btn-menuorder"><i class="fa fa-sort fa-fw"></i> Edit Menu</a></li>
+                            <li class="divider"></li>
                             % if htpc.AUTH:
-                            <li><a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC Manager"><i class="fa fa-sign-out"></i> Logout</a></li>
+                            <li><a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC Manager"><i class="fa fa-sign-out fa-fw"></i> Logout</a></li>
                             % endif
-                            <li><a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC Manager"><i class="fa fa-refresh"></i> Restart</a></li>
-                            <li><a href="${htpc.WEBDIR}shutdown" class="confirm" title="Shutdown HTPC Manager"><i class="fa fa-power-off"></i> Shutdown</a></li>
+                            <li><a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC Manager"><i class="fa fa-refresh fa-fw"></i> Restart</a></li>
+                            <li><a href="${htpc.WEBDIR}shutdown" class="confirm" title="Shutdown HTPC Manager"><i class="fa fa-power-off fa-fw"></i> Shutdown</a></li>
                           </ul>
                         </div>
                     </form>
                     <div class="btn-group hide" id="menu-editing">
-                        <i id="menu-save" class="btn fa fa-check" title="Save"></i>
-                        <i id="menu-cancel" class="btn fa fa-times" title="Discard"></i>
+                        <i id="menu-save" class="btn btn-success fa fa-check fa-fw" title="Save"></i>
+                        <i id="menu-cancel" class="btn btn-danger fa fa-times fa-fw" title="Discard"></i>
                     </div>
                 </div>
             </div>
@@ -235,6 +234,9 @@ ${self.body()}
     <!-- end tablesorter -->
 
 % endif
+<script src="${htpc.WEBDIR}js/libs/re-bootstrap.min.js"></script>
+<!--Triggers special feature of Aurora theme when that theme is selected!-->
+<script src="${htpc.WEBDIR}css/themes/${s.get('app_theme','aurora')}/aurora.min.js"></script> 
 <script src="${htpc.WEBDIR}js/libs/jquery.raty.js"></script>
 <script src="${htpc.WEBDIR}js/libs/jquery.pnotify.min.js"></script>
 <script src="${htpc.WEBDIR}js/libs/jquery.pager.js"></script>

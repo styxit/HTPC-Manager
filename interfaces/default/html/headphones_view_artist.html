@@ -9,15 +9,16 @@ ${self.attr.webdir}
         <h1 class="page-header page-title" data-artistid="${artist_id}" data-artistimg="${artistimg}">
             <span class="headphones_artistname">${artist['ArtistName']}</span>
             <div class="btn-group show-options-menu pull-right">
-                <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="fa fa-cogs"></i>
-                    <i class="fa fa-caret-down"></i>
+                <a class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" href="#">
+                    <i class="fa fa-cogs fa-lg"></i>
+                    <i class="fa fa-chevron-down fa-fw"></i>
                 </a>
                 <ul class="dropdown-menu">
-                    <li><a href="${self.attr.webdir}headphones/RefreshArtist/${artist_id}" class="ajax-link"><i class="fa fa-refresh"></i> Refresh</a></li>
-                    <li><a href="${self.attr.webdir}headphones/DeleteArtist/${artist_id}" class="ajax-link"><i class="fa fa-trash-o"></i> Delete</a></li>
-                    <li><a href="${self.attr.webdir}headphones/PauseArtist/${artist_id}" class="ajax-link"><i class="fa fa-pause"></i> Pause</a></li>
-                    <li><a href="${self.attr.webdir}headphones/ResumeArtist/${artist_id}" class="ajax-link"><i class="fa fa-play"></i> Resume</a></li>
+                    <li><a href="${self.attr.webdir}headphones/RefreshArtist/${artist_id}" class="ajax-link"><i class="fa fa-refresh fa-fw"></i> Refresh</a></li>
+                    <li><a href="${self.attr.webdir}headphones/DeleteArtist/${artist_id}" class="ajax-link"><i class="fa fa-trash-o fa-fw"></i> Delete</a></li>
+                    <li class="divider"></li>
+                    <li><a href="${self.attr.webdir}headphones/PauseArtist/${artist_id}" class="ajax-link"><i class="fa fa-pause fa-fw"></i> Pause</a></li>
+                    <li><a href="${self.attr.webdir}headphones/ResumeArtist/${artist_id}" class="ajax-link"><i class="fa fa-play fa-fw"></i> Resume</a></li>
                 </ul>
             </div>
         </h1>
@@ -88,11 +89,11 @@ ${self.attr.webdir}
                             <div class="btn-group">
                             % if album['can_download'] is True:
                             <a class="btn btn-mini btn-search" title="Set as wanted">
-                                <i class="fa fa-heart"></i>
+                                <i class="fa fa-heart fa-fw"></i>
                             </a>
                             % endif
                             <a class="btn btn-mini unque-album-hp" title="Set as skipped">
-                                <i class="fa fa-step-forward"></i>
+                                <i class="fa fa-step-forward fa-fw"></i>
                             </a>
 
                             </div>
