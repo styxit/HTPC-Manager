@@ -45,7 +45,7 @@ function loadShowData(seriesId, tvdbId) {
                     });
                 }
 
-                $('.sonarr_want_quality').text(qname);
+                $('.sonarr_want_quality').append(sonarrStatusLabel(qname));
                 $('.sonarr_showname').text(tvshow.title);
                 $('.sonarr_status').append(sonarrStatusLabel(tvshow.status));
                 $('.sonarr_network').text(tvshow.network);
@@ -55,14 +55,14 @@ function loadShowData(seriesId, tvdbId) {
 
                 var menu = $('.show-options-menu');
                 $('.rescan-files')
+                	.attr('data-desc', 'Refresh Series')
                     .attr('data-method', 'RefreshSeries')
                     .attr('data-param', 'seriesId')
                     .attr('data-id', tvshow.id)
                     .attr('data-name', tvshow.title)
-                    .text('Refresh Series');
 
                 $('.full-update')
-                    .attr('data-desc', 'Rescan Serie')
+                    .attr('data-desc', 'Rescan Series')
                     .attr('data-method', 'RescanSeries')
                     .attr('data-param', 'seriesId')
                     .attr('data-id', tvshow.id)
@@ -145,7 +145,7 @@ function showEpisodeInfo(episodeid, value) {
                 .append($("<td>").text(moment(ep.airDateUtc).calendar())))
                 .append($("<tr>")
                 .append($("<td>").html("<b>Quality</b>"))
-                .append($("<td>").text(pResult.quality.quality.name)))
+                .append($("<td>").html(sonarrStatusLabel(qname))))
                 .append($("<tr>")
                 .append($("<td>").html("<b>File size</b>"))
                 .append($("<td>").text(bytesToSize(pResult.size, 2))))
@@ -200,7 +200,7 @@ function rendseason(sID, id, seasonnumber) {
                 })),
                 $('<td>').text(value.airDate),
                 $('<td>').html(sonarrStatusLabel(hasfile)),
-                $('<td>').addClass('quality').text(''), // TODO when/if they change api
+                $('<td>').html(sonarrStatusLabel(qname)),
                 $('<td>').append(search_link));
                 seasonContent.append(row);
 
@@ -226,19 +226,23 @@ function rendseason(sID, id, seasonnumber) {
 
 function sonarrStatusIcon(iconText, white) {
     var text = [
-        'downloaded',
+        'Downloaded',
+        'Missing',
         'continuing',
-        'snatched',
-        'unaired',
-        'archived',
-        'skipped'];
+        'Snatched',
+        'Unaired',
+        'Archived',
+        'Skipped',
+        'ended'];
     var icons = [
         'fa fa-download',
-        'fa fa-repeat',
-        'fa fa-share-alt',
+        'fa fa-exclamation-triangle',
+        'fa fa-play',
+        'fa fa-cloud-download',
         'fa fa-clock-o',
-        'fa fa-lock',
-        'fa fa-fast-forward'];
+        'fa fa-archive',
+        'fa fa-fast-forward',
+        'fa fa-stop'];
 
     if (text.indexOf(iconText) != -1) {
         var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
@@ -251,11 +255,11 @@ function sonarrStatusIcon(iconText, white) {
 }
 
 function sonarrStatusLabel(text) {
-    var statusOK = ['continuing', 'downloaded', 'HD', 'HD-720p', 'HD-1080p', 'HDTV-720p',
-                    'HDTV-1080p', 'WEBDL-720p', 'WEBDL-1080p', 'Bluray', 'Bluray-720p', 'Bluray-1080p'];
-    var statusInfo = ['snatched', 'SD', 'SDTV', 'DVD'];
-    var statusError = ['ended'];
-    var statusWarning = ['skipped'];
+    var statusOK = ['continuing', 'Downloaded','Any'];
+    var statusInfo = ['Snatched', 'HD', 'HD - All', 'HD-720p', 'HD-1080p', 'HDTV-720p', 'HDTV-1080p', 'WEBDL-720p', 'WEBDL-1080p'];
+    var statusError = ['ended','Missing'];
+    var statusWarning = ['Skipped', 'SD', 'SD - All', 'SDTV', 'DVD'];
+    var statusNormal = ['Bluray', 'Bluray-720p', 'Bluray-1080p'];
     var label = $('<span>').addClass('label').text(text);
 
     if (statusOK.indexOf(text) != -1) {
@@ -266,6 +270,8 @@ function sonarrStatusLabel(text) {
         label.addClass('label-important');
     } else if (statusWarning.indexOf(text) != -1) {
         label.addClass('label-warning');
+    } else if (statusNormal.indexOf(text) != -1) {
+	    label;
     }
 
     var icon = sonarrStatusIcon(text, true);

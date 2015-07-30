@@ -132,7 +132,7 @@ function getTorrents(){
           // Remove button
           removeButton = $('<a>').
             addClass('btn btn-mini').
-            html('<i class="fa fa-times"></i>').
+            html('<i class="fa fa-trash-o fa-lg"></i>').
             attr('href', WEBDIR + 'transmission/remove/' + torrent.id).
             attr('title', 'Remove torrent');
           buttons.append(removeButton);

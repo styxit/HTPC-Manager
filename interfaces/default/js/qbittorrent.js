@@ -57,7 +57,7 @@ function get_torrents() {
                 // Remove button
                 removeButton = $('<a class="qbt_removetorrent" data-action="delete" data-hash="" data-name="">').
                 addClass('btn btn-mini').
-                html('<i class="fa fa-times"></i>').
+                html('<i class="fa fa-trash-o fa-lg"></i>').
                 attr('data-hash', torrent.hash).
                 attr('data-name', torrent.name).
                 attr('title', 'Remove torrent');

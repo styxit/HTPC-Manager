@@ -244,7 +244,7 @@ function sickrageStatusIcon(iconText, white) {
 }
 
 
-// Not in use atm. Needs to a edit show to the api. and add more stuff from sb.show cmd.
+// Not in use atm. Needs to add edit show to the api and add more stuff from sb.show cmd.
 function loadShow(data) {
     var table = $('<table>');
     table.addClass('table table-bordered table-striped table-condensed');
@@ -531,3 +531,5 @@ function delete_show(tvshow) {
         }, 2500);
     }
 }
+
+$("[type='checkbox']").bootstrapSwitch();

@@ -73,11 +73,11 @@ function loadShows() {
                 var progress = $('<div>').addClass("progress")
                 var progressbar = $('<div>').addClass("bar bar-success").css("width", calc + '%')
                 if (tvshow.episodeCount > tvshow.episodeFileCount) {
-                    progressbar.removeClass("bar-success").addClass("bar-danger")
+                    progressbar.removeClass("bar-success").addClass("bar-warning")
                 }
                 // For if no eps are aired
                 if (tvshow.episodeCount === 0) {
-                    progressbar.removeClass("bar-success").addClass("bar-warning").css("width", 100 + '%')
+                    progressbar.removeClass("bar-success").addClass("bar-danger").css("width", 100 + '%')
                 }
                 var progresstext = $('<span>').text(tvshow.episodeFileCount + '/' + tvshow.episodeCount)
                 progress.append(progressbar, progresstext);
@@ -106,19 +106,23 @@ function loadShows() {
 
 function sonarrStatusIcon(iconText, white) {
     var text = [
-        'downloaded',
+        'Downloaded',
+        'Missing',
         'continuing',
-        'snatched',
-        'unaired',
-        'archived',
-        'skipped'];
+        'Snatched',
+        'Unaired',
+        'Archived',
+        'Skipped',
+        'ended'];
     var icons = [
-        'fa fa-download',
-        'fa fa-repeat',
-        'fa fa-share-alt',
-        'fa fa-clock-o',
-        'fa fa-lock',
-        'fa fa-fast-forward'];
+        'fa fa-download &nbsp',
+        'fa fa-exclamation-triangle &nbsp',
+        'fa fa-play &nbsp',
+        'fa fa-cloud-download &nbsp',
+        'fa fa-clock-o &nbsp',
+        'fa fa-archive &nbsp',
+        'fa fa-fast-forward &nbsp',
+        'fa fa-stop &nbsp'];
 
     if (text.indexOf(iconText) != -1) {
         var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
@@ -131,11 +135,11 @@ function sonarrStatusIcon(iconText, white) {
 }
 
 function sonarrStatusLabel(text) {
-    var statusOK = ['continuing', 'downloaded', 'HD', 'HD-720p', 'HD-1080p', 'HDTV-720p',
-                    'HDTV-1080p', 'WEBDL-720p', 'WEBDL-1080p', 'Bluray', 'Bluray-720p', 'Bluray-1080p'];
-    var statusInfo = ['snatched', 'SD', 'SDTV', 'DVD'];
+    var statusOK = ['continuing', 'Downloaded', 'Any'];
+    var statusInfo = ['Snatched', 'HD', 'HD - All', 'HD-720p', 'HD-1080p', 'HDTV-720p', 'HDTV-1080p', 'WEBDL-720p', 'WEBDL-1080p',];
     var statusError = ['ended'];
-    var statusWarning = ['skipped'];
+    var statusWarning = ['Skipped', 'SD', 'SD - All', 'SDTV', 'DVD'];
+    var statusNormal = ['Bluray', 'Bluray-720p', 'Bluray-1080p']
 
     var label = $('<span>').addClass('label').text(text);
 
@@ -147,6 +151,8 @@ function sonarrStatusLabel(text) {
         label.addClass('label-important');
     } else if (statusWarning.indexOf(text) != -1) {
         label.addClass('label-warning');
+    } else if (statusNormal.indexOf(text) != -1) {
+	    label;
     }
 
     var icon = sonarrStatusIcon(text, true);

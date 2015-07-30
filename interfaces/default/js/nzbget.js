@@ -165,8 +165,8 @@ function loadHistory() {
                 buttons = $('<div>').addClass('btn-group pull-right');
 
                 removeButton = $('<a class="nzbget_removenzbhistory nzb_action" data-action="" data-id="" data-name="">').
-                addClass('btn btn-mini').
-                html('<i class="fa fa-remove"></i>').
+                addClass('btn btn-mini btn-danger').
+                html('<i class="fa fa-trash-o fa-lg"></i>').
                 attr('data-id', slot.NZBID).
                 attr('data-action', 'hidehistory').
                 attr('data-name', slot.Name).
@@ -320,7 +320,7 @@ function loadQueue(once) {
                 buttons.append(actionButton);
 
                 deleteButton = $('<a class="nzbget_deleteenzb nzb_action" data-action="delete" data-id="" data-name="">').
-                addClass('btn btn-mini').
+                addClass('btn btn-mini btn-danger').
                 html('<i class="fa fa-remove"></i>').
                 attr('data-id', job.NZBID).
                 attr('data-name', job.NZBName).
@@ -358,23 +358,27 @@ function loadWarnings() {
     });
 }
 function nzbgetStatusLabel(text){
-  var statusOK = ['SUCCESS', 'Downloading'];
-  var statusInfo = ['Extracting', 'Running'];
+  var statusOK = ['SUCCESS'];
+  var statusInfo = ['Extracting', 'Running','Downloading'];
   var statusError = ['FAILURE'];
-  var statusWarning = ['Verifying', 'Repairing'];
+  var statusWarning = ['Verifying', 'Repairing', 'NONE'];
 
-  var label = $('<span>').addClass('label').text(text);
+  var label = $('<span>').addClass('label btn-info').text(text);
 
   if (statusOK.indexOf(text) != -1) {
+	label.removeClass('btn-info');
     label.addClass('label-success');
   }
   else if (statusInfo.indexOf(text) != -1) {
+	label.removeClass('btn-info');
     label.addClass('label-info');
   }
   else if (statusError.indexOf(text) != -1) {
+	label.removeClass('btn-info');
     label.addClass('label-important');
   }
   else if (statusWarning.indexOf(text) != -1) {
+	label.removeClass('btn-info');
     label.addClass('label-warning');
   }
 

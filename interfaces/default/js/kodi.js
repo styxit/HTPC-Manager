@@ -215,7 +215,7 @@ function loadMovies(options) {
                         movieAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-check-circle fa-inverse watched'));
                     }
 
-                    movieAnchor.append($('<h6>').addClass('title').html(shortenText(movie.title, 12)));
+                    movieAnchor.append($('<h6>').addClass('title').html(shortenText(movie.title, 16)));
 
                     movieItem.append(movieAnchor);
 
@@ -391,7 +391,7 @@ function loadShows(options) {
                         showAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-check-circle fa-inverse watched'));
                     }
 
-                    showAnchor.append($('<h6>').addClass('title').html(shortenText(show.title, 11)));
+                    showAnchor.append($('<h6>').addClass('title').html(shortenText(show.title, 16)));
 
                     showItem.append(showAnchor);
 
@@ -814,11 +814,11 @@ function loadNowPlaying() {
                             thumbnail.attr('width', '140').attr('height', '140');
                     }
                 }
-                if (data.itemInfo.item.fanart) {
+                /*if (data.itemInfo.item.fanart) {
                     var background = encodeURIComponent(data.itemInfo.item.fanart)
                     background = WEBDIR + 'kodi/GetThumb?w=1150&h=640&o=10&thumb='+background;
                     $('#nowplaying').css({'background-image':'url('+background+')'});
-                }
+                }*/
             }
 
             if (data.playerInfo.speed == 1) {
@@ -1040,7 +1040,7 @@ function GetAddons() {
                     }
 
                     addonAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
-                    addonAnchor.append($('<h6>').addClass('title').html(shortenText(addon.name, 11)));
+                    addonAnchor.append($('<h6>').addClass('title').html(shortenText(addon.name, 17)));
                     row.append(addonAnchor);
                     $('#addons-grid').append(row);
                     //Holder.run();

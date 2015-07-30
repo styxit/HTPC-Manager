@@ -137,7 +137,7 @@ function anc(nzb) {
                     "height": "24px"
             }).click(function () {
                 sendToclient(nzb, client);
-            }).append($('<i>').addClass('rg rg-' + client.client.toLowerCase() + '-c'));
+            }).append($('<i>').addClass('rg rg-lg rg-' + client.client.toLowerCase()));
 
             b.append(button);
 
@@ -151,7 +151,7 @@ function anc(nzb) {
             "height": "24px"
     }).click(function () {
         downloadFile(nzb.link);
-    }).append($('<i>').addClass('fa fa-download rg-client'));
+    }).append($('<i>').addClass('fa fa-download rg-lg rg-client'));
 
     b.append(browserdl);
 

@@ -109,7 +109,7 @@ function loadHistory() {
             }
             $('#history_table_body').html('');
             $.each(data.history.slots, function (i, slot) {
-                var deleteImage = makeIcon('fa fa-times', 'Delete');
+                var deleteImage = makeIcon('fa fa-trash-o fa-lg');
                 deleteImage.click(function () {
                     removeHistoryItem(slot.nzo_id);
                 });

@@ -26,7 +26,7 @@ $(document).ready(function () {
             url: WEBDIR + 'settings/urls',
             data: JSON.stringify(data),
             success: function () {
-                notify('Settings', 'Save successful', 'info');
+                notify('Settings', 'Save successful', 'success');
             },
             error: function () {
                 notify('Settings', 'Save failed', 'error');
@@ -148,7 +148,7 @@ $(document).ready(function () {
                 var name = item.find('option:selected').text();
                 if (!confirm('Delete ' + name)) return;
                 $.get(WEBDIR + 'kodi/delserver?id=' + id, function (data) {
-                    notify('Settings', 'Server deleted', 'info');
+                    notify('Settings', 'Server deleted', 'warning');
                     $(this).val(0);
                     item.find('option[value=' + id + ']').remove();
                     $('button:reset:visible').html('Clear').removeClass('btn-danger').unbind();
@@ -173,7 +173,7 @@ $(document).ready(function () {
                 var name = item.find('option:selected').text();
                 if (!confirm('Delete ' + name)) return;
                 $.get(WEBDIR + 'users/deluser?id=' + id, function (data) {
-                    notify('Settings', name + ' deleted', 'info');
+                    notify('Settings', name + ' deleted', 'error');
                     $(this).val(0);
                     item.find('option[value=' + id + ']').remove();
                     $('button:reset:visible').html('Clear').removeClass('btn-danger').unbind();
@@ -204,7 +204,7 @@ $(document).ready(function () {
                 var name = item.find('option:selected').text();
                 if (!confirm('Delete ' + name)) return;
                 $.get(WEBDIR + 'newznab/delindexer?id=' + id, function (data) {
-                    notify('Settings', name + ' deleted', 'info');
+                    notify('Settings', name + ' deleted', 'error');
                     $(this).val(0);
                     item.find('option[value=' + id + ']').remove();
                     $('button:reset:visible').html('Clear').removeClass('btn-danger').unbind();

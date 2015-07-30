@@ -357,12 +357,12 @@ function makechart(selector, interfaceid, d) {
             {
 
                 label: "Download",
-                fillColor: "rgba(220,220,220,0.2)",
-                strokeColor: "#56ff00", //"rgba(220,220,220,1)",
-                pointColor: "#56ff00", //"rgba(220,220,220,1)",
+                fillColor: "rgba(63,197,19,0.2)",
+                strokeColor: "#3FC513",
+                pointColor: "#3FC513",
                 pointStrokeColor: "#fff",
                 pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(220,220,220,1)",
+                pointHighlightStroke: "rgba(63,197,19,1)",
                 // reverse the data so its the same way as a the chart
                 data: d.drx,
                 title: "Download",
@@ -370,23 +370,23 @@ function makechart(selector, interfaceid, d) {
             {
 
                 label: "Upload",
-                fillColor: "rgba(151,187,205,0.2)",
-                strokeColor: "#0038ff", //"rgba(151,187,205,1)",
-                pointColor: "#0038ff", //"rgba(151,187,205,1)",
+                fillColor: "rgba(255,0,49,0.2)",
+                strokeColor: "#FF0031",
+                pointColor: "#FF0031",
                 pointStrokeColor: "#fff",
                 pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(151,187,205,1)",
+                pointHighlightStroke: "rgba(255,0,49,1)",
                 data: d.dtx,
                 title: "Upload",
          },
             {
                 label: "Total",
-                fillColor: "rgba(151,187,205,0.2)", // red #FF0000
-                strokeColor: "#EC7886", //rgba(151,187,205,1)",
-                pointColor: "#EC7886", //"rgba(151,187,205,1)",
+                fillColor: "rgba(153,60,187,0.2)",
+                strokeColor: "#993CBB",
+                pointColor: "#993CBB",
                 pointStrokeColor: "#fff",
                 pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(151,187,205,1)",
+                pointHighlightStroke: "rgba(153,60,187,1)",
                 data: d.dt,
                 title: "Total",
          }
@@ -408,6 +408,8 @@ function makechart(selector, interfaceid, d) {
         graphSubTitleFontSize: 10,
         graphSubTitleSpaceBefore: 0,
         graphSubTitleSpaceAfter: 2,
+        graphSubTitleFontFamily: 'inherit',
+        graphTitleFontFamily: 'inherit',
         //inGraphDataTmpl: "<%=v2.toFixed(2)%>",
         annotateLabel: "<%=(v1 == '' ? '' : v1) + (v1!='' && v2 !='' ? ' -  ' : '')+(v2 == '' ? '' : v2)+(v1!='' || v2 !='' ? ': ' : ' ') + v3.toFixed(2)%>",
     };

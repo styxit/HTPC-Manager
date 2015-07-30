@@ -109,7 +109,7 @@ function getTorrents() {
                     // Remove button
                     removeButton = $('<a>').
                     addClass('btn btn-mini').
-                    html('<i class="fa fa-times"></i>').
+                    html('<i class="fa fa-trash-o fa-lg"></i>').
                     attr('title', 'Remove torrent').
                     attr('data-torrent-id', torrent.hash).
                     click(function () {

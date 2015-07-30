@@ -3,8 +3,8 @@ $.ajaxSetup({timeout: 30000})
 $(document).ready(function () {
     path = window.location.pathname.split('/')
     $('#nav-'+path[1]).addClass('active')
-
-    // Handle other links check if it should open i
+	$("[type='checkbox']").bootstrapSwitch();
+    // Handle other links check if it should open in
     // iframe or not
 	$('.other-link-item').click(function (e) {
 		e.preventDefault();

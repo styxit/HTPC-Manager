@@ -72,7 +72,7 @@ function getMovies(strStatus, pHTMLElement) {
                 strHTML.append($("<i>").attr("title", "Download").addClass("fa fa-arrow-circle-o-down fa-inverse status"));
             }
 
-            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(pMovie.info.original_title, 12)));
+            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(pMovie.info.original_title, 16)));
             pHTMLElement.append($("<li>").attr("id", pMovie.id).append(strHTML));
         });
     });
@@ -150,7 +150,7 @@ function searchMovie(q) {
                 src = WEBDIR + 'couchpotato/GetImage?w=100&h=150&url=' + movie.images.poster[0]
             }
             link.append($('<img>').attr('src', src).addClass('thumbnail'))
-            var title = shortenText(movie.original_title, 12)
+            var title = shortenText(movie.original_title, 16)
             link.append($('<h6>').addClass('movie-title').html(title))
             grid.append($('<li>').attr('id', movie.id).append(link))
         })
@@ -384,7 +384,7 @@ function getSuggestions() {
             }
 
 
-            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(m.original_title, 12)));
+            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(m.original_title, 16)));
             suggestion.append($("<li>").attr("id", m.id).append(strHTML));
         });
     });
@@ -413,7 +413,7 @@ function getDashboardSoon() {
             }
 
 
-            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(m.info.original_title, 12)));
+            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(m.info.original_title, 16)));
             suggestion.append($("<li>").attr("id", m.id).append(strHTML));
         });
     });
@@ -597,7 +597,7 @@ function getCharts() {
                 }
 
 
-                strHTML.append($("<h6>").addClass("movie-title").html(shortenText(m.original_title, 12)));
+                strHTML.append($("<h6>").addClass("movie-title").html(shortenText(m.original_title, 16)));
                 grid.append($("<li>").attr("id", m.imdb).append(strHTML));
             });
         });

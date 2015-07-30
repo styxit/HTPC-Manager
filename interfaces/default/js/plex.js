@@ -4,7 +4,7 @@ var hideWatched = 0;
 var movieLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 55,
     options: null
 }
 
@@ -111,7 +111,7 @@ function loadMovies(options) {
                         movieAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-inverse fa-check-circle watched'));
                     }
 
-                    movieAnchor.append($('<h6>').addClass('title').html(shortenText(movie.title, 12)));
+                    movieAnchor.append($('<h6>').addClass('title').html(shortenText(movie.title, 16)));
 
                     movieItem.append(movieAnchor);
 
@@ -158,7 +158,7 @@ function loadMovie(movie) {
     $.get(WEBDIR + 'plex/GetPlayers?filter=playback', function(data) {
         $.each(data.players, function (i, player) {
         $('.modal-footer').prepend(
-            $('<button>').html('Play on ' + player.name).addClass('btn btn-primary').click(function() {
+            $('<button>').html('<i class="fa fa-play fa-inverse fa-fw"></i>' + 'Play on ' + player.name).addClass('btn btn-primary').click(function() {
                 playItem(movie.id, player);
                 hideModal();
             })
@@ -197,7 +197,7 @@ function loadEpisode(episode) {
     $.get(WEBDIR + 'plex/GetPlayers?filter=playback', function(data) {
         $.each(data.players, function (i, player) {
         $('.modal-footer').prepend(
-            $('<button>').html('Play on ' + player.name).addClass('btn btn-primary').click(function() {
+            $('<button>').html('<i class="fa fa-play fa-inverse fa-fw"></i>' + 'Play on ' + player.name).addClass('btn btn-primary').click(function() {
                 playItem(episode.id, player);
                 hideModal();
             })
@@ -209,7 +209,7 @@ function loadEpisode(episode) {
 var showLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 55,
     options: null
 };
 var currentShow = null;
@@ -266,7 +266,7 @@ function loadShows(options) {
                         showAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-inverse fa-check-circle watched'));
                     }
 
-                    showAnchor.append($('<h6>').addClass('title').html(shortenText(show.title, 11)));
+                    showAnchor.append($('<h6>').addClass('title').html(shortenText(show.title, 17)));
 
                     showItem.append(showAnchor);
 
@@ -284,7 +284,7 @@ function loadShows(options) {
 var episodeLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 55,
     options: null
 }
 var currentShow = null;
@@ -341,7 +341,7 @@ function loadEpisodes(options) {
                         episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-inverse fa-check-circle watched_episode'));
                     }
 
-                    episodeAnchor.append($('<h6>').addClass('title').html(shortenText(episode.label, 18)));
+                    episodeAnchor.append($('<h6>').addClass('title').html(shortenText(episode.label, 17)));
 
                     episodeItem.append(episodeAnchor);
 
@@ -361,7 +361,7 @@ function loadEpisodes(options) {
 var artistLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 55,
     options: null
 }
 function loadArtists(options) {
@@ -419,7 +419,7 @@ function loadArtists(options) {
 var albumLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 55,
     options: null,
     artist: null
 }
@@ -506,7 +506,7 @@ function loadAlbums(options) {
 var songsLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 55,
     options: {},
     albumid: ''
 }
