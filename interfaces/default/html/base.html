@@ -30,8 +30,8 @@ webdir = htpc.WEBDIR
     <script type="text/javascript">var ALLOWIFRAME="${s.get('app_open_otherlink_in_iframe', 'false')}"</script>
     <script type="text/javascript">var JSLOGCONSOLE="${jslogconsole}"</script>
     <link href="${htpc.WEBDIR}css/bootstrap-slider.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','obsidian')}/bootstrap.min.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','obsidian')}/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/bootstrap.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/bootstrap-responsive.min.css" rel="stylesheet">
     % if s.get('app_use_cdn', 0):
 	    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/minified/jquery-ui.min.css" rel="stylesheet">
 	    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
@@ -235,8 +235,10 @@ ${self.body()}
 
 % endif
 <script src="${htpc.WEBDIR}js/libs/re-bootstrap.min.js"></script>
-<!--Triggers special feature of Aurora theme when that theme is selected!-->
-<script src="${htpc.WEBDIR}css/themes/${s.get('app_theme','aurora')}/aurora.min.js"></script> 
+% if s.get('app_theme_mig') == 'aurora':
+    <!--Triggers special feature of Aurora theme when that theme is selected!-->
+    <script src="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig')}/aurora.min.js"></script>
+% endif
 <script src="${htpc.WEBDIR}js/libs/jquery.raty.js"></script>
 <script src="${htpc.WEBDIR}js/libs/jquery.pnotify.min.js"></script>
 <script src="${htpc.WEBDIR}js/libs/jquery.pager.js"></script>

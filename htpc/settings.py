@@ -122,7 +122,7 @@ class Settings(object):
         themes = []
         dirs = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
         for theme in dirs:
-            current = bool(theme == self.get('app_theme', 'default'))
+            current = bool(theme == self.get('app_theme_mig', 'obsidian'))
             themes.append({'name': theme, 'value': theme, 'selected': current})
         return themes
 

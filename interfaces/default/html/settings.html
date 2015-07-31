@@ -66,7 +66,7 @@
                 % endif
             % endfor
             ${form.buildForm(id='theme', classes='form-horizontal tab-pane', legend='Theme', description='<div class="alert alert-block alert-info"><i class="fa fa-lightbulb-o fa-fw"></i> &nbsp Hint: Can&#8217t decide on your favorite theme?  Feeling adventurous?  Then try out the Aurora theme!  Inspired by the Northern Lights, the menu bar is always gently changing color and cycles through different patterns depending on the time of day.</div>', fields=[
-                {'type':'select', 'label':'Theme', 'name':'app_theme', 'options':settings.get_themes(), 'desc':'Changes the appearance of HTPC Manager'}
+                {'type':'select', 'label':'Theme', 'name':'app_theme_mig', 'options':settings.get_themes(), 'desc':'Changes the appearance of HTPC Manager'}
             ])}
             ${form.buildForm(id='dashboard', classes='form-horizontal tab-pane', legend='Dashboard', fields=[
 	            {'type':'bool', 'label':'Show CouchPotato', 'name':'dash_couchpotato',
