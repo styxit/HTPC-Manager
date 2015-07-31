@@ -65,8 +65,7 @@ class Sickrage(object):
         ssl = 's' if sickrage_ssl else ''
         self.logger.debug('Testing connectivity')
         try:
-            if not sickrage_basepath:
-                sickrage_basepath = fix_basepath(sickrage_basepath)
+            sickrage_basepath = fix_basepath(sickrage_basepath)
 
             url = 'http%s://%s:%s%sapi/%s/?cmd=sb.ping' % (ssl, striphttp(sickrage_host), sickrage_port, sickrage_basepath, sickrage_apikey)
 
