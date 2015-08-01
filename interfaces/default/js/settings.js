@@ -196,8 +196,10 @@ $(document).ready(function () {
             $('#newznab_indexer_apikey').val(data.apikey);
             if (data.use_ssl == 'on') {
                 $('#newznab_indexer_ssl').attr('checked', true);
+                $("#newznab_indexer_ssl").bootstrapSwitch('toggleState', true);
             } else {
                 $('#newznab_indexer_ssl').attr('checked', false);
+                $("#newznab_indexer_ssl").bootstrapSwitch('toggleState', false);
             }
 
             $("button:reset:visible").html('Delete').addClass('btn-danger').click(function (e) {
@@ -288,6 +290,7 @@ function newznab_update_indexer(id) {
             indexers.append(option);
         });
     }, 'json');
+    //$("[type='checkbox']").bootstrapSwitch();
 }
 
 function get_branches() {

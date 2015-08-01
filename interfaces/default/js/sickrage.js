@@ -10,10 +10,22 @@ $(document).ready(function() {
     loadShows();
     showstats();
 
-    $('#add_show_button').click(function() {
-        $(this).attr('disabled', true);
-        searchTvDb($('#add_show_name').val());
+
+    var addShowAction = function () {
+            var query = $('#add_show_name').val();
+            if (query) {
+                $('#add_show_button').attr('disabled', true);
+                searchTvDb(query);
+            }
+        };
+
+    $('#add_show_name').keyup(function(event){
+        if(event.keyCode == 13){
+            addShowAction();
+        }
     });
+    $('#add_show_button').click(addShowAction);
+
 
     $('#add_tvdbid_button').click(function() {
         addShow($('#add_show_select').val(), $('#add_show_select').find('option:selected').attr(

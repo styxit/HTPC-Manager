@@ -4,6 +4,22 @@ $(document).ready(function () {
     loadWanteds();
     loadHistory();
 
+    var searchAction = function () {
+            var query = $('#add_artist_name').val();
+            if (query) {
+                $('#add_artist_button').attr('disabled', true);
+                searchForArtist(query, $('#add_artist_album').find('option:selected').val());
+            }
+        };
+
+    $('#add_artist_name').keyup(function(event){
+        if(event.keyCode == 13){
+            searchAction();
+        }
+    });
+
+    $('#add_artist_button').click(searchAction);
+
     $('#add_artist_button').click(function () {
         $(this).attr('disabled', true);
         searchForArtist($('#add_artist_name').val(), $('#add_artist_album').find('option:selected').val());
