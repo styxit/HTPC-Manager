@@ -3,7 +3,15 @@ var row_n = 0
 function loadWantedAlbums () {
     if (!$('#headphones-carousel').length) return
     $.get(WEBDIR + 'headphones/GetWantedList', function (data) {
-        if (data === null) return
+        if (data == null) {
+            dasherror('dash_wanted_albums', 'No data returned from headphones')
+            return
+        }
+
+        if (data && !data.length) { // not sure if this is correct, dont have hp to test with.
+            dasherror('dash_wanted_albums', 'No wanted albums')
+            return
+        }
         $.each(data, function (i, albums) {
             var src;
             var itemDiv = $('<div>').addClass('item carousel-item')
@@ -404,6 +412,16 @@ function loadNextAiredSickrage(options) {
         })
     })
 }
+
+function dasherror(i, msg){
+    // expects id like #dash_wanted_albums
+    var h = $('#' + i).find('h3')
+    $('#' + i).html('')
+    var t = "<table class='table table-striped'><tr><td>"+ msg + "</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr></table>"
+    $('#' + i).append(h, t)
+
+}
+
 
 function loadsysinfo(options) {
     start_refresh('sysinfo','loadsysinfo');
