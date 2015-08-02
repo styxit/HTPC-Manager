@@ -55,18 +55,15 @@ ${self.attr.webdir}
         </div>
 
         <ul class="nav nav-tabs">
-            <li>
-                <a href="#info" data-toggle="tab">Info</a>
-            </li>
             <li class="active">
                 <a href="#albums" data-toggle="tab">Albums</a>
+            </li>
+            <li>
+                <a href="#info" data-toggle="tab">Info</a>
             </li>
         </ul>
 
         <div class="tab-content">
-            <div id="info" class="tab-pane">
-                <p>${description['Summary']}</p>
-            </div>
             <div id="albums" class="tab-pane active">
                 <table class="table table-striped table-condensed table-sortable">
                     <thead>
@@ -102,6 +99,9 @@ ${self.attr.webdir}
                     % endfor
                     </tbody>
                 </table>
+            </div>
+            <div id="info" class="tab-pane">
+                <p>${description['Summary']}</p>
             </div>
         </div>
     </div>
