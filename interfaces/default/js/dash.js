@@ -11,7 +11,7 @@ function loadWantedAlbums () {
             if (i === 0) itemDiv.addClass('active')
 
             var tt;
-            if (albums.ReleaseDate != null || album.ReleaseDate != 'None') || typeof(album.ReleaseDate !== 'undefined') {
+            if (albums.ReleaseDate != null || album.ReleaseDate != 'None' || typeof(album.ReleaseDate !== 'undefined')){
                 // release date should be (yyyy) or empty string
                 tt = ' (' + albums.ReleaseDate.substring(0,4) + ') '
             } else {
