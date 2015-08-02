@@ -26,9 +26,7 @@ $(document).ready(function () {
             } else {
                 $.post(WEBDIR + "log/logit", e, function (data) {
                 });
-                return true
             }
-            return true
         };
 
 
