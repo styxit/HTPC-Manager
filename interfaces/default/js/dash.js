@@ -232,7 +232,9 @@ function loadRecentAlbumsPlex () {
             }
 
             var label = album.title
-            if (album.year != '0') label += ' (' + album.year + ')'
+            if (album.year != '0' && typeof album.year !== 'undefined') {
+                label += ' (' + album.year + ')'
+            }
 
             $('#albums-content-plex').append(
                 $('<li>').addClass('media').append(

@@ -61,7 +61,7 @@ class Updater(object):
             return GitUpdater()
         else:  # Otherwise update from Sourece
             self.logger.info('Using SourceUpdater engine')
-            htpc.UPDATERTYPE = self.updateEngineName
+            self.updateEngineName = 'Source'
             return SourceUpdater()
 
     def test_git(self):
@@ -75,8 +75,10 @@ class Updater(object):
         if platform.system().lower() == 'windows':
             if gp != gp.lower():
                 alternative_gp.append(gp.lower())
-            # Comment out the line beflow to test the source updater
-            # alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "C:\Program Files (x86)\Git\bin\git.exe"]
+            # Disable this if dev as it would be impossible
+            # to teste the source updater
+            if not htpc.DEV:
+                alternative_gp += ["%USERPROFILE%\AppData\Local\GitHub\PORTAB~1\bin\git.exe", "C:\Program Files (x86)\Git\bin\git.exe"]
         # Returns a empty string if failed
         output = GitUpdater().git_exec(gp, 'version')
 
