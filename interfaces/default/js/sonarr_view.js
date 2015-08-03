@@ -114,6 +114,7 @@ function renderSeasonTabs(showid, id, tvshow) {
             .attr('data-tvdbid', id)
             .attr('data-showid', showid));
 
+
         list.append(pill);
     });
 
@@ -123,8 +124,20 @@ function renderSeasonTabs(showid, id, tvshow) {
         rendseason(sid, id, sn);
     });
 
-    // Trigger latest season
-    list.find('li:first-child a').trigger('click');
+    if (tvshow.status == 'continuing') {
+        // Activate latest season
+        list.find('li:last-child a').trigger('click').parent().addClass('active');
+
+    } else {
+        if (tvshow.seasons[0].seasonNumber !== 0) {
+            // if the are not specials trigger season 1
+            list.find('li:first-child a').trigger('click').parent().addClass('active');
+            //list.find('li:first-child').addClass('active')
+        } else {
+            // Specials exist, pick season 1
+            list.find('li:nth-of-type(2) a').trigger('click').parent().addClass('active');
+        }
+    }
 }
 
 function showEpisodeInfo(episodeid, value) {
@@ -168,8 +181,6 @@ function find_d_q(id) {
 
 function rendseason(sID, id, seasonnumber) {
     $.getJSON(WEBDIR + 'sonarr/Episodes/' + id, function (result) {
-        $('#season-list li').removeClass('active');
-        $(this).parent().addClass("active");
         var seasonContent = $('#season-content');
         // Clear table contents before inserting new row
         seasonContent.html('');

@@ -62,7 +62,7 @@ function loadShows() {
                 if (tvshow.nextAiring) {
                     nextair = moment(tvshow.nextAiring).calendar();
                 } else {
-                    nextair = 'N/A';
+                    nextair = '';
                 }
 
                 // Start progressbar

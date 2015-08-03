@@ -71,6 +71,7 @@ class Sonarr(object):
                 #  the path includes the basepath automaticly
                 url = 'http%s://%s:%s%s' % (ssl, host, port, path)
                 # Cache the image in HTPC Manager aswell.
+                # will fail if auth is on.
                 return get_image(url, headers=headers)
 
             if type == 'post':
