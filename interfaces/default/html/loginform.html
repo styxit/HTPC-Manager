@@ -12,7 +12,7 @@ webdir = htpc.WEBDIR
     <link href="${htpc.WEBDIR}favicon.ico" type="image/x-icon" rel="icon">
     <link rel="apple-touch-icon" href="${htpc.WEBDIR}img/homescreen.png">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
-    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','obsidian')}/bootstrap.min.css" rel="stylesheet">
+ 
     % if s.get('app_use_cdn', 0):
 	    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/minified/jquery-ui.min.css" rel="stylesheet">
 	    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
@@ -20,7 +20,8 @@ webdir = htpc.WEBDIR
 	    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
 	    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
     % endif
-    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','obsidian')}/bootstrap-responsive.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/bootstrap.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/bootstrap-responsive.min.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/rg-icons.min.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/base.css" rel="stylesheet"/>
@@ -44,13 +45,13 @@ webdir = htpc.WEBDIR
                 </div>
             </div>
         </div>
-		% if s.get('app_use_cdn', 0):
+	% if s.get('app_use_cdn', 0):
         	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
         % else:
         	<script src="${htpc.WEBDIR}js/libs/jquery.min.js"></script>
-			<script src="${htpc.WEBDIR}js/libs/bootstrap.min.js"></script>
-		% endif
+		<script src="${htpc.WEBDIR}js/libs/bootstrap.min.js"></script>
+	% endif
 		<script src="${htpc.WEBDIR}js/libs/re-bootstrap.min.js"></script>
         <script type="text/javascript">$(function () {$('#username').focus();});</script>
     </body>
