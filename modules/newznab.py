@@ -31,6 +31,7 @@ class NewznabIndexers(SQLObject):
 class Newznab(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.newznab')
+        self.headers = {'User Agent': 'HTPC-Manager'}
         NewznabIndexers.createTable(ifNotExists=True)
         htpc.MODULES.append({
             'name': 'Newznab',
@@ -259,6 +260,8 @@ class Newznab(object):
         if cat:
             cat = '&cat=' + cat
 
+
+
         sess = FuturesSession(max_workers=8)
         job_list = []
 
@@ -283,7 +286,7 @@ class Newznab(object):
         for url in job_list:
             try:
                 self.logger.debug('Fetching search results from %s' % url)
-                t = sess.get(url, timeout=60)
+                t = sess.get(url, timeout=60, headers=self.headers)
             except Exception as e:
                 self.logger.error('%s when fetching %s' % (e, url))
                 continue
@@ -344,7 +347,7 @@ class Newznab(object):
         self.logger.debug("Fetching information from: %s" % url)
         try:
             # some newznab providers are insanely slow
-            r = requests.get(url, timeout=20)
+            r = requests.get(url, timeout=20, headers=self.headers)
             return r.json()
         except ValueError as e:
             self.logger.error('%s' % e)
@@ -375,7 +378,7 @@ class Newznab(object):
         self.logger.debug("Fetching category information from: %s" % url)
         try:
             # some newznab providers are insanely slow
-            r = requests.get(url, timeout=20)
+            r = requests.get(url, timeout=20, headers=self.headers)
             if r.status_code == requests.codes.ok:
                 xml = xmltodict.parse(r.content)
                 if xml.get('error'):
