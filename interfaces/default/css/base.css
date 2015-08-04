@@ -222,6 +222,16 @@ table th.tablesorter-header {
   }
 }
 
+@media screen and (max-width: 979px) {
+	.navbar .brand {
+		padding: 7px 0 5px 12px!important;
+		margin-top: 5px!important;
+		}
+	.navbar .btn {
+		margin-top: 0px !important;
+	}
+}
+
 /* for tablesorter boostrap theme icons */
 .tablesorter-bootstrap .tablesorter-header i.tablesorter-icon {
   font-size: 11px;
