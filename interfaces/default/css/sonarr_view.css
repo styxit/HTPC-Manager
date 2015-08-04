@@ -42,7 +42,10 @@
 .sonarr_show .banner .show_details strong {
   margin:10px;
 }
-
+strong {
+	line-height: 10px !important;
+	vertical-align: bottom !important;
+}
 @media all and  (max-width: 767px) {
   /*
    * On small screens, remove top and bottom round bars on show-detail block

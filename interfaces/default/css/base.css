@@ -165,7 +165,6 @@ table th.tablesorter-header {
 	vertical-align: middle !important;
 }
 .rg-client {
-	font-size: x-large !important;
 	vertical-align: middle !important;
 }
 .tooltip-inner {
@@ -221,6 +220,16 @@ table th.tablesorter-header {
   .mofa > .table-bordered > tfoot > tr:last-child > td {
     border-bottom: 0;
   }
+}
+
+@media screen and (max-width: 979px) {
+	.navbar .brand {
+		padding: 7px 0 5px 12px!important;
+		margin-top: 5px!important;
+		}
+	.navbar .btn {
+		margin-top: 0px !important;
+	}
 }
 
 /* for tablesorter boostrap theme icons */
