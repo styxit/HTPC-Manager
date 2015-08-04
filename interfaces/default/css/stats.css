@@ -37,6 +37,10 @@ table.networktable {
 	font-weight: bold;
 }
 
+.progress {
+	margin-bottom: 0px !important;
+}
+
 #statscmd {
 	margin-top:10px;
 }
