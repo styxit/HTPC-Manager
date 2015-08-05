@@ -20,8 +20,13 @@ webdir = htpc.WEBDIR
 	    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
 	    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
     % endif
+    % if s.get('app_use_heavy_font',0):
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/xl.bootstrap.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/xl.bootstrap-responsive.min.css" rel="stylesheet">
+    % else:
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/bootstrap.min.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/bootstrap-responsive.min.css" rel="stylesheet">
+    % endif
     <link href="${htpc.WEBDIR}css/rg-icons.min.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/base.css" rel="stylesheet"/>
