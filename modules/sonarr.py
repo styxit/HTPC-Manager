@@ -68,10 +68,8 @@ class Sonarr(object):
             url = 'http%s://%s:%s%sapi/%s' % (ssl, host, port, sonarr_basepath, path)
 
             if banner:
-                #  the path includes the basepath automaticly
-                url = 'http%s://%s:%s%s' % (ssl, host, port, path)
+                #  the path includes the basepath automaticly (if fetched from api command "Series")
                 # Cache the image in HTPC Manager aswell.
-                # will fail if auth is on.
                 return get_image(url, headers=headers)
 
             if type == 'post':
@@ -117,11 +115,11 @@ class Sonarr(object):
     def Rootfolder(self):
         return [folder["path"] for folder in self.fetch('Rootfolder')]
 
-    #Returns all shows
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def Series(self):
+        ''' Return info about all your shows '''
         return self.fetch('Series')
 
     #Return one show
@@ -129,6 +127,7 @@ class Sonarr(object):
     @require()
     @cherrypy.tools.json_out()
     def Show(self, id, tvdbid=None):
+        ''' Details about one show '''
         return self.fetch('Series/%s' % id)
 
     @cherrypy.expose()
@@ -157,7 +156,7 @@ class Sonarr(object):
             raise cherrypy.HTTPError("500 Error", "Invalid show ID.")
             self.logger.error("Invalid show ID was supplied: " + str(id))
             return False
-
+        # tvdbid is acctually id, and id is tvdbid....
         return htpc.LOOKUP.get_template('sonarr_view.html').render(scriptname='sonarr_view', tvdbid=tvdbid, id=id)
 
     @cherrypy.expose()

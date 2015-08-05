@@ -65,6 +65,15 @@ function loadShows() {
                     nextair = '';
                 }
 
+                if (typeof(tvshow.episodeFileCount) == "undefined") {
+                    tvshow.episodeFileCount = 0
+                }
+
+
+                if (typeof(tvshow.episodeCount) == "undefined") {
+                    tvshow.episodeCount = 0
+                }
+
                 // Start progressbar
                 var calc = (tvshow.episodeFileCount*100/tvshow.episodeCount)
                 if (calc == 0) {
@@ -362,21 +371,22 @@ function loadShow(seriesID) {
 
         modalContent = $('<div>');
         modalContent.append(
-        $('<img>').attr('src', WEBDIR + 'sonarr/GetBanner/?url=' + bannerurl).addClass('img-rounded'),
+
+        $('<img>').attr('src', WEBDIR + 'sonarr/GetBanner/?url=MediaCover/'+ tvshow.id + '/banner.jpg').addClass('img-rounded'),
         $('<hr>'),
         table);
 
         // Disabled for now
-        /*
+
         var modalButtons = {
             'Show': function () {
             data = {'id': tvshow.seriesID}
-            window.location = WEBDIR + 'sonarr/View/' + tvshow.tvdbid + '/' + tvshow.seriesID ;
+            window.location = WEBDIR + 'sonarr/View/' + tvshow.id + '/' + tvshow.tvdbId;
             }
         };
-        */
 
-        showModal(tvshow.title, modalContent, []);
+
+        showModal(tvshow.title, modalContent, modalButtons);
     });
 
 }

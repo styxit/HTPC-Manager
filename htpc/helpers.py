@@ -97,6 +97,9 @@ def download_image(url, dest, auth=None, headers=None):
         if headers:
             for key, value in headers.iteritems():
                 request.add_header(key, value)
+            # Sonarrs image api returns 304, but they cant know if a user has cleared it
+            # So make sure we get data every time.
+            request.add_header('Cache-Control', 'private, max-age=0, no-cache, must-revalidate')
 
         with open(dest, 'wb') as local_file:
             local_file.write(urlopen(request).read())

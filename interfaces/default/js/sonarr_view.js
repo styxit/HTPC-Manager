@@ -7,6 +7,12 @@ $(document).ready(function () {
     loadShowData(showid, idz);
 });
 
+/*
+All the ids need to get fixed some time
+its just confusing. I dont think tvdbid is used from anything
+
+*/
+
 function loadShowData(seriesId, tvdbId) {
     $.ajax({
         url: WEBDIR + 'sonarr/Show/' + seriesId + '/' + tvdbId,
@@ -17,7 +23,6 @@ function loadShowData(seriesId, tvdbId) {
                 notify('Error', 'Show not found.', 'error');
                 return;
             }
-
             // Convert id to a Quality name
             $.each(qlty, function (i, q) {
                 if (tvshow.qualityProfileId == q.id) {
@@ -25,68 +30,68 @@ function loadShowData(seriesId, tvdbId) {
                 }
             });
 
-            // If the show is the one clicked on
-            if (tvshow.tvdbId == tvdbId) {
-                var showid = $('h1.page-title').attr('data-tvdbid');
-                // If there is a airdate format it, else leave set N/A
-                if (tvshow.nextAiring) {
-                    nextair = moment(tvshow.nextAiring).calendar();
-                } else {
-                    nextair = 'N/A';
-                }
-                if (tvshow.images.length > 0) {
-                    $.each(tvshow.images, function (i, cover) {
-                        if (cover.coverType === "banner") {
-                            // set the url to the banner so the modal can access it
-                            $('h1.page-title').attr('data-bannerurl', cover.url);
-                            // Fetch the banner
-                            $('#banner').css('background-image', 'url(' + WEBDIR + 'sonarr/GetBanner/?url=' + cover.url + ')');
-                        }
-                    });
-                }
+            var showid = $('h1.page-title').attr('data-tvdbid');
+            // If there is a airdate format it, else leave set N/A
+            if (tvshow.nextAiring) {
+                nextair = moment(tvshow.nextAiring).calendar();
+            } else {
+                nextair = 'N/A';
+            }
+            var at = (typeof (tvshow.airTime) == "undefined") ? 'TBA' : tvshow.airTime;
+            if (tvshow.images.length > 0) {
+                $.each(tvshow.images, function (i, cover) {
+                    if (cover.coverType === "banner") {
+                        // set the url to the banner so the modal can access it
+                        $('h1.page-title').attr('data-bannerurl', cover.url);
+                        // Fetch the banner
+                        $('#banner').css('background-image', 'url(' + WEBDIR + 'sonarr/GetBanner/?url=MediaCover/' + tvshow.id + '/banner.jpg)');
+                    }
+                });
+            }
 
-                $('.sonarr_want_quality').append(sonarrStatusLabel(qname));
-                $('.sonarr_showname').text(tvshow.title);
-                $('.sonarr_status').append(sonarrStatusLabel(tvshow.status));
-                $('.sonarr_network').text(tvshow.network);
-                $('.sonarr_location').text(tvshow.path);
-                $('.sonarr_airs').text(tvshow.airTime);
-                $('.sonarr_next_air').text(nextair);
+            $('.sonarr_want_quality').append(sonarrStatusLabel(qname));
+            $('.sonarr_showname').text(tvshow.title);
+            $('.sonarr_status').append(sonarrStatusLabel(tvshow.status));
+            $('.sonarr_network').text(tvshow.network);
+            $('.sonarr_location').text(tvshow.path);
+            $('.sonarr_airs').text(at);
+            $('.sonarr_next_air').text(nextair);
 
-                var menu = $('.show-options-menu');
-                $('.rescan-files')
-                	.attr('data-desc', 'Refresh Series')
-                    .attr('data-method', 'RefreshSeries')
-                    .attr('data-param', 'seriesId')
-                    .attr('data-id', tvshow.id)
-                    .attr('data-name', tvshow.title)
+            var menu = $('.show-options-menu');
+            $('.rescan-files')
+                .attr('data-desc', 'Refresh Series')
+                .attr('data-method', 'RefreshSeries')
+                .attr('data-param', 'seriesId')
+                .attr('data-id', tvshow.id)
+                .attr('data-name', tvshow.title)
 
-                $('.full-update')
-                    .attr('data-desc', 'Rescan Series')
-                    .attr('data-method', 'RescanSeries')
-                    .attr('data-param', 'seriesId')
-                    .attr('data-id', tvshow.id)
-                    .attr('data-name', tvshow.title);
+            $('.full-update')
+                .attr('data-desc', 'Rescan Series')
+                .attr('data-method', 'RescanSeries')
+                .attr('data-param', 'seriesId')
+                .attr('data-id', tvshow.id)
+                .attr('data-name', tvshow.title);
 
-                $('.search_all_ep_in_show')
-                    .attr('data-desc', 'Search for all episodes')
-                    .attr('data-method', 'SeriesSearch')
-                    .attr('data-param', 'seriesId')
-                    .attr('data-id', tvshow.id)
-                    .attr('data-name', tvshow.title);
+            $('.search_all_ep_in_show')
+                .attr('data-desc', 'Search for all episodes')
+                .attr('data-method', 'SeriesSearch')
+                .attr('data-param', 'seriesId')
+                .attr('data-id', tvshow.id)
+                .attr('data-name', tvshow.title);
 
+            /* // todo?
                 $('.edit_show').click(function (evt) {
                     evt.preventDefault();
                     loadShow2(tvshow);
                 });
+                */
 
-                $('.delete_show').click(function (e) {
-                    e.preventDefault();
-                    delete_show(tvshow);
-                });
+            $('.delete_show').click(function (e) {
+                e.preventDefault();
+                delete_show(tvshow);
+            });
 
-                renderSeasonTabs(tvdbId, tvshow.id, tvshow);
-            }
+            renderSeasonTabs(tvdbId, tvshow.id, tvshow);
 
         },
         error: function () {
@@ -132,7 +137,6 @@ function renderSeasonTabs(showid, id, tvshow) {
         if (tvshow.seasons[0].seasonNumber !== 0) {
             // if the are not specials trigger season 1
             list.find('li:first-child a').trigger('click').parent().addClass('active');
-            //list.find('li:first-child').addClass('active')
         } else {
             // Specials exist, pick season 1
             list.find('li:nth-of-type(2) a').trigger('click').parent().addClass('active');
@@ -143,7 +147,7 @@ function renderSeasonTabs(showid, id, tvshow) {
 function showEpisodeInfo(episodeid, value) {
     var ep = value;
     $.getJSON(WEBDIR + "sonarr/Episodeqly/" + episodeid + "/", function (pResult) {
-        bannerurl = $('h1.page-title').attr('data-bannerurl');
+        var sid = $('h1.page-title').attr('data-showid');
         var strHTML = $("<table>").attr("class", "episodeinfo")
             .append($("<tr>")
             .append($("<td>").html("<b>Name</b>"))
@@ -167,7 +171,7 @@ function showEpisodeInfo(episodeid, value) {
                 .append($("<td>").text(pResult.path)));
         }
 
-        showModal($('<img>').attr('src', WEBDIR + 'sonarr/GetBanner/?url=' + bannerurl).addClass('img-rounded'),
+        showModal($('<img>').attr('src', WEBDIR + 'sonarr/GetBanner/?url=MediaCover/' + sid + '/banner.jpg').addClass('img-rounded'),
         strHTML, []);
     });
 }
@@ -217,7 +221,7 @@ function rendseason(sID, id, seasonnumber) {
 
                 $.each(qqq, function (i, q) {
                     if (value.hasFile && value.episodeFileId === q.id) {
-                      $('.quality').text(q.quality.quality.name);
+                        $('.quality').text(q.quality.quality.name);
                     }
                 });
 
@@ -266,9 +270,9 @@ function sonarrStatusIcon(iconText, white) {
 }
 
 function sonarrStatusLabel(text) {
-    var statusOK = ['continuing', 'Downloaded','Any'];
+    var statusOK = ['continuing', 'Downloaded', 'Any'];
     var statusInfo = ['Snatched', 'HD', 'HD - All', 'HD-720p', 'HD-1080p', 'HDTV-720p', 'HDTV-1080p', 'WEBDL-720p', 'WEBDL-1080p'];
-    var statusError = ['ended','Missing'];
+    var statusError = ['ended', 'Missing'];
     var statusWarning = ['Skipped', 'SD', 'SD - All', 'SDTV', 'DVD'];
     var statusNormal = ['Bluray', 'Bluray-720p', 'Bluray-1080p'];
     var label = $('<span>').addClass('label').text(text);
@@ -282,7 +286,7 @@ function sonarrStatusLabel(text) {
     } else if (statusWarning.indexOf(text) != -1) {
         label.addClass('label-warning');
     } else if (statusNormal.indexOf(text) != -1) {
-	    label;
+        label;
     }
 
     var icon = sonarrStatusIcon(text, true);
