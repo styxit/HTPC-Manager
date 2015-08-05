@@ -31,7 +31,7 @@ class NewznabIndexers(SQLObject):
 class Newznab(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.newznab')
-        self.headers = {'User Agent': 'HTPC-Manager'}
+        self.headers = {'User-Agent': 'HTPC-Manager'}
         NewznabIndexers.createTable(ifNotExists=True)
         htpc.MODULES.append({
             'name': 'Newznab',
