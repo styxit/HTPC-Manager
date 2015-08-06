@@ -1,6 +1,7 @@
 $.ajaxSetup({timeout: 30000})
 
 $(document).ready(function () {
+   
     path = window.location.pathname.split('/')
     $('#nav-'+path[1]).addClass('active')
 	$("[type='checkbox']").bootstrapSwitch();
@@ -266,6 +267,11 @@ $(document).ready(function () {
         menu_ordered += menus[menu_item];
     }
     $(".mobile-search").after(menu_ordered)
+ 
+    var navtitle = $(".content h1.page-header a:eq(0)").text().toLowerCase()
+    $("#nav-"+navtitle).addClass("active")    
+ 
+
 })
 
 function byteSizeOrdering() {
