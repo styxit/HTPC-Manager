@@ -66,11 +66,15 @@ function search(query, catid, indexer) {
                         });
                         item.attr = attributes;
 
-                        var row = $('<tr>');
+                        var clean_category = item.category.split(' > ')[0].toLowerCase().trim()
+
+                        var row = $('<tr>').attr('data-category', clean_category);
                         var itemlink = $('<a>').attr('href', '#').text(item.description).click(function () {
-                            showDetails(item);
+                            showDetails(item, clean_category);
                             return false;
                         });
+
+
                         row.append($('<td>').append(indexername));
                         row.append($('<td>').append(itemlink));
                         var cat = $('<a>').attr('href', '#').text(item.category).click(function () {
@@ -93,7 +97,7 @@ function search(query, catid, indexer) {
                         row.append($('<td>').addClass('right').html(bytesToSize(item.attr['size'], 2)));
 
                         // Make a group of nzbclient buttons
-                        row.append($('<td>').append(anc(item)));
+                        row.append($('<td>').append(anc(item, clean_category)));
 
                         $('#results_table_body').append(row);
 
@@ -123,7 +127,7 @@ function get_clients() {
     });
 }
 
-function anc(nzb) {
+function anc(nzb, clean_category) {
     var b = $('<div>').addClass('btn-group clearfix');
     // Used to check if there are any active clients
     var n = 0;
@@ -134,9 +138,9 @@ function anc(nzb) {
             var button = $('<button>').addClass("btn btn-mini rg-client").attr('title', 'Send to ' + client.client)
                 .css({
                 "cursor": "pointer",
-                    "height": "24px"
+                "height": "24px"
             }).click(function () {
-                sendToclient(nzb, client);
+                sendToclient(nzb, client, clean_category);
             }).append($('<i>').addClass('rg rg-lg rg-' + client.client.toLowerCase()));
 
             b.append(button);
@@ -148,7 +152,7 @@ function anc(nzb) {
     var browserdl = $('<button>').addClass("btn btn-mini rg-client").attr('title', 'Download NZB to browser')
         .css({
         "cursor": "pointer",
-            "height": "24px"
+        "height": "24px"
     }).click(function () {
         downloadFile(nzb.link);
     }).append($('<i>').addClass('fa fa-download rg-lg rg-client'));
@@ -158,7 +162,7 @@ function anc(nzb) {
     return b;
 }
 
-function showDetails(data) {
+function showDetails(data, category) {
     var modalTitle = data.description;
     if (data.attr['imdbtitle']) {
         modalTitle = data.attr['imdbtitle'];
@@ -244,7 +248,7 @@ function showDetails(data) {
         if (v.active === 1 && v.client === "NZBGet") {
             $.extend(modalButtons, {
                 'NZBget': function () {
-                    sendToGet(data)
+                    sendToGet(data, category)
                     hideModal();
                 }
             });
@@ -253,7 +257,7 @@ function showDetails(data) {
         if (v.active === 1 && v.client === "SABnzbd") {
             $.extend(modalButtons, {
                 'SABnzbd': function () {
-                    sendToSab(data)
+                    sendToSab(data, category)
                     hideModal();
                 }
             });
@@ -296,14 +300,16 @@ function showDetails(data) {
     showModal(modalTitle, modalBody, modalButtons);
 }
 
-function sendToSab(item) {
+function sendToSab(item, category) {
     return $.ajax({
         url: WEBDIR + 'sabnzbd/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
         data: {
             nzb_url: item.link,
-            nzb_name: item.description
+            nzb_name: item.description,
+            nzb_category: category
+
         },
         success: function (result) {
             notify('', 'Sent ' + item.description + ' to SabNZBd', 'info');
@@ -311,14 +317,15 @@ function sendToSab(item) {
     });
 }
 
-function sendToGet(item) {
+function sendToGet(item, category) {
     return $.ajax({
         url: WEBDIR + 'nzbget/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
         data: {
             nzb_url: item.link,
-            nzb_name: item.description
+            nzb_name: item.description,
+            nzb_category: category
         },
         success: function (result) {
             notify('', 'Sent ' + item.description + ' to NzbGet', 'info');
@@ -326,14 +333,15 @@ function sendToGet(item) {
     });
 }
 
-function sendToclient(item, client) {
+function sendToclient(item, client, category) {
     return $.ajax({
         url: WEBDIR + client.client.toLowerCase() + '/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
         data: {
             nzb_url: item.link,
-            nzb_name: item.description
+            nzb_name: item.description,
+            nzb_category: category
         },
         success: function (result) {
             state = (result) ? 'success' : 'error';
