@@ -1,7 +1,7 @@
 @import url('//fonts.googleapis.com/css?family=Roboto:300,400,700,100');
 
-/*!
- * sable 
+/*
+ * sable
  * 
  * re-bootstrap v2.3.2
  * a suite of beautiful and modern themes for bootstrap
@@ -230,7 +230,7 @@ textarea {
 body {
     margin: 0;
     font-family: "Roboto";
-    font-size: 12px;
+    font-size: 14px;
     line-height: 20px;
     color: #e5e5e5;
     background-color: #222
@@ -746,7 +746,7 @@ h5,
 h6 {
     margin: 10px 0;
     font-family: "Roboto";
-    font-weight: 300;
+    font-weight: 400;
     line-height: 20px;
     color: #e5e5e5;
     text-rendering: optimizelegibility
@@ -829,7 +829,7 @@ ol ul {
 }
 
 li {
-    line-height: 14px
+    line-height: 20px
 }
 
 ul.unstyled,
@@ -1136,7 +1136,7 @@ input[type="tel"],
 input[type="color"],
 .uneditable-input {
     background-color: #333;
-    border: 1px solid #444;
+    border: 1px solid #ccc;
     -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
@@ -1940,7 +1940,7 @@ legend+.control-group {
 }
 
 .form-horizontal .control-group {
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     *zoom: 1
 }
 
@@ -2004,10 +2004,11 @@ table {
 
 .table th,
 .table td {
-    padding: 6px 8px;
-    line-height: 14px;
+    padding: 8px;
+    line-height: 20px;
     text-align: left;
     vertical-align: top;
+    border-top: 1px solid #333
 }
 
 .table th {
@@ -2041,12 +2042,18 @@ table {
 }
 
 .table-bordered {
-    border:none;
+    border: 1px solid #333;
+    border-collapse: separate;
+    *border-collapse: collapse;
+    border-left: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0
 }
 
 .table-bordered th,
 .table-bordered td {
-    border-left: none;
+    border-left: 1px solid #333
 }
 
 .table-bordered caption+thead tr:first-child th,
@@ -2129,7 +2136,7 @@ table {
 
 .table-striped tbody>tr:nth-child(odd)>td,
 .table-striped tbody>tr:nth-child(odd)>th {
-    background-color: #161616;
+    background-color: #111
 }
 
 .table-hover tbody tr:hover>td,
@@ -3097,9 +3104,16 @@ table th[class*="span"],
 
 .well {
     min-height: 20px;
-    padding: 0;
+    padding: 19px;
     margin-bottom: 20px;
-   
+    background-color: #111;
+    border: 1px solid #000;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05)
 }
 
 .well blockquote {
@@ -4044,9 +4058,9 @@ input[type="submit"].btn.btn-mini {
 }
 
 .nav-tabs>li>a {
-    padding-top: 4px;
-    padding-bottom: 4px;
-    line-height: 14px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    line-height: 20px;
     border: 1px solid transparent;
     -webkit-border-radius: 4px 4px 0 0;
     -moz-border-radius: 4px 4px 0 0;
@@ -6143,7 +6157,7 @@ a.badge:focus {
 }
 
 body {
-    font-weight: 300
+    font-weight: 400
 }
 
 h1 {
@@ -6152,7 +6166,7 @@ h1 {
 
 h2,
 h3 {
-    font-size: 16px
+    font-size: 26px
 }
 
 h4 {
@@ -6241,7 +6255,7 @@ body {
 #loginform {
     background-color: #111
 }
-i.fa.fa-bars.fa-inverse{font-size: 22px!important;}
+
 h1.page-header.page-title {
     padding-top: 0!important;
     padding-right: 15px!important;
@@ -6252,8 +6266,7 @@ h1.page-header.page-title {
     background-color: #111!important;
     border-width: 0!important
 }
-h1.page-header.page-title>a,h1.page-header.page-title>span,h1.page-header.page-title small,h1.page-header.page-title strong{font-size: 12px;font-weight: 300;color:#fff;}
-.nav-menu-item.active>a{color: #f90!important;}
+
 .page-header .btn-group>a {
     text-align: right!important;
     background: none!important;
@@ -6906,7 +6919,14 @@ legend {
 }
 
 .well {
-    padding: 0;
+    padding: 10px;
+    border: 1px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none
 }
 
 .well .checkbox {
@@ -6974,17 +6994,14 @@ a.thumbnail:hover {
     border-radius: 0;
     -webkit-box-shadow: none;
     -moz-box-shadow: none;
-    box-shadow: none;
+    box-shadow: none
 }
-td.stats_disk_progress.span4{width: 40%;}
-td.stats_disk_mountpoint{width: 30%;}
-td.stats_disk_percent{width: 26px;}
+
 .progress span,
 .bar span {
     color: #e5e5e5!important
 }
-.dash-module h3{font-size: 14px;line-height:14px;margin:20px 0 10px 0;padding:0 0 8px 0;font-weight: 400;}
-.dash-module .btn.fa.fa-refresh{font-size: 14px;}
+
 .progress bar,
 .bar bar {
     background-color: #0053cc!important;
@@ -7094,12 +7111,12 @@ td.stats_disk_percent{width: 26px;}
 }
 
 .navbar .span3.search {
-    margin-top: 8px!important;
+    margin-top: 3px!important;
     margin-right: 5px!important
 }
 
 .navbar .btn-group {
-    margin-top: 5px!important
+    margin-top: 3px!important
 }
 
 span#player-item-title {

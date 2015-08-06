@@ -579,7 +579,7 @@ function loadqbit() {
 function start_refresh(module, fn){
     if ($('#dash_'+module).children('h3:first-child').has('.refresh-btns').length == 0){
         $('#dash_'+module).children('h3:first-child').append('<span class="refresh-btns">' +
-                                '<i id="'+module+'-refresh" class="btn fa fa-refresh" style="font-size:0.6em" title="Refresh" onclick="'+fn+'();"></i>' +
+                                '<i id="'+module+'-refresh" class="btn fa fa-refresh" title="Refresh" onclick="'+fn+'();"></i>' +
                                 '<i class="fa fa-spinner fa-pulse" style="font-size:0.7em" id="'+module+'-spinner"></i></span>');
     }
     $('#'+module+'-refresh').hide();
