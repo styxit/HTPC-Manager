@@ -268,9 +268,8 @@ $(document).ready(function () {
     }
     $(".mobile-search").after(menu_ordered)
  
-    var title = $(".content h1.page-header a:eq(0)").text().toLowerCase()
-    console.log("title:"+title)
-    $("#nav-"+title).addClass("active")    
+    var navtitle = $(".content h1.page-header a:eq(0)").text().toLowerCase()
+    $("#nav-"+navtitle).addClass("active")    
  
 
 })
