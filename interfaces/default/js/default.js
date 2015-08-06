@@ -1,9 +1,6 @@
 $.ajaxSetup({timeout: 30000})
 
 $(document).ready(function () {
-   
-    path = window.location.pathname.split('/')
-    $('#nav-'+path[1]).addClass('active')
 	$("[type='checkbox']").bootstrapSwitch();
     // Handle other links check if it should open in
     // iframe or not
@@ -268,8 +265,8 @@ $(document).ready(function () {
     }
     $(".mobile-search").after(menu_ordered)
  
-    //var navtitle = $(".content h1.page-header a:eq(0)").text().toLowerCase()
-    //$("#nav-"+navtitle).addClass("active")    
+    path = window.location.href.split("/").slice(0, - 1).pop()
+	$('#nav-'+path).addClass('active')
  
 
 })
