@@ -37,8 +37,9 @@ table.networktable {
 	font-weight: bold;
 }
 
-.progress {
-	margin-bottom: 0px !important;
+
+#disklist > tr > td.span3.stats_disk_progress > div {
+	margin-bottom: 0px;
 }
 
 #statscmd {

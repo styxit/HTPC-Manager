@@ -8,3 +8,8 @@
 table {
 	margin-bottom: 10px !important;
 }
+
+tr > td.span3.qbit_progress > .progress  {
+	margin-bottom: 0px;
+}
+
