@@ -268,8 +268,8 @@ $(document).ready(function () {
     }
     $(".mobile-search").after(menu_ordered)
  
-    var navtitle = $(".content h1.page-header a:eq(0)").text().toLowerCase()
-    $("#nav-"+navtitle).addClass("active")    
+    //var navtitle = $(".content h1.page-header a:eq(0)").text().toLowerCase()
+    //$("#nav-"+navtitle).addClass("active")    
  
 
 })
