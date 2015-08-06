@@ -274,10 +274,10 @@ function loadQueue(once) {
                 row.append($('<td>').html(job.timeleft + ' / ' + job.mbleft + 'MB').addClass('span3'));
 
                 var deleteImage = $('<a>');
-                deleteImage.html('&times;');
                 deleteImage.attr('alt', 'Remove');
                 deleteImage.addClass('close');
                 deleteImage.attr('href', '#');
+                deleteImage.append($('<i>').addClass('fa fa-times'))
                 deleteImage.click(function () {
                     removeQueueItem(job.nzo_id);
                 });

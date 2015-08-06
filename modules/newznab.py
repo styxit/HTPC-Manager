@@ -137,7 +137,7 @@ class Newznab(object):
 
             # protection against the hack
             # only allow correct kw be save to db
-            if k in ["newznab_enable", "newznab_name", "newznab_show_in_menu"]:
+            if k in ['newznab_enable', 'newznab_name', 'newznab_show_in_menu']:
                 htpc.settings.set(k, v)
 
         # Clean hostname
@@ -189,7 +189,7 @@ class Newznab(object):
     @cherrypy.expose()
     @require()
     def thumb(self, url, h=None, w=None, o=100, category=None):
-
+        # Fix me?
         if url.startswith('rageid'):
             if category:
                 try:
@@ -259,8 +259,6 @@ class Newznab(object):
         self.logger.debug("Searching for %s category %s on indexer %s" % (q, cat, indexer))
         if cat:
             cat = '&cat=' + cat
-
-
 
         sess = FuturesSession(max_workers=8)
         job_list = []

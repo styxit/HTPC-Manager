@@ -11,7 +11,6 @@ $(document).ready(function () {
                 option.html(cat);
                 $('#nzb_category').append(option);
 
-
             });
         }
     });
@@ -96,7 +95,7 @@ $(document).ready(function () {
             dataType: 'json'
         });
     });
-	
+
     $('#nzb_set_speed').click(function(e) {
         e.preventDefault();
         var speed = ($('#nzb_get_speed').val());
