@@ -1,17 +1,9 @@
 @import url('//fonts.googleapis.com/css?family=Roboto:300,400,700,100');
 
-/*!
- * sable 
+/*
+ * sable - theme for htpc manager
+ * https://github.com/Hellowlol/HTPC-Manager 
  * 
- * re-bootstrap v2.3.2
- * a suite of beautiful and modern themes for bootstrap
- * https://www.github.com/raysguy/re-bootstrap
- *
- * Copyright 2015 raysguy
- * Licensed under the Apache License v2.0
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * based on bootstrap v2.3.2 by @mdo and @fat
  */
 
 .clearfix {
@@ -117,7 +109,7 @@ img {
 .google-maps img {
     max-width: none
 }
-
+.refresh-btns .btn{font-size: 14px!important;}
 button,
 input,
 select,
@@ -2005,7 +1997,6 @@ table {
 .table th,
 .table td {
     padding: 6px 8px;
-    line-height: 14px;
     text-align: left;
     vertical-align: top;
 }
