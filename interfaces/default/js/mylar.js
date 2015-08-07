@@ -291,7 +291,7 @@ function loadHistory() {
                 var row = $('<tr>');
                 row.append(
                     $('<td>').html(item.DateAdded),
-                    $('<td>').html(item.Title),
+                    $('<td>').html(item.ComicName),
                     $('<td>').html(mylarStatusLabel(item.Status))
                 );
                 $('#history_table_body').append(row);
