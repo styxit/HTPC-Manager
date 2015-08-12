@@ -32,7 +32,7 @@ $(document).ready(function () {
         var url = $(this).find("a").attr("href")
         if (pybooltojsbool(ALLOWIFRAME) === true && e.which==1) { //if iframe is on and left click
 			// open in iframe
-            location.href = WEBDIR + 'iframe/' + encodeURIComponent(url)
+            location.href = WEBDIR + 'iframe?link=' + encodeURIComponent(url)
         } else {
             // Open link in a new tab
             window.open(url);
