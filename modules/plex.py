@@ -9,7 +9,7 @@ import struct
 from json import loads
 from urllib2 import Request, urlopen
 import urllib
-from htpc.helpers import get_image, striphttp, joinArgs
+from htpc.helpers import get_image, striphttp, joinArgs, cachedprime
 import logging
 import urlparse
 import base64
@@ -17,6 +17,8 @@ import platform
 from cherrypy.lib.auth2 import require
 import requests
 from uuid import getnode
+import os
+import hashlib
 
 # Only imported to check if pil is installed
 # Dont remove even if import is unused

@@ -11,9 +11,11 @@ from urllib2 import quote
 from jsonrpclib import Server
 from sqlobject import SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol, IntCol
-from htpc.helpers import get_image
+from htpc.helpers import get_image, cachedprime
 import logging
 from cherrypy.lib.auth2 import require
+import os
+import hashlib
 
 
 class KodiServers(SQLObject):
@@ -114,10 +116,95 @@ class Kodi(object):
         raise cherrypy.HTTPRedirect(self.url('', True))
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    @require()
+    def primecache(self, t='all', wanted_art='all', async=True, resize=True):
+        ''' find all images and cache them, might take a while...'''
+        kodi = Server(self.url('/jsonrpc', True))
+        url = self.url('/image/')
+        # fix headers
+        _head = 'Basic %s' % self.auth()
+        headers = {'Authorization': _head}
+
+        musicprop = ['fanart', 'thumbnail']
+        itemprop = ['art', 'fanart', 'thumbnail']
+        addonprop = ['thumbnail']
+        stuff = []
+
+        if t == 'all':
+            movie = kodi.VideoLibrary.GetMovies(properties=itemprop)
+            episode = kodi.VideoLibrary.GetEpisodes(properties=itemprop)
+            artist = kodi.AudioLibrary.GetArtists(properties=musicprop)
+            song = kodi.AudioLibrary.GetSongs(properties=musicprop)
+            tvshow = kodi.VideoLibrary.GetTVShows(properties=itemprop)
+            stuff = [movie, episode, artist, song, tvshow]
+        elif t == 'movie':
+            movie = kodi.VideoLibrary.GetMovies(properties=itemprop)
+            stuff.append(movie)
+        elif t == 'episode':
+            episode = kodi.VideoLibrary.GetEpisodes(properties=itemprop)
+            stuff.append(episode)
+        elif t == 'song':
+            song = kodi.AudioLibrary.GetSongs(properties=musicprop)
+            stuff.append(song)
+        elif t == 'tvshow':
+            tvshow = kodi.VideoLibrary.GetTVShows(properties=itemprop)
+            stuff.append(tvshow)
+        elif t == 'addon':
+            addon = kodi.Addons.GetAddons(content='unknown', enabled='all', properties=addonprop)
+            stuff.append(addon)
+
+        imgdir = os.path.join(htpc.DATADIR, 'images/')
+
+        imglist = []
+
+        self.logger.debug('Fetching every image we can find from kodi')  # todo add addon images
+
+        resize_sizes = [[225, 338], [200, 300], [675, 400], [100, 150], [375, 210], [150, 150]]
+
+        for item in stuff:
+            for k, v in item.items():
+                if k in ['episodes', 'movies', 'tvshows', 'songs', 'artists', 'addons']:
+                    self.logger.debug('There where %s %s' % (len(item[k]), k))
+                    for kk in item[k]:
+                        for kkk, vvv, in kk.items():
+                            d = {}
+                            if kkk == wanted_art or wanted_art == 'all':
+                                if kkk == 'art':
+                                    for z, a in kk['art'].items():
+                                        if z == wanted_art or wanted_art == 'all':
+                                            _url = url + quote(a)
+                                            h = hashlib.md5(_url).hexdigest()
+                                            d['fp'] = os.path.join(imgdir, h)
+                                            d['hash'] = h
+                                            d['url'] = _url
+                                            d['resize'] = resize_sizes
+                                            imglist.append(d)
+
+                                if kkk in ['fanart', 'thumbnail']:
+                                    _url = url + quote(vvv)
+                                    h = hashlib.md5(_url).hexdigest()
+                                    d['fp'] = os.path.join(imgdir, h)
+                                    d['hash'] = h
+                                    d['url'] = _url
+                                    d['resize'] = resize_sizes
+                                    imglist.append(d)
+
+        self.logger.debug('Found %s images in total' % len(imglist))
+
+        try:
+            if async:
+                t = cachedprime(imglist, headers, resize=bool(resize))
+                return t
+
+        except Exception as e:
+            self.logger.debug('%s' % e)
+
+    @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def ping(self, kodi_server_host='', kodi_server_port='',
-            kodi_server_username='', kodi_server_password='', **kwargs):
+             kodi_server_username='', kodi_server_password='', **kwargs):
         """ Tests settings, returns MAC address on success and null on fail """
         self.logger.debug("Testing kodi connectivity")
         try:
@@ -248,7 +335,7 @@ class Kodi(object):
             kodi = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
             properties = ['title', 'year', 'plot', 'thumbnail', 'file', 'fanart', 'studio', 'trailer',
-                    'imdbnumber', 'genre', 'rating', 'playcount']
+                          'imdbnumber', 'genre', 'rating', 'playcount']
             limits = {'start': int(start), 'end': int(end)}
             filter = {'field': 'title', 'operator': 'contains', 'value': filter}
             if hidewatched == "1":
@@ -403,7 +490,7 @@ class Kodi(object):
         if cmd1 == 'undefined':
             cmd1 = ''
         """ Execute an kodi addon """
-        self.logger.debug("Execute '" + addon + "' with commands cmd0 '" + cmd0 + "' and cmd1 '" + cmd1 +"'")
+        self.logger.debug('Execute %s with commands cmd0 %s and cmd1 %s' % (addon, cmd0, cmd1))
         kodi = Server(self.url('/jsonrpc', True))
         if addon == 'script.artwork.downloader':
             return kodi.Addons.ExecuteAddon(addonid=addon, params=['tvshow', 'movie', 'musicvideos'])
@@ -714,7 +801,7 @@ class Kodi(object):
     @cherrypy.tools.json_out()
     def Notify(self, text):
         """ Create popup in kodi """
-        self.logger.debug("Sending notification to kodi: %s", text)
+        self.logger.debug("Sending notification to kodi: %s" % text)
         kodi = Server(self.url('/jsonrpc', True))
         image = '../interfaces/default/img/kodi-logo.png'
         return kodi.GUI.ShowNotification(title='HTPC manager', message=text, image=image)
