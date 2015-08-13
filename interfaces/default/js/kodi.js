@@ -8,7 +8,7 @@ var sorting = {
 }
 
 $(document).ready(function() {
-    playerLoader = setInterval('loadNowPlaying()', 2000);
+    playerLoader = setInterval('loadNowPlaying()', 1000);
     hideWatched = $('#hidewatched').hasClass('active')?1:0;
 
     // Load data on tab display
@@ -788,7 +788,6 @@ function loadNowPlaying() {
                 $('a[href=#playlist]').parent().hide();
                 return;
             }
-
             if (nowPlayingId != data.itemInfo.item.id) {
                 var nowPlayingThumb = encodeURIComponent(data.itemInfo.item.thumbnail);
                 var thumbnail = $('#nowplaying .thumb img').attr('alt', data.itemInfo.item.label);
@@ -815,16 +814,11 @@ function loadNowPlaying() {
                             thumbnail.attr('width', '140').attr('height', '140');
                     }
                 }
-
-                /*
-                if (data.itemInfo.item.fanart) {
+                /*if (data.itemInfo.item.fanart) {
                     var background = encodeURIComponent(data.itemInfo.item.fanart)
-                    // mode: L == black and white, 1 == black and white, stored with one pixel per byte see http://effbot.org/imagingbook/concepts.htm
-                    // o == opacity
-                    background = WEBDIR + 'kodi/GetThumb?w=1150&h=640&mode=L&thumb='+background;
+                    background = WEBDIR + 'kodi/GetThumb?w=1150&h=640&o=10&thumb='+background;
                     $('#nowplaying').css({'background-image':'url('+background+')'});
-                }
-                */
+                }*/
             }
 
             if (data.playerInfo.speed == 1) {
@@ -851,8 +845,8 @@ function loadNowPlaying() {
             var playingTitle = '';
             var playingSubtitle = '';
             if (data.itemInfo.item.type == 'episode') {
-                playingSubtitle = data.itemInfo.item.label;
-                playingTitle = data.itemInfo.item.showtitle + ' ' +
+                playingTitle = data.itemInfo.item.label;
+                playingSubtitle = data.itemInfo.item.showtitle + ' ' +
                                   data.itemInfo.item.season + 'x' +
                                   data.itemInfo.item.episode;
             }
@@ -1046,7 +1040,7 @@ function GetAddons() {
                     }
 
                     addonAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
-                    addonAnchor.append($('<h6>').addClass('title').html(shortenText(addon.name, 11)));
+                    addonAnchor.append($('<h6>').addClass('title').html(shortenText(addon.name, 17)));
                     row.append(addonAnchor);
                     $('#addons-grid').append(row);
                     //Holder.run();

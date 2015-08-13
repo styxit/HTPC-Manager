@@ -9,9 +9,8 @@ var movieLoad = {
 }
 
 $(document).ready(function() {
-    loadNowPlaying()
     hideWatched = $('#hidewatched').hasClass('active')?1:0;
-    playerLoader = setInterval('loadNowPlaying()', 60000);
+    playerLoader = setInterval('loadNowPlaying()', 4000);
 
     // Load data on tab display
     $('a[data-toggle=\'tab\']').click(function(e) {
@@ -51,30 +50,11 @@ $(document).delegate('[data-player-control]', 'click', function () {
         $.get(WEBDIR + 'plex/ControlPlayer?player='+player+'&action='+action);
     });
 
-$(document).on('click', '.clickworks', function (e) {
-    var percent = ((e.pageX-this.offsetLeft)/$(this).width()*100)//.toFixed(2);
-    var duration = $(this).attr('data-duration');
-    pos = (duration/100) * percent
-    // not needed
-    var offset = $(this).attr('data-viewOffset');
-
-    var id = $(this).attr('data-id');
-    var address = $(this).attr('data-address');
-    var ttype = $(this).attr('data-type');
-    var machine = $(this).attr('data-machineid');
-    var transcodekey = $(this).attr('data-transcodesessionkey');
-    $.get(WEBDIR + 'plex/ControlPlayer?player='+address+'&action=seekTo' + '&offset=' + pos.toFixed());
-
-
-});
-
-
 function playItem(item, player) {
     type = typeof type !== 'undefined';
     d = {'item': item,
         'playerip': player.address,
-        'machineid': player.machineIdentifier,
-        'type': item.type}
+        'machineid': player.machineIdentifier}
     $.get(WEBDIR + 'plex/PlayItem', d);
 }
 
@@ -147,7 +127,6 @@ function loadMovies(options) {
 }
 
 function loadMovie(movie) {
-    console.log(movie)
     var poster = WEBDIR + 'plex/GetThumb?w=375&h=563&thumb='+encodeURIComponent(movie.thumbnail)
     var info = $('<div>').addClass('modal-movieinfo');
     if (movie.runtime) {
@@ -657,13 +636,7 @@ function loadNowPlaying() {
                 info.append(username);
                 info.append('<h2><span id="player-item-title">' + playingTitle +'</span>&nbsp;<small id="player-item-subtitle" class="muted">' + playingSubtitle + '</small></h2>');
                 info.append('<h2><small id="player-item-time">' + parseSec(item.viewOffset/1000) + ' / ' + parseSec(item.duration/1000) + '</small></h2>');
-                var pgbar = $('<div id="player-progressbar" data-viewOffset='+item.viewOffset +' data-duration='+item.duration+'/>').addClass("progress").append($('<div>').addClass("bar active").css('width', (item.viewOffset / item.duration)*100 + '%'));
-                pgbar.attr('data-machineid', item.machineIdentifier).attr('data-address', item.address).attr('data-id', item.id).attr('data-type', item.itemtype).attr('data-transcodesessionkey', item.transcodesessionkey)
-                // only allow the shrudder on stuff that works
-                if (item.protocolCapabilities.indexOf('playback') != -1) {
-                    pgbar.addClass('clickworks')
-                }
-                info.append(pgbar)
+                info.append($('<div id="player-progressbar"/>').addClass("progress").append($('<div>').addClass("bar active").css('width', (item.viewOffset / item.duration)*100 + '%')));
                 if (item.protocolCapabilities.indexOf('playback') != -1) {
                     var btn_toolbar = $('<div id="nowplaying_control"/>').addClass("btn-toolbar");
                     var btn_group = $('<div>').addClass("btn-group");

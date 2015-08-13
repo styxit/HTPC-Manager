@@ -33,8 +33,7 @@ def start():
         'server.socket_port': htpc.PORT,
         'log.screen': False,
         'server.thread_pool': 15,
-        'server.socket_queue_size': 10,
-        'engine.timeout_monitor.on': False
+        'server.socket_queue_size': 10
     })
 
     # Wrap htpc manager in secure headers.

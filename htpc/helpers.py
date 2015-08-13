@@ -15,9 +15,6 @@ from operator import itemgetter
 import itertools
 from mako import exceptions
 from mako.lookup import TemplateLookup
-import requests
-import sys
-import workerpool
 
 try:
     import Image
@@ -30,16 +27,6 @@ except ImportError:
         PIL = False
 
 logger = logging.getLogger('htpc.helpers')
-
-
-def timeit_func(func):
-    @wraps(func)
-    def inner(*args, **kwargs):
-        start = time.time()
-        res = func(*args)
-        logger.debug('%s took %s' % (func.__name__, time.time() - start))
-        return res
-    return inner
 
 
 def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, headers=None):
@@ -59,8 +46,8 @@ def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, h
     # Set filename and path
     image = os.path.join(imgdir, imghash)
 
-    # If there is no local copy of
-    # the original download it
+    # If there is no local copy of the original
+    # download it
     if not os.path.isfile(image):
         logger.debug('No local image found for ' + image + '. Downloading')
         image = download_image(url, image, auth, headers)
@@ -96,108 +83,6 @@ def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, h
         return serve_file(path=image, content_type='image/' + imagetype)
 
 
-class CacheImgDownload(workerpool.Job):
-    "Job for downloading a given URL."
-    def __init__(self, item, headers):
-        self.url = item['url']
-        self.fp = item['fp']
-        self.resize = item['resize']
-        self.headers = headers
-        self.item = item
-
-    def run(self):
-        try:
-            if self.resize:
-                for i in self.resize:
-                    if len(i) > 3:
-                        r = requests.get(i[2], headers=self.headers)
-                        with open(i[3], 'wb') as local_file:
-                            local_file.write(r.content)
-                # Download original image
-                r = requests.get(self.url, headers=self.headers)
-                with open(self.fp, 'wb') as local_file:
-                    local_file.write(r.content)
-
-        except Exception as e:
-            self.logger.debug('Failed to cache image %s' % e)
-
-
-def cache_resize_image(item):
-    #imglist = [{'hash': '123', 'url': 'xxx', 'fp': 'filepath', 'resize': [(w, h), (w, h)]}]
-    fp = item['fp']
-    imagetype = imghdr.what(fp)
-    if imagetype:
-        # Open orginal image
-        im = Image.open(fp)
-        if 'resize' in item:
-            for r in item['resize']:
-                im = im.resize(r, Image.ANTIALIAS)
-                resized = '%s_w%s_h%s_o_%s_%s' % (fp, r[0], r[1], None, None)
-
-                if imagetype.lower() == 'jpeg' or 'jpg':
-                    im.save(resized, 'JPEG', quality=95)
-                else:
-                    im.save(resized, imagetype)
-
-@timeit_func
-def cachedprime(urls, headers={}, resize=False, plex_resize=False):
-    '''
-    {'hash': '1dad1d1', fp': 'filepath', 'url': 'imgurl', 'resize': [[w, h, url, dest]}
-    '''
-    logger.debug('Got %s images' % len(urls))
-    urls = remove_dict_dupe_from_list(urls, 'hash')
-    logger.debug('Removed all dupicate images got %s left' % len(urls))
-
-    imgdir = os.path.join(htpc.DATADIR, 'images/')
-    made_dir = False
-    if not os.path.exists(imgdir):
-        logger.debug('Creating image directory at %s' % imgdir)
-        os.makedirs(imgdir)
-        made_dir = True
-
-    resize_list = []
-
-    logger.debug('This can take a while..')
-
-    # If there is no local copy of the original
-    if made_dir is True:
-        logger.debug('There was no image directory, so everything is missing')
-        resize_list = urls
-
-    else:
-        logger.debug('Checking for missing images')
-        # cba with resizes for plex
-        for item in urls:
-            if not os.path.isfile(item['fp']):
-                logger.debug('%s was missing, download it %s' % (item['fp'], item['url']))
-                resize_list.append(item)
-
-    if made_dir is False and resize_list == 0:
-        logger.debug('No missing images :)')
-        return
-
-    pool = workerpool.WorkerPool(size=20)
-    for i in resize_list:
-        j = CacheImgDownload(i, headers)
-        pool.put(j)
-    pool.shutdown()
-    pool.wait()
-
-    # use pil to resize images
-    if resize_list and plex_resize is False and resize is True:
-        from multiprocessing import Pool, cpu_count
-        ppool = Pool(cpu_count())
-        try:
-            ppool.map_async(cache_resize_image, (b for b in resize_list), 5)
-            ppool.close()
-            ppool.join()
-        except Exception as e:
-            logger.debug('Failed to resize image %s' % e)
-    else:
-        # Already downloaded transcoded images
-        return
-
-
 def download_image(url, dest, auth=None, headers=None):
     ''' Download image and save to disk '''
     logger = logging.getLogger('htpc.helpers')
@@ -230,13 +115,10 @@ def resize_image(img, height, width, opacity, mode, dest):
     imagetype = imghdr.what(img)
     im = Image.open(img)
 
-    # Lazy fix for allow opacity with orginal size
-    if height is None or width is None:
-        size = im.size
-    else:
+    # Only resize if needed
+    if height is not None or width is not None:
         size = int(width), int(height)
-
-    im = im.resize(size, Image.ANTIALIAS)
+        im = im.resize(size, Image.ANTIALIAS)
 
     # Apply overlay if opacity is set
     if (opacity < 100):
@@ -281,6 +163,16 @@ def striphttp(s):
         return s
     else:
         return ''
+
+
+def timeit_func(func):
+    @wraps(func)
+    def inner(*args, **kwargs):
+        start = time.time()
+        res = func(*args)
+        print '%s took %s' % (func.__name__, time.time() - start)
+        return res
+    return inner
 
 
 def remove_dict_dupe_from_list(l, key):

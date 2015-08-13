@@ -6,10 +6,10 @@ import htpc
 import re
 import socket
 import struct
-from json import loads, dumps
+from json import loads
 from urllib2 import Request, urlopen
 import urllib
-from htpc.helpers import get_image, striphttp, joinArgs, cachedprime
+from htpc.helpers import get_image, striphttp, joinArgs
 import logging
 import urlparse
 import base64
@@ -17,8 +17,6 @@ import platform
 from cherrypy.lib.auth2 import require
 import requests
 from uuid import getnode
-import hashlib
-import os
 
 # Only imported to check if pil is installed
 # Dont remove even if import is unused
@@ -833,76 +831,6 @@ class Plex(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def primecache(self, disable_pil=0):
-        plex_host = htpc.settings.get('plex_host')
-        plex_port = htpc.settings.get('plex_port')
-        headers = self.getHeaders()
-        imgdir = os.path.join(htpc.DATADIR, 'images/')
-        imglist = []
-
-
-        disable_pil = bool(int(disable_pil))
-
-        # if Pil isnt installed override current setting
-        if use_pil is False:
-            disable_pil = True
-
-        print "disable_pil %s" % disable_pil
-
-        for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=headers)).read())['_children']:
-            for item in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all' % (plex_host, plex_port, section['key']), headers=headers)).read())['_children']:
-
-                if 'thumb' in item:
-                    d = {}
-                    h = hashlib.md5(item['thumb']).hexdigest()
-                    resize_sizes = [[225, 338], [300, 300], [675, 400], [100, 150], [375, 210], [375, 563], [150, 150], [525, 300], [1013, 600]]
-                    if disable_pil is True:
-                        # use the transcoder
-                        for r in resize_sizes:
-                            u = 'http://%s:%s/photo/:/transcode?height=%s&width=%s&url=%s' % (plex_host, plex_port, r[0], r[1], item['thumb'])
-                            r.append(u)
-                            resized = '%s_w%s_h%s_o_%s_%s' % (os.path.join(imgdir, h), r[0], r[1], None, None)
-                            r.append(resized)
-                            #print r
-                        #print
-
-                    d['resize'] = resize_sizes
-                    d['hash'] = h
-                    # Original image
-                    d['url'] = 'http://%s:%s%s' % (plex_host, plex_port, item['thumb'])
-                    d['fp'] = os.path.join(imgdir, h)
-                    imglist.append(d)
-
-                if 'fanart' in item:
-                    d = {}
-                    h = hashlib.md5(item['art']).hexdigest()
-                    resize_sizes = [[225, 338], [300, 300], [675, 400], [100, 150], [375, 210], [375, 563], [150, 150], [525, 300], [1013, 600]]
-                    if disable_pil is True:
-                        for r in resize_sizes:
-                            u = 'http://%s:%s/photo/:/transcode?height=%s&width=%s&url=%s' % (plex_host, plex_port, r[0], r[1], item['thumb'])
-                            r.append(u)
-                            resized = '%s_w%s_h%s_o_%s_%s' % (os.path.join(imgdir, h), r[0], r[1], None, None)
-                            r.append(resized)
-
-                    d['resize'] = resize_sizes
-                    d['hash'] = h
-                    # original image
-                    d['url'] = 'http://%s:%s%s' % (plex_host, plex_port, item['art'])
-                    d['fp'] = os.path.join(imgdir, h)
-                    imglist.append(d)
-
-        print len(imglist)
-        print "done"
-        #return imglist
-
-        if use_pil:
-            t = cachedprime(imglist, headers=headers, plex_resize=disable_pil)
-            return t
-
-
-    @cherrypy.expose()
-    @require()
-    @cherrypy.tools.json_out()
     def NowPlaying(self):
         ''' Get information about current playing item '''
         self.logger.debug('Fetching currently playing information')
@@ -915,10 +843,6 @@ class Plex(object):
             for video in self.JsonLoader(urlopen(Request('http://%s:%s/status/sessions' % (plex_host, plex_port), headers=self.getHeaders())).read())['_children']:
                 jplaying_item = {}
                 jplaying_item['protocolCapabilities'] = []
-                jplaying_item['dumpz'] = video
-
-                if '_elementType' in video:
-                    jplaying_item['itemtype'] = video['_elementType'].lower()
 
                 if 'index' in video:
                     jplaying_item['episode'] = int(video['index'])
@@ -935,7 +859,6 @@ class Plex(object):
                 if 'grandparentTitle' in video:
                     jplaying_item['show'] = video['grandparentTitle']
                 jplaying_item['duration'] = int(video['duration'])
-                jplaying_item['type'] = video['type']
                 try:
                     jplaying_item['viewOffset'] = int(video['viewOffset'])
                 except:
@@ -945,10 +868,9 @@ class Plex(object):
                     if children['_elementType'] == 'Player':
                         jplaying_item['state'] = children['state']
                         jplaying_item['player'] = children['title']
-                        jplaying_item['machineIdentifier'] = children['machineIdentifier']
                         # We need some more info to see what the client supports
                         for client in self.JsonLoader(urlopen(Request('http://%s:%s/clients' % (plex_host, plex_port), headers=self.getHeaders())).read())['_children']:
-                            if client['machineIdentifier'] == children['machineIdentifier'] or client['machineIdentifier'] in children['machineIdentifier']:
+                            if client['machineIdentifier'] == children['machineIdentifier']:
                                 jplaying_item['protocolCapabilities'] = client['protocolCapabilities'].split(',')
                                 jplaying_item['address'] = client['address']
 
@@ -957,9 +879,6 @@ class Plex(object):
                             jplaying_item['user'] = children['title']
                         if 'thumb' in children:
                             jplaying_item['avatar'] = children['thumb']
-
-                    if children['_elementType'] == 'TranscodeSession':
-                        jplaying_item['transcodesessionkey'] = children['key']
 
                 # Sometimes the client doesn't send the last timeline event. Ignore all client that almost have played the entire lenght.
                 if jplaying_item['viewOffset'] < (int(jplaying_item['duration']) - 10000):
@@ -995,42 +914,24 @@ class Plex(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def ControlPlayer(self, player, action, value='', **kwargs):
+    def ControlPlayer(self, player, action, value=''):
         ''' Various commands to control Plex Player '''
         self.logger.debug('Sending %s to %s value %s: ' % (action, player, value))
-
-        if kwargs:
-            kwargs = '?' + urllib.urlencode(kwargs)
-        else:
-            kwargs = ''
-
         try:
-            self.navigationCommands = ['moveUp', 'moveDown', 'moveLeft', 'moveRight', 'pageUp', 'pageDown', 'nextLetter',
-                                       'previousLetter', 'select', 'back', 'contextMenu', 'toggleOSD']
-
-            self.playbackCommands = ['play', 'pause', 'stop', 'rewind', 'fastForward', 'stepForward', 'bigStepForward',
-                                     'stepBack', 'bigStepBack', 'skipNext', 'skipPrevious', 'seekTo', 'skipTo']
-
-            self.applicationCommands = ['playFile', 'playMedia', 'screenshot', 'sendString', 'sendKey',
-                                        'sendVirtualKey', 'setVolume']
-
-            #self.othercommands = ['transcode_stop']
+            self.navigationCommands = ['moveUp', 'moveDown', 'moveLeft', 'moveRight', 'pageUp', 'pageDown', 'nextLetter', 'previousLetter', 'select', 'back', 'contextMenu', 'toggleOSD']
+            self.playbackCommands = ['play', 'pause', 'stop', 'rewind', 'fastForward', 'stepForward', 'bigStepForward', 'stepBack', 'bigStepBack', 'skipNext', 'skipPrevious']
+            self.applicationCommands = ['playFile', 'playMedia', 'screenshot', 'sendString', 'sendKey', 'sendVirtualKey', 'setVolume']
 
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
             if action in self.navigationCommands:
-                resp = urllib.urlopen('http://%s:%s/system/players/%s/naviation/%s' % (plex_host, plex_port, player, action)).read()
+                urllib.urlopen('http://%s:%s/system/players/%s/naviation/%s' % (plex_host, plex_port, player, action))
             elif action in self.playbackCommands:
-                resp = urllib.urlopen('http://%s:%s/system/players/%s/playback/%s%s' % (plex_host, plex_port, player, action, kwargs)).read()
+                urllib.urlopen('http://%s:%s/system/players/%s/playback/%s' % (plex_host, plex_port, player, action))
             elif action.split('?')[0] in self.applicationCommands:
-                resp = urllib.urlopen('http://%s:%s/system/players/%s/application/%s' % (plex_host, plex_port, player, action)).read()
-            # Add stop transcode?
-            #elif action in self.othercommands:
-            #    resp = urllib.urlopen('http://%s:%s/%s/:/transcode/universal/stop?session=%s' % (plex_host, plex_port, kwargs['transcodesessionkey)
+                urllib.urlopen('http://%s:%s/system/players/%s/application/%s' % (plex_host, plex_port, player, action))
             else:
                 raise ValueError('Unable to control Plex with action: %s' % action)
-
-            return resp
 
         except Exception as e:
             self.logger.debug('Exception: %s' % e)
@@ -1039,7 +940,8 @@ class Plex(object):
 
     @cherrypy.expose()
     @require()
-    def GetPlayers(self, filter=None, seek=False):
+    @cherrypy.tools.json_out()
+    def GetPlayers(self, filter=None):
         ''' Get list of active Players '''
         self.logger.debug('Getting players from Plex')
         try:
@@ -1047,7 +949,9 @@ class Plex(object):
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
             players = []
+            players2 = []
             for player in self.JsonLoader(urlopen(Request('http://%s:%s/clients' % (plex_host, plex_port), headers=self.getHeaders())).read())['_children']:
+                players2.append(player)
 
                 try:
                     del player['_elementType']
@@ -1059,11 +963,7 @@ class Plex(object):
                 if filter is None or filter in player['protocolCapabilities']:
                     players.append(player)
             self.logger.debug(players2)
-            if not seek:
-                cherrypy.response.headers['Content-Type'] = 'application/json'
-                return dumps({'players': players})
-            else:
-                return {'players': players}
+            return {'players': players}
 
         except Exception as e:
             self.logger.debug('Exception: %s' % e)
@@ -1153,24 +1053,19 @@ class Plex(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def PlayItem(self, playerip, machineid, item=None, type='video', offset=0, **kwargs):
-        ''' Play a file in Plex or jump'''
+    def PlayItem(self, playerip, machineid, item=None, type=None, offset=0, **kwargs):
+        ''' Play a file in Plex '''
         self.logger.debug('Playing %s on %s type %s offset %s' % (item, playerip, type, offset))
         # Ripped a lot for plexapi so all credits goes there, the parameters are very picky...
         # The maybe swich to the api?
-        plex_host = htpc.settings.get('plex_host')
-        plex_port = htpc.settings.get('plex_port')
-
-        #urllib2.urlopen(Request('http://%s:%s/%s/:/transcode/universal/stop?session=%s' % (plex_host, plex_port, type, kwargs['transcodesessionkey']), headers=self.getHeaders()).read())
+        # add type later
         try:
             plex_host = htpc.settings.get('plex_host', '')
             plex_port = htpc.settings.get('plex_port', '32400')
             # urllib2 sucks should use requests
             data = {'shuffle': 0,
                     'continuous': 0,
-                    'type': type,
-                    #'offset': offset
-                    }
+                    'type': 'video'}
 
             data['X-Plex-Client-Identifier'] = str(hex(getnode()))
             data['uri'] = 'library://__GID__/item//library/metadata/%s' % item
@@ -1191,14 +1086,12 @@ class Plex(object):
             arg = {'machineIdentifier': s.get('machineIdentifier'),
                    'key': '/library/metadata/' + item,
                    'containerKey': ctkey,
-                   'offset': offset
+                   'offset': 0
                    }
             play = 'playback/playMedia%s' % joinArgs(arg)
             playcommand = b_url + play
             r = requests.get(playcommand, headers=self.getHeaders())
-
             self.logger.debug("playcommand is %s" % playcommand)
-            self.logger.debug('%s' % r.url)
 
         except Exception as e:
             self.logger.debug('Exception: %s' % e)
