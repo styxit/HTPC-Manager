@@ -11,9 +11,11 @@ from urllib2 import quote
 from jsonrpclib import Server
 from sqlobject import SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol, IntCol
-from htpc.helpers import get_image
+from htpc.helpers import get_image, cachedprime
 import logging
 from cherrypy.lib.auth2 import require
+import hashlib
+import os
 
 
 class KodiServers(SQLObject):
@@ -27,6 +29,7 @@ class KodiServers(SQLObject):
 
     class sqlmeta:
         fromDatabase = True
+
 
 class Kodi(object):
     def __init__(self):
@@ -114,10 +117,95 @@ class Kodi(object):
         raise cherrypy.HTTPRedirect(self.url('', True))
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    @require()
+    def primecache(self, t='all', wanted_art='all', async=True, resize=True):
+        ''' find all images and cache them, might take a while...'''
+        kodi = Server(self.url('/jsonrpc', True))
+        url = self.url('/image/')
+        # fix headers
+        _head = 'Basic %s' % self.auth()
+        headers = {'Authorization': _head}
+
+        musicprop = ['fanart', 'thumbnail']
+        itemprop = ['art', 'fanart', 'thumbnail']
+        addonprop = ['thumbnail']
+        stuff = []
+
+        if t == 'all':
+            movie = kodi.VideoLibrary.GetMovies(properties=itemprop)
+            episode = kodi.VideoLibrary.GetEpisodes(properties=itemprop)
+            artist = kodi.AudioLibrary.GetArtists(properties=musicprop)
+            song = kodi.AudioLibrary.GetSongs(properties=musicprop)
+            tvshow = kodi.VideoLibrary.GetTVShows(properties=itemprop)
+            stuff = [movie, episode, artist, song, tvshow]
+        elif t == 'movie':
+            movie = kodi.VideoLibrary.GetMovies(properties=itemprop)
+            stuff.append(movie)
+        elif t == 'episode':
+            episode = kodi.VideoLibrary.GetEpisodes(properties=itemprop)
+            stuff.append(episode)
+        elif t == 'song':
+            song = kodi.AudioLibrary.GetSongs(properties=musicprop)
+            stuff.append(song)
+        elif t == 'tvshow':
+            tvshow = kodi.VideoLibrary.GetTVShows(properties=itemprop)
+            stuff.append(tvshow)
+        elif t == 'addon':
+            addon = kodi.Addons.GetAddons(content='unknown', enabled='all', properties=addonprop)
+            stuff.append(addon)
+
+        imgdir = os.path.join(htpc.DATADIR, 'images/')
+
+        imglist = []
+
+        self.logger.debug('Fetching every image we can find from kodi')  # todo add addon images
+
+        resize_sizes = [[225, 338], [200, 300], [675, 400], [100, 150], [375, 210], [150, 150]]
+
+        for item in stuff:
+            for k, v in item.items():
+                if k in ['episodes', 'movies', 'tvshows', 'songs', 'artists', 'addons']:
+                    self.logger.debug('There where %s %s' % (len(item[k]), k))
+                    for kk in item[k]:
+                        for kkk, vvv, in kk.items():
+                            d = {}
+                            if kkk == wanted_art or wanted_art == 'all':
+                                if kkk == 'art':
+                                    for z, a in kk['art'].items():
+                                        if z == wanted_art or wanted_art == 'all':
+                                            _url = url + quote(a)
+                                            h = hashlib.md5(_url).hexdigest()
+                                            d['fp'] = os.path.join(imgdir, h)
+                                            d['hash'] = h
+                                            d['url'] = _url
+                                            d['resize'] = resize_sizes
+                                            imglist.append(d)
+
+                                if kkk in ['fanart', 'thumbnail']:
+                                    _url = url + quote(vvv)
+                                    h = hashlib.md5(_url).hexdigest()
+                                    d['fp'] = os.path.join(imgdir, h)
+                                    d['hash'] = h
+                                    d['url'] = _url
+                                    d['resize'] = resize_sizes
+                                    imglist.append(d)
+
+        self.logger.debug('Found %s images in total' % len(imglist))
+
+        try:
+            if async:
+                t = cachedprime(imglist, headers, resize=bool(resize))
+                return t
+
+        except Exception as e:
+            self.logger.debug('%s' % e)
+
+    @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def ping(self, kodi_server_host='', kodi_server_port='',
-            kodi_server_username='', kodi_server_password='', **kwargs):
+             kodi_server_username='', kodi_server_password='', **kwargs):
         """ Tests settings, returns MAC address on success and null on fail """
         self.logger.debug("Testing kodi connectivity")
         try:
@@ -160,7 +248,7 @@ class Kodi(object):
     @cherrypy.tools.json_out()
     def setserver(self, kodi_server_id, kodi_server_name, kodi_server_host, kodi_server_port,
                   kodi_server_username=None, kodi_server_password=None, kodi_server_mac=None, kodi_server_starterport=''):
-        """ Create a server if id=0, else update a server """
+        """ Create a server if id=0, else update a server """ # fixme?
         if kodi_server_starterport == '':
             kodi_server_starterport = None
         else:
@@ -169,12 +257,12 @@ class Kodi(object):
             self.logger.debug("Creating kodi-Server in database")
             try:
                 server = KodiServers(name=kodi_server_name,
-                        host=kodi_server_host,
-                        port=int(kodi_server_port),
-                        username=kodi_server_username,
-                        password=kodi_server_password,
-                        mac=kodi_server_mac,
-                        starterport=kodi_server_starterport)
+                                     host=kodi_server_host,
+                                     port=int(kodi_server_port),
+                                     username=kodi_server_username,
+                                     password=kodi_server_password,
+                                     mac=kodi_server_mac,
+                                     starterport=kodi_server_starterport)
 
                 self.changeserver(server.id)
                 htpc.BLACKLISTWORDS.append(kodi_server_password)
@@ -202,7 +290,7 @@ class Kodi(object):
     @cherrypy.expose()
     @require()
     def delserver(self, id):
-        """ Delete a server """
+        """ Delete a server """ # fixme?
         self.logger.debug("Deleting server " + str(id))
         KodiServers.delete(id)
         self.changeserver()
@@ -247,8 +335,13 @@ class Kodi(object):
         try:
             kodi = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
-            properties = ['title', 'year', 'plot', 'thumbnail', 'file', 'fanart', 'studio', 'trailer',
-                    'imdbnumber', 'genre', 'rating', 'playcount']
+            # see http://kodi.wiki/view/JSON-RPC_API/v6#Item.Fields.Base
+            properties = ['title', 'genre', 'year', 'rating', 'director', 'trailer', 'tagline',
+                          'plot', 'plotoutline', 'originaltitle', 'lastplayed', 'playcount', 'writer',
+                          'studio', 'mpaa', 'cast', 'country', 'imdbnumber', 'runtime', 'set', 'showlink',
+                          'streamdetails', 'top250', 'votes', 'fanart', 'thumbnail', 'file', 'sorttitle',
+                          'resume', 'setid', 'dateadded', 'art']
+
             limits = {'start': int(start), 'end': int(end)}
             filter = {'field': 'title', 'operator': 'contains', 'value': filter}
             if hidewatched == "1":
@@ -268,7 +361,7 @@ class Kodi(object):
         try:
             kodi = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
-            properties = ['title', 'year', 'plot', 'thumbnail', 'playcount']
+            properties = ['title', 'year', 'plot', 'thumbnail', 'playcount', 'fanart', 'art']
             limits = {'start': int(start), 'end': int(end)}
             filter = {'field': 'title', 'operator': 'contains', 'value': filter}
             if hidewatched == "1":
@@ -289,7 +382,7 @@ class Kodi(object):
         try:
             kodi = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
-            properties = ['episode', 'season', 'thumbnail', 'plot', 'file', 'playcount']
+            properties = ['episode', 'season', 'thumbnail', 'plot', 'file', 'playcount', 'fanart', 'art']
             limits = {'start': int(start), 'end': int(end)}
             filter = {'field': 'title', 'operator': 'contains', 'value': filter}
             if hidewatched == "1":
@@ -308,7 +401,7 @@ class Kodi(object):
         try:
             kodi = Server(self.url('/jsonrpc', True))
             sort = {'order': sortorder, 'method': sortmethod, 'ignorearticle': True}
-            properties = ['thumbnail', 'fanart']
+            properties = ['thumbnail', 'fanart', 'art']
             limits = {'start': int(start), 'end': int(end)}
             filter = {'field': 'artist', 'operator': 'contains', 'value': filter}
             return kodi.AudioLibrary.GetArtists(properties=properties, limits=limits, sort=sort, filter=filter)
@@ -544,7 +637,7 @@ class Kodi(object):
                               'subtitles', 'currentaudiostream', 'audiostreams']
 
                 itemprop = ['title', 'season', 'episode', 'duration', 'showtitle',
-                            'fanart', 'tvshowid', 'plot', 'thumbnail', 'year']
+                            'fanart', 'tvshowid', 'plot', 'thumbnail', 'year', 'art']
 
             elif player['type'] == 'audio':
                 playerprop = ['speed', 'position', 'time', 'totaltime', 'percentage']
@@ -554,7 +647,16 @@ class Kodi(object):
             player = kodi.Player.GetProperties(playerid=playerid, properties=playerprop)
             item = kodi.Player.GetItem(playerid=playerid, properties=itemprop)
 
+            # removes type prefix. like tvshow.banner to banner
+            if 'art' in item['item']:
+                for k, v in item['item']['art'].items():
+                    if '.' in k:
+                        newk = k.split('.')[1]
+                        del item['item']['art'][k]
+                        item['item']['art'][newk] = v
+
             return {'playerInfo': player, 'itemInfo': item, 'app': app}
+
         except IndexError:
             return
         except Exception, e:
