@@ -163,6 +163,71 @@ class Plex(object):
             self.logger.error('Unable to fetch recent movies! Exception: %s' % e)
             return
 
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def primecache(self, disable_pil=0):
+        plex_host = htpc.settings.get('plex_host')
+        plex_port = htpc.settings.get('plex_port')
+        headers = self.getHeaders()
+        imgdir = os.path.join(htpc.DATADIR, 'images/')
+        imglist = []
+
+
+        disable_pil = bool(int(disable_pil))
+
+        # if Pil isnt installed override current setting
+        if use_pil is False:
+            disable_pil = True
+
+
+        for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=headers)).read())['_children']:
+            for item in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all' % (plex_host, plex_port, section['key']), headers=headers)).read())['_children']:
+
+                if 'thumb' in item:
+                    d = {}
+                    h = hashlib.md5(item['thumb']).hexdigest()
+                    resize_sizes = [[225, 338], [300, 300], [675, 400], [100, 150], [375, 210], [375, 563], [150, 150], [525, 300], [1013, 600]]
+                    if disable_pil is True:
+                        # use the transcoder
+                        for r in resize_sizes:
+                            u = 'http://%s:%s/photo/:/transcode?height=%s&width=%s&url=%s' % (plex_host, plex_port, r[0], r[1], item['thumb'])
+                            r.append(u)
+                            resized = '%s_w%s_h%s_o_%s_%s' % (os.path.join(imgdir, h), r[0], r[1], None, None)
+                            r.append(resized)
+                            #print r
+                        #print
+
+                    d['resize'] = resize_sizes
+                    d['hash'] = h
+                    # Original image
+                    d['url'] = 'http://%s:%s%s' % (plex_host, plex_port, item['thumb'])
+                    d['fp'] = os.path.join(imgdir, h)
+                    imglist.append(d)
+
+                if 'fanart' in item:
+                    d = {}
+                    h = hashlib.md5(item['art']).hexdigest()
+                    resize_sizes = [[225, 338], [300, 300], [675, 400], [100, 150], [375, 210], [375, 563], [150, 150], [525, 300], [1013, 600]]
+                    if disable_pil is True:
+                        for r in resize_sizes:
+                            u = 'http://%s:%s/photo/:/transcode?height=%s&width=%s&url=%s' % (plex_host, plex_port, r[0], r[1], item['thumb'])
+                            r.append(u)
+                            resized = '%s_w%s_h%s_o_%s_%s' % (os.path.join(imgdir, h), r[0], r[1], None, None)
+                            r.append(resized)
+
+                    d['resize'] = resize_sizes
+                    d['hash'] = h
+                    # original image
+                    d['url'] = 'http://%s:%s%s' % (plex_host, plex_port, item['art'])
+                    d['fp'] = os.path.join(imgdir, h)
+                    imglist.append(d)
+
+        if use_pil:
+            t = cachedprime(imglist, headers=headers, plex_resize=disable_pil)
+            return t
+
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
