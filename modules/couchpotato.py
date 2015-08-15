@@ -100,6 +100,7 @@ class Couchpotato(object):
     @require()
     def GetImage(self, url, h=None, w=None, o=100, *args, **kwargs):
         # url can be a string or json
+        print "ran"
         working_url = None
         imgdir = os.path.join(htpc.DATADIR, 'images/')
         try:
@@ -107,30 +108,46 @@ class Couchpotato(object):
             if isinstance(x, list):
                 tl = [(hashlib.md5(u).hexdigest(), u) for u in x]
                 c = 0
+                checkurl = []
                 for i in tl:
                     c += 1
                     if os.path.isfile(os.path.join(imgdir, i[0])):
+                        print c
+                        print "hash exist %s" % str(i)
                         working_url = i[1]
                         break
                     else:
-                        try:
-                            r = requests.head(i[1], headers={'Cache-Control': 'private, max-age=0, no-cache, must-revalidate', 'Pragma': 'no-cache'})
-                            if r.ok:
-                                working_url = i[1]
-                                break
-
-                        except Exception as e:
-                            self.logger.error('Error: %s url: %s item: %s  loop n : %s  tublelist %s' % (e, i[1], i, c, tl))
-                            continue
+                        print "didnt find %s" % str(i)
+                        checkurl.append(i)
+                        continue
 
                 if working_url:
                     return get_image(working_url, h, w, o)
+                else:
+                    if checkurl:
+                        cc = 0
+                        for i in checkurl:
+                            cc += 1
+                            print cc
+                            try:
+                                r = requests.get(i[1], headers={'Cache-Control': 'private, max-age=0, no-cache, must-revalidate', 'Pragma': 'no-cache'})
+                                if r.content:
+                                    working_url = i[1]
+                                    self.logger.debug('%s works' % i[1])
+                                    break
 
+                            except Exception as e:
+                                self.logger.error('Error: %s url: %s item: %s  loop n : %s  tublelist %s' % (e, i[1], i, c, tl))
+
+                        if working_url:
+                            return get_image(working_url, h, w, o)
+
+        except ValueError as e:
+            print type(url)
+            if isinstance(url, basestring):
+                return get_image(url, h, w, o)
         except Exception as e:
-            pass
-            # return static faild img
-            #print e, url, type(url)
-            #return get_image(url, h, w, o)
+            print "last error %s" % e
 
     @cherrypy.expose()
     @require()

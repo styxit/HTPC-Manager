@@ -6,7 +6,7 @@ import hashlib
 import htpc
 import imghdr
 import logging
-from cherrypy.lib.static import serve_file
+from cherrypy.lib.static import serve_file, serve_fileobj
 from urllib2 import Request, urlopen
 import urllib
 import time
@@ -17,6 +17,8 @@ from mako import exceptions
 from mako.lookup import TemplateLookup
 import requests
 import workerpool
+import StringIO
+import traceback
 
 try:
     import Image
@@ -45,6 +47,7 @@ def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, h
     ''' Load image form cache if possible, else download. Resize if needed '''
     opacity = float(opacity)
     logger = logging.getLogger('htpc.helpers')
+    print "find %s url" % url
 
     # Create image directory if it doesnt exist
     imgdir = os.path.join(htpc.DATADIR, 'images/')
@@ -61,33 +64,42 @@ def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, h
     # If there is no local copy of the original
     # download it
     if not os.path.isfile(image):
-        logger.debug('No local image found for ' + image + '. Downloading')
+        logger.debug('No local image found for %s. Downloading..' % url)
         image = download_image(url, image, auth, headers)
 
     # Check if resize is needed
     if (height and width) or (opacity < 100) or mode:
 
         if PIL:
+            print "pil"
             # Set a filename for resized file
             resized = '%s_w%s_h%s_o_%s_%s' % (image, width, height, opacity, mode)
+            print "resized %s" % resized
 
             # If there is no local resized copy
             if not os.path.isfile(resized):
                 # try to resize, if we cant return original image
                 try:
+                    print "lol"
                     image = resize_image(image, height, width, opacity, mode, resized)
+                    return serve_file(path=image, content_type='image/png')
                 except Exception as e:
                     try:
-                        logger.debug('%s returning orginal image %s' % (e, url))
-                        return serve_file(path=image, content_type='image/png')
+                        logger.error('dick')
+                        image = os.path.join(htpc.RUNDIR, 'interfaces/default/img/missingposter.png')
+                        return serve_file(path=os.path.abspath(image), content_type='image/png')
+                    except Exception as e:
 
-                    except:
-                        image = os.path.join(htpc.RUNDIR, 'interfaces/default/img/fff_20')
-                        return serve_file(path=image, content_type='image/png')
+                        print "ass"
+                        print e
+                        print "%s" % traceback.format_exc()
+                        return
 
             # If the resized image is already cached
             if os.path.isfile(resized):
+                print "is resized and exist"
                 image = resized
+                print image
 
         else:
             logger.error("Can't resize when PIL is missing on system!")
@@ -95,12 +107,20 @@ def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, h
                 image = os.path.join(htpc.RUNDIR, 'interfaces/default/img/fff_20.png')
 
     # Load file from disk
-    imagetype = imghdr.what(image)
+
+    imagetype = imghdr.what(os.path.abspath(image))
+    print imagetype
     if imagetype is not None:
+        #print "serving"
+        #return serve_file(path=image, content_type='image/' + imagetype)
+
         try:
+            # try to fix path
             return serve_file(path=image, content_type='image/' + imagetype)
-        except:
-            print "zomg"
+        except Exception as e:
+            logger.error('%s' % traceback.format_exc())
+            logger.error('zomg %s, %s' % (e, url))
+
 
 
 class CacheImgDownload(workerpool.Job):
@@ -223,9 +243,16 @@ def download_image(url, dest, auth=None, headers=None):
             # Sonarrs image api returns 304, but they cant know if a user has cleared it
             # So make sure we get data every time.
             request.add_header('Cache-Control', 'private, max-age=0, no-cache, must-revalidate')
+            request.add_header('Pragma', 'no-cache')
 
-        with open(dest, 'wb') as local_file:
-            local_file.write(urlopen(request).read())
+        resp = urlopen(request).read()
+        print len(resp)
+        if resp:
+
+            with open(dest, 'wb') as local_file:
+                local_file.write(urlopen(request).read())
+        else:
+            raise
 
         return dest
 
