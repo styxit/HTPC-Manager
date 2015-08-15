@@ -8,12 +8,13 @@ from cherrypy import tools
 
 def setup_server():
     class Root:
+
         def index(self):
             yield "Hello, world"
         index.exposed = True
         h = [("Content-Language", "en-GB"), ('Content-Type', 'text/plain')]
         tools.response_headers(headers=h)(index)
-        
+
         def other(self):
             return "salut"
         other.exposed = True
@@ -22,16 +23,15 @@ def setup_server():
             'tools.response_headers.headers': [("Content-Language", "fr"),
                                                ('Content-Type', 'text/plain')],
             'tools.log_hooks.on': True,
-            }
-    
-    
+        }
+
     class Accept:
         _cp_config = {'tools.accept.on': True}
-        
+
         def index(self):
             return '<a href="feed">Atom feed</a>'
         index.exposed = True
-        
+
         # In Python 2.4+, we could use a decorator instead:
         # @tools.accept('application/atom+xml')
         def feed(self):
@@ -41,7 +41,7 @@ def setup_server():
 </feed>"""
         feed.exposed = True
         feed._cp_config = {'tools.accept.media': 'application/atom+xml'}
-        
+
         def select(self):
             # We could also write this: mtype = cherrypy.lib.accept.accept(...)
             mtype = tools.accept.callable(['text/html', 'text/plain'])
@@ -50,14 +50,16 @@ def setup_server():
             else:
                 return "PAGE TITLE"
         select.exposed = True
-    
+
     class Referer:
+
         def accept(self):
             return "Accepted!"
         accept.exposed = True
         reject = accept
-    
+
     class AutoVary:
+
         def index(self):
             # Read a header directly with 'get'
             ae = cherrypy.request.headers.get('Accept-Encoding')
@@ -76,7 +78,7 @@ def setup_server():
             mtype = tools.accept.callable(['text/html', 'text/plain'])
             return "Hello, world!"
         index.exposed = True
-    
+
     conf = {'/referer': {'tools.referer.on': True,
                          'tools.referer.pattern': r'http://[^/]*example\.com',
                          },
@@ -85,7 +87,7 @@ def setup_server():
                                 },
             '/autovary': {'tools.autovary.on': True},
             }
-    
+
     root = Root()
     root.referer = Referer()
     root.accept = Accept()
@@ -95,6 +97,7 @@ def setup_server():
 
 
 from cherrypy.test import helper
+
 
 class ResponseHeadersTest(helper.CPWebCase):
     setup_server = staticmethod(setup_server)
@@ -112,21 +115,21 @@ class ResponseHeadersTest(helper.CPWebCase):
 
 class RefererTest(helper.CPWebCase):
     setup_server = staticmethod(setup_server)
-    
+
     def testReferer(self):
         self.getPage('/referer/accept')
         self.assertErrorPage(403, 'Forbidden Referer header.')
-        
+
         self.getPage('/referer/accept',
                      headers=[('Referer', 'http://www.example.com/')])
         self.assertStatus(200)
         self.assertBody('Accepted!')
-        
+
         # Reject
         self.getPage('/referer/reject')
         self.assertStatus(200)
         self.assertBody('Accepted!')
-        
+
         self.getPage('/referer/reject',
                      headers=[('Referer', 'http://www.example.com/')])
         self.assertErrorPage(403, 'Forbidden Referer header.')
@@ -134,40 +137,41 @@ class RefererTest(helper.CPWebCase):
 
 class AcceptTest(helper.CPWebCase):
     setup_server = staticmethod(setup_server)
-    
+
     def test_Accept_Tool(self):
         # Test with no header provided
         self.getPage('/accept/feed')
         self.assertStatus(200)
         self.assertInBody('<title>Unknown Blog</title>')
-        
+
         # Specify exact media type
-        self.getPage('/accept/feed', headers=[('Accept', 'application/atom+xml')])
+        self.getPage('/accept/feed',
+                     headers=[('Accept', 'application/atom+xml')])
         self.assertStatus(200)
         self.assertInBody('<title>Unknown Blog</title>')
-        
+
         # Specify matching media range
         self.getPage('/accept/feed', headers=[('Accept', 'application/*')])
         self.assertStatus(200)
         self.assertInBody('<title>Unknown Blog</title>')
-        
+
         # Specify all media ranges
         self.getPage('/accept/feed', headers=[('Accept', '*/*')])
         self.assertStatus(200)
         self.assertInBody('<title>Unknown Blog</title>')
-        
+
         # Specify unacceptable media types
         self.getPage('/accept/feed', headers=[('Accept', 'text/html')])
         self.assertErrorPage(406,
                              "Your client sent this Accept header: text/html. "
                              "But this resource only emits these media types: "
                              "application/atom+xml.")
-        
+
         # Test resource where tool is 'on' but media is None (not set).
         self.getPage('/accept/')
         self.assertStatus(200)
         self.assertBody('<a href="feed">Atom feed</a>')
-    
+
     def test_accept_selection(self):
         # Try both our expected media types
         self.getPage('/accept/select', [('Accept', 'text/html')])
@@ -176,10 +180,11 @@ class AcceptTest(helper.CPWebCase):
         self.getPage('/accept/select', [('Accept', 'text/plain')])
         self.assertStatus(200)
         self.assertBody('PAGE TITLE')
-        self.getPage('/accept/select', [('Accept', 'text/plain, text/*;q=0.5')])
+        self.getPage('/accept/select',
+                     [('Accept', 'text/plain, text/*;q=0.5')])
         self.assertStatus(200)
         self.assertBody('PAGE TITLE')
-        
+
         # text/* and */* should prefer text/html since it comes first
         # in our 'media' argument to tools.accept
         self.getPage('/accept/select', [('Accept', 'text/*')])
@@ -188,13 +193,14 @@ class AcceptTest(helper.CPWebCase):
         self.getPage('/accept/select', [('Accept', '*/*')])
         self.assertStatus(200)
         self.assertBody('<h2>Page Title</h2>')
-        
+
         # Try unacceptable media types
         self.getPage('/accept/select', [('Accept', 'application/xml')])
-        self.assertErrorPage(406,
-                             "Your client sent this Accept header: application/xml. "
-                             "But this resource only emits these media types: "
-                             "text/html, text/plain.")
+        self.assertErrorPage(
+            406,
+            "Your client sent this Accept header: application/xml. "
+            "But this resource only emits these media types: "
+            "text/html, text/plain.")
 
 
 class AutoVaryTest(helper.CPWebCase):
@@ -203,5 +209,7 @@ class AutoVaryTest(helper.CPWebCase):
     def testAutoVary(self):
         self.getPage('/autovary/')
         self.assertHeader(
-            "Vary", 'Accept, Accept-Charset, Accept-Encoding, Host, If-Modified-Since, Range')
-
+            "Vary",
+            'Accept, Accept-Charset, Accept-Encoding, '
+            'Host, If-Modified-Since, Range'
+        )

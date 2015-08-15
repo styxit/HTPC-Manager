@@ -16,10 +16,11 @@ import cherrypy
 
 
 class HTTPErrorDemo(object):
-    
+
     # Set a custom response for 403 errors.
-    _cp_config = {'error_page.403' : os.path.join(curpath, "custom_error.html")}
-    
+    _cp_config = {'error_page.403':
+                  os.path.join(curpath, "custom_error.html")}
+
     def index(self):
         # display some links that will result in errors
         tracebacks = cherrypy.request.show_tracebacks
@@ -27,12 +28,16 @@ class HTTPErrorDemo(object):
             trace = 'off'
         else:
             trace = 'on'
-            
+
         return """
         <html><body>
             <p>Toggle tracebacks <a href="toggleTracebacks">%s</a></p>
             <p><a href="/doesNotExist">Click me; I'm a broken link!</a></p>
-            <p><a href="/error?code=403">Use a custom error page from a file.</a></p>
+            <p>
+              <a href="/error?code=403">
+                Use a custom error page from a file.
+              </a>
+            </p>
             <p>These errors are explicitly raised by the application:</p>
             <ul>
                 <li><a href="/error?code=400">400</a></li>
@@ -45,21 +50,21 @@ class HTTPErrorDemo(object):
         </body></html>
         """ % trace
     index.exposed = True
-    
+
     def toggleTracebacks(self):
-        # simple function to toggle tracebacks on and off 
+        # simple function to toggle tracebacks on and off
         tracebacks = cherrypy.request.show_tracebacks
         cherrypy.config.update({'request.show_tracebacks': not tracebacks})
-        
+
         # redirect back to the index
         raise cherrypy.HTTPRedirect('/')
     toggleTracebacks.exposed = True
-    
+
     def error(self, code):
         # raise an error based on the get query
-        raise cherrypy.HTTPError(status = code)
+        raise cherrypy.HTTPError(status=code)
     error.exposed = True
-    
+
     def messageArg(self):
         message = ("If you construct an HTTPError with a 'message' "
                    "argument, it wil be placed on the error page "

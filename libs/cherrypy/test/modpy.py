@@ -91,20 +91,21 @@ PythonOption socket_host %(host)s
 PythonDebug On
 """
 
+
 class ModPythonSupervisor(helper.Supervisor):
-    
+
     using_apache = True
     using_wsgi = False
     template = None
-    
+
     def __str__(self):
         return "ModPython Server on %s:%s" % (self.host, self.port)
-    
+
     def start(self, modulename):
         mpconf = CONF_PATH
         if not os.path.isabs(mpconf):
             mpconf = os.path.join(curdir, mpconf)
-        
+
         f = open(mpconf, 'wb')
         try:
             f.write(self.template %
@@ -112,34 +113,36 @@ class ModPythonSupervisor(helper.Supervisor):
                      'host': self.host})
         finally:
             f.close()
-        
+
         result = read_process(APACHE_PATH, "-k start -f %s" % mpconf)
         if result:
             print(result)
-    
+
     def stop(self):
         """Gracefully shutdown a server that is serving forever."""
         read_process(APACHE_PATH, "-k stop")
 
 
 loaded = False
+
+
 def wsgisetup(req):
     global loaded
     if not loaded:
         loaded = True
         options = req.get_options()
-        
+
         import cherrypy
         cherrypy.config.update({
             "log.error_file": os.path.join(curdir, "test.log"),
             "environment": "test_suite",
             "server.socket_host": options['socket_host'],
-            })
-        
+        })
+
         modname = options['testmod']
         mod = __import__(modname, globals(), locals(), [''])
         mod.setup_server()
-        
+
         cherrypy.server.unsubscribe()
         cherrypy.engine.start()
     from mod_python import apache
@@ -151,13 +154,12 @@ def cpmodpysetup(req):
     if not loaded:
         loaded = True
         options = req.get_options()
-        
+
         import cherrypy
         cherrypy.config.update({
             "log.error_file": os.path.join(curdir, "test.log"),
             "environment": "test_suite",
             "server.socket_host": options['socket_host'],
-            })
+        })
     from mod_python import apache
     return apache.OK
-

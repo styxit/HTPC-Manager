@@ -6,6 +6,7 @@ log = logging.getLogger(__name__)
 import os
 thisdir = os.path.abspath(os.path.dirname(__file__))
 serverpem = os.path.join(os.getcwd(), thisdir, 'test.pem')
+import unittest
 
 import re
 import sys
@@ -19,11 +20,18 @@ from cherrypy.lib import gctools
 from cherrypy.lib.reprconf import unrepr
 from cherrypy.test import webtest
 
+# Use subprocess module from Python 2.7 on Python 2.3-2.6
+if sys.version_info < (2, 7):
+    import cherrypy._cpcompat_subprocess as subprocess
+else:
+    import subprocess
+
 import nose
 
 _testconfig = None
 
-def get_tst_config(overconf = {}):
+
+def get_tst_config(overconf={}):
     global _testconfig
     if _testconfig is None:
         conf = {
@@ -51,7 +59,9 @@ def get_tst_config(overconf = {}):
 
     return conf
 
+
 class Supervisor(object):
+
     """Base class for modeling and controlling servers during testing."""
 
     def __init__(self, **kwargs):
@@ -63,13 +73,16 @@ class Supervisor(object):
 
 log_to_stderr = lambda msg, level: sys.stderr.write(msg + os.linesep)
 
+
 class LocalSupervisor(Supervisor):
-    """Base class for modeling/controlling servers which run in the same process.
+
+    """Base class for modeling/controlling servers which run in the same
+    process.
 
     When the server side runs in a different process, start/stop can dump all
     state between each test module easily. When the server side runs in the
-    same process as the client, however, we have to do a bit more work to ensure
-    config and mounted apps are reset between tests.
+    same process as the client, however, we have to do a bit more work to
+    ensure config and mounted apps are reset between tests.
     """
 
     using_apache = False
@@ -110,15 +123,16 @@ class LocalSupervisor(Supervisor):
         td = getattr(self, 'teardown', None)
         if td:
             td()
-        
+
         cherrypy.engine.exit()
-        
+
         for name, server in copyitems(getattr(cherrypy, 'servers', {})):
             server.unsubscribe()
             del cherrypy.servers[name]
 
 
 class NativeServerSupervisor(LocalSupervisor):
+
     """Server supervisor for the builtin HTTP server."""
 
     httpserver_class = "cherrypy._cpnative_server.CPHTTPServer"
@@ -130,6 +144,7 @@ class NativeServerSupervisor(LocalSupervisor):
 
 
 class LocalWSGISupervisor(LocalSupervisor):
+
     """Server supervisor for the builtin WSGI server."""
 
     httpserver_class = "cherrypy._cpwsgi_server.CPWSGIServer"
@@ -147,24 +162,26 @@ class LocalWSGISupervisor(LocalSupervisor):
         """Obtain a new (decorated) WSGI app to hook into the origin server."""
         if app is None:
             app = cherrypy.tree
-        
+
         if self.conquer:
             try:
                 import wsgiconq
             except ImportError:
-                warnings.warn("Error importing wsgiconq. pyconquer will not run.")
+                warnings.warn(
+                    "Error importing wsgiconq. pyconquer will not run.")
             else:
                 app = wsgiconq.WSGILogger(app, c_calls=True)
-        
+
         if self.validate:
             try:
                 from wsgiref import validate
             except ImportError:
-                warnings.warn("Error importing wsgiref. The validator will not run.")
+                warnings.warn(
+                    "Error importing wsgiref. The validator will not run.")
             else:
-                #wraps the app in the validator
+                # wraps the app in the validator
                 app = validate.validator(app)
-        
+
         return app
 
 
@@ -174,6 +191,7 @@ def get_cpmodpy_supervisor(**options):
     sup.template = modpy.conf_cpmodpy
     return sup
 
+
 def get_modpygw_supervisor(**options):
     from cherrypy.test import modpy
     sup = modpy.ModPythonSupervisor(**options)
@@ -181,17 +199,21 @@ def get_modpygw_supervisor(**options):
     sup.using_wsgi = True
     return sup
 
+
 def get_modwsgi_supervisor(**options):
     from cherrypy.test import modwsgi
     return modwsgi.ModWSGISupervisor(**options)
+
 
 def get_modfcgid_supervisor(**options):
     from cherrypy.test import modfcgid
     return modfcgid.ModFCGISupervisor(**options)
 
+
 def get_modfastcgi_supervisor(**options):
     from cherrypy.test import modfastcgi
     return modfastcgi.ModFCGISupervisor(**options)
+
 
 def get_wsgi_u_supervisor(**options):
     cherrypy.server.wsgi_version = ('u', 0)
@@ -199,7 +221,7 @@ def get_wsgi_u_supervisor(**options):
 
 
 class CPWebCase(webtest.WebCase):
- 
+
     script_name = ""
     scheme = "http"
 
@@ -213,7 +235,7 @@ class CPWebCase(webtest.WebCase):
                          'modfastcgi': get_modfastcgi_supervisor,
                          }
     default_server = "wsgi"
-    
+
     def _setup_server(cls, supervisor, conf):
         v = sys.version.split()[0]
         log.info("Python version used to run this test script: %s" % v)
@@ -257,17 +279,18 @@ class CPWebCase(webtest.WebCase):
             webtest.WebCase.HTTP_CONN = HTTPSConnection
         return baseconf
     _setup_server = classmethod(_setup_server)
-    
+
     def setup_class(cls):
         ''
-        #Creates a server
+        # Creates a server
         conf = get_tst_config()
-        supervisor_factory = cls.available_servers.get(conf.get('server', 'wsgi'))
+        supervisor_factory = cls.available_servers.get(
+            conf.get('server', 'wsgi'))
         if supervisor_factory is None:
             raise RuntimeError('Unknown server in config: %s' % conf['server'])
         supervisor = supervisor_factory(**conf)
 
-        #Copied from "run_test_suite"
+        # Copied from "run_test_suite"
         cherrypy.config.reset()
         baseconf = cls._setup_server(supervisor, conf)
         cherrypy.config.update(baseconf)
@@ -293,62 +316,64 @@ class CPWebCase(webtest.WebCase):
         if hasattr(cls, 'setup_server'):
             cls.supervisor.stop()
     teardown_class = classmethod(teardown_class)
-    
+
     do_gc_test = False
-    
+
     def test_gc(self):
         if self.do_gc_test:
             self.getPage("/gc/stats")
             self.assertBody("Statistics:")
-    # Tell nose to run this last in each class.
-    # Prefer sys.maxint for Python 2.3, which didn't have float('inf')
-    test_gc.compat_co_firstlineno = getattr(sys, 'maxint', None) or float('inf')
-    
+
     def prefix(self):
         return self.script_name.rstrip("/")
-    
+
     def base(self):
         if ((self.scheme == "http" and self.PORT == 80) or
-            (self.scheme == "https" and self.PORT == 443)):
+                (self.scheme == "https" and self.PORT == 443)):
             port = ""
         else:
             port = ":%s" % self.PORT
-        
+
         return "%s://%s%s%s" % (self.scheme, self.HOST, port,
                                 self.script_name.rstrip("/"))
-    
+
     def exit(self):
         sys.exit()
-    
-    def getPage(self, url, headers=None, method="GET", body=None, protocol=None):
+
+    def getPage(self, url, headers=None, method="GET", body=None,
+                protocol=None):
         """Open the url. Return status, headers, body."""
         if self.script_name:
             url = httputil.urljoin(self.script_name, url)
-        return webtest.WebCase.getPage(self, url, headers, method, body, protocol)
-    
+        return webtest.WebCase.getPage(self, url, headers, method, body,
+                                       protocol)
+
     def skip(self, msg='skipped '):
         raise nose.SkipTest(msg)
-    
+
     def assertErrorPage(self, status, message=None, pattern=''):
         """Compare the response body with a built in error page.
-        
+
         The function will optionally look for the regexp pattern,
         within the exception embedded in the error page."""
-        
+
         # This will never contain a traceback
         page = cherrypy._cperror.get_error_page(status, message=message)
-        
+
         # First, test the response body without checking the traceback.
         # Stick a match-all group (.*) in to grab the traceback.
-        esc = re.escape
-        epage = esc(page)
-        epage = epage.replace(esc('<pre id="traceback"></pre>'),
-                              esc('<pre id="traceback">') + '(.*)' + esc('</pre>'))
-        m = re.match(ntob(epage, self.encoding), self.body, re.DOTALL)
+        def esc(text):
+            return re.escape(ntob(text))
+        epage = re.escape(page)
+        epage = epage.replace(
+            esc('<pre id="traceback"></pre>'),
+            esc('<pre id="traceback">') + ntob('(.*)') + esc('</pre>'))
+        m = re.match(epage, self.body, re.DOTALL)
         if not m:
-            self._handlewebError('Error page does not match; expected:\n' + page)
+            self._handlewebError(
+                'Error page does not match; expected:\n' + page)
             return
-        
+
         # Now test the pattern against the traceback
         if pattern is None:
             # Special-case None to mean that there should be *no* traceback.
@@ -360,14 +385,14 @@ class CPWebCase(webtest.WebCase):
                               m.group(1))):
                 msg = 'Error page does not contain %s in traceback'
                 self._handlewebError(msg % repr(pattern))
-    
+
     date_tolerance = 2
-    
+
     def assertEqualDates(self, dt1, dt2, seconds=None):
         """Assert abs(dt1 - dt2) is within Y seconds."""
         if seconds is None:
             seconds = self.date_tolerance
-        
+
         if dt1 > dt2:
             diff = dt1 - dt2
         else:
@@ -375,6 +400,20 @@ class CPWebCase(webtest.WebCase):
         if not diff < datetime.timedelta(seconds=seconds):
             raise AssertionError('%r and %r are not within %r seconds.' %
                                  (dt1, dt2, seconds))
+
+
+def _test_method_sorter(_, x, y):
+    """Monkeypatch the test sorter to always run test_gc last in each suite."""
+    if x == 'test_gc':
+        return 1
+    if y == 'test_gc':
+        return -1
+    if x > y:
+        return 1
+    if x < y:
+        return -1
+    return 0
+unittest.TestLoader.sortTestMethodsUsing = _test_method_sorter
 
 
 def setup_client():
@@ -388,7 +427,7 @@ def setup_client():
 
 
 class CPProcess(object):
-    
+
     pid_file = os.path.join(thisdir, 'test.pid')
     config_file = os.path.join(thisdir, 'test.conf')
     config_template = """[global]
@@ -403,14 +442,15 @@ log.access_file: r'%(access_log)s'
 """
     error_log = os.path.join(thisdir, 'test.error.log')
     access_log = os.path.join(thisdir, 'test.access.log')
-    
-    def __init__(self, wait=False, daemonize=False, ssl=False, socket_host=None, socket_port=None):
+
+    def __init__(self, wait=False, daemonize=False, ssl=False,
+                 socket_host=None, socket_port=None):
         self.wait = wait
         self.daemonize = daemonize
         self.ssl = ssl
         self.host = socket_host or cherrypy.server.socket_host
         self.port = socket_port or cherrypy.server.socket_port
-    
+
     def write_conf(self, extra=""):
         if self.ssl:
             serverpem = os.path.join(thisdir, 'test.pem')
@@ -420,7 +460,7 @@ server.ssl_private_key: r'%s'
 """ % (serverpem, serverpem)
         else:
             ssl = ""
-        
+
         conf = self.config_template % {
             'host': self.host,
             'port': self.port,
@@ -428,52 +468,64 @@ server.ssl_private_key: r'%s'
             'access_log': self.access_log,
             'ssl': ssl,
             'extra': extra,
-            }
+        }
         f = open(self.config_file, 'wb')
         f.write(ntob(conf, 'utf-8'))
         f.close()
-    
+
     def start(self, imports=None):
         """Start cherryd in a subprocess."""
         cherrypy._cpserver.wait_for_free_port(self.host, self.port)
-        
-        args = [sys.executable, os.path.join(thisdir, '..', 'cherryd'),
-                '-c', self.config_file, '-p', self.pid_file]
-        
+
+        args = [
+            os.path.join(thisdir, '..', 'cherryd'),
+            '-c', self.config_file,
+            '-p', self.pid_file,
+        ]
+
         if not isinstance(imports, (list, tuple)):
             imports = [imports]
         for i in imports:
             if i:
                 args.append('-i')
                 args.append(i)
-        
+
         if self.daemonize:
             args.append('-d')
 
         env = os.environ.copy()
-        # Make sure we import the cherrypy package in which this module is defined.
+        # Make sure we import the cherrypy package in which this module is
+        # defined.
         grandparentdir = os.path.abspath(os.path.join(thisdir, '..', '..'))
         if env.get('PYTHONPATH', ''):
-            env['PYTHONPATH'] = os.pathsep.join((grandparentdir, env['PYTHONPATH']))
+            env['PYTHONPATH'] = os.pathsep.join(
+                (grandparentdir, env['PYTHONPATH']))
         else:
             env['PYTHONPATH'] = grandparentdir
+        self._proc = subprocess.Popen([sys.executable] + args, env=env)
         if self.wait:
-            self.exit_code = os.spawnve(os.P_WAIT, sys.executable, args, env)
+            self.exit_code = self._proc.wait()
         else:
-            os.spawnve(os.P_NOWAIT, sys.executable, args, env)
             cherrypy._cpserver.wait_for_occupied_port(self.host, self.port)
-        
+
         # Give the engine a wee bit more time to finish STARTING
         if self.daemonize:
             time.sleep(2)
         else:
             time.sleep(1)
-    
+
     def get_pid(self):
-        return int(open(self.pid_file, 'rb').read())
-    
+        if self.daemonize:
+            return int(open(self.pid_file, 'rb').read())
+        return self._proc.pid
+
     def join(self):
         """Wait for the process to exit."""
+        if self.daemonize:
+            return self._join_daemon()
+        self._proc.wait()
+
+    def _join_daemon(self):
         try:
             try:
                 # Mac, UNIX
@@ -491,4 +543,3 @@ server.ssl_private_key: r'%s'
             x = sys.exc_info()[1]
             if x.args != (10, 'No child processes'):
                 raise
-

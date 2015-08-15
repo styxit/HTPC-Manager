@@ -70,16 +70,13 @@ def start():
             'environment': 'production'
         })
 
-    # If ssl is enabled but there is not cert og key, try to make self signed.
     if htpc.settings.get('app_use_ssl'):
-        # Check if the cert and  key exists
-        if not os.path.exists(htpc.settings.get('app_ssl_cert')) and not os.path.exists(htpc.settings.get('app_ssl_key')):
-            serverkey = os.path.join(htpc.DATADIR, 'server.key')
-            cert = os.path.join(htpc.DATADIR, 'server.cert')
+        serverkey = os.path.join(htpc.DATADIR, 'server.key')
+        cert = os.path.join(htpc.DATADIR, 'server.cert')
+        # If either the HTTPS certificate or key do not exist, make some self-signed ones.
+        if not (cert and os.path.exists(cert)) or not (serverkey and os.path.exists(serverkey)):
             logger.debug('There isnt any certificate or key, trying to make them')
-
-            # If they dont exist, make them.
-            if create_https_certificates(serverkey, cert):
+            if create_https_certificates(cert, serverkey):
                 # Save the new crt and key to settings
                 htpc.SSLKEY = htpc.settings.set('app_ssl_key', serverkey)
                 htpc.SSLCERT = htpc.settings.set('app_ssl_cert', cert)
@@ -88,14 +85,13 @@ def start():
                 logger.info("Restarting to activate SSL")
                 do_restart()
 
-        if os.path.exists(htpc.settings.get('app_ssl_cert')) and os.path.exists(htpc.settings.get('app_ssl_key')):
+        if (os.path.exists(htpc.settings.get('app_ssl_cert')) and os.path.exists(htpc.settings.get('app_ssl_key'))):
             htpc.ENABLESSL = True
 
     if htpc.ENABLESSL:
         protocol = "s"
         logger.debug("SSL is enabled")
         cherrypy.config.update({
-                'server.ssl_module': 'builtin',
                 'server.ssl_certificate': htpc.settings.get('app_ssl_cert'),
                 'server.ssl_private_key': htpc.settings.get('app_ssl_key')
 
