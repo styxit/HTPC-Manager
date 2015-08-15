@@ -77,8 +77,13 @@ def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, h
                 try:
                     image = resize_image(image, height, width, opacity, mode, resized)
                 except Exception as e:
-                    logger.debug('%s returning orginal image %s' % (e, url))
-                    return serve_file(path=image, content_type='image/png')
+                    try:
+                        logger.debug('%s returning orginal image %s' % (e, url))
+                        return serve_file(path=image, content_type='image/png')
+
+                    except:
+                        image = os.path.join(htpc.RUNDIR, 'interfaces/default/img/fff_20')
+                        return serve_file(path=image, content_type='image/png')
 
             # If the resized image is already cached
             if os.path.isfile(resized):
@@ -92,7 +97,10 @@ def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, h
     # Load file from disk
     imagetype = imghdr.what(image)
     if imagetype is not None:
-        return serve_file(path=image, content_type='image/' + imagetype)
+        try:
+            return serve_file(path=image, content_type='image/' + imagetype)
+        except:
+            print "zomg"
 
 
 class CacheImgDownload(workerpool.Job):

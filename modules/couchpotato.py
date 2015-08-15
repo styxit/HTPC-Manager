@@ -8,7 +8,8 @@ from cherrypy.lib.auth2 import require
 import logging
 import hashlib
 from htpc.helpers import fix_basepath, get_image, striphttp
-
+import json
+import os
 
 class Couchpotato(object):
     def __init__(self):
@@ -97,8 +98,39 @@ class Couchpotato(object):
 
     @cherrypy.expose()
     @require()
-    def GetImage(self, url, h=None, w=None, o=100):
-        return get_image(url, h, w, o)
+    def GetImage(self, url, h=None, w=None, o=100, *args, **kwargs):
+        # url can be a string or json
+        working_url = None
+        imgdir = os.path.join(htpc.DATADIR, 'images/')
+        try:
+            x = json.loads(url)
+            if isinstance(x, list):
+                tl = [(hashlib.md5(u).hexdigest(), u) for u in x]
+                c = 0
+                for i in tl:
+                    c += 1
+                    if os.path.isfile(os.path.join(imgdir, i[0])):
+                        working_url = i[1]
+                        break
+                    else:
+                        try:
+                            r = requests.head(i[1], headers={'Cache-Control': 'private, max-age=0, no-cache, must-revalidate', 'Pragma': 'no-cache'})
+                            if r.ok:
+                                working_url = i[1]
+                                break
+
+                        except Exception as e:
+                            self.logger.error('Error: %s url: %s item: %s  loop n : %s  tublelist %s' % (e, i[1], i, c, tl))
+                            continue
+
+                if working_url:
+                    return get_image(working_url, h, w, o)
+
+        except Exception as e:
+            pass
+            # return static faild img
+            #print e, url, type(url)
+            #return get_image(url, h, w, o)
 
     @cherrypy.expose()
     @require()
