@@ -19,6 +19,7 @@ import requests
 import workerpool
 import StringIO
 import traceback
+import cherrypy
 
 try:
     import Image
@@ -31,6 +32,16 @@ except ImportError:
         PIL = False
 
 logger = logging.getLogger('htpc.helpers')
+
+
+def serve_htpc_image(fp, ch):
+    cherrypy.response.headers['Content-Type'] = ch
+    file_ = open(fp, 'rb')
+
+    if file_:
+        cherrypy.response.body = file_
+        return file_
+
 
 
 def timeit_func(func):
@@ -116,7 +127,12 @@ def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, h
 
         try:
             # try to fix path
-            return serve_file(path=image, content_type='image/' + imagetype)
+            #return serve_file(path=image, content_type='image/' + imagetype)
+            #cherrypy.response.headers['Content-Type'] = imagetype
+            #fileobj = open(image, 'rb')
+            # use our own that ignores last modified since
+            return serve_htpc_image(image, imagetype)
+            #return fileobj
         except Exception as e:
             logger.error('%s' % traceback.format_exc())
             logger.error('zomg %s, %s' % (e, url))
