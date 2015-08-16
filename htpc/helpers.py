@@ -6,7 +6,7 @@ import hashlib
 import htpc
 import imghdr
 import logging
-from cherrypy.lib.static import serve_file, serve_fileobj
+from cherrypy.lib.static import serve_file
 from urllib2 import Request, urlopen
 import urllib
 import time
@@ -17,9 +17,7 @@ from mako import exceptions
 from mako.lookup import TemplateLookup
 import requests
 import workerpool
-import StringIO
-import traceback
-import cherrypy
+
 
 try:
     import Image
@@ -34,31 +32,20 @@ except ImportError:
 logger = logging.getLogger('htpc.helpers')
 
 
-def serve_htpc_image(fp, ch):
-    cherrypy.response.headers['Content-Type'] = ch
-    file_ = open(fp, 'rb')
-
-    if file_:
-        cherrypy.response.body = file_
-        return file_
-
-
-
 def timeit_func(func):
     @wraps(func)
     def inner(*args, **kwargs):
         start = time.time()
         res = func(*args)
-        print '%s took %s' % (func.__name__, time.time() - start)
+        logger.debug('%s took %s' % (func.__name__, time.time() - start))
         return res
     return inner
 
 
-def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, headers=None):
+def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, headers=None, missing_image=None):
     ''' Load image form cache if possible, else download. Resize if needed '''
     opacity = float(opacity)
     logger = logging.getLogger('htpc.helpers')
-    print "find %s url" % url
 
     # Create image directory if it doesnt exist
     imgdir = os.path.join(htpc.DATADIR, 'images/')
@@ -82,35 +69,19 @@ def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, h
     if (height and width) or (opacity < 100) or mode:
 
         if PIL:
-            print "pil"
             # Set a filename for resized file
             resized = '%s_w%s_h%s_o_%s_%s' % (image, width, height, opacity, mode)
-            print "resized %s" % resized
 
             # If there is no local resized copy
             if not os.path.isfile(resized):
                 # try to resize, if we cant return original image
-                try:
-                    print "lol"
-                    image = resize_image(image, height, width, opacity, mode, resized)
-                    return serve_file(path=image, content_type='image/png')
-                except Exception as e:
-                    try:
-                        logger.error('dick')
-                        image = os.path.join(htpc.RUNDIR, 'interfaces/default/img/missingposter.png')
-                        return serve_file(path=os.path.abspath(image), content_type='image/png')
-                    except Exception as e:
-
-                        print "ass"
-                        print e
-                        print "%s" % traceback.format_exc()
-                        return
+                image = resize_image(image, height, width, opacity, mode, resized)
+                if image:
+                    return serve_file(path=image, content_type='image/jpeg')
 
             # If the resized image is already cached
             if os.path.isfile(resized):
-                print "is resized and exist"
                 image = resized
-                print image
 
         else:
             logger.error("Can't resize when PIL is missing on system!")
@@ -118,25 +89,14 @@ def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, h
                 image = os.path.join(htpc.RUNDIR, 'interfaces/default/img/fff_20.png')
 
     # Load file from disk
-
-    imagetype = imghdr.what(os.path.abspath(image))
-    print imagetype
-    if imagetype is not None:
-        #print "serving"
-        #return serve_file(path=image, content_type='image/' + imagetype)
-
-        try:
-            # try to fix path
-            #return serve_file(path=image, content_type='image/' + imagetype)
-            #cherrypy.response.headers['Content-Type'] = imagetype
-            #fileobj = open(image, 'rb')
-            # use our own that ignores last modified since
-            return serve_htpc_image(image, imagetype)
-            #return fileobj
-        except Exception as e:
-            logger.error('%s' % traceback.format_exc())
-            logger.error('zomg %s, %s' % (e, url))
-
+    if image is not None:
+        imagetype = imghdr.what(os.path.abspath(image))
+        if imagetype is None:
+            imagetype = 'image/jpeg'
+        return serve_file(path=image, content_type=imagetype)
+    if missing_image:
+        # full fp to missing image
+        return serve_file(path=missing_image, content_type='image/jpeg')
 
 
 class CacheImgDownload(workerpool.Job):
@@ -262,13 +222,12 @@ def download_image(url, dest, auth=None, headers=None):
             request.add_header('Pragma', 'no-cache')
 
         resp = urlopen(request).read()
-        print len(resp)
         if resp:
 
             with open(dest, 'wb') as local_file:
                 local_file.write(urlopen(request).read())
         else:
-            raise
+            return
 
         return dest
 
