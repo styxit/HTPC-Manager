@@ -137,16 +137,25 @@ h6.title {
 	.modal .movie-poster {
 		height: 207px !important;
 		width: 144px !important;
+        margin-right: 8px;
 	}
+    .page-header .header-toolbar {
+        margin-top: 10px!important;
+    }
 	.modal-body {
 		max-height: 280px;
 	}
 	.modal .modal-youtube {
 		max-height: 200px;
 	}
+    #episode-grid.thumbnails>li {
+        padding: 0px;
+        margin-left: 63px !important;
+
+    }
 	.thumbnails>li {
 		padding: 0px;
-		margin-left: 12px;
+		margin-left: 15px !important;
 	}
 	.thumbnail {
 		padding: 6px;
@@ -156,6 +165,9 @@ h6.title {
 	}
     .modal .modal-episodeinfo {
         margin-left: 0px;
+    }
+    .modal .episode-poster {
+        margin-right: 8px;
     }
     .dropdown-menu {
         right:initial!important;

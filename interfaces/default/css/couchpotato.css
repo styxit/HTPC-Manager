@@ -65,10 +65,11 @@
 	}
 	.thumbnails>li {
 		padding: 0px;
-		margin-left: 12px;
+		margin-left: 17px !important;
 	}
 	.thumbnail {
 		padding: 6px;
+        margin-right: 5px;
 	}
 	.modal .modal-movieinfo {
 		margin-left: 0px;
