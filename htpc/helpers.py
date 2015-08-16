@@ -18,6 +18,7 @@ from mako.lookup import TemplateLookup
 import requests
 import workerpool
 
+
 try:
     import Image
     PIL = True
@@ -36,12 +37,12 @@ def timeit_func(func):
     def inner(*args, **kwargs):
         start = time.time()
         res = func(*args)
-        print '%s took %s' % (func.__name__, time.time() - start)
+        logger.debug('%s took %s' % (func.__name__, time.time() - start))
         return res
     return inner
 
 
-def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, headers=None):
+def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, headers=None, missing_image=None):
     ''' Load image form cache if possible, else download. Resize if needed '''
     opacity = float(opacity)
     logger = logging.getLogger('htpc.helpers')
@@ -61,7 +62,7 @@ def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, h
     # If there is no local copy of the original
     # download it
     if not os.path.isfile(image):
-        logger.debug('No local image found for ' + image + '. Downloading')
+        logger.debug('No local image found for %s. Downloading..' % url)
         image = download_image(url, image, auth, headers)
 
     # Check if resize is needed
@@ -74,11 +75,9 @@ def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, h
             # If there is no local resized copy
             if not os.path.isfile(resized):
                 # try to resize, if we cant return original image
-                try:
-                    image = resize_image(image, height, width, opacity, mode, resized)
-                except Exception as e:
-                    logger.debug('%s returning orginal image %s' % (e, url))
-                    return serve_file(path=image, content_type='image/png')
+                image = resize_image(image, height, width, opacity, mode, resized)
+                if image:
+                    return serve_file(path=image, content_type='image/jpeg')
 
             # If the resized image is already cached
             if os.path.isfile(resized):
@@ -90,9 +89,14 @@ def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, h
                 image = os.path.join(htpc.RUNDIR, 'interfaces/default/img/fff_20.png')
 
     # Load file from disk
-    imagetype = imghdr.what(image)
-    if imagetype is not None:
-        return serve_file(path=image, content_type='image/' + imagetype)
+    if image is not None:
+        imagetype = imghdr.what(os.path.abspath(image))
+        if imagetype is None:
+            imagetype = 'image/jpeg'
+        return serve_file(path=image, content_type=imagetype)
+    if missing_image:
+        # full fp to missing image
+        return serve_file(path=missing_image, content_type='image/jpeg')
 
 
 class CacheImgDownload(workerpool.Job):
@@ -215,9 +219,15 @@ def download_image(url, dest, auth=None, headers=None):
             # Sonarrs image api returns 304, but they cant know if a user has cleared it
             # So make sure we get data every time.
             request.add_header('Cache-Control', 'private, max-age=0, no-cache, must-revalidate')
+            request.add_header('Pragma', 'no-cache')
 
-        with open(dest, 'wb') as local_file:
-            local_file.write(urlopen(request).read())
+        resp = urlopen(request).read()
+        if resp:
+
+            with open(dest, 'wb') as local_file:
+                local_file.write(urlopen(request).read())
+        else:
+            return
 
         return dest
 

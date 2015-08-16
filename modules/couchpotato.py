@@ -8,7 +8,8 @@ from cherrypy.lib.auth2 import require
 import logging
 import hashlib
 from htpc.helpers import fix_basepath, get_image, striphttp
-
+import json
+import os
 
 class Couchpotato(object):
     def __init__(self):
@@ -97,8 +98,49 @@ class Couchpotato(object):
 
     @cherrypy.expose()
     @require()
-    def GetImage(self, url, h=None, w=None, o=100):
-        return get_image(url, h, w, o)
+    def GetImage(self, url, h=None, w=None, o=100, *args, **kwargs):
+        # url can be a string or json
+        working_url = None
+        imgdir = os.path.join(htpc.DATADIR, 'images/')
+        try:
+            x = json.loads(url)
+            if isinstance(x, list):
+                tl = [(hashlib.md5(u).hexdigest(), u) for u in x]
+                checkurl = []
+                # check any of the images exist in the cache
+                for i in tl:
+                    if os.path.isfile(os.path.join(imgdir, i[0])):
+                        self.logger.debug('%s exist in cache, ignore the rest of the hashes %s' % (str(i), str(tl)))
+                        # dont bother checking any else if we have image
+                        checkurl = []
+                        working_url = i[1]
+                        break
+                    else:
+                        checkurl.append(i)
+                        continue
+
+                if working_url:
+                    return get_image(working_url, h, w, o)
+                else:
+                    # None of the imges existed in the cache
+                    if checkurl:
+                        for i in checkurl:
+                            # verify that the download is ok before we try to cache it.
+                            try:
+                                r = requests.get(i[1], headers={'Cache-Control': 'private, max-age=0, no-cache, must-revalidate', 'Pragma': 'no-cache'})
+                                if r.content:
+                                    working_url = i[1]
+                                    break
+
+                            except Exception as e:
+                                self.logger.error('Error: %s url: %s item: %s  loop n : %s  tuplelist %s' % (e, i[1], i, c, tl))
+
+                        if working_url:
+                            return get_image(working_url, h, w, o)
+
+        except ValueError as e:
+            if isinstance(url, basestring):
+                return get_image(url, h, w, o)
 
     @cherrypy.expose()
     @require()
