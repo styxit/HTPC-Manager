@@ -11,6 +11,7 @@ from htpc.helpers import fix_basepath, get_image, striphttp
 import json
 import os
 
+
 class Couchpotato(object):
     def __init__(self):
         self.logger = logging.getLogger('modules.couchpotato')
@@ -28,7 +29,7 @@ class Couchpotato(object):
                 {'type': 'text', 'label': 'Basepath', 'placeholder': '/couchpotato', 'name': 'couchpotato_basepath'},
                 {'type': 'text', 'label': 'API key', 'desc': 'Press test get apikey', 'name': 'couchpotato_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'couchpotato_ssl'},
-                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc':'Reverse proxy link ex: https://couchpotato.domain.com', 'name': 'couchpotato_reverse_proxy_link'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link ex: https://couchpotato.domain.com', 'name': 'couchpotato_reverse_proxy_link'},
 
             ]
         })
@@ -110,7 +111,7 @@ class Couchpotato(object):
                 # check any of the images exist in the cache
                 for i in tl:
                     if os.path.isfile(os.path.join(imgdir, i[0])):
-                        self.logger.debug('%s exist in cache, ignore the rest of the hashes %s' % (str(i), str(tl)))
+                        #self.logger.debug('%s exist in cache, ignore the rest of the hashes %s' % (str(i[1]), str(tl)))
                         # dont bother checking any else if we have image
                         checkurl = []
                         working_url = i[1]
@@ -124,7 +125,7 @@ class Couchpotato(object):
                 else:
                     # None of the imges existed in the cache
                     if checkurl:
-                        for i in checkurl:
+                        for ii, i in enumerate(checkurl):
                             # verify that the download is ok before we try to cache it.
                             try:
                                 r = requests.get(i[1], headers={'Cache-Control': 'private, max-age=0, no-cache, must-revalidate', 'Pragma': 'no-cache'})
@@ -133,7 +134,7 @@ class Couchpotato(object):
                                     break
 
                             except Exception as e:
-                                self.logger.error('Error: %s url: %s item: %s  loop n : %s  tuplelist %s' % (e, i[1], i, c, tl))
+                                self.logger.error('Error: %s url: %s item: %s  loop n : %s  tuplelist %s' % (e, i[1], i, ii, str(tl)))
 
                         if working_url:
                             return get_image(working_url, h, w, o)

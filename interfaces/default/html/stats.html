@@ -86,15 +86,15 @@ webdir = htpc.WEBDIR
 	% if settings.get('stats_psutil_enabled'):
       % if importPsutil:
         <div id="diskt" class="tab-pane mofa">
-            <table class="table disktable table-striped table-hover">
+            <table class="table disktable table-sortable table-hover">
                 <thead>
                     <tr>
                         <th>Mount Point</th>
                         <th class="hidden-phone">Location</th>
                         <th class="hidden-phone">File System</th>
-                        <th class="">Free</th>
-                        <th class="">Used</th>
-                        <th class="">Total</th>
+                        <th class="" data-sorter="filesize">Free</th>
+                        <th class="" data-sorter="filesize">Used</th>
+                        <th class="" data-sorter="filesize">Total</th>
                         <th id="pbar" class="span3">Bar</th>
                         <th class="">%</th>
                     </tr>
@@ -105,17 +105,18 @@ webdir = htpc.WEBDIR
             <div class="disktspinner"></div>
         </div>
         <div id="proc" class="tab-pane mofa">
-            <table class="table disktable table-striped table-hover">
+            <table class="table disktable table-sortable table-hover">
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Pid</th>
                         <th class="hidden-phone">Status</th>
                         <th class="hidden-phone">User</th>
-                        <th>Memory %</th>
-                        <th>Memory usage</th>
+                        <th data-parser="percent">Memory %</th>
+                        <!--<th data-sorter="metric" data-metric-name-abbr="N/A|b|B|mb|MB|gb|Gb|GB|tb|Tb|TB">Memory usage</th>-->
+                        <th data-sorter="filesize">Memory usage</th>
                         <th>Time</th>
-                        <th>CPU %</th>
+                        <th data-parser="percent">CPU %</th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
@@ -156,7 +157,7 @@ webdir = htpc.WEBDIR
 			</div>
 		  % else:
       <div class="mofa">
-  			<table class="table table-striped table-hover smart_three">
+  			<table class="table table-striped table-hover table-sortable smart_three">
           <thead>
             <tr>
               <th class="">Mount Point</th>
