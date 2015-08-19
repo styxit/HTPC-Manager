@@ -107,7 +107,7 @@ function processes() {
                 var meminfo
                 // why the fuck dont you work...
 
-                if (proc.memory_percent === "N/A" || proc.memory_percent === 'undefined') {
+                if (proc.memory_percent === "N/A" || proc.memory_percent == null) {
                     pmc = 'N/A'
                 } else {
                     pmc = proc.memory_percent.toFixed(2) + '%'
