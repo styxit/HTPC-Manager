@@ -193,7 +193,7 @@ function loadArtists() {
         success: function (result) {
             if (result.length == 0) {
                 var row = $('<tr>')
-                row.append($('<td>').attr('colspan', '5').html('No wanted albums found'));
+                row.append($('<td>').attr('colspan', '5').html('No artists found'));
                 $('#artists_table_body').append(row);
             } else {
                 $.each(result, function (index, artist) {
