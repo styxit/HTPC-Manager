@@ -264,27 +264,39 @@ $(document).ready(function () {
         menu_ordered += menus[menu_item];
     }
     $(".mobile-search").after(menu_ordered)
- 
+
     path = window.location.href.split("/").slice(0, - 1).pop()
 	$('#nav-'+path).addClass('active')
- 
+
 
 })
 
+
 function byteSizeOrdering() {
-    jQuery.tablesorter.addParser(
+// "modified parser for stats module (filesizes)
+jQuery.tablesorter.addParser(
     {
       id: 'filesize',
       is: function (s)
       {
-        return s.match(new RegExp(/[0-9]+(\.[0-9]+)?\ (KB|B|GB|MB|TB)/i));
+        // disable auto select parser
+        return false;
+        //return s.match(new RegExp(/[0-9]+(\.[0-9]+)?\ (KB|B|GB|MB|TB)/i));
       },
       format: function (s)
       {
-        var suf = s.match(new RegExp(/(KB|B|GB|MB|TB)$/i))[1];
-        var num = parseFloat(s.match(new RegExp(/^[0-9]+(\.[0-9]+)?/))[0]);
+        var suf
+        if (s == 'N/A') {
+            suf = 'N/A'
+        } else{
+            suf = s.match(new RegExp(/(KB|B|GB|MB|TB)$/i))[1];
+            var num = parseFloat(s.match(new RegExp(/^[0-9]+(\.[0-9]+)?/))[0]);
+        }
+
         switch (suf)
         {
+          case 'N/A':
+            return 'N/A';
           case 'B':
             return num;
           case 'KB':
@@ -297,9 +309,10 @@ function byteSizeOrdering() {
             return num * 1024 * 1024 * 1024 * 1024;
         }
       },
-      type: 'numeric'
+      type: 'string'
     });
-  }
+}
+
 
 function makeIcon(iconClass, title) {
     return $('<i>')
@@ -312,6 +325,7 @@ function shortenText(string, length) {
     return string.substr(0,length)+(string.length>length?'&hellip;':'')
 }
 function pad(str, max) {
+    if  (!str) return str
   return str.toString().length < max ? pad("0"+str, max) : str
 }
 function bytesToSize(bytes, precision) {
@@ -401,7 +415,7 @@ $('.dropdown-toggle').click(function(e) {
 // Converts bytes to filesize in kb,mb,gb
 function getReadableFileSizeString(fileSizeInBytes) {
     var i = -1;
-    var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB'];
+    var byteUnits = [' b' ,' kB', ' MB', ' GB', ' TB', 'PB'];
     do {
         fileSizeInBytes = fileSizeInBytes / 1024;
         i++;
@@ -413,7 +427,8 @@ function getReadableFileSizeString(fileSizeInBytes) {
 // For hdd. Converts bytes to filesize in kb,mb,gb
  function getReadableFileSizeStringHDD(fileSizeInBytes) {
     var i = -1;
-    var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB'];
+    // is KB because of sorting..
+    var byteUnits = [' b',' kB', ' MB', ' GB', ' TB', 'PB'];
     do {
         fileSizeInBytes = fileSizeInBytes / 1000;
         i++;
@@ -428,6 +443,8 @@ function humanFileSize(bytes, pre, si) {
     pre = typeof pre ===  'undefined' ? 0:pre;
 
     var thresh = si ? 1000 : 1024;
+    if (bytes == 'N/A') return bytes;
+
     if(Math.abs(bytes) < thresh) {
         return bytes.toFixed(pre) + ' B';
     }
