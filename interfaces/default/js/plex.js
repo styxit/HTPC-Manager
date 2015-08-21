@@ -26,7 +26,7 @@ $(document).ready(function() {
         }
     });
 
-    $(".search").on('keydown', function (e) {
+    $(".search").on('keyup', function (e) {
         searchString = $(this).val();
         reloadTab()
     });

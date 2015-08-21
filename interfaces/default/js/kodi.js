@@ -141,7 +141,7 @@ $(document).ready(function() {
     });
 
     // Filter on searchfield changes
-    $(".search").on('keydown', function (e) {
+    $(".search").on('keyup', function (e) {
         searchString = $(this).val();
         reloadTab()
     });

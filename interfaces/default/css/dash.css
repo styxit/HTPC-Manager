@@ -105,6 +105,7 @@
     text-align: left !important;
 }
 */
+#dash_disks_table_body .progress,
 #dash_sysinfo_table_body .progress{
     margin-bottom:0px !important;
 }

@@ -42,8 +42,7 @@ function search(query) {
 
         // Stops the function from running if the search doesn't get any hits
         if (!response.length) {
-            $('#error_msg').text('Didnt find any torrents with the query ' + query);
-            $('#error_msg').css({"font-weight": "bold"});
+            $('#error_msg').html('Didnt find any torrents with the query <code>' + query + '</code>');
             $('.spinner').hide();
             return;
         }

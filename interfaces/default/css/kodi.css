@@ -112,12 +112,15 @@ h6.title {
     height: 100px;
     width: 150px;
 }
+/*
 .modal .modal-movieinfo {
     margin-left: 171px;
 }
+*/
 .modal .modal-episodeinfo {
     margin-left: 171px;
 }
+
 .modal-body {
 	overflow: hidden;
 }

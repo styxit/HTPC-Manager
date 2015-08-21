@@ -20,7 +20,6 @@ $(document).ready(function () {
         if (l.length) {
             addUrl(l)
         }
-
     })
 
     $('#utorrent_speed_down').keyup(function(event){
@@ -118,19 +117,34 @@ function getTorrents() {
                     dl_speed_sum += torrent.dl_speed;
                     up_speed_sum += torrent.up_speed;
 
+
+                    var progressText = $('<span>');
+                    progressText.text((torrent.percentage_done / 10) + ' %');
+
                     var progressBar = $('<div>');
-                    progressBar.addClass('bar');
-                    progressBar.css('width', (torrent.percentage_done / 10.) + '%');
+                    progressBar.addClass('bar').addClass('progress-success');
+
+                    var prog
+                    if (torrent.percentage_done > 0) {
+                        prog = (torrent.percentage_done / 10.)
+                    } else {
+                        prog = 0
+
+                    }
+                    progressBar.css('width',  prog + '%');
 
                     var progress = $('<div>');
                     progress.addClass('progress');
-                    if (torrent.percentage_done >= 1) {
+                    if (torrent.percentage_done >= 1000) {
                         progress.addClass('progress-success');
+                        progressBar.removeClass('progress-success');
                     }
+
                     progress.append(progressBar);
+                    progress.append(progressText);
 
                     // Round to 2 decimals
-                    ratio = Math.round(torrent.ratio * 100) / 100;
+                    ratio = Math.round(torrent.ratio / 10) / 100;
 
                     // Button group
                     buttons = $('<div>').addClass('btn-group');
@@ -160,6 +174,7 @@ function getTorrents() {
                             + '<br><small><i class="fa fa-long-arrow-down"></i> ' + getReadableFileSizeString(torrent.dl_speed)
                             + '/s <i class="fa fa-long-arrow-up"></i> ' + getReadableFileSizeString(torrent.up_speed) + '/s</small>'
                         ),
+                        $('<td>').text(humanFileSize(torrent.size, 2)),
                         $('<td>').text(ratio),
                         $('<td>').text(getReadableTime(torrent.eta)),
                         $('<td>').text(getStatusInfo(torrent)),
