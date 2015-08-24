@@ -267,7 +267,7 @@ class Stats(object):
         processes = sorted(procs, key=lambda p: p['cpu_percent'], reverse=True)
 
         # Adds the total number of processes running, not in use atm
-        processes.append(procs_status)
+        #processes.append(procs_status)
 
         # If limit is a empty string
         if not limit:
