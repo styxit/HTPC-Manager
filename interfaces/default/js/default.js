@@ -415,11 +415,13 @@ $('.dropdown-toggle').click(function(e) {
 // Converts bytes to filesize in kb,mb,gb
 function getReadableFileSizeString(fileSizeInBytes) {
     var i = -1;
-    var byteUnits = [' b' ,' kB', ' MB', ' GB', ' TB', 'PB'];
+    if (fileSizeInBytes < 1024) return fileSizeInBytes + ' b';
+    var byteUnits = ['kB', 'MB', 'GB', 'TB','PB'];
     do {
         fileSizeInBytes = fileSizeInBytes / 1024;
         i++;
     } while (fileSizeInBytes > 1024);
+    console.log(fileSizeInBytes)
     return fileSizeInBytes.toFixed(1) + byteUnits[i];
 };
 
@@ -428,7 +430,8 @@ function getReadableFileSizeString(fileSizeInBytes) {
  function getReadableFileSizeStringHDD(fileSizeInBytes) {
     var i = -1;
     // is KB because of sorting..
-    var byteUnits = [' b',' kB', ' MB', ' GB', ' TB', 'PB'];
+    if (fileSizeInBytes < 1024) return fileSizeInBytes + ' b';
+    var byteUnits = ['kB', 'MB', 'GB', 'TB', 'PB'];
     do {
         fileSizeInBytes = fileSizeInBytes / 1000;
         i++;
@@ -439,15 +442,17 @@ function getReadableFileSizeString(fileSizeInBytes) {
 // should really clean up js helpers..
 function humanFileSize(bytes, pre, si) {
   // Set default args
-    si = typeof si ===  'undefined' ? true:false;
-    pre = typeof pre ===  'undefined' ? 0:pre;
+    var si = typeof si ===  'undefined' ? true:false;
+    var pre = typeof pre ===  'undefined' ? 0:pre;
 
     var thresh = si ? 1000 : 1024;
     if (bytes == 'N/A') return bytes;
 
+    /*
     if(Math.abs(bytes) < thresh) {
         return bytes.toFixed(pre) + ' B';
     }
+    */
     var units = si
         ? ['kB','MB','GB','TB','PB','EB','ZB','YB']
         : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];

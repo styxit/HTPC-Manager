@@ -26,7 +26,7 @@ class Sabnzbd(object):
                 {'type': 'text', 'label': 'Basepath', 'name': 'sabnzbd_basepath'},
                 {'type': 'text', 'label': 'API key', 'name': 'sabnzbd_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'sabnzbd_ssl'},
-                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc':'Reverse proxy link, e.g. https://sab.domain.com', 'name': 'sabnzbd_reverse_proxy_link'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link, e.g. https://sab.domain.com', 'name': 'sabnzbd_reverse_proxy_link'},
 
             ]
         })
@@ -107,6 +107,9 @@ class Sabnzbd(object):
     @cherrypy.tools.json_out()
     def AddNzbFromUrl(self, nzb_url, nzb_category='', nzb_name=''):
         self.logger.debug('Adding nzb from url')
+        self.logger.debug('%s %s %s' % (quote(nzb_url), nzb_category, nzb_name))
+        if 'api.nzbgeek.info' in nzb_url:
+            nzb_url = nzb_url.replace('amp;', '')
         if nzb_category:
             nzb_category = '&cat=' + nzb_category
         return self.fetch('&mode=addurl&name=' + quote(nzb_url) + nzb_category)
@@ -169,7 +172,7 @@ class Sabnzbd(object):
             ssl = 's' if htpc.settings.get('sabnzbd_ssl', 0) else ''
 
             url = 'http%s://%s:%s%sapi?output=json&apikey=%s%s' % (ssl, host, port, sabnzbd_basepath, apikey, path)
-            self.logger.debug('Fetching information from: ' + url)
+            self.logger.debug('Fetching information from: %s' % url)
             return loads(urlopen(url, timeout=10).read(), strict=False)
         except Exception as e:
             self.logger.error('Cannot contact sabnzbd %s' % e)

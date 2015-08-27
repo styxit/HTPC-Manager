@@ -176,7 +176,6 @@ class Plex(object):
         imgdir = os.path.join(htpc.DATADIR, 'images/')
         imglist = []
 
-
         disable_pil = bool(int(disable_pil))
 
         # if Pil isnt installed override current setting

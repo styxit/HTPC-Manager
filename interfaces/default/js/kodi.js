@@ -10,6 +10,9 @@ var sorting = {
 $(document).ready(function() {
     playerLoader = setInterval('loadNowPlaying()', 1000);
     hideWatched = $('#hidewatched').hasClass('active')?1:0;
+    $('.formsearch').submit(function(e) {
+        e.preventDefault()
+    });
 
     // Load data on tab display
     $('a[data-toggle="tab"]').click(function(e) {

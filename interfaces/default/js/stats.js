@@ -69,7 +69,7 @@ function get_diskinfo() {
                 $.each(response, function (i, disk) {
                     var row = $('<tr>');
                     var lazy_solution = (disk.percent >= 90) ? 'progress-danger' : '';
-                    var progress = "<div class='progress " + lazy_solution + " hddprog'><div class=bar style=width:" + disk.percent + "%><span class=sr-only>"+ getReadableFileSizeStringHDD(disk.used) +"</span></div><div class='bar bar-success' style=width:" + (100 - disk.percent) + "% ><span class=sr-only>" + getReadableFileSizeStringHDD(disk.free) +"</span></div>";
+                    var progress = "<div class='progress " + lazy_solution + " hddprog'><div class=bar style=width:" + disk.percent + "%><span class=sr-only>"+ humanFileSize(disk.used, 2) +"</span></div><div class='bar bar-success' style=width:" + (100 - disk.percent) + "% ><span class=sr-only>" + getReadableFileSizeStringHDD(disk.free) +"</span></div>";
 
                     row.append(
                         $('<td>').addClass('stats_disk_mountpoint').text(disk.mountpoint),

@@ -9,8 +9,13 @@ var movieLoad = {
 }
 
 $(document).ready(function() {
+
     hideWatched = $('#hidewatched').hasClass('active')?1:0;
     playerLoader = setInterval('loadNowPlaying()', 4000);
+    $('.formsearch').submit(function(e) {
+        e.preventDefault()
+    });
+
 
     // Load data on tab display
     $('a[data-toggle=\'tab\']').click(function(e) {
@@ -28,6 +33,14 @@ $(document).ready(function() {
 
     $(".search").on('keyup', function (e) {
         searchString = $(this).val();
+        console.log(searchString);
+        // reset so only load what we should
+        movieLoad.last = 0;
+        showLoad.last = 0;
+        episodeLoad.last = 0;
+        artistLoad.last = 0;
+        albumLoad.last = 0;
+        songsLoad.last = 0;
         reloadTab()
     });
 
@@ -512,10 +525,8 @@ var songsLoad = {
 }
 function loadSongs(options) {
     if (options != undefined) {
-        songsLoad.last = 0
-        $('#songs-grid tbody').empty()
         songsLoad.options = options
-        }
+    }
 
     var active = (songsLoad.request!=null && songsLoad.request.readyState!=4)
     if (active || songsLoad.last == -1) return
@@ -527,7 +538,6 @@ function loadSongs(options) {
     }
     $.extend(sendData, songsLoad.options)
 
-    console.log('sendData loadSongs', sendData)
 
     $('.spinner').show();
     songsLoad.request = $.ajax({
