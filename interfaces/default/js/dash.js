@@ -417,7 +417,7 @@ function dasherror(i, msg){
     // expects id like #dash_wanted_albums
     var h = $('#' + i).find('h3')
     $('#' + i).html('')
-    var t = "<table class='table table-striped'><tr><td>"+ msg + "</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr><tr><td>&nbsp;</td></tr></table>"
+    var t = "<table class='table table-striped'><tr><td>"+ msg + "</td></tr></table>"
     $('#' + i).append(h, t)
 
 }

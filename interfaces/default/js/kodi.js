@@ -1116,17 +1116,22 @@ function reloadTab() {
     options = {'filter': searchString}
 
     if ($('#movies').is(':visible')) {
+        $('.search').attr('placeholder', "Search movies")
         loadMovies(options);
     } else if ($('#shows').is(':visible')) {
+        $('.search').attr('placeholder', "Search shows")
         loadShows(options);
     } else if ($('#episodes').is(':visible')) {
         options = $.extend(options, {'tvshowid': currentShow});
         loadEpisodes(options);
     } else if ($('#artists').is(':visible')) {
+        $('.search').attr('placeholder', "Search artists")
         loadArtists(options);
     } else if ($('#albums').is(':visible')) {
+        $('.search').attr('placeholder', "Search albums")
         loadAlbums(options);
     } else if ($('#songs').is(':visible')) {
+        $('.search').attr('placeholder', "Search songs")
         loadSongs();
     } else if ($('#pvr').is(':visible')) {
         loadChannels();

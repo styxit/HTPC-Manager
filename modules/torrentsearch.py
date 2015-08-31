@@ -29,43 +29,63 @@ class Torrentsearch(object):
                 {'type': 'bool', 'label': 'Norbits', 'name': 'torrents_norbits_enabled'},
                 {'type': 'text', 'label': 'Norbits username', 'name': 'torrents_norbits_username'},
                 {'type': 'password', 'label': 'Norbits passkey', 'name': 'torrents_norbits_passkey'},
-                {'type': 'bool', 'label': 'YTS', 'name': 'torrents_yts_enabled'},
-                {'type': 'bool', 'label': 'KAT', 'name': 'torrents_ka_enabled'},
-                {'type': 'bool', 'label': 'Strike', 'name': 'torrents_getstrike_enabled'},
                 {'type': 'bool', 'label': 'PTP', 'name': 'torrents_ptp_enabled'},
                 {'type': 'text', 'label': 'PTP username', 'name': 'torrents_ptp_username'},
                 {'type': 'password', 'label': 'PTP password', 'name': 'torrents_ptp_password'},
                 {'type': 'password', 'label': 'PTP passkey', 'name': 'torrents_ptp_passkey'},
-                {'type': 'bool', 'label': 'Rarbg', 'name': 'torrents_rarbg_enabled'}
+                {'type': 'bool', 'label': 'Rarbg', 'name': 'torrents_rarbg_enabled'},
+                {'type': 'bool', 'label': 'YTS', 'name': 'torrents_yts_enabled'},
+                {'type': 'bool', 'label': 'KAT', 'name': 'torrents_ka_enabled'},
+                {'type': 'bool', 'label': 'Strike', 'name': 'torrents_getstrike_enabled', 'desc': 'DTH tracker'},
             ]
         })
 
     @cherrypy.expose()
     @require()
     def index(self, query='', **kwargs):
-        return htpc.LOOKUP.get_template('torrentsearch.html').render(query=query, scriptname='torrentsearch')
+        return htpc.LOOKUP.get_template('torrentsearch.html').render(query=query, scriptname='torrentsearch', torrentproviders=self.torrentproviders())
 
-    # Search all, add categorys and providers later
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def search(self, query=None):
+    def search(self, query=None, provider='all'):
         self.logger.debug(query)
+        self.logger.debug(provider)
         r = []
-        if htpc.settings.get('torrents_btn_enabled'):
-            r += self.btn(query)
-        if htpc.settings.get('torrents_norbits_enabled'):
-            r += self.search_norbits(query, 'all')
-        if htpc.settings.get('torrents_yts_enabled'):
-            r += self.search_yts(query)
-        if htpc.settings.get('torrents_ka_enabled'):
-            r += self.search_ka(query)
-        if htpc.settings.get('torrents_getstrike_enabled'):
-            r += self.search_getstrike(query, 'all')
-        if htpc.settings.get('torrents_ptp_enabled'):
-            r += self.search_ptp(query, 'movie')
-        if htpc.settings.get('torrents_rarbg_enabled'):
-            r += self.search_rarbg(query, None)
+
+        if provider == 'all':
+            if htpc.settings.get('torrents_btn_enabled'):
+                r += self.btn(query)
+            if htpc.settings.get('torrents_norbits_enabled'):
+                r += self.search_norbits(query, 'all')
+            if htpc.settings.get('torrents_yts_enabled'):
+                r += self.search_yts(query)
+            if htpc.settings.get('torrents_ka_enabled'):
+                r += self.search_ka(query)
+            if htpc.settings.get('torrents_getstrike_enabled'):
+                r += self.search_getstrike(query, 'all')
+            if htpc.settings.get('torrents_ptp_enabled'):
+                r += self.search_ptp(query, 'movie')
+            if htpc.settings.get('torrents_rarbg_enabled'):
+                r += self.search_rarbg(query, None)
+
+        elif provider == 'btn':
+            if htpc.settings.get('torrents_btn_enabled'):
+                r += self.btn(query)
+        elif provider == 'rarbg':
+            if htpc.settings.get('torrents_rarbg_enabled'):
+                r += self.search_rarbg(query, None)
+        elif provider == 'yts':
+            if htpc.settings.get('torrents_yts_enabled'):
+                r += self.search_yts(query)
+        elif provider == 'getstrike':
+            if htpc.settings.get('torrents_getstrike_enabled'):
+                r += self.search_getstrike(query, 'all')
+        elif provider == 'kat':
+            self.logger.debug("PUSSY")
+            if htpc.settings.get('torrents_ka_enabled'):
+                r += self.search_ka(query)
+
         self.logger.debug('Found %s torrents in total' % len(r))
         return r
 
@@ -97,24 +117,29 @@ class Torrentsearch(object):
             return []
 
     def torrentproviders(self):
-        torrentproviders = ['ALL']
+        torrentproviders = []
         if htpc.settings.get('torrents_btnapikey') and htpc.settings.get('torrents_btn_enabled') == 1:
             torrentproviders.append('BTN')
 
-        if htpc.settings.get('torrents_norbits_enabled') == 1 and htpc.settings.get('torrents_norbits_passkey') and htpc.settings.get('torrents_norbits_username'):
+        if (htpc.settings.get('torrents_norbits_enabled') == 1 and
+            htpc.settings.get('torrents_norbits_passkey') and htpc.settings.get('torrents_norbits_username')):
             torrentproviders.append('norbits')
 
         if htpc.settings.get('torrents_yts_enabled') == 1:
-            torrentproviders.append('yts')
+            torrentproviders.append('YTS')
 
         if htpc.settings.get('torrents_ka_enabled') == 1:
-            torrentproviders.append('ka')
+            torrentproviders.append('KAT')
 
         if htpc.settings.get('torrents_getstrike_enabled') == 1:
-            torrentproviders.append('getstrike')
+            torrentproviders.append('GetStrike')
 
-        if htpc.settings.get('torrents_ptp_enabled') == 1:
-            torrentproviders.append('ptp')
+        if (htpc.settings.get('torrents_ptp_enabled') == 1 and htpc.settings.get('torrents_ptp_passkey')
+            and htpc.settings.get('torrents_ptp_username') and htpc.settings.get('torrents_ptp_password')):
+            torrentproviders.append('PTP')
+
+        if htpc.settings.get('torrents_rarbg_enabled') == 1:
+            torrentproviders.append('rarbg')
 
         return torrentproviders
 

@@ -7,6 +7,7 @@ import logging
 
 
 def search(what, cat='all'):
+    logging.debug('Searching kat for %s' % what)
     seeds = htpc.settings.get('torrents_seeds', 5)
     url = 'https://kickass.to'
     supported_categories = {'all': '', 'movies': 'Movies', 'tv': 'TV', 'music': 'Music', 'games': 'Games', 'software': 'Applications'}
@@ -56,7 +57,7 @@ def search(what, cat='all'):
                 pass
         i += 1
 
-    logging.debug(ret)
+    #logging.debug(ret)
     if len(ret):
         return sorted(ret, reverse=True, key=lambda k: k['Seeders'])
     else:

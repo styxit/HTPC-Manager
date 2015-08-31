@@ -15,7 +15,7 @@ def search(q, cat):
     logger = logging.getLogger('modules.torrentsearch')
     try:
         req = requests.Session()
-        r = req.get(url, verify=False)
+        r = req.get(url, verify=False, timeout=5)
         if r.status_code == 200 and r.json()['statuscode'] == 200:
             result = r.json()['torrents']
             l = []

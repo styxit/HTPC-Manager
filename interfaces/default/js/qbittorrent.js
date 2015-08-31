@@ -65,7 +65,9 @@ function get_torrents() {
 
                 tr.append(
 
-                $('<td>').addClass('qbt_name').html(torrent.name + '<br><small><i class="fa fa-long-arrow-down"></i> ' + torrent.dlspeed + '<i class="fa fa-long-arrow-up"></i> ' + torrent.upspeed + '</small>'),
+                $('<td>').addClass('qbt_name').text(torrent.name),
+                $('<td>').text(torrent.dlspeed),
+                $('<td>').text(torrent.upspeed),
                 $('<td>').text(torrent.num_seeds),
                 $('<td>').text(torrent.num_leechs),
                 $('<td>').addClass('qbt_ratio').text(torrent.ratio),

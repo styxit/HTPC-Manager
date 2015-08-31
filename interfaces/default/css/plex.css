@@ -40,8 +40,8 @@ a:Hover {
 }
 .grid-caption {
     position: absolute;
-    bottom: 5px;
-    left: 5px;
+    bottom: 1px;
+    left: 1px;
     background: rgba(0,0,0,0.75);
     padding: 10px;
     width: 130px;

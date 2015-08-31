@@ -40,14 +40,13 @@ $(document).ready(function () {
     });
 
     tablesorterOptions = {
-        debug: true,
-        theme: 'bootstrap',
-        //widthFixed: true,
-        headerTemplate: '{content} {icon}',
         //debug: true,
+        //theme: 'bootstrap',
+        headerTemplate: '{content} {icon}',
         ignoreCase: true,
         filter_ignoreCase: true,
-        widgets : [ "uitheme", "filter", "zebra" ],
+        widgets : [ "filter", "zebra" ],
+        //widgets : [ "uitheme", "filter", "zebra" ],
         widgetOptions : {
           filter_columnFilters: false,
           filter_hideFilters : true
@@ -91,13 +90,14 @@ $(document).ready(function () {
             if ($('a[data-toggle="tab"]').length === 0 && $('.table-sortable').length > 0) {
                 // Allow search on everything in the table
                 $('.search').attr('data-column', "all");
-                $('.search').attr('placeholder', "Search table");
+                $('.search').attr('placeholder', find_filter_name());
                 // add def options
                 $('.table-sortable').tablesorter(tablesorterOptions);
                 // Enable search
                 $.tablesorter.filter.bindSearch($('.table-sortable'), $('.search'), false);
 
             }
+
         }
 
     });
@@ -121,13 +121,40 @@ $(document).ready(function () {
             if ($t.length) {
                 // Allow search on everything in the table
                 $('.search').attr('data-column', "all")
-                $('.search').attr('placeholder', "Search table")
+                $('.search').attr('placeholder', find_filter_name())
+
                 // add def options
                 $t.tablesorter(tablesorterOptions);
                 // Enable search
                 $.tablesorter.filter.bindSearch( $t, $('.search'), false)
             }
+        } else {
+            // to set default place holder if that table isnt sortable
+            $('.search').attr('placeholder', 'Search')
         }
+    }
+
+    function find_filter_name() {
+        // this will not fire unless a table is sortable
+        var tname;
+
+        // For modules with tabs
+        if ($('ul.nav.nav-tabs').find('li.active a').text()) {
+            tname = $('ul.nav.nav-tabs').find('li.active a').text()
+        } else {
+            // Modules with no tabs but h1 has a link
+            if ($('.content h1.page-title a').text()) {
+                tname = $('div.container-fluid > div.content > h1.page-title a').text()
+            // Modules with no tabs and no link in h1
+            } else {
+                tname = $.trim($('div.container-fluid > div.content > h1.page-title').html())
+            }
+        }
+
+        var name = (tname) ? 'Filter ' + tname : 'Search'
+
+        return name
+
     }
 
     // Activates the tooltips
@@ -421,7 +448,6 @@ function getReadableFileSizeString(fileSizeInBytes) {
         fileSizeInBytes = fileSizeInBytes / 1024;
         i++;
     } while (fileSizeInBytes > 1024);
-    console.log(fileSizeInBytes)
     return fileSizeInBytes.toFixed(1) + byteUnits[i];
 };
 

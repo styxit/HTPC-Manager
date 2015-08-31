@@ -2,20 +2,30 @@
 $(document).ready(function () {
     var clients
     get_clients()
-    $('.torrent_search_table').tablesorter();
+    $(window).trigger('hashchange')
+
     // Disables nzb search if torrent search page is open
     if ($('.formsearch').length) {
         $('.formsearch').addClass('disabled');
-    } else {
-        //pass
     }
+    $('.search').attr('placeholder', "Filter torrents")
 
-    $('.formsearch').submit(function (e) {
+    var TorrentSearch = function (e) {
         e.preventDefault();
-        query = $(e.target).find('.search').val();
-        if (query === undefined) return;
-        search(query);
+        var query = $('#tsinput').val();
+        var provider = $('#formindexer').val();
+        if (query) {
+            search(query, provider);
+        }
+    };
+
+    $('#tsinput').keyup(function(event){
+        if(event.keyCode == 13){
+            TorrentSearch
+        }
     });
+
+    $('#search_torrent_button').click(TorrentSearch);
 });
 
 // Sends torrent to the client on click
@@ -32,13 +42,13 @@ $(document).on('click', '.dlt', function (e) {
 
 
 // Based on btn for now, should use a generic one..
-function search(query) {
+function search(query, provider) {
     if (query.length === 0) return;
     $('.spinner').show();
     $('#torrent_search_results').empty();
     $('#error_msg').empty();
 
-    $.getJSON(WEBDIR + "torrentsearch/search/" + query, function (response) {
+    $.getJSON(WEBDIR + "torrentsearch/search?query=" + query +  '&provider=' + provider,function (response) {
 
         // Stops the function from running if the search doesn't get any hits
         if (!response.length) {
@@ -46,7 +56,6 @@ function search(query) {
             $('.spinner').hide();
             return;
         }
-
 
         $.each(response, function (index, torrent) {
             tr = $('<tr>');
@@ -73,7 +82,6 @@ function search(query) {
     byteSizeOrdering()
     $('.torrent_search_table').trigger('update');
     // sort on seeds 0 based 0 1 2
-    $('table').trigger("sorton", [[[2,1]]]);
 
 
     });

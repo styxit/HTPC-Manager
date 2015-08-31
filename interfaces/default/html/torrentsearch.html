@@ -6,15 +6,28 @@
           ${settings.get('torrentsearch_name', 'Torrent Search')}
       </h1>
 
+      <form class="well form-inline">
+        <input id="tsinput" type="text" class="span6">
+        <select class="span2" name="provider" id="formindexer">
+                <option value="all">All</option>
+                % for p in torrentproviders:
+                    <option value="${p.lower()}">${p}</option>
+                % endfor
+            </select>
+        <button type="submit" id="search_torrent_button" class="btn btn-success"><i class="fa fa-search fa-inverse fa-fw"></i> Search</button>
+
+
+      </form>
+
         <div class="mofa">
-            <table class="table table-condensed table-striped table-hover tablesorter torrent_search_table">
+            <table class="table table-condensed table-striped table-hover table-sortable torrent_search_table">
                 <thead>
                     <tr>
                         <th>&nbsp;</th>
                         <th class="span6">Name</th>
                         <th class="">Seeds</th>
                         <th class="">Peers</th>
-                        <th class="span2">Filesize</th>
+                        <th class="span2" data-sorter="filesize">Filesize</th>
                         <th class="hidden-phone">Source</th>
                         <th class="hidden-phone">Res</th>
                         <th class="hidden-phone">Ext</th>
