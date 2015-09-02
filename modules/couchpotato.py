@@ -10,6 +10,7 @@ import hashlib
 from htpc.helpers import fix_basepath, get_image, striphttp
 import json
 import os
+import re
 
 
 class Couchpotato(object):
@@ -52,6 +53,110 @@ class Couchpotato(object):
             url = htpc.settings.get('couchpotato_reverse_proxy_link')
 
         return url
+
+
+    def fuzzyfinder(self, text, collection):
+        #print text, collection
+        # stolen from fuzzyfinder
+        """
+        Args:
+            text (str): A partial string which is typically entered by a user.
+            collection (iterable): A collection of strings which will be filtered
+                                   based on the input `text`.
+        Returns:
+            suggestions (generator): A generator object that produces a list of
+                suggestions narrowed down from `collections` using the `text`
+                input.
+        """
+        suggestions = []
+        pat = '.*?'.join(map(re.escape, text))
+        regex = re.compile(pat, flags=re.I)
+        for item in collection:
+            r = regex.search(item)
+            if r:
+                suggestions.append((len(r.group()), r.start(), item))
+
+        return suggestions
+        #return [z for _, _, z in sorted(suggestions)]
+
+    def ctrl_c(self, filt):
+        ctrl_char = ''
+        if '!=' in filt:
+            ctrl_char = '!='
+        elif '==' in filt:
+            ctrl_char = '=='
+        elif '<=' in filt:
+            ctrl_char = '<='
+        elif '>=' in filt:
+            ctrl_char = '>='
+        elif '<=' in filt:
+            ctrl_char = '=='
+        elif '!' in filt:
+            ctrl_char = '!'
+        elif '<' in filt:
+            ctrl_char = '<'
+        elif '>' in filt:
+            ctrl_char = '>'
+        elif '=' in filt:
+            ctrl_char = '='
+        return ctrl_char
+
+
+
+
+    def cp_filter(self, filt, collection):
+        self.logger.debug('Called cp_filter %s' % filt)
+        before = len(collection.get('movies', 0))
+        results = []
+        if collection.get('movies', ''):
+            check = self.ctrl_c(filt)
+            if filt:
+                # default to fuzzy title search "16 blocks"
+                if check == '':
+                    for m in collection['movies']:
+                        f = self.fuzzyfinder(filt, [m['title']])
+                        if f:
+                            results.append(m)
+                else:
+                    # default to normal search
+                    if check:
+                        filt = filt.split(check)
+
+                    for m in collection['movies']:
+                        # flatten the info since we would normally be interessed in that
+                        if 'info' in m:
+                            for k, v in m['info'].iteritems():
+                                m[k] = v
+                                try:
+                                    imdb = m['info']['rating']['imdb']
+                                    m['rating'] = imdb[0]
+                                except:
+                                    pass
+
+                        for k, v in m.iteritems():
+                            if k.lower() == filt[0].lower():
+                                if isinstance(v, dict):
+                                    # actor roles='Jack Bauer'
+                                    for kk, vv in v.iteritems():
+                                        if v == kk:
+                                            results.append(m)
+                                elif isinstance(v, list):
+                                    # genres=action
+                                    if filt[1].lower() in [z.lower() for z in v]:
+                                        results.append(m)
+                                elif isinstance(v, (int, float)):
+                                    # for year!=1337 rating<=5.0
+                                    if check and check != '=':
+                                        eva = '%f %s %f' % (v, check, filt[1])
+                                        if eval(eva):
+                                            results.append(m)
+                                elif isinstance(v, basestring):
+                                    # plot='some string'
+                                    if filt[1].lower() in v.lower():
+                                        results.append(m)
+
+                self.logger.debug('Filter out %s' % (before - len(results)))
+                return results
 
     @cherrypy.expose()
     @require()
@@ -146,13 +251,28 @@ class Couchpotato(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def GetMovieList(self, status='', limit=''):
+    def GetMovieList(self, status='', limit='', f=''):
+        self.logger.debug('Fetching Movies')
         if status == 'done':
             status += '&type=movie&release_status=done&status_or=1'
-            return self.fetch('media.list/?status=' + status)
+            data = self.fetch('media.list/?status=' + status)
+            if f:
+                filtered_movies = self.cp_filter(f, data)
+                data['movies'] = filtered_movies
+                data['total'] = len(filtered_movies)
+                return data
+            else:
+                return data
 
-        self.logger.debug('Fetching Movies')
-        return self.fetch('media.list/?status=' + status + '&limit_offset=' + limit)
+        data = self.fetch('media.list/?status=' + status + '&limit_offset=' + limit)
+        if f:
+            filtered_movies = self.cp_filter(f, data)
+            data['movies'] = filtered_movies
+            data['total'] = len(filtered_movies)
+            return data
+        else:
+            return data
+        #return self.fetch('media.list/?status=' + status + '&limit_offset=' + limit)
 
     @cherrypy.expose()
     @require()

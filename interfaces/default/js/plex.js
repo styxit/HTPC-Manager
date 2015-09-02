@@ -16,7 +16,6 @@ $(document).ready(function() {
         e.preventDefault()
     });
 
-
     // Load data on tab display
     $('a[data-toggle=\'tab\']').click(function(e) {
         $('.search').val('');
@@ -33,7 +32,6 @@ $(document).ready(function() {
 
     $(".search").on('keyup', function (e) {
         searchString = $(this).val();
-        console.log(searchString);
         // reset so only load what we should
         movieLoad.last = 0;
         showLoad.last = 0;
@@ -72,6 +70,9 @@ function playItem(item, player) {
 }
 
 function loadMovies(options) {
+    if (options.f.length) {
+        $('#movie-grid').empty();
+    }
     var optionstr = JSON.stringify(options) + hideWatched;
     if (movieLoad.options != optionstr) {
         movieLoad.last = 0;
@@ -228,6 +229,9 @@ var showLoad = {
 var currentShow = null;
 
 function loadShows(options) {
+    if (options.f.length){
+        $('#show-grid').empty();
+    }
     var optionstr = JSON.stringify(options) + hideWatched;
     if (showLoad.options != optionstr) {
         showLoad.last = 0;
@@ -437,6 +441,9 @@ var albumLoad = {
     artist: null
 }
 function loadAlbums(options) {
+    if (options.f.length){
+        $('#album-grid').empty();
+    }
     var elem = $('#album-grid');
     if (options && options.artistid!=undefined) {
         $('.artist-albums:visible').slideUp(300, function() {
