@@ -49,11 +49,10 @@ def search(q, cat):
             return []
 
         r = s.get(urls['search'] % urllib.quote_plus(q), timeout=10)
+        result_list = []
 
         if r.ok:
             result = r.json()
-
-            result_list = []
 
             authkey = result['AuthKey']
             logger.debug('Found %s movies with %s' % (len(result['Movies']), q))
@@ -79,9 +78,7 @@ def search(q, cat):
                     result_list.append(r)
 
             logger.debug('Found %s torrents from PTP' % len(result_list))
-            return result_list
-        else:
-            raise
+        return result_list
 
     except Exception as e:
         logger.error('Error while fetching torrents from PTP %s %s' % (r.url, e))
