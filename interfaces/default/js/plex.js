@@ -5,11 +5,12 @@ var movieLoad = {
     last: 0,
     request: null,
     limit: 55,
-    options: null
+    options: null,
+    f: null
 }
 
 $(document).ready(function() {
-
+    $(window).trigger('hashchange')
     hideWatched = $('#hidewatched').hasClass('active')?1:0;
     playerLoader = setInterval('loadNowPlaying()', 4000);
     $('.formsearch').submit(function(e) {
@@ -21,7 +22,6 @@ $(document).ready(function() {
         $('.search').val('');
         searchString = '';
     }).on('shown', reloadTab);
-    $(window).trigger('hashchange')
 
      // Load more titles on scroll
     $(window).scroll(function() {
@@ -41,6 +41,21 @@ $(document).ready(function() {
         songsLoad.last = 0;
         reloadTab()
     });
+
+    if ($('#movies').is(':visible')) {
+        $('.search').attr('placeholder', 'Filter movies')
+    } else if ($('#shows').is(':visible')) {
+        $('.search').attr('placeholder', 'Filter tvshows')
+    } else if ($('#episodes').is(':visible')) {
+        $('.search').attr('placeholder', 'Filter episodes')
+        options = $.extend(options, {'tvshowid': currentShow});
+    } else if ($('#artists').is(':visible')) {
+        $('.search').attr('placeholder', 'Filter artists')
+    } else if ($('#albums').is(':visible')) {
+        $('.search').attr('placeholder', 'Filter albums')
+    } else if ($('#songs').is(':visible')) {
+        $('.search').attr('placeholder', 'Filter songs')
+    }
 
     // Toggle whether to show already seen episodes
     $('#hidewatched').click(function(e) {
@@ -306,6 +321,9 @@ var episodeLoad = {
 }
 var currentShow = null;
 function loadEpisodes(options) {
+    if (options.f.length) {
+        $('#episode-grid').empty();
+    }
     currentShow = options.tvshowid;
     var optionstr = JSON.stringify(options) + hideWatched;
     if (episodeLoad.options != optionstr) {
@@ -382,6 +400,9 @@ var artistLoad = {
     options: null
 }
 function loadArtists(options) {
+    if (options.f.length) {
+        $('#artist-grid').empty();
+    }
     var optionstr = JSON.stringify(options);
     if (artistLoad.options != optionstr) {
         artistLoad.last = 0;
@@ -531,6 +552,10 @@ var songsLoad = {
     albumid: ''
 }
 function loadSongs(options) {
+    if (options.f.length) {
+        $('#songs-grid tbody').html('');
+    }
+
     if (options != undefined) {
         songsLoad.options = options
     }
@@ -587,7 +612,6 @@ function loadSongs(options) {
             }
         },
         complete: function() {
-            $('a[href=#songs]').tab('show');
             $('.spinner').hide();
         }
     });
@@ -701,7 +725,7 @@ function reloadTab() {
         loadAlbums(options);
     } else if ($('#songs').is(':visible')) {
         loadSongs(options);
-}
+    }
 }
 
 function hideWatched() {

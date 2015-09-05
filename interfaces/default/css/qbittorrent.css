@@ -34,8 +34,3 @@ table {
 end progress bar
 */
 
-
-tr > td.span3.qbit_progress > .progress  {
-	margin-bottom: 0px;
-}
-

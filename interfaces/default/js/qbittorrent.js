@@ -33,18 +33,20 @@ function get_torrents() {
                     times_in += 1;
                 }
 
-
                 var progressBar = $('<div>');
                 progressBar.addClass('bar');
                 progressBar.css('width', (torrent.progress * 100) + '%');
-                progressBar.text(torrent.size);
+
 
                 var progress = $('<div>');
                 progress.addClass('progress');
                 if (torrent.percentage_done >= 1) {
                     progress.addClass('progress-success');
                 }
+
+                var sp = $('<span>').text(torrent.size)
                 progress.append(progressBar);
+                progress.append(sp)
 
                 // Button group
                 buttons = $('<div>').addClass('btn-group');
@@ -56,11 +58,11 @@ function get_torrents() {
 
                 // Remove button
                 removeButton = $('<a class="qbt_removetorrent" data-action="delete" data-hash="" data-name="">').
-                addClass('btn btn-mini').
-                html('<i class="fa fa-trash-o fa-lg"></i>').
-                attr('data-hash', torrent.hash).
-                attr('data-name', torrent.name).
-                attr('title', 'Remove torrent');
+                    addClass('btn btn-mini').
+                    html('<i class="fa fa-trash-o fa-lg"></i>').
+                    attr('data-hash', torrent.hash).
+                    attr('data-name', torrent.name).
+                    attr('title', 'Remove torrent');
                 buttons.append(removeButton);
 
                 tr.append(
@@ -190,9 +192,9 @@ $(document).ready(function () {
     get_global_limit();
 
     setInterval(function () {
-        get_torrents();
-        get_speed();
-        get_global_limit();
+        //get_torrents();
+        //get_speed();
+        //get_global_limit();
     }, 10000);
 
 });
