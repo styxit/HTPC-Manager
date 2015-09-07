@@ -237,8 +237,13 @@ def download_image(url, dest, auth=None, headers=None):
 
 def resize_image(img, height, width, opacity, mode, dest):
     ''' Resize image, set opacity and save to disk '''
-    imagetype = imghdr.what(img)
-    im = Image.open(img)
+    try:
+
+        imagetype = imghdr.what(img)
+        im = Image.open(img)
+    except IOError:
+        logger.error('Failed to open image %s dest %s' % (img, dest))
+        return
 
     # Only resize if needed
     if height is not None or width is not None:

@@ -12,6 +12,7 @@ import htpc
 import logging
 import os
 import requests
+import time
 from cherrypy.lib.auth2 import require, member_of
 
 logger = logging.getLogger('modules.stats')
@@ -247,7 +248,12 @@ class Stats(object):
                 p.dict = p.as_dict(['username', 'memory_percent', 'create_time',
                                     'cpu_percent', 'name', 'status', 'pid', 'memory_info'], ad_value='N/A')
                 # Create a readable time
-                r_time = datetime.now() - datetime.fromtimestamp(p.dict['create_time'])
+                try:
+                    r_time = datetime.now() - datetime.fromtimestamp(p.dict['create_time'])
+                except TypeError:
+                    # for shitty os
+                    r_time = time.time()
+
                 r_time = str(r_time)[:-7]
                 p.dict['r_time'] = r_time
                 # fix for windows process name

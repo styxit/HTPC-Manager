@@ -6,21 +6,30 @@ var movieLoad = {
     request: null,
     limit: 55,
     options: null,
-    f: null
 }
 
 $(document).ready(function() {
-    $(window).trigger('hashchange')
     hideWatched = $('#hidewatched').hasClass('active')?1:0;
     playerLoader = setInterval('loadNowPlaying()', 4000);
     $('.formsearch').submit(function(e) {
         e.preventDefault()
     });
 
+    $('.search').attr('placeholder', 'Filter movies')
+    $('a[href="#movies"]').tab('show')
+    reloadTab();
+
     // Load data on tab display
-    $('a[data-toggle=\'tab\']').click(function(e) {
+    $('a[data-toggle="tab"]').click(function(e) {
         $('.search').val('');
+        $('.search').attr('placeholder', 'Filter ' + $(this).text());
         searchString = '';
+        movieLoad.last = 0;
+        showLoad.last = 0;
+        episodeLoad.last = 0;
+        artistLoad.last = 0;
+        albumLoad.last = 0;
+        songsLoad.last = 0;
     }).on('shown', reloadTab);
 
      // Load more titles on scroll
@@ -41,21 +50,6 @@ $(document).ready(function() {
         songsLoad.last = 0;
         reloadTab()
     });
-
-    if ($('#movies').is(':visible')) {
-        $('.search').attr('placeholder', 'Filter movies')
-    } else if ($('#shows').is(':visible')) {
-        $('.search').attr('placeholder', 'Filter tvshows')
-    } else if ($('#episodes').is(':visible')) {
-        $('.search').attr('placeholder', 'Filter episodes')
-        options = $.extend(options, {'tvshowid': currentShow});
-    } else if ($('#artists').is(':visible')) {
-        $('.search').attr('placeholder', 'Filter artists')
-    } else if ($('#albums').is(':visible')) {
-        $('.search').attr('placeholder', 'Filter albums')
-    } else if ($('#songs').is(':visible')) {
-        $('.search').attr('placeholder', 'Filter songs')
-    }
 
     // Toggle whether to show already seen episodes
     $('#hidewatched').click(function(e) {
@@ -86,6 +80,9 @@ function playItem(item, player) {
 
 function loadMovies(options) {
     if (options.f.length) {
+        $('#movie-grid').empty();
+    }
+    if (movieLoad.last == 0) {
         $('#movie-grid').empty();
     }
     var optionstr = JSON.stringify(options) + hideWatched;
@@ -247,6 +244,9 @@ function loadShows(options) {
     if (options.f.length){
         $('#show-grid').empty();
     }
+    if (showLoad.last == 0) {
+        $('#show-grid').empty();
+    }
     var optionstr = JSON.stringify(options) + hideWatched;
     if (showLoad.options != optionstr) {
         showLoad.last = 0;
@@ -322,6 +322,9 @@ var episodeLoad = {
 var currentShow = null;
 function loadEpisodes(options) {
     if (options.f.length) {
+        $('#episode-grid').empty();
+    }
+    if (episodeLoad.last == 0) {
         $('#episode-grid').empty();
     }
     currentShow = options.tvshowid;
@@ -403,6 +406,9 @@ function loadArtists(options) {
     if (options.f.length) {
         $('#artist-grid').empty();
     }
+    if (artistLoad.last == 0) {
+        $('#artist-grid').empty();
+    }
     var optionstr = JSON.stringify(options);
     if (artistLoad.options != optionstr) {
         artistLoad.last = 0;
@@ -463,6 +469,9 @@ var albumLoad = {
 }
 function loadAlbums(options) {
     if (options.f.length){
+        $('#album-grid').empty();
+    }
+    if (albumLoad.last == 0) {
         $('#album-grid').empty();
     }
     var elem = $('#album-grid');
@@ -554,6 +563,9 @@ var songsLoad = {
 function loadSongs(options) {
     if (options.f.length) {
         $('#songs-grid tbody').html('');
+    }
+    if (songsLoad.last == 0) {
+        $('#songs-grid').empty();
     }
 
     if (options != undefined) {
@@ -702,9 +714,9 @@ function loadNowPlaying() {
                 $('#nowplaying').append(row);
                 });
                 $('#nowplaying').slideDown();
-    }
-}
-});
+            }
+        }
+    });
 }
 
 

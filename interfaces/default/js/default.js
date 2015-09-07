@@ -130,7 +130,7 @@ $(document).ready(function () {
             }
         } else {
             // to set default place holder if that table isnt sortable
-            $('.search').attr('placeholder', 'Search')
+            //$('.search').attr('placeholder', 'Search')
         }
     }
 
@@ -156,6 +156,7 @@ $(document).ready(function () {
         return name
 
     }
+
 
     // Activates the tooltips
     $('.settingstooltip').tooltip({placement: 'right'})
@@ -532,3 +533,4 @@ function pybooltojsbool(s) {
         return false
     }
 }
+

@@ -170,6 +170,9 @@ function loadMovies(options) {
         movieLoad.last = 0;
         $('#movie-grid').empty();
     }
+    if (movieLoad.last == 0) {
+        $('#movie-grid').empty();
+    }
     movieLoad.options = optionstr;
 
     var active = (movieLoad.request!=null && movieLoad.request.readyState!=4);
@@ -346,6 +349,9 @@ function loadShows(options) {
         showLoad.last = 0;
         $('#show-grid').empty();
     }
+    if (showLoad.last == 0) {
+        $('#show-grid').empty();
+    }
     showLoad.options = optionstr;
 
     var active = (showLoad.request!=null && showLoad.request.readyState!=4);
@@ -423,6 +429,9 @@ function loadEpisodes(options) {
         episodeLoad.last = 0;
         $('#episode-grid').empty();
     }
+    if (episodeLoad.last == 0) {
+        $('#episode-grid').empty();
+    }
     episodeLoad.options = optionstr;
 
     var active = (episodeLoad.request!=null && episodeLoad.request.readyState!=4);
@@ -496,6 +505,9 @@ function loadArtists(options) {
     var optionstr = JSON.stringify(options);
     if (artistLoad.options != optionstr) {
         artistLoad.last = 0;
+        $('#artist-grid').empty();
+    }
+    if (artistLoad.last == 0) {
         $('#artist-grid').empty();
     }
     artistLoad.options = optionstr;
@@ -665,6 +677,9 @@ var songsLoad = {
 }
 function loadSongs(options) {
     searchString = $('.search').val()
+    if (songLoad.last == 0) {
+        $('#songs-grid tbody').empty();
+    }
     if (options != undefined || searchString != songsLoad.filter) {
         songsLoad.last = 0
         $('#songs-grid tbody').empty()
@@ -1037,8 +1052,7 @@ function GetAddons() {
                         loadAddons(addon);
                     });
                     var src = 'holder.js/100x150/text:No artwork';
-                    //Holder.run();
-                    if (addon.thumbnail !== undefined) {
+                    if (addon.thumbnail) {
                         src = WEBDIR + 'kodi/GetThumb?w=100&h=150&thumb=' + encodeURIComponent(addon.thumbnail);
                     }
 
@@ -1046,7 +1060,6 @@ function GetAddons() {
                     addonAnchor.append($('<h6>').addClass('title').html(shortenText(addon.name, 17)));
                     row.append(addonAnchor);
                     $('#addons-grid').append(row);
-                    //Holder.run();
                 });
                 $('.spinner').hide();
                 Holder.run();
@@ -1136,6 +1149,7 @@ function reloadTab() {
     } else if ($('#pvr').is(':visible')) {
         loadChannels();
     } else if ($('#addons').is(':visible')) {
+        $('.search').attr('placeholder', "Search")
         GetAddons();
     }
 }
