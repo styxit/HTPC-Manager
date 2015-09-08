@@ -41,6 +41,15 @@ def timeit_func(func):
         return res
     return inner
 
+comp_table = {
+    '==': lambda x, y: x == y,
+    '!=': lambda x, y: x != y,
+    '>': lambda x, y: x > y,
+    '<': lambda x, y: x < y,
+    '>=': lambda x, y: x >= y,
+    '<=': lambda x, y: x <= y,
+}
+
 
 def get_image(url, height=None, width=None, opacity=100, mode=None, auth=None, headers=None, missing_image=None):
     ''' Load image form cache if possible, else download. Resize if needed '''
@@ -238,7 +247,6 @@ def download_image(url, dest, auth=None, headers=None):
 def resize_image(img, height, width, opacity, mode, dest):
     ''' Resize image, set opacity and save to disk '''
     try:
-
         imagetype = imghdr.what(img)
         im = Image.open(img)
     except IOError:

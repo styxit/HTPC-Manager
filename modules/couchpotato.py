@@ -7,7 +7,7 @@ import requests
 from cherrypy.lib.auth2 import require
 import logging
 import hashlib
-from htpc.helpers import fix_basepath, get_image, striphttp
+from htpc.helpers import fix_basepath, get_image, striphttp, comp_table
 import json
 import os
 import re
@@ -54,31 +54,6 @@ class Couchpotato(object):
 
         return url
 
-
-    def fuzzyfinder(self, text, collection):
-        #print text, collection
-        # stolen from fuzzyfinder
-        """
-        Args:
-            text (str): A partial string which is typically entered by a user.
-            collection (iterable): A collection of strings which will be filtered
-                                   based on the input `text`.
-        Returns:
-            suggestions (generator): A generator object that produces a list of
-                suggestions narrowed down from `collections` using the `text`
-                input.
-        """
-        suggestions = []
-        pat = '.*?'.join(map(re.escape, text))
-        regex = re.compile(pat, flags=re.I)
-        for item in collection:
-            r = regex.search(item)
-            if r:
-                suggestions.append((len(r.group()), r.start(), item))
-
-        return suggestions
-        #return [z for _, _, z in sorted(suggestions)]
-
     def ctrl_c(self, filt):
         ctrl_char = ''
         if '!=' in filt:
@@ -101,9 +76,6 @@ class Couchpotato(object):
             ctrl_char = '='
         return ctrl_char
 
-
-
-
     def cp_filter(self, filt, collection):
         self.logger.debug('Called cp_filter %s' % filt)
         before = len(collection.get('movies', 0))
@@ -113,8 +85,10 @@ class Couchpotato(object):
             if filt:
                 # default to fuzzy title search "16 blocks"
                 if check == '':
+                    pat = '.*?'.join(map(re.escape, filt))
+                    regex = re.compile(pat, flags=re.I)
                     for m in collection['movies']:
-                        f = self.fuzzyfinder(filt, [m['title']])
+                        f = regex.search(m['title'])
                         if f:
                             results.append(m)
                 else:
@@ -147,8 +121,7 @@ class Couchpotato(object):
                                 elif isinstance(v, (int, float)):
                                     # for year!=1337 rating<=5.0
                                     if check and check != '=':
-                                        eva = '%f %s %f' % (v, check, filt[1])
-                                        if eval(eva):
+                                        if comp_table[check](float(v), float(filt[1])):
                                             results.append(m)
                                 elif isinstance(v, basestring):
                                     # plot='some string'
@@ -272,7 +245,6 @@ class Couchpotato(object):
             return data
         else:
             return data
-        #return self.fetch('media.list/?status=' + status + '&limit_offset=' + limit)
 
     @cherrypy.expose()
     @require()
