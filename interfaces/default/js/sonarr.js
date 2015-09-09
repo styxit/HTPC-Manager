@@ -22,7 +22,7 @@ $(document).ready(function () {
     $('#add_show_button').click(addShowAction);
 
     $('#add_tvdbid_button').click(function () {
-        addShow($('#add_show_select').val(), $('#add_show_quality').val(), $('#add_show_folder').val(), $('#add_show_seasonfolder').val(), $('#add_show_specials').val());
+        addShow($('#add_show_select').val(), $('#add_show_quality').val(), $('#add_show_monitor').val(), $('#add_show_folder').val(), $('#add_show_seasonfolder').val(), $('#add_show_specials').val());
     });
 
     $('#cancel_show_button').click(function () {
@@ -268,6 +268,7 @@ function searchTvDb(query) {
             $('#add_show_select').fadeIn();
             $('#add_show_button').attr('disabled', false).hide();
             $('#add_tvdbid_button').show();
+            $('#add_show_monitor').fadeIn().show();
             $('#add_show_quality').fadeIn().show();
             $('#add_show_folder').fadeIn().show();
             $('.sonarr_checkboxs').show();
@@ -275,10 +276,11 @@ function searchTvDb(query) {
     });
 }
 
-function addShow(tvdbid, quality, rootfolder, seasonfolder, specials) {
+function addShow(tvdbid, quality, monitor, rootfolder, seasonfolder, specials) {
     var data = {
         rootfolder: rootfolder,
         seasonfolder: seasonfolder,
+        monitor: monitor,
         specials: specials
     };
 
@@ -288,15 +290,13 @@ function addShow(tvdbid, quality, rootfolder, seasonfolder, specials) {
         type: 'get',
         dataType: 'json',
         success: function (data) {
-            $.each(data, function (i, res) {
-                if (!res.errorMessage) {
-                    notify('Add TV show', data.title, 'success');
-                    loadShows();
-                } else {
-                    notify('Failed to add show', res.errorMessage, 'error');
-                }
-            });
-            cancelAddShow();
+            if (data.title) {
+                notify('Add TV show ' + data.title + '', '', 'success');
+                loadShows();
+            } else {
+                notify('Failed to add show', data[0].errorMessage, 'error');
+                cancelAddShow();
+            }
         }
     });
 }
@@ -311,6 +311,7 @@ function cancelAddShow() {
     $('#add_tvdbid_button').hide();
     $('#add_show_button').show();
     $('#add_show_quality').hide();
+    $('#add_show_monitor').hide();
     $('#add_show_folder').hide();
     $('.sonarr_checkboxs').hide();
 }

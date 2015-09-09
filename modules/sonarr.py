@@ -226,14 +226,15 @@ class Sonarr(object):
 
     @cherrypy.expose()
     @require()
-    def AddShow(self, tvdbid, quality, rootfolder='', seasonfolder='on', specials=False):
+    def AddShow(self, tvdbid, quality, monitor='all', rootfolder='', seasonfolder='on', specials=False):
         d = {}
         try:
             tvshow = self.fetch('Series/lookup?term=tvdbid:%s' % tvdbid)
             seasoncount = 1
             season = []
             for i in tvshow:
-                seasoncount += i['seasonCount']
+
+                self.logger.debug('monitor=%s' % monitor)
 
                 d["title"] = i['title']
                 d["tvdbId"] = int(i['tvdbId'])
@@ -241,6 +242,7 @@ class Sonarr(object):
                 d["titleSlug"] = i['titleSlug']
                 d["RootFolderPath"] = rootfolder
                 d["monitored"] = True
+                season_monitoring = False
 
                 if seasonfolder == 'on':
                     d["seasonFolder"] = True
@@ -249,11 +251,41 @@ class Sonarr(object):
                 else:
                     start_on_season = 1
 
+                seasoncount += i['seasonCount']
+
+                options = {'ignoreEpisodesWithFiles': False,
+                           'ignoreEpisodesWithoutFiles': False}
+
+                if monitor == 'all':
+                    season_monitoring = True
+
                 for x in xrange(start_on_season, int(seasoncount)):
-                    s = {"seasonNumber": x, "monitored": True}
+                    s = {"seasonNumber": x, "monitored": season_monitoring}
                     season.append(s)
 
+                if monitor == 'future':
+                    options['ignoreEpisodesWithFiles'] = True
+                    options['ignoreEpisodesWithoutFiles'] = True
+
+                elif monitor == 'latest':
+                    season[i['seasonCount']]['monitored'] = True#({'seasonNumber': i['seasonCount'], 'monitored': True})
+
+                elif monitor == 'first':
+                    season[1]['monitored'] = True
+
+                elif monitor == 'missing':
+                    options['ignoreEpisodesWithFiles'] = True
+
+                elif monitor == 'existing':
+                    options['ignoreEpisodesWithoutFiles'] = True
+
+                elif monitor == 'none':
+                    season_monitoring = False
+
                 d["seasons"] = season
+                d['addOptions'] = options
+
+                self.logger.debug('%s' % dumps(d, indent=4))
 
             # Manually add correct headers since @cherrypy.tools.json_out() renders it wrong
             cherrypy.response.headers['Content-Type'] = "application/json"
@@ -261,3 +293,10 @@ class Sonarr(object):
 
         except Exception, e:
             self.logger.error('Failed to add tvshow %s %s' % (tvdbid, e))
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def test(self):
+        tvshow = self.fetch('Series/lookup?term=tvdbid:70327')
+        return tvshow

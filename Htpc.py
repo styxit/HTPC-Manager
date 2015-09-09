@@ -217,7 +217,7 @@ def main():
 
     # Open webbrowser
     if args.openbrowser or htpc.settings.get('openbrowser') and not htpc.DEV:
-        browser_ssl = 's' if htpc.SSLCERT and htpc.SSLKEY else ''
+        browser_ssl = 's' if htpc.SSLCERT and htpc.SSLKEY and htpc.settings.get('app_use_ssl') else ''
         if htpc.settings.get('app_host') == '0.0.0.0':
             browser_host = 'localhost'
         else:

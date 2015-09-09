@@ -18,7 +18,16 @@
         <div class="well form-inline">
             <input class="span6" id="add_show_name" name="add_show_name" type="text" />
             <select class="span4" style="display:none;" id="add_show_select" name="add_show_select"></select>
-            <select class="span2" style="display:none;" id="add_show_quality" name="add_show_quality"></select>
+            <select class="span1" style="display:none;" id="add_show_quality" name="add_show_quality"></select>
+            <select class="span1" style="display:none;" id="add_show_monitor" name="add_show_monitor">
+                <option value="all">All</option>
+                <option value="future">Future</option>
+                <option value="missing">Missing</option>
+                <option value="latest">Latest</option>
+                <option value="first">First</option>
+                <option value="none">None</option>
+                <option value="existing">Existing</option>
+            </select>
             <select class="span2" style="display:none;" id="add_show_folder" name="add_show_folder"></select>
 
             <label style="display:none;padding-left: 5px;padding-right: 5px;" class="checkbox sonarr_checkboxs"> Season folders:
