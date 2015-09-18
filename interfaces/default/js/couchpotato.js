@@ -127,12 +127,6 @@ function getMovies(strStatus, pHTMLElement) {
 
 
 function reloadTab() {
-    /*
-    options = {'f': searchString,
-                'status': '',
-                'limit': ''
-            }
-    */
     options = {
         'f': searchString
     }
@@ -641,7 +635,7 @@ function Postprocess() {
             // Stop the notify from firing on cancel
             if (p !== null) {
                 path = (p.length === 0) ? 'Default folder' : p;
-                notify('sickrage', 'Postprocess ' + path, state);
+                notify('Couchpotato', 'Postprocess ' + path, state);
             }
         });
 

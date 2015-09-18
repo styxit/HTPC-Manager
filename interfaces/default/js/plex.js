@@ -4,7 +4,7 @@ var hideWatched = 0;
 var movieLoad = {
     last: 0,
     request: null,
-    limit: 55,
+    limit: 75,
     options: null,
 }
 
@@ -235,7 +235,7 @@ function loadEpisode(episode) {
 var showLoad = {
     last: 0,
     request: null,
-    limit: 55,
+    limit: 75,
     options: null
 };
 var currentShow = null;
@@ -316,7 +316,7 @@ function loadShows(options) {
 var episodeLoad = {
     last: 0,
     request: null,
-    limit: 55,
+    limit: 75,
     options: null
 }
 var currentShow = null;
@@ -399,7 +399,7 @@ function loadEpisodes(options) {
 var artistLoad = {
     last: 0,
     request: null,
-    limit: 55,
+    limit: 75,
     options: null
 }
 function loadArtists(options) {
@@ -463,7 +463,7 @@ function loadArtists(options) {
 var albumLoad = {
     last: 0,
     request: null,
-    limit: 55,
+    limit: 75,
     options: null,
     artist: null
 }
@@ -556,7 +556,7 @@ function loadAlbums(options) {
 var songsLoad = {
     last: 0,
     request: null,
-    limit: 55,
+    limit: 75,
     options: {},
     albumid: ''
 }

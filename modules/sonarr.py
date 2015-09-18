@@ -68,7 +68,7 @@ class Sonarr(object):
             url = 'http%s://%s:%s%sapi/%s' % (ssl, host, port, sonarr_basepath, path)
 
             if banner:
-                #  the path includes the basepath automaticly (if fetched from api command "Series")
+                #  the path includes the basepath automaticly (if fetched from api command 'Series')
                 # Cache the image in HTPC Manager aswell.
                 return get_image(url, headers=headers)
 
@@ -93,7 +93,7 @@ class Sonarr(object):
 
     @cherrypy.expose()
     @require()
-    def Version(self, sonarr_host, sonarr_port, sonarr_basepath, sonarr_apikey, sonarr_ssl = False, **kwargs):
+    def Version(self, sonarr_host, sonarr_port, sonarr_basepath, sonarr_apikey, sonarr_ssl=False, **kwargs):
         try:
             ssl = 's' if sonarr_ssl else ''
 
@@ -113,7 +113,7 @@ class Sonarr(object):
     @require()
     @cherrypy.tools.json_out()
     def Rootfolder(self):
-        return [folder["path"] for folder in self.fetch('Rootfolder')]
+        return [folder['path'] for folder in self.fetch('Rootfolder')]
 
     @cherrypy.expose()
     @require()
@@ -122,7 +122,6 @@ class Sonarr(object):
         ''' Return info about all your shows '''
         return self.fetch('Series')
 
-    #Return one show
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
@@ -153,8 +152,8 @@ class Sonarr(object):
     @require()
     def View(self, tvdbid, id):
         if not (tvdbid.isdigit()):
-            raise cherrypy.HTTPError("500 Error", "Invalid show ID.")
-            self.logger.error("Invalid show ID was supplied: " + str(id))
+            raise cherrypy.HTTPError('500 Error', 'Invalid show ID.')
+            self.logger.error('Invalid show ID was supplied: ' + str(id))
             return False
         # tvdbid is acctually id, and id is tvdbid....
         return htpc.LOOKUP.get_template('sonarr_view.html').render(scriptname='sonarr_view', tvdbid=tvdbid, id=id)
@@ -168,7 +167,7 @@ class Sonarr(object):
     @cherrypy.expose()
     @require()
     def GetBanner(self, url=None):
-        self.logger.debug("Fetching Banner")
+        self.logger.debug('Fetching Banner')
         cherrypy.response.headers['Content-Type'] = 'image/jpeg'
         return self.fetch(url, banner=True)
 
@@ -176,10 +175,9 @@ class Sonarr(object):
     @require()
     @cherrypy.tools.json_out()
     def Episode(self, id):
-        self.logger.debug("Fetching Episode info")
+        self.logger.debug('Fetching Episode info')
         return self.fetch('episode/%s' % id)
 
-    #Returns all the episodes from a show, with file info
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
@@ -187,14 +185,12 @@ class Sonarr(object):
         self.logger.debug('Fetching fileinfo for all episodes in a show')
         return self.fetch('episodefile?seriesId=%s' % id)
 
-    #Return one episode with file info
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def Episodeqly(self, id):
         return self.fetch('episodefile/%s' % id)
 
-    #Return the download profiles, used to match a id to  get the name
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
@@ -205,19 +201,18 @@ class Sonarr(object):
     @require()
     def Command(self, **kwargs):
         k = kwargs
-        cherrypy.response.headers['Content-Type'] = "application/json"
+        cherrypy.response.headers['Content-Type'] = 'application/json'
         try:
             data = {}
-            data["name"] = k["method"]
-            if k["par"] == "episodeIds":
-                k["id"] = [int(k["id"])]
-            data[k["par"]] = k["id"]
+            data['name'] = k['method']
+            if k['par'] == 'episodeIds':
+                k['id'] = [int(k['id'])]
+            data[k['par']] = k['id']
         except KeyError:
             pass
 
         return self.fetch(path='command', data=data, type='post')
 
-    #Search for a serie
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
@@ -226,7 +221,8 @@ class Sonarr(object):
 
     @cherrypy.expose()
     @require()
-    def AddShow(self, tvdbid, quality, monitor='all', rootfolder='', seasonfolder='on', specials=False):
+    def AddShow(self, tvdbid, quality, monitor='all', seriestype='standard',
+                rootfolder='', seasonfolder='on', specials=False):
         d = {}
         try:
             tvshow = self.fetch('Series/lookup?term=tvdbid:%s' % tvdbid)
@@ -236,16 +232,17 @@ class Sonarr(object):
 
                 self.logger.debug('monitor=%s' % monitor)
 
-                d["title"] = i['title']
-                d["tvdbId"] = int(i['tvdbId'])
-                d["qualityProfileId"] = int(quality)
-                d["titleSlug"] = i['titleSlug']
-                d["RootFolderPath"] = rootfolder
-                d["monitored"] = True
+                d['title'] = i['title']
+                d['tvdbId'] = int(i['tvdbId'])
+                d['qualityProfileId'] = int(quality)
+                d['titleSlug'] = i['titleSlug']
+                d['RootFolderPath'] = rootfolder
+                d['monitored'] = True
                 season_monitoring = False
+                d['seriesType'] = seriestype
 
                 if seasonfolder == 'on':
-                    d["seasonFolder"] = True
+                    d['seasonFolder'] = True
                 if specials == 'on':
                     start_on_season = 0
                 else:
@@ -260,35 +257,30 @@ class Sonarr(object):
                     season_monitoring = True
 
                 for x in xrange(start_on_season, int(seasoncount)):
-                    s = {"seasonNumber": x, "monitored": season_monitoring}
+                    s = {'seasonNumber': x, 'monitored': season_monitoring}
                     season.append(s)
 
                 if monitor == 'future':
                     options['ignoreEpisodesWithFiles'] = True
                     options['ignoreEpisodesWithoutFiles'] = True
-
                 elif monitor == 'latest':
-                    season[i['seasonCount']]['monitored'] = True#({'seasonNumber': i['seasonCount'], 'monitored': True})
-
+                    season[i['seasonCount']]['monitored'] = True
                 elif monitor == 'first':
                     season[1]['monitored'] = True
-
                 elif monitor == 'missing':
                     options['ignoreEpisodesWithFiles'] = True
-
                 elif monitor == 'existing':
                     options['ignoreEpisodesWithoutFiles'] = True
-
                 elif monitor == 'none':
                     season_monitoring = False
 
-                d["seasons"] = season
+                d['seasons'] = season
                 d['addOptions'] = options
 
                 self.logger.debug('%s' % dumps(d, indent=4))
 
             # Manually add correct headers since @cherrypy.tools.json_out() renders it wrong
-            cherrypy.response.headers['Content-Type'] = "application/json"
+            cherrypy.response.headers['Content-Type'] = 'application/json'
             return self.fetch('Series', data=d, type='post')
 
         except Exception, e:

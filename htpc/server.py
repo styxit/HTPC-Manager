@@ -125,6 +125,7 @@ def start():
 
     stopp_ap.priority = 10
     cherrypy.engine.subscribe('stop', stopp_ap)
+    cherrypy.engine.timeout_monitor.unsubscribe()
 
     # Set static directories
     webdir = os.path.join(htpc.RUNDIR, htpc.TEMPLATE)
