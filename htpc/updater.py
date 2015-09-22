@@ -520,6 +520,11 @@ class SourceUpdater():
         self.logger.debug('Overwriting files.')
 
         try:
+            existing_files = []
+            for src_dir, dirs, files in os.walk(htpc.RUNDIR):
+                for f in files:
+                    existing_files.append(os.path.join(src_dir, f))
+
             # Loop files and folders and place them in the HTPC Manager path
             for src_dir, dirs, files in os.walk(contentdir):
                 dst_dir = src_dir.replace(contentdir, targetFolder)
@@ -531,6 +536,22 @@ class SourceUpdater():
                     if os.path.exists(dst_file):
                         os.remove(dst_file)
                     shutil.move(src_file, dst_dir)
+
+                    try:
+                        existing_files.remove(dst_file)
+                    except:
+                        pass
+
+            # Try to remove all old files
+            for existing_file in existing_files:
+                if htpc.RUNDIR in existing_file:
+                    continue
+
+                try:
+                    os.remove(existing_file)
+                except:
+                    self.logger.error('Failed to remove unused file %s' % existing_file)
+
         except:
             self.logger.warning('Failed to overwrite old files')
             self.__finishUpdate()
