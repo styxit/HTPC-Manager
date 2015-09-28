@@ -1,6 +1,8 @@
 Hellowlol HTPC Manager fork [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=U3BELJYUPR95U)
 
 =====
+
+[![Join the chat at https://gitter.im/Hellowlol/HTPC-Manager](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Hellowlol/HTPC-Manager?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 A python based web application to manage the software on your HTPC. HTPC Manager combines all your favorite software into one slick interface.
 ![Screenshot](http://i.imgur.com/6QEWPFf.png)
 
