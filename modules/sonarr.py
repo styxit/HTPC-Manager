@@ -251,7 +251,8 @@ class Sonarr(object):
                 seasoncount += i['seasonCount']
 
                 options = {'ignoreEpisodesWithFiles': False,
-                           'ignoreEpisodesWithoutFiles': False}
+                           'ignoreEpisodesWithoutFiles': False,
+                           'searchForMissingEpisodes': True}
 
                 if monitor == 'all':
                     season_monitoring = True
