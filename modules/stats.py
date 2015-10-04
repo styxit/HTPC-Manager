@@ -6,13 +6,13 @@ import json
 from datetime import datetime
 import socket
 import platform
+import subprocess
 from subprocess import PIPE
 import cherrypy
 import htpc
 import logging
 import os
 import requests
-import time
 from cherrypy.lib.auth2 import require, member_of
 
 logger = logging.getLogger('modules.stats')
@@ -73,7 +73,9 @@ class Stats(object):
                 {'type': 'bool', 'label': 'Enable OHM', 'desc': 'Open Hardware Monitor is used for grabbing hardware info', 'name': 'stats_ohm_enabled'},
                 {'type': 'text', 'label': 'OHM IP', 'placeholder': 'localhost', 'name': 'stats_ohm_ip'},
                 {'type': 'text', 'label': 'OHM port', 'placeholder': '8085', 'desc': '', 'name': 'stats_ohm_port'},
-                {'type': 'bool', 'label': 'Enable S.M.A.R.T.', 'desc': 'smartmontools is used for grabbing HDD health info (python must be executed as administrator)', 'name': 'stats_smart_enabled'}
+                {'type': 'bool', 'label': 'Enable S.M.A.R.T.', 'desc': 'smartmontools is used for grabbing HDD health info (python must be executed as administrator)', 'name': 'stats_smart_enabled'},
+                {'type': 'bool', 'label': 'Enable Scripts', 'desc': 'Add your scripts to userdata/scripts. Must be started with --shell. Dont come crying if you delete your computer', 'name': 'stats_scripts_enabled'}
+
             ]
         })
 
@@ -85,7 +87,8 @@ class Stats(object):
                                                              importPsutilerror=importPsutilerror,
                                                              cmdline=htpc.SHELL,
                                                              importpySMART=importpySMART,
-                                                             importpySMARTerror=importpySMARTerror)
+                                                             importpySMARTerror=importpySMARTerror,
+                                                             scripts=self.list_scripts())
 
     @cherrypy.expose()
     @require()
@@ -607,3 +610,64 @@ class Stats(object):
         else:
             self.logger.debug("Check settings, ohm isn't configured correct")
             return
+
+    @cherrypy.expose()
+    @require()
+    def list_scripts(self):
+        scriptdir = os.path.join(htpc.DATADIR, 'scripts/')
+        scripts = []
+
+        if not os.path.exists(scriptdir):
+            os.makedirs(scriptdir)
+
+        for root, dirs, files in os.walk(scriptdir):
+            for f in files:
+                name, ext = os.path.splitext(f)
+                ext = ext[1:]
+                if ext in ('txt', 'py', 'sh', 'cmd'):
+                    d = {'filename': f,
+                         'fp': os.path.join(scriptdir, f),
+                         'name': name,
+                         'ext': ext}
+
+                    scripts.append(d)
+
+        return scripts
+
+    @cherrypy.expose()
+    @require(member_of('admin'))
+    @cherrypy.tools.json_out()
+    def run_script(self, script, **kwargs):
+        start = time.time()
+        prefix = ''
+        name, ext = os.path.splitext(script)
+
+        if ext == '.py':
+            prefix = 'python'
+        elif ext == '.pl':
+            prefix = 'pearl'
+
+        if prefix:
+            script = '%s %s' % (prefix, script)
+
+        out = error = status = None
+
+        try:
+            p = subprocess.Popen(script, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                 shell=True, cwd=os.path.join(htpc.DATADIR, 'scripts/'))
+
+            out, error = p.communicate()
+            status = p.returncode
+
+            if out:
+                out = out.strip()
+
+            if error:
+                error = error.strip()
+
+        except OSError as out:
+            self.logger.error('Failed to run %s error %s' % (script, out))
+
+        end = time.time() - start
+        d = {'runtime': end, 'result': out, 'exit_status': status}
+        return d

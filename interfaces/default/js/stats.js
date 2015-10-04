@@ -18,6 +18,18 @@ $(document).ready(function () {
             processes();
         });
 
+
+        $('.scriptli').click(function (e) {
+            e.preventDefault();
+            var script = $(this).attr('data-filename');
+            var conf = confirm('Are your sure you want to execute ' + script)
+            if (conf) {
+                runscript(script);
+            }
+            // to stop the tab from exceute
+            return false;
+        });
+
     }
 
     if (importpySMART) {
@@ -411,6 +423,25 @@ function reloadtab() {
        });
    }
    });
+
+    function runscript(s){
+        $.ajax({
+                url: WEBDIR + 'stats/run_script/'+ s,
+                type: 'get',
+                success: function (data) {
+                    if (data.exit_status) {
+                        $('#script-info').html('Failed to run ' + s);
+                        $('#script-result').html('<pre>' + data.result +'</pre>');
+                    }
+                    if (data.result) {
+                        $('#script-result').html('<pre>' + data.result +'</pre>');
+                        $('#script-info').html('<code>'+ s + ' took ' + data.runtime + ' sec</code>');
+
+                    }
+
+                }
+        });
+    }
 
 
     if (location.hash) {

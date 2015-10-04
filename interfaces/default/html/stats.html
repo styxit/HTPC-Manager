@@ -76,11 +76,15 @@ webdir = htpc.WEBDIR
 	% endif
 	% if settings.get('stats_ohm_enabled'):
     <li id="ohm"><a href="#ohm_" data-toggle="tab">Hardware Info</a></li>
-    % endif
+  % endif
 	% if settings.get('stats_smart_enabled'):
 	<li id="smartl"><a href="#smart" data-toggle="tab">S.M.A.R.T.</a></li>
 	% endif
+  % if settings.get('stats_scripts_enabled'):
+  <li id="scriptl"><a href="#scripts" data-toggle="tab">Scripts</a></li>
+  % endif
 	</ul>
+
 
     <div class="tab-content">
 	% if settings.get('stats_psutil_enabled'):
@@ -148,7 +152,7 @@ webdir = htpc.WEBDIR
 
     % if settings.get('stats_smart_enabled'):
 		<div id="smart" class="tab-pane">
-          % if not importpySMART:
+      % if not importpySMART:
 			<div class="row-fluid">
 				<div class="alert alert-error">
 					<h4>smartmontools</h4>
@@ -178,6 +182,25 @@ webdir = htpc.WEBDIR
 		</div>
 		% endif
 
+    % if cmdline:
+    <div id="scripts" class="tab-pane">
+      <div class="tabbable tabs-left hidden-sm hidden-xs">
+        <div class="tabbable">
+          <ul class="nav nav-tabs">
+            <!-- if you know css, please fixme.. -->
+            % for script in scripts:
+              <li class="scriptli" data-name="${script['name']}" data-filename="${script['filename']}" data-ext="${script['ext']}" data-fp="${script['fp']}"><a href="">${script['name']}</a></li>
+            % endfor
+          </ul>
+            <div class="span11">
+                <span id="script-info">Pick one</span>
+                <span id="script-result"></span>
+            </div>
+      </div>
+
+
+    </div> <!-- #scripts -->
+    % endif
     </div>
   </div>
 </div>

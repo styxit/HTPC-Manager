@@ -151,6 +151,11 @@ def main():
     if not os.access(htpc.DATADIR, os.W_OK):
         sys.exit("No write access to userdata folder")
 
+    htpc.SCRIPTDIR = os.path.join(htpc.DATADIR, 'scripts/')
+
+    if not os.path.isdir(htpc.SCRIPTDIR):
+        os.makedirs(htpc.SCRIPTDIR)
+
     from mako.lookup import TemplateLookup
 
     # Enable dev mode if needed
