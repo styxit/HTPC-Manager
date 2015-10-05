@@ -638,36 +638,40 @@ class Stats(object):
     @require(member_of('admin'))
     @cherrypy.tools.json_out()
     def run_script(self, script, **kwargs):
-        start = time.time()
-        prefix = ''
-        name, ext = os.path.splitext(script)
+        if htpc.SHELL:
 
-        if ext == '.py':
-            prefix = 'python'
-        elif ext == '.pl':
-            prefix = 'pearl'
+            prefix = ''
+            name, ext = os.path.splitext(script)
 
-        if prefix:
-            script = '%s %s' % (prefix, script)
+            if ext == '.py':
+                prefix = 'python'
+            elif ext == '.pl':
+                prefix = 'perl'
 
-        out = error = status = None
+            out = error = status = None
 
-        try:
-            p = subprocess.Popen(script, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                 shell=True, cwd=os.path.join(htpc.DATADIR, 'scripts/'))
+            for root, dirs, files in os.walk(htpc.SCRIPTDIR):
+                for f in files:
+                    if script == f:
+                        if prefix:
+                            script = '%s %s' % (prefix, script)
+                        start = time.time()
+                        try:
+                            p = subprocess.Popen(script, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                                 shell=True, cwd=os.path.join(htpc.DATADIR, 'scripts/'))
 
-            out, error = p.communicate()
-            status = p.returncode
+                            out, error = p.communicate()
+                            status = p.returncode
 
-            if out:
-                out = out.strip()
+                            if out:
+                                out = out.strip()
 
-            if error:
-                error = error.strip()
+                            if error:
+                                error = error.strip()
 
-        except OSError as out:
-            self.logger.error('Failed to run %s error %s' % (script, out))
+                        except OSError as out:
+                            self.logger.error('Failed to run %s error %s' % (script, out))
 
-        end = time.time() - start
-        d = {'runtime': end, 'result': out, 'exit_status': status}
-        return d
+                        end = time.time() - start
+                        d = {'runtime': end, 'result': out, 'exit_status': status}
+                        return d
