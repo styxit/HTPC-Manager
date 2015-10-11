@@ -40,7 +40,7 @@ $(document).ready(function () {
     });
 
     tablesorterOptions = {
-        //debug: true,
+        debug: true,
         //theme: 'bootstrap',
         headerTemplate: '{content} {icon}',
         ignoreCase: true,

@@ -47,8 +47,15 @@ function search(query, catid, indexer) {
                     var indexername;
                     // if there are not indexer.item this acts as python continue
                     if (indexer.item == undefined) return true;
-                    if (indexer.title) {
-                        indexername = indexer.title;
+                    if (indexer.title && indexer.title.length) {
+                        indexername = indexer.title.replace('api.', '')
+
+                    } else if (indexer.link){
+                        indexername = indexer.link.replace('https://', '')
+                                                  .replace('http://', '')
+                                                  .replace('/', '')
+                                                  .replace('/api', '')
+                                                  .replace('api.', '')
                     } else {
                         indexername = indexer.description;
                     }
@@ -59,17 +66,19 @@ function search(query, catid, indexer) {
                             stop = 1;
                         }
                         var attributes = []
-                        $.each(item.attr, function (a, attr) {
-                            var name = attr['@attributes']['name'];
-                            var value = attr['@attributes']['value'];
+                        $.each(item['newznab:attr'], function (a, attr) {
+                            console.log(attr)
+                            var name = attr['name'];
+                            var value = attr['value'];
                             attributes[name] = value.replace(/\|/g, ', ');
+
                         });
                         item.attr = attributes;
 
                         var clean_category = item.category.split(' > ')[0].toLowerCase().trim()
 
                         var row = $('<tr>').attr('data-category', clean_category);
-                        var itemlink = $('<a>').attr('href', '#').text(item.description).click(function () {
+                        var itemlink = $('<a>').attr('href', '#').text(item.title).click(function () {
                             showDetails(item, clean_category);
                             return false;
                         });
@@ -84,14 +93,20 @@ function search(query, catid, indexer) {
                         });
 
                         var usenetdate;
-                        if (item.attr['usenetdate']) {
-                            var age = moment(item.attr['usenetdate']).format("YYYY-MM-DD")
-                            var temp = moment().diff(age, 'days')
-                            usenetdate = temp + ' d'
-
+                        if (item.pubDate) {
+                            usenetdate = item.pubDate;
+                            var age = moment(usenetdate).format("YYYY-MM-DD");
+                            var temp = moment().diff(age, 'days');
+                            usenetdate = temp + ' d';
+                        } else if (item.attr['usenetdate']) {
+                            usenetdate = item.attr['usenetdate'];
+                            var age = moment(usenetdate).format("YYYY-MM-DD");
+                            var temp = moment().diff(age, 'days');
+                            usenetdate = temp + ' d';
                         } else {
-                            usenetdate = 'N/A'
+                            usenetdate = 'N/A';
                         }
+
                         row.append($('<td>').append(cat));
                         row.append($('<td>').addClass('right').html(usenetdate));
                         row.append($('<td>').addClass('right').html(bytesToSize(item.attr['size'], 2)));
@@ -108,11 +123,14 @@ function search(query, catid, indexer) {
 
             $('.spinner').hide();
             // update tablesorter, sort on age
-            $('#results_table_body').parent().trigger('update').trigger("sorton", [
+            $('#results_table_body').parent().trigger('update')
+
+            .trigger("sorton", [
                 [
                     [3, 0]
                 ]
             ]);
+
         }
 
     });
@@ -163,7 +181,9 @@ function anc(nzb, clean_category) {
 }
 
 function showDetails(data, category) {
-    var modalTitle = data.description;
+    // grab some stuff from tha api
+    console.log(data)
+    var modalTitle = data.title;
     if (data.attr['imdbtitle']) {
         modalTitle = data.attr['imdbtitle'];
         if (data.attr['imdbyear']) modalTitle += ' (' + data.attr['imdbyear'] + ')';
@@ -171,17 +191,25 @@ function showDetails(data, category) {
         modalTitle = data.attr['artist'] + ' - ' + data.attr['album'];
     }
 
-
-
     var modalImage = '';
     if (data.attr["coverurl"]) {
         var url = WEBDIR + 'newznab/thumb?url=' + data.attr['coverurl'] + '&w=200&h=300&category=';
         var modalImage = $('<div>').addClass('thumbnail pull-left');
         modalImage.append($('<img>').attr('src', url));
-    } else if (data.attr["rageid"]) {
-        var url = WEBDIR + 'newznab/thumb?url=rageid' + data.attr['rageid'] + '&w=200&h=300&category=' + data.category;
+    } else if (data.attr["tvdbid"]) {
+        var url = WEBDIR + 'newznab/thumb?url=tvdbid' + data.attr['tvdbid'] +'&thetvdb='+ data.attr['tvdbid']+ '&w=200&h=300&category=' + data.category;
         var modalImage = $('<div>').addClass('thumbnail pull-left');
         modalImage.append($('<img>').attr('src', url));
+    } else if (data.attr["rageid"]) {
+        var url = WEBDIR + 'newznab/thumb?url=rageid' + data.attr['rageid']  +'&tvrage='+ data.attr['rageid'] + '&w=200&h=300&category=' + data.category;
+        var modalImage = $('<div>').addClass('thumbnail pull-left');
+        modalImage.append($('<img>').attr('src', url));
+        // check for 0000000 because of 6box.me
+    } else if (data.attr["imdb"] && data.attr["imdb"] != 0000000) {
+        var url = WEBDIR + 'newznab/thumb?url=imdb' + data.attr['imdb'] + '&imdb='+ data.attr['imdb']+ '&w=200&h=300&category=' + data.category;
+        var modalImage = $('<div>').addClass('thumbnail pull-left');
+        modalImage.append($('<img>').attr('src', url));
+
     }
 
     var modalInfo = $('<div>').addClass('modal-movieinfo');
@@ -281,14 +309,6 @@ function showDetails(data, category) {
             }
         });
     }
-    if (data.attr['rageid']) {
-        var link = 'http://www.tvrage.com/shows/id-' + data.attr['rageid'];
-        $.extend(modalButtons, {
-            'TVRage': function () {
-                window.open(link, 'TVRage')
-            }
-        });
-    }
 
     if (data.attr['backdropurl']) {
         var url = WEBDIR + 'newznab/thumb?url=' + data.attr['backdropurl'] + '&w=675&h=400&o=20';
@@ -307,7 +327,7 @@ function sendToSab(item, category) {
         dataType: 'json',
         data: {
             nzb_url: item.link,
-            nzb_name: item.description,
+            nzb_name: item.title,
             nzb_category: category
 
         },
@@ -324,7 +344,7 @@ function sendToGet(item, category) {
         dataType: 'json',
         data: {
             nzb_url: item.link,
-            nzb_name: item.description,
+            nzb_name: item.title,
             nzb_category: category
         },
         success: function (result) {
@@ -340,12 +360,12 @@ function sendToclient(item, client, category) {
         dataType: 'json',
         data: {
             nzb_url: item.link,
-            nzb_name: item.description,
+            nzb_name: item.title,
             nzb_category: category
         },
         success: function (result) {
             state = (result) ? 'success' : 'error';
-            notify('', 'Sent ' + item.description + ' to ' + client.client, state);
+            notify('', 'Sent ' + item.title + ' to ' + client.client, state);
         }
     });
 }

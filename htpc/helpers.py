@@ -151,6 +151,7 @@ def cache_resize_image(item):
                 else:
                     im.save(resized, imagetype)
 
+
 @timeit_func
 def cachedprime(urls, headers={}, resize=False, plex_resize=False):
     '''
@@ -378,3 +379,77 @@ def serve_template(name, **kwargs):
         logger.error('%s' % exceptions.text_error_template())
         if htpc.DEV or htpc.LOGLEVEL == 'debug':
             return exceptions.html_error_template().render()
+
+
+def fan_art(id, t='tvshow', wanted_art='tvposter'):
+    assert t in ('tv', 'movies', 'music', 'tvshow')
+
+    possible_image_types = ['movielogo', 'tvposter', 'moviethumb', 'seasonposter', 'seasonbanner',
+                            'hdmovieclearart', 'characterart', 'hdtvlogo', 'hdclearart', 'seasonthumb',
+                            'hdmovielogo', 'movieposter', 'tvbanner', 'moviedisc', 'tvthumb', 'clearart',
+                            'moviebackground', 'movieart', 'showbackground', 'clearlogo', 'moviebanner',
+                            'tvposter', 'movieposter'
+                            ]
+
+    # CBA with hiding the key from the logs
+    url = 'http://webservice.fanart.tv/v3/%s/%s?api_key=%s' % (t, id, htpc.FANART_APIKEY)
+    logger.debug('Looking for images from fanart.tv %s' % url)
+
+    header = {"Content-type": "application/json",
+              "User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36"
+             }
+
+    img_list = []
+
+    try:
+        r = requests.get(url, headers=header)
+
+        result = r.json()
+        for k, v in result.items():
+            if k in possible_image_types or wanted_art == 'all':
+                if k == wanted_art or wanted_art == 'all':
+                    for image in v:
+                        img_list.append(image['url'])
+
+        logger.debug('Found %s images from fanart.tv' % len(img_list))
+        return img_list
+    except Exception as e:
+        logger.error(e)
+        return img_list
+
+
+def tvmaze(_id, img_provider, t):
+    ''' Tries to find any images to a show, if it faileds and the shows has a tvdbid
+        it will call fanart to check There '''
+
+    url = 'http://api.tvmaze.com/lookup/%s?%s=%s' % (t, img_provider, _id)
+    logger.debug('Looking for images from tvmaze %s' % url)
+    img_list = []
+
+    try:
+        r = requests.get(url)
+        result = r.json()
+        if 'image' in result:
+            for k, v in result['image'].items():
+                img_list.append(v)
+
+        if img_list:
+            logger.debug('Found %s images at tvmaze' % len(img_list))
+            return img_list
+        else:
+            # no images, lets try grab the tvdbid
+            if t == 'shows':
+                t = 'tv'
+                img_type = 'tvposter'
+            elif t == 'movies':
+                t = 'movies'
+                img_type = 'movieposter'
+
+            tvdbid = result['external']['thetvdb']
+            fa = fan_art(tvdbid, t=t, wanted_art=img_type)
+            if fa:
+                return fa[0]
+
+    except Exception as e:
+        logger.info('Failed to find any images from tvmaze %s' % e)
+        return img_list

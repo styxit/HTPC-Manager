@@ -3,7 +3,7 @@
 
 import cherrypy
 import htpc
-from htpc.helpers import get_image
+from htpc.helpers import get_image, fan_art, tvmaze
 import urllib2
 import logging
 from cherrypy.lib.auth2 import require, member_of
@@ -146,17 +146,16 @@ class Newznab(object):
         # make the search url
         ssl = 's' if kw.get('newznab_indexer_ssl') == 'on' else ''
 
-        apiurl = 'http%s://%s/api?o=json&apikey=%s&t=' % (ssl, host, kw.get('newznab_indexer_apikey'))
+        apiurl = 'http%s://%s/api?o=xml&apikey=%s&t=' % (ssl, host, kw.get('newznab_indexer_apikey'))
 
         if kw.get('newznab_indexer_id') == "0":
             self.logger.debug("Creating newznab indexer in database")
             try:
-                indexer = NewznabIndexers(
-                        name=kw.get('newznab_indexer_name'),
-                        host=host,
-                        apikey=kw.get('newznab_indexer_apikey'),
-                        use_ssl=kw.get('newznab_indexer_ssl'),
-                        apiurl=apiurl)
+                indexer = NewznabIndexers(name=kw.get('newznab_indexer_name'),
+                                          host=host,
+                                          apikey=kw.get('newznab_indexer_apikey'),
+                                          use_ssl=kw.get('newznab_indexer_ssl'),
+                                          apiurl=apiurl)
 
                 if kw.get('newznab_indexer_apikey') not in htpc.BLACKLISTWORDS:
                     htpc.BLACKLISTWORDS.append(kw.get('newznab_indexer_apikey'))
@@ -188,33 +187,68 @@ class Newznab(object):
 
     @cherrypy.expose()
     @require()
-    def thumb(self, url, h=None, w=None, o=100, category=None):
-        # Fix me?
-        if url.startswith('rageid'):
+    def thumb(self, url='', h=None, w=None, o=100, category=None, **kwargs):
+        ''' If the indexer has a url, it uses that one to download if not it will try to
+            find a url via fanart.tv or tvmaze
+        '''
+        fanart_results = []
+
+        t = None
+        # coverurl is missing..
+        if 'tvrage' in kwargs:
+            t = 'tvrage'
+            _id = kwargs['tvrage']
+            url = None
+        elif 'thetvdb' in kwargs:
+            t = 'thetvdb'
+            _id = kwargs['thetvdb']
+            url = None
+        elif 'imdb' in kwargs:
+            t = 'imdb'
+            _id = kwargs['imdb']
+            url = None
+
+        # do http://omdbapi.com/ aswell?
+        if t:
             if category:
-                try:
-                    cat = category.split('>')[0].lower().strip()
-                    if cat == 'tv':
-                        try:
-                            # Get the image path from tvrage
-                            q_tvrage = 'http://services.tvrage.com/feeds/full_show_info.php?sid=%s' % url[6:]
-                            r = requests.get(q_tvrage)
-                            url = xmltodict.parse(r.content)['Show']['image']
+                cat = category.split('>')[0].lower().strip()
 
-                        except Exception as e:
-                            self.logger.error('failed to fetch image url from tvrage %s' % e)
-                except:
-                    cat = 'tv'
-            else:
-                cat = 'tv'
+                if cat == 'movie':
+                    cat == 'movies'
 
-            if 'www.usenet-crawler' in url:
-                url = 'https://www.usenet-crawler/covers/%s/%s.jpg' % (cat, url[6:])
+            if cat in ('tv', 'movies'):
+                imagetype = None
 
-            if 'api.dognzb' in url:
-                url = 'https://dognzb.cr/content/covers/%s/%s.jpg' % (cat, url[6:])
+                if t in ('thetvdb', 'tvrage'):
+                    imagetype = 'tvposter'
 
-        return get_image(url, h, w, o)
+                elif t == 'imdb':
+                    _id = 'tt%s' % _id
+                    imagetype = 'movieposter'
+
+                # lets try fanart.tv first
+                if t in ('thetvdb', 'imdb'):
+                    fanart_results = fan_art(_id, t=cat, wanted_art=imagetype)
+
+                if len(fanart_results):
+                    url = fanart_results[0]
+                else:
+                    tvmazecomp = {'tv': 'shows',
+                                  'movies': 'movies'}
+                    tvmaze_results = tvmaze(_id, t, tvmazecomp[cat])
+
+                    if len(tvmaze_results):
+                        url = tvmaze_results[0]
+
+            elif cat == 'music':
+                # todo?
+                pass
+            elif cat == 'games':
+                pass
+
+        if url:
+            self.logger.debug('Downloading %s' % url)
+            return get_image(url, h, w, o)
 
     @cherrypy.expose()
     @require()
@@ -246,12 +280,6 @@ class Newznab(object):
         l.append(sab)
         return l
 
-    def cb(self, sess, resp):
-        try:
-            resp.data = resp.json()
-        except Exception as e:
-            pass
-
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
@@ -268,7 +296,7 @@ class Newznab(object):
                 cmd = 'search&q=' + urllib2.quote(q.encode(encoding="UTF-8")) + cat + '&extended=1'
                 u = i.apiurl
                 u += cmd
-
+                u = u.replace('o=json', 'o=xml')
                 job_list.append(u)
         else:
             for i in NewznabIndexers.select():
@@ -276,6 +304,7 @@ class Newznab(object):
                     cmd = 'search&q=' + urllib2.quote(q.encode(encoding="UTF-8")) + cat + '&extended=1'
                     u = i.apiurl
                     u += cmd
+                    u = u.replace('o=json', 'o=xml')
                     job_list.append(u)
 
         result = []
@@ -298,32 +327,17 @@ class Newznab(object):
                 f = []
                 res = future.result()
                 try:
-                    provider_res = res.json()
+                    provider_res = xmltodict.parse(res.content, attr_prefix='')
+                    if provider_res:
+                        if 'rss' in provider_res:
+                            if 'channel' in provider_res['rss']:
+                                    if 'item' in provider_res['rss']['channel']:
+                                        f.append(provider_res['rss']['channel'])
 
-                    # Check for errors:
-                    if provider_res.get('error'):
-                        self.logger.error('Faile to fetch search results from %s. Error msg %s' % (res.url, provider_res.get['error']['@description']))
+                except Exception as e:
+                    self.logger.error(res.url)
+                    self.logger.error(e, exc_info=True)
 
-                    # this will still not work unless they provide some more info
-                    if isinstance(provider_res, list) and 'spotweb' in res.url:
-                        shittyspots = {'description': 'spotweb',
-                                       'item': provider_res}
-                        f.append(shittyspots)
-
-                    else:
-                        f.append(provider_res['channel'])
-                except ValueError:
-                    self.logger.error('Cant decode json')
-                    # Cant decode json. Many indexers defaults to xml on errors
-                    try:
-                        error = xmltodict.parse(res.content)
-                        # See if the error msg exist
-                        if error['error']['@description']:
-                            self.logger.error('%s %s' % (error['error']['@description'], res.url))
-                        else:
-                            self.logger.error('%s' % error)
-                    except Exception as e:
-                        self.logger.error('%s %s' % (e, res.content))
                 result.append(f)
 
         return result
