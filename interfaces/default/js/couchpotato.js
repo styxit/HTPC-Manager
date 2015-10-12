@@ -446,14 +446,14 @@ function getSuggestions() {
             suggestion.append($("<li>").html("No suggestioned movies found"));
             return;
         }
-        $.each(data.suggestions, function(i, m) {
+        $.each(data.movies, function(i, m) {
             var strHTML = $("<a>").attr("href", "#").click(function(c) {
                 c.preventDefault();
                 load_sc(m, cpcat);
             });
             var a = []
             var src = 'holder.js/100x150/text:No artwork'
-            $.each(m.images.poster, function(ii, mm) {
+            $.each(m.info.images.poster, function(ii, mm) {
                 a.push(mm)
             })
 
@@ -462,7 +462,7 @@ function getSuggestions() {
             }
 
             strHTML.append($("<img>").attr("src", src).attr("width", "100").attr("height", "150").addClass("thumbnail"));
-            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(m.original_title, 16)));
+            strHTML.append($("<h6>").addClass("movie-title").html(shortenText(m.info.original_title, 16)));
             suggestion.append($("<li>").attr("id", m.id).append(strHTML));
         });
 
@@ -512,52 +512,49 @@ function getDashboardSoon() {
 // Used for suggestion and charts modal
 function load_sc(movie, was_search) {
     var modalButtons;
-    var info = movie;
-    var plot = movie.plot;
-    var year = movie.year;
 
 
     var src = 'holder.js/154x231/text:No artwork';
-    if (info.images.poster && info.images.poster[0]) {
-        src = WEBDIR + 'couchpotato/GetImage?w=154&h=231&url=' + info.images.poster[0];
+    if (movie.info.images.poster && movie.info.images.poster[0]) {
+        src = WEBDIR + 'couchpotato/GetImage?w=154&h=231&url=' + movie.info.images.poster[0];
     }
     var modalImg = $('<img>').attr('src', src).addClass('thumbnail pull-left');
 
     var modalInfo = $('<div>').addClass('modal-movieinfo');
-    if (info.runtime) {
-        modalInfo.append($('<p>').html('<b>Runtime:</b> ' + parseSec(info.runtime)));
+    if (movie.info.runtime) {
+        modalInfo.append($('<p>').html('<b>Runtime:</b> ' + parseSec(movie.info.runtime)));
     }
-    modalInfo.append($('<p>').html('<b>Plot:</b> ' + plot));
-    if (info.directors) {
-        modalInfo.append($('<p>').html('<b>Director:</b> ' + info.directors));
+    modalInfo.append($('<p>').html('<b>Plot:</b> ' + movie.info.plot));
+    if (movie.info.directors) {
+        modalInfo.append($('<p>').html('<b>Director:</b> ' + movie.info.directors));
     }
-    if (info.genres) {
-        modalInfo.append($('<p>').html('<b>Genre:</b> ' + info.genres));
+    if (movie.info.genres) {
+        modalInfo.append($('<p>').html('<b>Genre:</b> ' + movie.info.genres));
     }
 
-    if (info.rating && info.rating.imdb) {
+    if (movie.info.rating && movie.info.rating.imdb) {
         modalInfo.append(
             $('<div>').raty({
                 readOnly: true,
                 path: null,
-                score: (info.rating.imdb[0] / 2)
+                score: (movie.info.rating.imdb[0] / 2)
             }));
     }
 
     var titles = $('<select>').attr('id', 'titles');
-    if (typeof movie.plot === 'undefined') {
-        $.each(info.titles, function(i, item) {
+    if (typeof movie.info.plot === 'undefined') {
+        $.each(movie.info.titles, function(i, item) {
             titles.append($('<option>').text(item).val(item).prop('selected', item["default"]));
         });
     } else {
-        $.each(info.titles, function(i, item) {
+        $.each(movie.info.titles, function(i, item) {
             titles.append($('<option>').text(item).val(item));
         });
 
     }
 
     profiles.unbind();
-    var title = info.original_title + ' (' + year + ')';
+    var title = movie.info.original_title + ' (' + movie.info.year + ')';
     profiles.change(function() {
         editMovie(movie._id, profiles.val(), titles.val());
     }).val(movie.profile_id);
@@ -574,12 +571,12 @@ function load_sc(movie, was_search) {
             } else {
                 was_search = was_search.val()
             }
-            addMovie(movie.imdb, profiles.val(), titles.val(), was_search);
+            addMovie(movie.info.imdb, profiles.val(), titles.val(), was_search);
             hideModal();
             getMovies("active", $("#wanted-grid"));
         },
         'Ignore': function() {
-            $.get(WEBDIR + "couchpotato/SuggestionIgnore/" + info.imdb, function(data) {
+            $.get(WEBDIR + "couchpotato/SuggestionIgnore/" + movie.info.imdb, function(data) {
                 if (data.result) {
                     notify("Marked", titles.val() + " as ignored", "sucess")
                     getCharts();
@@ -592,7 +589,7 @@ function load_sc(movie, was_search) {
             })
         },
         'Seen it': function() {
-            $.get(WEBDIR + "couchpotato/SuggestionIgnore/?imdb=" + info.imdb + "&seenit=1", function(data) {
+            $.get(WEBDIR + "couchpotato/SuggestionIgnore/?imdb=" + movie.info.imdb + "&seenit=1", function(data) {
                 if (data.result) {
                     notify("Marked ", titles.val() + " as seen", "sucess")
                     getCharts();
@@ -607,10 +604,10 @@ function load_sc(movie, was_search) {
 
     };
 
-    if (info.imdb) {
+    if (movie.info.imdb) {
         $.extend(modalButtons, {
             'IMDb': function() {
-                window.open('http://www.imdb.com/title/' + info.imdb, 'IMDb');
+                window.open('http://www.imdb.com/title/' + movie.info.imdb, 'IMDb');
             }
         });
     }
