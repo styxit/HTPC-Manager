@@ -335,8 +335,7 @@ class Newznab(object):
                                         f.append(provider_res['rss']['channel'])
 
                 except Exception as e:
-                    self.logger.error(res.url)
-                    self.logger.error(e, exc_info=True)
+                    self.logger.error(res.url, e, exc_info=True)
 
                 result.append(f)
 

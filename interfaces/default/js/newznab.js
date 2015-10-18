@@ -60,14 +60,10 @@ function search(query, catid, indexer) {
                         indexername = indexer.description;
                     }
 
+
                     $.each(indexer.item, function (i, item) {
-                        if (item.description == undefined) {
-                            var item = indexer.item;
-                            stop = 1;
-                        }
                         var attributes = []
                         $.each(item['newznab:attr'], function (a, attr) {
-                            console.log(attr)
                             var name = attr['name'];
                             var value = attr['value'];
                             attributes[name] = value.replace(/\|/g, ', ');
@@ -116,7 +112,6 @@ function search(query, catid, indexer) {
 
                         $('#results_table_body').append(row);
 
-                        if (stop) return false;
                     });
                 });
             });
@@ -182,7 +177,6 @@ function anc(nzb, clean_category) {
 
 function showDetails(data, category) {
     // grab some stuff from tha api
-    console.log(data)
     var modalTitle = data.title;
     if (data.attr['imdbtitle']) {
         modalTitle = data.attr['imdbtitle'];
