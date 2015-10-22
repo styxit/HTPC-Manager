@@ -18,7 +18,6 @@ $(document).ready(function () {
             processes();
         });
 
-
         $('.scriptli').click(function (e) {
             e.preventDefault();
             var script = $(this).attr('data-filename');
@@ -406,24 +405,6 @@ function reloadtab() {
    }
    });
 
-   // Used for popen
-    $(document).on('click', '#sendcmd', function(){
-       var i = $('#cmdinput').val();
-       param = {'cmd':i};
-       if (confirm('Are you sure you want to send "'+ i +'" to shell?')) {
-       $.getJSON(WEBDIR + "stats/cmdpopen/",param, function (response) {
-            $.pnotify({
-                title: 'Response',
-                text: response.msg,
-                type: 'success',
-                width: '500px',
-                min_height: '400px'
-            });
-
-       });
-   }
-   });
-
     function runscript(s){
         $.ajax({
                 url: WEBDIR + 'stats/run_script/'+ s,
@@ -434,7 +415,7 @@ function reloadtab() {
                         $('#script-result').html('<pre>' + data.result +'</pre>');
                     }
                     if (data.result) {
-                        $('#script-result').html('<pre>' + data.result +'</pre>');
+                        $('#script-result').html('<pre style=display:table;>' + data.result +'</pre>');
                         $('#script-info').html('<code>'+ s + ' took ' + data.runtime + ' sec</code>');
 
                     }

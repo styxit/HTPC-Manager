@@ -70,18 +70,18 @@ webdir = htpc.WEBDIR
     <ul class="nav nav-tabs">
 	% if settings.get('stats_psutil_enabled'):
       % if importPsutil:
-    <li id="diskl"><a href="#diskt" data-toggle="tab">Disk</a></li>
-    <li id="procl"><a href="#proc" data-toggle="tab">Process</a></li>
+        <li id="diskl"><a href="#diskt" data-toggle="tab">Disk</a></li>
+        <li id="procl"><a href="#proc" data-toggle="tab">Process</a></li>
       %  endif
 	% endif
 	% if settings.get('stats_ohm_enabled'):
     <li id="ohm"><a href="#ohm_" data-toggle="tab">Hardware Info</a></li>
   % endif
 	% if settings.get('stats_smart_enabled'):
-	<li id="smartl"><a href="#smart" data-toggle="tab">S.M.A.R.T.</a></li>
+	 <li id="smartl"><a href="#smart" data-toggle="tab">S.M.A.R.T.</a></li>
 	% endif
   % if settings.get('stats_scripts_enabled'):
-  <li id="scriptl"><a href="#scripts" data-toggle="tab">Scripts</a></li>
+    <li id="scriptl"><a href="#scripts" data-toggle="tab">Scripts</a></li>
   % endif
 	</ul>
 
@@ -127,15 +127,6 @@ webdir = htpc.WEBDIR
                 <tbody id="proclist"></tbody>
                 <div class="procspinner"></div>
             </table>
-            % if cmdline:
-            <div id="statscmd" class="span4">
-                <div class="input-append">
-                    <input id="cmdinput" class="span4" type="text" placeholder="mkdir, dir1"></input>
-                    <button id="sendcmd" data-cmd="popen" class="btn" type="button">Go!</button>
-                </div>
-                <div class="alert helper-block">WARNING! What is written here is passed to the shell! Don't come crying if you delete your hardrive!</div>
-            </div>
-            % endif
             <span id="error_message"></i></span>
         </div>
 	  % endif
@@ -182,10 +173,10 @@ webdir = htpc.WEBDIR
 		</div>
 		% endif
 
-    % if cmdline:
     <div id="scripts" class="tab-pane">
-      <div class="tabbable tabs-left hidden-sm hidden-xs">
-        <div class="tabbable">
+      % if len(scripts):
+      <div class="tabbable tabs-left">
+
           <ul class="nav nav-tabs">
             <!-- if you know css, please fixme.. -->
             % for script in scripts:
@@ -193,14 +184,17 @@ webdir = htpc.WEBDIR
             % endfor
           </ul>
             <div class="span11">
-                <span id="script-info">Pick one</span>
-                <span id="script-result"></span>
+                <div id="script-info">Pick one</div>
+                <div id="script-result"></div>
             </div>
-      </div>
 
-
+      </div> <!-- .tabbable .tabs-left -->
+      % else:
+        <div class="alert alert-info helper-block">
+          You havn't added any scripts to the <code>userdata/scripts</code> folder
+        </div>
+      % endif
     </div> <!-- #scripts -->
-    % endif
     </div>
   </div>
 </div>

@@ -7,7 +7,6 @@ from datetime import datetime
 import socket
 import platform
 import subprocess
-from subprocess import PIPE
 import cherrypy
 import htpc
 import logging
@@ -518,31 +517,6 @@ class Stats(object):
             self.logger.error('Error trying to %s %s' % (cmd, e))
 
     @cherrypy.expose()
-    @require(member_of('admin'))
-    @cherrypy.tools.json_out()
-    def cmdpopen(self, cmd=None):
-        d = {}
-        cmd = cmd.split(', ')
-
-        try:
-            if htpc.SHELL:
-                r = psutil.Popen(cmd, stdout=PIPE, stdin=PIPE, stderr=PIPE, shell=False)
-                msg = r.communicate()
-                d['msg'] = msg
-                self.logger.info(msg)
-                return d
-
-            else:
-                msg = 'HTPC Manager is not started with --shell'
-                self.logger.error(msg)
-                d['msg'] = msg
-                self.logger.error(msg)
-                return d
-
-        except Exception as e:
-            self.logger.error('Sending command from stat module failed: %s' % e)
-
-    @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def smart_info(self):
@@ -638,40 +612,38 @@ class Stats(object):
     @require(member_of('admin'))
     @cherrypy.tools.json_out()
     def run_script(self, script, **kwargs):
-        if htpc.SHELL:
+        prefix = ''
+        name, ext = os.path.splitext(script)
 
-            prefix = ''
-            name, ext = os.path.splitext(script)
+        if ext == '.py':
+            prefix = 'python'
+        elif ext == '.pl':
+            prefix = 'perl'
 
-            if ext == '.py':
-                prefix = 'python'
-            elif ext == '.pl':
-                prefix = 'perl'
+        out = error = status = None
 
-            out = error = status = None
+        for root, dirs, files in os.walk(htpc.SCRIPTDIR):
+            for f in files:
+                if script == f:
+                    if prefix:
+                        script = '%s %s' % (prefix, script)
+                    start = time.time()
+                    try:
+                        p = subprocess.Popen(script, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                             shell=True, cwd=os.path.join(htpc.DATADIR, 'scripts/'))
 
-            for root, dirs, files in os.walk(htpc.SCRIPTDIR):
-                for f in files:
-                    if script == f:
-                        if prefix:
-                            script = '%s %s' % (prefix, script)
-                        start = time.time()
-                        try:
-                            p = subprocess.Popen(script, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                                 shell=True, cwd=os.path.join(htpc.DATADIR, 'scripts/'))
+                        out, error = p.communicate()
+                        status = p.returncode
 
-                            out, error = p.communicate()
-                            status = p.returncode
+                        if out:
+                            out = out.strip()
 
-                            if out:
-                                out = out.strip()
+                        if error:
+                            error = error.strip()
 
-                            if error:
-                                error = error.strip()
+                    except OSError as out:
+                        self.logger.error('Failed to run %s error %s' % (script, out))
 
-                        except OSError as out:
-                            self.logger.error('Failed to run %s error %s' % (script, out))
-
-                        end = time.time() - start
-                        d = {'runtime': end, 'result': out, 'exit_status': status}
-                        return d
+                    end = time.time() - start
+                    d = {'runtime': end, 'result': out, 'exit_status': status}
+                    return d

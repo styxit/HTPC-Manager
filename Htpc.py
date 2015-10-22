@@ -27,7 +27,7 @@ def parse_arguments():
     parser.add_argument('--port', type=int,
                         help='Use a specific port')
     parser.add_argument('--shell', action='store_true', default=False,
-                        help='WARNING! DO NOT USE UNLESS YOU KNOW WHAT .POPEN CAN BE USED FOR (LIKE WIPING YOUR HARDDRIVE).')
+                        help='This argument has has been deprecated')
     parser.add_argument('--daemon', action='store_true', default=False,
                         help='Daemonize process')
     parser.add_argument('--pid', default=False,
@@ -245,9 +245,11 @@ def main():
     # Inititialize root and settings page
     load_modules()
 
+    logger = logging.getLogger('root')
     if args.debug:
-        logger = logging.getLogger('root')
-        logger.warning('Commandline parameter --debug has has been deprecated')
+        logger.warning('Commandline parameter --debug has been deprecated')
+    if args.shell:
+        logger.warning('Shell parameter --shell has been deprecated')
 
     htpc.ARGS = sys.argv
 
