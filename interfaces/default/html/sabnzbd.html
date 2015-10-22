@@ -2,7 +2,7 @@
 <% settings = self.attr.settings %>
 <div class="container-fluid">
     <div class="content maincontent">
-        <h1 class="page-header page-title">
+        <h1 id="sabheader" class="page-header page-title">
             <a href="${webinterface}" target="_blank" title="Open original SABnzbd interface">${settings.get('sabnzbd_name', 'SABnzbd')}</a>
             <small>
                 <strong>Speed:</strong> <span id="queue_speed"></span>
@@ -47,7 +47,7 @@
                         <th>File</th>
                         <th>Status</th>
                         <th>Size</th>
-                        <th>&nbsp;</th>
+                        <th><i id="sabnzbd_clear_history" class="fa fa-trash-o fa-lg"></i></th>
                     </tr>
                     </thead>
                     <tbody id="history_table_body"></tbody>

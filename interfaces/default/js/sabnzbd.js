@@ -12,6 +12,37 @@ $(document).ready(function () {
         $('#sab_pause_for').val('');
     });
 
+    $('#sabnzbd_clear_history').click(function() {
+        var modalButtons = {
+            'Remove all': function() {
+                $.ajax({
+                    'url': WEBDIR + 'sabnzbd/DeleteHistory/all',
+                    'success': function(response) {
+                        if (response.status) {
+                            notify('Info ', 'Removed all nzbs from history', 'success', 5);
+                        } else {
+                            notify('Error ', 'Failed to remove all nzbs from history ', 'error ', 5);
+                        }
+                        hideModal();
+                    }
+                });
+            },
+            'Remove failed ': function() {
+                $.ajax({
+                    'url': WEBDIR + 'sabnzbd/DeleteHistory/failed',
+                    'success ': function(response) {
+                        if (response.status) {
+                            notify('Info ', 'Removed all failed nzbs from history ', 'success ', 5);
+                        } else {
+                            notify('Error ', 'Failed to remove all nzbs from history ' , 'error ', 5);
+                        }
+                    }
+                });
+            }
+        };
+        showModal('History', 'What history do you want to remove?', modalButtons);
+    });
+
     $('#add_nzb_button').click(function (e) {
         // nzb_url, nzb_category
         var nzb_url = $('#nzb_url').val()
@@ -426,4 +457,8 @@ function sabnzbdStatusIcon(iconText, white){
     return icon;
   }
   return '';
+}
+
+function historymodal() {
+
 }

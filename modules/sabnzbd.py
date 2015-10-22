@@ -115,7 +115,7 @@ class Sabnzbd(object):
             nzb_url = nzb_url.replace('amp;', '')
         if nzb_category:
             nzb_category = '&cat=' + nzb_category
-        return self.fetch('&mode=addurl&name=' + quote(nzb_url) + nzb_category)
+        return self.fetch('&mode=addurl&name=' + quote(nzb_url) + nzb_category + '&priority=2')
 
     @cherrypy.expose()
     @require()
