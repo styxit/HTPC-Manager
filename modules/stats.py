@@ -58,7 +58,7 @@ class Stats(object):
         self.last_check_ip = None
         htpc.MODULES.append({
             'name': 'System Info',
-            'description': '<div class="alert alert-block alert-info"><i class="fa fa-info-circle fa-fw"></i> This module shows stats about your HTPC, including CPU usage, HDD space and hardware info.</div>',
+            'description': '<div class="alert alert-block alert-info"><i class="fa fa-info-circle fa-fw"></i> This module shows stats about your HTPC, including CPU usage, HDD space and hardware info. You can also execute scripts and kill processes</div>',
             'id': 'stats',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'stats_enable'},
@@ -73,7 +73,7 @@ class Stats(object):
                 {'type': 'text', 'label': 'OHM IP', 'placeholder': 'localhost', 'name': 'stats_ohm_ip'},
                 {'type': 'text', 'label': 'OHM port', 'placeholder': '8085', 'desc': '', 'name': 'stats_ohm_port'},
                 {'type': 'bool', 'label': 'Enable S.M.A.R.T.', 'desc': 'smartmontools is used for grabbing HDD health info (python must be executed as administrator)', 'name': 'stats_smart_enabled'},
-                {'type': 'bool', 'label': 'Enable Scripts', 'desc': 'Add your scripts to userdata/scripts. Must be started with --shell. Dont come crying if you delete your computer', 'name': 'stats_scripts_enabled'}
+                {'type': 'bool', 'label': 'Enable Scripts', 'desc': 'Add your scripts to userdata/scripts. Dont come crying if you delete your computer', 'name': 'stats_scripts_enabled'}
 
             ]
         })

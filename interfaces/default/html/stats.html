@@ -80,7 +80,7 @@ webdir = htpc.WEBDIR
 	% if settings.get('stats_smart_enabled'):
 	 <li id="smartl"><a href="#smart" data-toggle="tab">S.M.A.R.T.</a></li>
 	% endif
-  % if settings.get('stats_scripts_enabled'):
+  % if settings.get('stats_scripts_enabled', 1):
     <li id="scriptl"><a href="#scripts" data-toggle="tab">Scripts</a></li>
   % endif
 	</ul>
@@ -173,6 +173,7 @@ webdir = htpc.WEBDIR
 		</div>
 		% endif
 
+  % if settings.get('stats_scripts_enabled', 1):
     <div id="scripts" class="tab-pane">
       % if len(scripts):
       <div class="tabbable tabs-left">
@@ -195,6 +196,7 @@ webdir = htpc.WEBDIR
         </div>
       % endif
     </div> <!-- #scripts -->
+    % endif
     </div>
   </div>
 </div>
