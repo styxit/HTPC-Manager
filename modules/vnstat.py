@@ -34,6 +34,7 @@ class Vnstat(object):
                 {'type': 'bool', 'label': 'Use SSH?', 'desc': 'Check this if vnStat is running on a different computer', 'name': 'vnstat_use_ssh'},
                 {'type': 'text', 'label': 'vnStat DB location', 'placeholder': '', 'name': 'vnstat_db', 'desc': 'Only set this if you have changed the default db location'},
                 {'type': 'text', 'label': 'Interface', 'placeholder': 'eth0', 'desc': 'Only grab data from this interface, if omitted it will return all interfaces except from speed witch uses default tr interface', 'name': 'vnstat_interface'},
+                {'type': 'text', 'label': 'IP / Host', 'placeholder': 'localhost', 'name': 'vnstat_interface_speed', 'desc': 'Get current speed from this interface'},
                 {'type': 'text', 'label': 'IP / Host', 'placeholder': 'localhost', 'name': 'vnstat_host'},
                 {'type': 'text', 'label': 'Port', 'name': 'vnstat_port', 'desc': 'Default ssh port is 22'},
                 {'type': 'text', 'label': 'Username', 'name': 'vnstat_username'},
@@ -62,11 +63,13 @@ class Vnstat(object):
 
             if not parameters:
                 return
+            cmd = 'vnstat %s' % parameters
 
             if htpc.settings.get('vnstat_db', ''):
-                cmd = 'vnstat --dbdir %s %s' % (htpc.settings.get('vnstat_db', ''), parameters)
-            else:
-                cmd = 'vnstat %s' % parameters
+                cmd += ' --dbdir %s' % (htpc.settings.get('vnstat_db', ''))
+
+            if htpc.settings.get('vnstat_interface', '') and '-i' not in parameters:
+                cmd += ' -i %s' % htpc.settings.get('vnstat_interface', '')
 
             # Force windows users to use paramiko as here isnt any native ssh.
             if htpc.settings.get('vnstat_use_ssh') or platform.system() == 'win32':
@@ -166,7 +169,7 @@ class Vnstat(object):
     @cherrypy.expose()
     @require()
     def tr(self, dash=False):
-        interface = htpc.settings.get('vnstat_interface', '')
+        interface = htpc.settings.get('vnstat_interface_speed', '')
         if interface:
             piped = self.run('-tr -i %s' % interface)
         else:
