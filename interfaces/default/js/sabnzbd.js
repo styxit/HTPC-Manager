@@ -3,11 +3,13 @@ $(document).ready(function () {
     $('#nzb_pause_button').click(function () {
         var clickItem = $(this);
         clickItem.button('loading');
+        var time = $('#sab_pause_for').val();
         $.ajax({
-            url: WEBDIR + 'sabnzbd/TogglePause?mode='+queueToggleStatusAction,
+            url: WEBDIR + 'sabnzbd/TogglePause?mode='+queueToggleStatusAction + '&time=' + time,
             dataType: 'json',
             type: 'get'
         });
+        $('#sab_pause_for').val('');
     });
 
     $('#add_nzb_button').click(function (e) {
@@ -229,8 +231,9 @@ function loadQueue(once) {
 
             var state = data.status.toLowerCase();
             var formattedState = state.charAt(0).toUpperCase() + state.slice(1);
+            var pausetime = (data.pause_int != '0') ? ' ' + data.pause_int: ''
 
-            $('#queue_state').html(formattedState);
+            $('#queue_state').html(formattedState + pausetime);
             $('#queue_speed').html(data.speed + 'B/Sec');
 
             $('#active_table_body').html('');
