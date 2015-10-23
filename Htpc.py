@@ -85,8 +85,10 @@ def load_modules():
     htpc.ROOT.qbittorrent = Qbittorrent()
     from modules.stats import Stats
     htpc.ROOT.stats = Stats()
-    from modules.tvheadend import TVHeadend
-    htpc.ROOT.tvheadend = TVHeadend()
+    # Commented out since it broken
+    # Its left here incase someone wants to fix it
+    #from modules.tvheadend import TVHeadend
+    #htpc.ROOT.tvheadend = TVHeadend()
     from modules.torrentsearch import Torrentsearch
     htpc.ROOT.torrentsearch = Torrentsearch()
     from modules.plex import Plex

@@ -16,7 +16,7 @@ Start with ```python Htpc.py```
 - Headphones
 - Samsung TV remote
 - SickRage module
-- Torrent search (BTN, Norbits, KAT, rarbg, PTP and YTS)
+- Torrent search (BTN, Norbits, KAT, strike, rarbg, PTP and YTS)
 - vnStat
 - Mylar
 
@@ -33,7 +33,6 @@ Start with ```python Htpc.py```
 - squeezebox
 - Stats
 - Transmission
-- Tvheadend
 - uTorrent
 
 #### [Improvements]
@@ -41,12 +40,14 @@ Start with ```python Htpc.py```
 - NZBGet module (rewritten)
 - qBittorrent module (rewritten)
 - Transmission (add url, upload local torrent)
-- SABnzbd (drag & drop to edit queue)
-- Stats module (Hardware info, S.M.A.R.T report)
-- CouchPotato
-- Plex
+- Deluge (add url/magnet, pause/remove, set limit)
+- SABnzbd (drag & drop to edit queue, pause for xx min, pruge history)
+- Stats module (Hardware info, S.M.A.R.T report, execute scripts)
+- CouchPotato (Suggestions and moar..)
+- Plex (Filter, search, fix duplicated, images, play to device and more)
 - KODI/XBMC addons tab, where you can search/execute/enable/disable addons and a volume slider instead of a progress bar
 - Send a nzb from NZB search to NZBGet in addition to SABnzbd.
+- Usenet (Multi search indexers, support nzedb and spotweb in addition to newznab)
 
 #### [Misc]
 - Notification if a update is available and autoupdate
@@ -61,6 +62,7 @@ Start with ```python Htpc.py```
 - Various fixes
 - Download log
 - Added argsparse (to support python 2.6)
+- And a shit load of other stuff i dont remember
 
 If you're missing something don't be afraid to make a request :)
 
