@@ -229,6 +229,7 @@ function showDetails(data, category) {
         posted = 'N/A'
     }
     modalInfo.append($('<p>').html('<b>Posted:</b> ' + posted));
+    modalInfo.append($('<p>').html('<b>Poster:</b> ' + data.attr['poster']));
     modalInfo.append($('<p>').html('<b>Size:</b> ' + bytesToSize(data.attr['size'])));
     modalInfo.append($('<p>').html('<b>Grabs:</b> ' + data.attr['grabs']));
     if (data.attr['files']) {
