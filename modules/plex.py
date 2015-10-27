@@ -165,7 +165,6 @@ class Plex(object):
             self.logger.error('Unable to fetch recent movies! Exception: %s' % e)
             return
 
-
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
@@ -182,7 +181,6 @@ class Plex(object):
         if use_pil is False:
             disable_pil = True
 
-
         for section in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections' % (plex_host, plex_port), headers=headers)).read())['_children']:
             for item in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/all' % (plex_host, plex_port, section['key']), headers=headers)).read())['_children']:
 
@@ -197,8 +195,6 @@ class Plex(object):
                             r.append(u)
                             resized = '%s_w%s_h%s_o_%s_%s' % (os.path.join(imgdir, h), r[0], r[1], None, None)
                             r.append(resized)
-                            #print r
-                        #print
 
                     d['resize'] = resize_sizes
                     d['hash'] = h
@@ -467,7 +463,7 @@ class Plex(object):
                     if section['type'] == 'show':
                         try:
                             for tvShow in self.JsonLoader(urlopen(Request('http://%s:%s/library/sections/%s/%s' % (plex_host, plex_port, section['key'], f), headers=self.getHeaders())).read())['_children']:
-                            # Only allow unique showname in dupecheck
+                                # Only allow unique showname in dupecheck
                                 if tvShow['title'] not in dupe_check:
                                     dupe_check.append(tvShow['title'])
                                     jshow = {}
@@ -689,11 +685,8 @@ class Plex(object):
                                 jsong['dumpz'] = song
                                 if 'grandparentTitle' or 'title' in song:
                                     jsong['artist'] = song['title']
-                                #jsong['artist'] = song['grandparentTitle'] or song['title']
                                 jsong['label'] = song['title']
-
                                 jsong['album'] = song['parentTitle']
-
                                 jsong['id'] = song['ratingKey']
                                 try:
                                     jsong['duration'] = song['duration'] / 1000
@@ -1248,6 +1241,5 @@ class Plex(object):
                                 d[k] = gen[v]
                             else:
                                 return default
-
 
                     return 'all?%s' % urllib.urlencode(d)

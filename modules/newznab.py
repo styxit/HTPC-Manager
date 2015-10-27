@@ -334,6 +334,9 @@ class Newznab(object):
                                     if 'item' in provider_res['rss']['channel']:
                                         f.append(provider_res['rss']['channel'])
 
+                        if 'error' in provider_res:
+                            self.logger.debug('%s %s' % (provider_res['rss']['channel']['title'], provider_res['error']['description']))
+
                 except Exception as e:
                     self.logger.error(res.url, e, exc_info=True)
 
