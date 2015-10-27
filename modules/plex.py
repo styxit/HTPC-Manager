@@ -819,7 +819,6 @@ class Plex(object):
     @cherrypy.tools.json_out()
     def myPlexSignin(self, username='', password=''):
         try:
-
             username = htpc.settings.get('plex_username', '')
             password = htpc.settings.get('plex_password', '')
 
@@ -841,7 +840,7 @@ class Plex(object):
 
                 # If auth fails, disable the username and password
                 # so account dont get locked
-                if r.getcode() == 404:
+                if r.getcode() == 401:
                     htpc.settings.set('plex_username', '')
                     htpc.settings.set('plex_password', '')
                     return
