@@ -222,7 +222,7 @@ class Headphones(object):
     @cherrypy.expose()
     @require()
     def ForceSearch(self):
-        return self.fetcfh('forceSearch', text=True)
+        return self.fetch('forceSearch', text=True)
 
     @cherrypy.expose()
     @require()
