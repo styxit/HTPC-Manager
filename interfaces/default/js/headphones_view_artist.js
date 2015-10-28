@@ -19,8 +19,7 @@ $(document).ready(function () {
     if(artistimg == "None") {
         $('.artist_img').attr('src', WEBDIR + 'img/no-cover-art.png')
      } else {
-        $('.artist_img').attr('src', WEBDIR + 'headphones/GetThumb/?url=' + encodeURIComponent(artistimg))
-        //$('.album_img').attr('src', WEBDIR + 'headphones/GetThumb/?url=' + albumimg)
+        $('.artist_img').attr('src', WEBDIR + 'headphones/GetThumb?url=' + encodeURIComponent(artistimg))
      }
 
 

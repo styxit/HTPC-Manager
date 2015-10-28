@@ -91,7 +91,7 @@ function loadShow(tvdbid) {
 
             modalContent = $('<div>');
             modalContent.append(
-              $('<img>').attr('src', WEBDIR + 'sickbeard/GetBanner/'+tvdbid).addClass('img-rounded'),
+              $('<img>').attr('src', WEBDIR + 'sickbeard/GetBanner?tvdbid='+tvdbid).addClass('img-rounded'),
               $('<hr>'),
               table
              );

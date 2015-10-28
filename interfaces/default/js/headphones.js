@@ -218,7 +218,7 @@ function loadArtists() {
                     }
 
                     if (artist.ThumbURL) {
-                        image.attr('src', WEBDIR + 'headphones/GetThumb/?thumb=' + artist.ThumbURL)
+                        image.attr('src', WEBDIR + 'headphones/GetThumb?thumb=' + artist.ThumbURL)
 
                     } else {
                         image.attr('src', '../img/no-cover-artist.png').css({'width' : '64px' , 'height' : '64px'}) //TODO
@@ -259,7 +259,7 @@ function loadWanteds() {
                     var row = $('<tr>');
                     var image = $('<img>').addClass('img-polaroid img-rounded')
                     if (wanted.ThumbURL) {
-                        image.attr('src', WEBDIR + 'headphones/GetThumb/?w=150&h=150&thumb=' + encodeURIComponent(wanted.ThumbURL))
+                        image.attr('src', WEBDIR + 'headphones/GetThumb?w=150&h=150&thumb=' + encodeURIComponent(wanted.ThumbURL))
 
                     } else {
                         image.attr('src', '../img/no-cover-artist.png').css({'width' : '75px' , 'height' : '75px'})

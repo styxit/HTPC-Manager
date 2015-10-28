@@ -1,7 +1,7 @@
 $(document).ready(function() {
     var showid = $('h1.page-title').attr('data-showid');
     loadShowData(showid);
-    $('#banner').css('background-image', 'url(' + WEBDIR + 'sickrage/GetBanner/' + showid + ')');
+    $('#banner').css('background-image', 'url(' + WEBDIR + 'sickrage/GetBanner?indexerid=' + showid + ')');
     $('.spinner').show();
 });
 
@@ -350,7 +350,7 @@ function loadShow(data) {
 
     modalContent = $('<div>');
     modalContent.append(
-        $('<img>').attr('src', WEBDIR + 'sickrage/GetBanner/' + data.indexerid).addClass('img-rounded'),
+        $('<img>').attr('src', WEBDIR + 'sickrage/GetBanner/?indexerid=' + data.indexerid).addClass('img-rounded'),
         $('<br>'),
         table);
 

@@ -158,7 +158,7 @@ function loadcomics() {
 
                     if (comic.ComicImageURL) {
                         // ComicImage
-                        image.attr('src', WEBDIR + 'mylar/GetThumb/?thumb=' + comic.ComicImageURL).css({'width' : '64px' , 'height' : '64px'})
+                        image.attr('src', WEBDIR + 'mylar/GetThumb?thumb=' + comic.ComicImageURL).css({'width' : '64px' , 'height' : '64px'})
 
                     } else {
                         image.attr('src', '../img/no-cover-comic.png').css({'width' : '64px' , 'height' : '64px'}) //TODO
@@ -210,7 +210,7 @@ function loadWanteds() {
                     var row = $('<tr>');
                     var image = $('<img>').addClass('img-polaroid img-rounded')
                     if (wanted.ThumbURL) {
-                        image.attr('src', WEBDIR + 'mylar/GetThumb/?w=150&h=150&thumb=' + encodeURIComponent(wanted.ThumbURL))
+                        image.attr('src', WEBDIR + 'mylar/GetThumb?w=150&h=150&thumb=' + encodeURIComponent(wanted.ThumbURL))
 
                     } else {
                         image.attr('src', '../img/no-cover-comic.png').css({'width' : '75px' , 'height' : '75px'})

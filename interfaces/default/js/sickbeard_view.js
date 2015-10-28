@@ -1,7 +1,7 @@
 $(document).ready(function () {
     var showid = $('h1.page-title').attr('data-showid');
     loadShowData(showid);
-    $('#banner').css('background-image', 'url(' + WEBDIR + 'sickbeard/GetBanner/' + showid + ')');
+    $('#banner').css('background-image', 'url(' + WEBDIR + 'sickbeard/GetBanner?tvdbid=' + showid + ')');
 });
 
 function loadShowData(showid){
@@ -84,14 +84,14 @@ function showEpisodeInfo(nShowID, nSeason, nEpisode) {
 			.append($("<tr>")
 				.append($("<td>").html("<b>Description</b>"))
 				.append($("<td>").text(pResult.data.description)));
-				
+
 				if (pResult.data.status == "Downloaded") {
 					strHTML.append($("<tr>")
 						.append($("<td>").html("<b>Air date</b>"))
 						.append($("<td>").text(pResult.data.airdate)))
 					.append($("<tr>")
 						.append($("<td>").html("<b>Quality</b>"))
-						.append($("<td>").text(pResult.data.quality)))						
+						.append($("<td>").text(pResult.data.quality)))
 					.append($("<tr>")
 						.append($("<td>").html("<b>File size</b>"))
 						.append($("<td>").text(pResult.data.file_size_human)))
@@ -99,7 +99,7 @@ function showEpisodeInfo(nShowID, nSeason, nEpisode) {
 						.append($("<td>").html("<b>Location</b>"))
 						.append($("<td>").text(pResult.data.location)));
 				}
-	
+
 		showModal(pResult.data.name, strHTML, []);
 	});
 }

@@ -18,7 +18,7 @@ $(document).ready(function () {
     if(comicimg == "None") {
         $('.comic_img').attr('src', WEBDIR + 'img/no-cover-art.png')
      } else {
-        $('.comic_img').attr('src', WEBDIR + 'mylar/GetThumb/?url=' + encodeURIComponent(comicimg))
+        $('.comic_img').attr('src', WEBDIR + 'mylar/GetThumb?url=' + encodeURIComponent(comicimg))
      }
 
 

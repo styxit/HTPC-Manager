@@ -5,7 +5,7 @@ $(document).ready(function() {
 	 if(albumimg == "None") {
 	 	$('.album_img').attr('src', WEBDIR + 'img/no-cover-art.png')
 	 } else {
-	 	$('.album_img').attr('src', WEBDIR + 'headphones/GetThumb/?url=' + albumimg)
+	 	$('.album_img').attr('src', WEBDIR + 'headphones/GetThumb?url=' + albumimg)
 	 }
 	 // sort tracks desc
 	 $('.tracks-table').trigger("sorton",[[[0,0]]]);

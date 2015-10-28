@@ -44,7 +44,7 @@ function loadShowData(seriesId, tvdbId) {
                         // set the url to the banner so the modal can access it
                         $('h1.page-title').attr('data-bannerurl', cover.url);
                         // Fetch the banner
-                        $('#banner').css('background-image', 'url(' + WEBDIR + 'sonarr/GetBanner/?url=MediaCover/' + tvshow.id + '/banner.jpg)');
+                        $('#banner').css('background-image', 'url(' + WEBDIR + 'sonarr/GetBanner?url=MediaCover/' + tvshow.id + '/banner.jpg)');
                     }
                 });
             }
@@ -171,7 +171,7 @@ function showEpisodeInfo(episodeid, value) {
                 .append($("<td>").text(pResult.path)));
         }
 
-        showModal($('<img>').attr('src', WEBDIR + 'sonarr/GetBanner/?url=MediaCover/' + sid + '/banner.jpg').addClass('img-rounded'),
+        showModal($('<img>').attr('src', WEBDIR + 'sonarr/GetBanner?url=MediaCover/' + sid + '/banner.jpg').addClass('img-rounded'),
         strHTML, []);
     });
 }

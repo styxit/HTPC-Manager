@@ -30,6 +30,7 @@ class KodiServers(SQLObject):
     class sqlmeta:
         fromDatabase = True
 
+
 class Kodi(object):
     def __init__(self):
         """ Add module to list of modules on load and set required settings """
@@ -38,7 +39,7 @@ class Kodi(object):
         KodiServers.createTable(ifNotExists=True)
         try:
             KodiServers.sqlmeta.addColumn(IntCol('starterport'), changeSchema=True)
-        except Exception, e:
+        except:
             # Will always raise if column exist
             pass
 
@@ -256,12 +257,12 @@ class Kodi(object):
             self.logger.debug("Creating kodi-Server in database")
             try:
                 server = KodiServers(name=kodi_server_name,
-                        host=kodi_server_host,
-                        port=int(kodi_server_port),
-                        username=kodi_server_username,
-                        password=kodi_server_password,
-                        mac=kodi_server_mac,
-                        starterport=kodi_server_starterport)
+                                     host=kodi_server_host,
+                                     port=int(kodi_server_port),
+                                     username=kodi_server_username,
+                                     password=kodi_server_password,
+                                     mac=kodi_server_mac,
+                                     starterport=kodi_server_starterport)
 
                 self.changeserver(server.id)
                 htpc.BLACKLISTWORDS.append(kodi_server_password)
@@ -321,7 +322,6 @@ class Kodi(object):
         url = self.url('/images/DefaultVideo.png')
         if thumb:
             url = self.url('/image/' + quote(thumb))
-
         self.logger.debug("Trying to fetch image via %s" % url)
         return get_image(url, h, w, o, mode, self.auth())
 
@@ -503,13 +503,13 @@ class Kodi(object):
         elif addon == 'script.cdartmanager':
             return kodi.Addons.ExecuteAddon('addonid=' + addon, cmd0)
         elif addon == 'plugin.video.twitch':
-            if cmd0: # If search
+            if cmd0:  # If search
                 return kodi.Addons.ExecuteAddon(addon, '/searchresults/'+ cmd0 + '/0' )
-            else: # Open plugin
+            else:  # Open plugin
                 return kodi.Addons.ExecuteAddon(addon, '/')
         elif addon == 'plugin.video.nrk':
             if cmd0:
-                #Does not work in kodi or via this one, think its a addon problem
+                # Does not work in kodi or via this one, think its a addon problem
                 cmd = '/search/%s/1' % cmd0
                 return kodi.Addons.ExecuteAddon(addon, cmd)
             else:
@@ -667,12 +667,12 @@ class Kodi(object):
                 return kodi.Player.Open(item={'partymode': 'audio'})
             elif action == 'getsub':
                 try:
-                    #Frodo
+                    # Frodo
                     return kodi.Addons.ExecuteAddon(addonid='script.kodi.subtitles')
                 except:
                     pass
                 try:
-                    #Gotham
+                    # Gotham
                     return kodi.GUI.ActivateWindow(window='subtitlesearch')
                 except:
                     pass
@@ -762,12 +762,13 @@ class Kodi(object):
         try:
             addr_byte = self.current.mac.split(':')
             hw_addr = struct.pack('BBBBBB',
-            int(addr_byte[0], 16),
-            int(addr_byte[1], 16),
-            int(addr_byte[2], 16),
-            int(addr_byte[3], 16),
-            int(addr_byte[4], 16),
-            int(addr_byte[5], 16))
+                                  int(addr_byte[0], 16),
+                                  int(addr_byte[1], 16),
+                                  int(addr_byte[2], 16),
+                                  int(addr_byte[3], 16),
+                                  int(addr_byte[4], 16),
+                                  int(addr_byte[5], 16))
+
             msg = '\xff' * 6 + hw_addr * 16
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)

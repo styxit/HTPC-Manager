@@ -117,7 +117,7 @@ function loadShow(indexerid) {
 
             modalContent = $('<div>');
             modalContent.append(
-                $('<img>').attr('src', WEBDIR + 'sickrage/GetBanner/' + indexerid).addClass(
+                $('<img>').attr('src', WEBDIR + 'sickrage/GetBanner?indexerid=' + indexerid).addClass(
                     'img-rounded'),
                 $('<hr>'),
                 table);
