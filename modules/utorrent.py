@@ -99,7 +99,7 @@ class UTorrent(object):
     _cookies = None
 
     def __init__(self):
-        self.sess = requests.session()
+        self.sess = requests.Session()
         htpc.MODULES.append({
             'name': 'uTorrent',
             'id': 'utorrent',
@@ -131,12 +131,11 @@ class UTorrent(object):
 
         return url
 
+    @cherrypy.tools.json_out()
     @cherrypy.expose()
     @require()
-    @cherrypy.tools.json_out()
     def torrents(self):
         req = self.fetch('&list=1')
-        # handle this better
         if req:
             torrents = req.json()['torrents']
             return {'torrents': [TorrentResult(tor) for tor in torrents], 'result': req.status_code}
@@ -183,9 +182,9 @@ class UTorrent(object):
     def get_speed_limit(self):
         r = self.do_action('getsettings')
         d = {}
-        if r.json():
+        if r:
             for k in r.json()['settings']:
-                if "max_dl_rate" in k:
+                if 'max_dl_rate' in k:
                     d['dl'] = k[2]
                 elif 'max_ul_rate' in k:
                         d['ul'] = k[2]
@@ -213,7 +212,7 @@ class UTorrent(object):
              utorrent_username='', utorrent_password='', **kwargs):
         logger.debug("Testing uTorrent connectivity")
         try:
-            res = self._fetch(utorrent_host, utorrent_port, utorrent_username, utorrent_password, '?list=1')
+            res = self.fetch('&list=1', host=utorrent_host, port=utorrent_port, username=utorrent_username, password=utorrent_password)
             logger.debug("Trying to contact uTorrent via " + self._get_url(utorrent_host, utorrent_port))
             if res.status_code == 200:
                 return True
@@ -257,14 +256,12 @@ class UTorrent(object):
 
     @cherrypy.expose()
     @require()
-    @cherrypy.tools.json_out()
     def set_upspeed(self, speed, *arg, **kw):
         return self.fetch('&action=setsetting&s=max_ul_rate&v=' + speed)
 
     @cherrypy.expose()
     @require()
-    @cherrypy.tools.json_out()
-    def set_download(self, speed, *arg, **kw):
+    def set_downspeed(self, speed, *arg, **kw):
         return self.fetch('&action=setsetting&s=max_dl_rate&v=' + speed)
 
     def _get_url(self, host=None, port=None):
@@ -279,59 +276,37 @@ class UTorrent(object):
         self._token = AuthTokenParser().token(token_page.content)
         self._cookies = token_page.cookies
         logger.debug('Auth token is %s' % self._token)
+        return self._token
 
-    def _fetch(self, host, port, username, pwd, args):
+    def fetch(self, args, username='', password='', host='', port=''):
         """
-
-        :param host:
-        :param port:
-        :param username:
-        :param pwd:
         :param args:
         :rtype: requests.Response
         :return:
         """
-        if not args:
-            return
+        password = password or htpc.settings.get('utorrent_password', '')
+        username = username or htpc.settings.get('utorrent_username', '')
+        host = host or htpc.settings.get('utorrent_host')
+        port = port or htpc.settings.get('utorrent_port')
 
         token_str = '?token=%s' % self._token
 
         url = self._get_url(host, port) + token_str + args
-        logger.debug('Trying to _fetch %s' % url)
 
         try:
-            response = self.sess.get(self._get_url(host, port) + token_str + args,
-                                     auth=(username, pwd), cookies=self._cookies)
-            return response
+            r = self.sess.get(url, timeout=5, auth=(username, password))
 
-        except Exception as e:
-            logger.error("Fail to get %s exception %s" % (url, e))
-
-    def fetch(self, args):
-        """
-        :param args:
-        :rtype: requests.Response
-        :return:
-        """
-        password = htpc.settings.get('utorrent_password', '')
-        username = htpc.settings.get('utorrent_username', '')
-        host = htpc.settings.get('utorrent_host')
-        port = htpc.settings.get('utorrent_port')
-        try:
-            r = self._fetch(host, port, username, password, args)
             # Api returns 300 if invalid token according to the docs
             # really returns 400
             # Check for a valid http code
-            if r.status_code == 200:
-                return r
-            elif r.status_code == 400:
-                # Fetch a new token
-                self.auth(host, port, username, password)
-                r = self._fetch(host, port, username, password, args)
-            else:
-                # log http status and error message
-                self.logger.error("%s" % r.raise_for_status())
-                return r
+            if r.status_code == 400 and r.content == 'invalid request':
+                token = self.auth(host, port, username, password)
+                if token:
+                    return self.fetch(args)
+
+            elif r.status_code == 200:
+                if r:
+                    return r
 
         except Exception as e:
-            logger.error("Failed to fetch args %s %s" % (args, e))
+            logger.error('Failed to fetch %s with args %s %s' % (url, args, e), exc_info=True)

@@ -3,7 +3,6 @@ $(document).ready(function () {
     $(window).trigger('hashchange');
     getTorrents();
     get_speed_limit()
-    //setAddTorrentModal();
     setInterval(function () {
         getTorrents();
         get_speed_limit();
@@ -54,36 +53,6 @@ $(document).ready(function () {
     });
 });
 
-function setAddTorrentModal(){
-    $('#btnaddtorrent').click(function (e) {
-        e.preventDefault();
-
-        var modalButtons = {
-            'Add': function () {
-                $.ajax(
-                    {
-                        'url' : WEBDIR +'utorrent/add_url/?url=' + encodeURI($('#inputTorrentUrl').val()),
-                        'success' : function(response){
-                            if (response.result == 200)
-                            {
-                                notify('Info', 'Torrent added', 'success', 5);
-                            }
-                            else
-                            {
-                                notify('Error', 'Problem adding torrent', 'error', 5);
-                            }
-                            hideModal();
-                        }
-                    }
-                )
-            }
-        }
-        // Create the content
-
-        var content = '<form id="addTorrentForm"><input id="inputTorrentUrl" type="url" placeholder="Enter the URL" /></form>'
-        showModal("Add a torrent", content, modalButtons);
-    })
-}
 
 function addUrl(url) {
     $.ajax(
@@ -116,7 +85,6 @@ function getTorrents() {
 
                     dl_speed_sum += torrent.dl_speed;
                     up_speed_sum += torrent.up_speed;
-
 
                     var progressText = $('<span>');
                     progressText.text((torrent.percentage_done / 10) + ' %');
