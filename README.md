@@ -41,7 +41,7 @@ Start with ```python Htpc.py```
 - qBittorrent module (rewritten)
 - Transmission (add url, upload local torrent)
 - Deluge (add url/magnet, pause/remove, set limit)
-- SABnzbd (drag & drop to edit queue, pause for xx min, pruge history)
+- SABnzbd (drag & drop to edit queue, pause for x min, purge history)
 - Stats module (Hardware info, S.M.A.R.T report, execute scripts)
 - CouchPotato (Suggestions and moar..)
 - Plex (Filter, search, fix duplicated, images, play to device and more)
@@ -92,3 +92,6 @@ If you still have problems: INCLUDE THIS IN YOUR ISSUE
 3. Start HTPC Manager and wait for error to occur again/reproduce it
 
 
+#### Installation
+
+See the [wiki](https://github.com/Hellowlol/HTPC-Manager/wiki)
