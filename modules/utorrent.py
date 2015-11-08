@@ -211,15 +211,11 @@ class UTorrent(object):
     def ping(self, utorrent_host='', utorrent_port='',
              utorrent_username='', utorrent_password='', **kwargs):
         logger.debug("Testing uTorrent connectivity")
-        try:
-            res = self.fetch('&list=1', host=utorrent_host, port=utorrent_port, username=utorrent_username, password=utorrent_password)
-            logger.debug("Trying to contact uTorrent via " + self._get_url(utorrent_host, utorrent_port))
-            if res.status_code == 200:
-                return True
-            else:
-                return
-        except Exception, e:
-            logger.debug("Exception: %s" % e)
+        res = self.fetch('&list=1', host=utorrent_host, port=utorrent_port, username=utorrent_username, password=utorrent_password)
+        logger.debug("Trying to contact uTorrent via " + self._get_url(utorrent_host, utorrent_port))
+        if res.status_code == 200:
+            return True
+        else:
             logger.error("Unable to contact uTorrent via " + self._get_url(utorrent_host, utorrent_port))
             return
 
@@ -292,6 +288,8 @@ class UTorrent(object):
         token_str = '?token=%s' % self._token
 
         url = self._get_url(host, port) + token_str + args
+
+        logger.debug('Fetching %s' % url)
 
         try:
             r = self.sess.get(url, timeout=5, auth=(username, password))
