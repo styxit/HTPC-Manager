@@ -261,7 +261,8 @@ class Mylar(object):
              mylar_host, mylar_port,
              mylar_basepath,
              mylar_apikey,
-             mylar_ssl=False):
+             mylar_ssl=False,
+             mylar_reverse_proxy_link=None):
 
         url = Mylar._build_url(
             mylar_ssl,
