@@ -249,14 +249,6 @@ function loadQueue(once) {
                 pausedSize = "" + job.PausedSizeHi + job.PausedSizeLo;
                 queuedSize = "" + remainingSize - pausedSize;
 
-                // determine status
-                status = 'Queued';
-                if (job.ActiveDownloads > 0) {
-                    status = 'Downloading';
-                } else if (pausedSize == remainingSize) {
-                    status = 'Paused';
-                }
-
                 var percentage = (100 * (totalSize - queuedSize)) / totalSize;
                 var progressBar = $('<div>');
                 progressBar.addClass('bar');
@@ -264,8 +256,8 @@ function loadQueue(once) {
 
                 var  progress = $('<div>');
                 progress.addClass('progress');
-                if (status == 'Downloading') {
-                    progress.addClass('progress-striped active');
+                if (percentage == 100) {
+                    progress.addClass('progress-success');
                 }
                 progress.append(progressBar);
 
@@ -294,8 +286,7 @@ function loadQueue(once) {
                 var row = $('<tr>');
                 row.attr('data-id', job.LastID)
                 // Job status
-                row.append($('<td>').append(nzbgetStatusLabel(status)));
-
+                row.append($('<td>').append(nzbgetStatusLabel(job.Status)));
 
                 row.append($('<td>').html(job.NZBName));
 
@@ -303,7 +294,7 @@ function loadQueue(once) {
 
                 row.append($('<td>').html(progress));
 
-                if (status == 'Downloading' && downloadSpeed) {
+                if (job.Status == 'DOWNLOADING' && downloadSpeed) {
                     var min = Math.round((remainingSize / downloadSpeed) / 60);
                     var hours = Math.floor(min / 60);
                     min = min - (hours * 60);
@@ -357,27 +348,23 @@ function loadWarnings() {
     });
 }
 function nzbgetStatusLabel(text){
-  var statusOK = ['SUCCESS'];
+  var statusOK = ['SUCCESS', 'DOWNLOADING'];
   var statusInfo = ['Extracting', 'Running','Downloading'];
   var statusError = ['FAILURE'];
   var statusWarning = ['Verifying', 'Repairing', 'NONE'];
 
-  var label = $('<span>').addClass('label btn-info').text(text);
+  var label = $('<span>').addClass('label').text(text);
 
   if (statusOK.indexOf(text) != -1) {
-	label.removeClass('btn-info');
     label.addClass('label-success');
   }
   else if (statusInfo.indexOf(text) != -1) {
-	label.removeClass('btn-info');
     label.addClass('label-info');
   }
   else if (statusError.indexOf(text) != -1) {
-	label.removeClass('btn-info');
     label.addClass('label-important');
   }
   else if (statusWarning.indexOf(text) != -1) {
-	label.removeClass('btn-info');
     label.addClass('label-warning');
   }
 
