@@ -34,7 +34,7 @@ class Vnstat(object):
                 {'type': 'bool', 'label': 'Use SSH?', 'desc': 'Check this if vnStat is running on a different computer', 'name': 'vnstat_use_ssh'},
                 {'type': 'text', 'label': 'vnStat DB location', 'placeholder': '', 'name': 'vnstat_db', 'desc': 'Only set this if you have changed the default db location'},
                 {'type': 'text', 'label': 'Interface', 'placeholder': 'eth0', 'desc': 'Only grab data from this interface, if omitted it will return all interfaces except from speed witch uses default tr interface', 'name': 'vnstat_interface'},
-                {'type': 'text', 'label': 'IP / Host', 'placeholder': 'localhost', 'name': 'vnstat_interface_speed', 'desc': 'Get current speed from this interface'},
+                {'type': 'text', 'label': 'Interface speed', 'placeholder': 'localhost', 'name': 'vnstat_interface_speed', 'desc': 'Get current speed from this interface'},
                 {'type': 'text', 'label': 'IP / Host', 'placeholder': 'localhost', 'name': 'vnstat_host'},
                 {'type': 'text', 'label': 'Port', 'name': 'vnstat_port', 'desc': 'Default ssh port is 22'},
                 {'type': 'text', 'label': 'Username', 'name': 'vnstat_username'},
