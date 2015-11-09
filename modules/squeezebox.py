@@ -30,11 +30,11 @@ class Squeezebox(object):
     @cherrypy.expose()
     @require()
     def index(self):
-        return htpc.LOOKUP.get_template('squeezebox.html').render(scriptname='squeezebox',webinterface=self.webinterface())
+        return htpc.LOOKUP.get_template('squeezebox.html').render(scriptname='squeezebox', webinterface=self.webinterface())
 
     def webinterface(self):
         ip = htpc.settings.get('squeezebox_host')
-        port = htp.settings.get('squeezebox_ip')
+        port = htpc.settings.get('squeezebox_ip')
         url = 'http://%s:%s' % (ip, port)
 
         if htpc.settings.get('squeezebox_reverse_proxy_link'):
@@ -119,15 +119,13 @@ class Squeezebox(object):
         return self.jsonRequest("", ["playlists", "0"])
 
     def webhost(self, path=''):
-        settings = htpc.settings
-        host = striphttp(settings.get('squeezebox_host', ''))
-        port = str(settings.get('squeezebox_port', ''))
+        host = striphttp(htpc.settings.get('squeezebox_host', ''))
+        port = str(htpc.settings.get('squeezebox_port', ''))
         return 'http://' + host + ':' + str(port) + '/' + path
 
     def auth(self):
-        settings = htpc.settings
-        username = settings.get('squeezebox_username', '')
-        password = settings.get('squeezebox_password', '')
+        username = htpc.settings.get('squeezebox_username', '')
+        password = htpc.settings.get('squeezebox_password', '')
         if username and password:
             return base64.encodestring('%s:%s' % (username, password)).strip()
 
