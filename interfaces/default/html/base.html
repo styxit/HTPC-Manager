@@ -15,6 +15,11 @@ webdir = htpc.WEBDIR
         jslogconsole = 1
     else:
         jslogconsole = 0
+
+    if settings.get('app_disable_menu_highlight', True) is True:
+        highlight_menu = 1
+    else:
+        highlight_menu = 0
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -29,6 +34,7 @@ webdir = htpc.WEBDIR
     <script type="text/javascript">var WEBDIR="${htpc.WEBDIR}";</script>
     <script type="text/javascript">var ALLOWIFRAME="${s.get('app_open_otherlink_in_iframe', 'false')}"</script>
     <script type="text/javascript">var JSLOGCONSOLE="${jslogconsole}"</script>
+    <script type="text/javascript">var HIGHLIGHT_MENU="${highlight_menu}"</script>
     <link href="${htpc.WEBDIR}css/bootstrap-slider.css" rel="stylesheet">
     % if s.get('app_use_heavy_font',0):
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/xl.bootstrap.min.css" rel="stylesheet">

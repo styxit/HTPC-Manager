@@ -281,20 +281,23 @@ $(document).ready(function () {
     menu_ordered = ""
     if (menu_order != '0' && menu_order != 'False') {
         menus_to_build = menu_order.split(',')
-        for (x = 0; x < menus_to_build.length; x++) {
+        for (var x = 0; x < menus_to_build.length; x++) {
             if (menus_to_build[x] in menus){
                 menu_ordered += menus[menus_to_build[x]];
                 delete menus[menus_to_build[x]]
             }
         }
     }
-    for (menu_item in menus) {  //build aditional items not in menu_order
+    for (var menu_item in menus) {  //build aditional items not in menu_order
         menu_ordered += menus[menu_item];
     }
     $(".mobile-search").after(menu_ordered)
 
-    path = window.location.href.split("/").slice(0, - 1).pop()
-	$('#nav-'+path).addClass('active')
+    // fiks?
+    if (HIGHLIGHT_MENU == 1) {
+        path = window.location.href.split("/").slice(0, - 1).pop()
+	   $('#nav-'+path).addClass('active')
+    }
 
 
 })

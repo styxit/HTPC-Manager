@@ -45,6 +45,7 @@
                 {'type':'bool', 'label':'Auto update', 'name':'app_auto_update', 'desc':'By enabling this HTPC Manager will update automatically', 'checked': bool(settings.get('app_auto_update', True))},
                 {'type':'bool', 'label':'Enable CDN', 'name':'app_use_cdn', 'desc':'Use CSS/JS files hosted on CDN', 'checked':bool(settings.get('app_use_cdn', False))},
                 {'type':'bool', 'label':'Disable cache after update', 'name':'app_disable_cache_on_update', 'desc':'This option will disable cache for 36 hours after a update', 'checked':bool(settings.get('app_disable_cache_on_update', True))},
+                {'type':'bool', 'label':'Highlight module name in menu', 'name':'app_disable_menu_highlight', 'desc':'', 'checked':bool(settings.get('app_disable_menu_highlight', True))},
                 {'type':'bool', 'label':'Allow iframe', 'name':'app_open_otherlink_in_iframe', 'desc':'Open other links inside HTPC Manager', 'checked':bool(settings.get('app_open_otherlink_in_iframe', False))}
                 ], buttons=[
                         {'name':'Save', 'type':'submit', 'classes':'btn-primary'},
