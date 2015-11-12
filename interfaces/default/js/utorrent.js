@@ -6,7 +6,7 @@ $(document).ready(function () {
     setInterval(function () {
         getTorrents();
         get_speed_limit();
-    }, 4000);
+    }, 8000);
 
     $('#addurlform').submit(function (e) {
         e.preventDefault()

@@ -212,7 +212,6 @@ class UTorrent(object):
              utorrent_username='', utorrent_password='', **kwargs):
         logger.debug("Testing uTorrent connectivity")
         res = self.fetch('&list=1', host=utorrent_host, port=utorrent_port, username=utorrent_username, password=utorrent_password)
-        logger.debug("Trying to contact uTorrent via " + self._get_url(utorrent_host, utorrent_port))
         if res.status_code == 200:
             return True
         else:
@@ -268,7 +267,7 @@ class UTorrent(object):
 
     def auth(self, host, port, username, pwd):
         logger.debug('Fetching auth token')
-        token_page = requests.get(self._get_url(host, port) + 'token.html', auth=(username, pwd))
+        token_page = self.sess.get(self._get_url(host, port) + 'token.html', auth=(username, pwd))
         self._token = AuthTokenParser().token(token_page.content)
         self._cookies = token_page.cookies
         logger.debug('Auth token is %s' % self._token)
@@ -294,13 +293,15 @@ class UTorrent(object):
         try:
             r = self.sess.get(url, timeout=5, auth=(username, password))
 
-            # Api returns 300 if invalid token according to the docs
-            # really returns 400
-            # Check for a valid http code
-            if r.status_code == 400 and r.content == 'invalid request':
+            # Api returns 300 if invalid token according to the docs but it really returns 400
+            # ut 3.4.5 returns 401 when you try to get the token
+            if r.status_code in [401, 400, 300]:
                 token = self.auth(host, port, username, password)
                 if token:
                     return self.fetch(args)
+
+            elif r.status_code == 404:
+                logger.error('Check your settings, invalid username or password')
 
             elif r.status_code == 200:
                 if r:
