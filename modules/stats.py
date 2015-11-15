@@ -598,7 +598,7 @@ class Stats(object):
             for f in files:
                 name, ext = os.path.splitext(f)
                 ext = ext[1:]
-                if ext in ('txt', 'py', 'sh', 'cmd'):
+                if ext in ('bat', 'py', 'sh', 'cmd'):
                     d = {'filename': f,
                          'fp': os.path.join(scriptdir, f),
                          'name': name,
