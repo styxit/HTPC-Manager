@@ -1,4 +1,4 @@
-Hellowlol HTPC Manager fork [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=U3BELJYUPR95U)
+Hellowlol HTPC Manager fork
 
 [![Join the chat at https://gitter.im/Hellowlol/HTPC-Manager](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Hellowlol/HTPC-Manager?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
@@ -16,7 +16,7 @@ Start with ```python Htpc.py```
 - Headphones
 - Samsung TV remote
 - SickRage module
-- Torrent search (BTN, Norbits, KAT, strike, rarbg, PTP and YTS)
+- Torrent search (BTN, Norbits, KAT, strike, rarbg and PTP)
 - vnStat
 - Mylar
 
