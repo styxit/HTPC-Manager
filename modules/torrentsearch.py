@@ -24,7 +24,7 @@ class Torrentsearch(object):
                 {'type': 'bool', 'label': 'Enable', 'name': 'torrentsearch_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'torrentsearch_name'},
                 {'type': 'bool', 'label': 'Enable BTN', 'name': 'torrents_btn_enabled'},
-                {'type': 'password', 'label': 'BTN apikey', 'name': 'torrentsearch_btn_apikey'},
+                {'type': 'password', 'label': 'BTN apikey', 'name': 'torrents_btn_apikey'},
                 {'type': 'bool', 'label': 'Norbits', 'name': 'torrents_norbits_enabled'},
                 {'type': 'text', 'label': 'Norbits username', 'name': 'torrents_norbits_username'},
                 {'type': 'password', 'label': 'Norbits passkey', 'name': 'torrents_norbits_passkey'},
@@ -86,7 +86,7 @@ class Torrentsearch(object):
         result = None
         try:
             btn = jsonrpclib.Server('http://api.btnapps.net')
-            result = btn.getTorrents(htpc.settings.get('torrentsearch_btn_apikey', ''), query, 999)
+            result = btn.getTorrents(htpc.settings.get('torrents_btn_apikey', ''), query, 999)
         except Exception as e:
             self.logger.error("Failed to fetch search results from BTN %s" % e)
             return []
@@ -111,7 +111,7 @@ class Torrentsearch(object):
 
     def torrentproviders(self):
         torrentproviders = []
-        if htpc.settings.get('torrents_btnapikey') and htpc.settings.get('torrents_btn_enabled') == 1:
+        if htpc.settings.get('torrents_btn_apikey') and htpc.settings.get('torrents_btn_enabled') == 1:
             torrentproviders.append('BTN')
 
         if (htpc.settings.get('torrents_norbits_enabled') == 1 and
