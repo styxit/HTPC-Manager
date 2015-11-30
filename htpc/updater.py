@@ -544,7 +544,7 @@ class SourceUpdater():
 
             # Try to remove all old files
             for existing_file in existing_files:
-                if htpc.RUNDIR in existing_file:
+                if htpc.DATADIR in existing_file:
                     continue
 
                 try:
