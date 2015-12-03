@@ -307,7 +307,7 @@ class GitUpdater():
                 # except from the content of htpc.DATADIR and VERSION.txt
                 self.git_exec(self.git, 'clean -d -fx -e %s -e VERSION.txt -e userdata/' % htpc.DATADIR)
             self.logger.warning('Restarting HTPC Manager after update.')
-            htpc.settings.set('app_updated_at', time.time())
+            htpc.settings.set('app_updated_at', str(time.time()))
             # Restart HTPC Manager to make sure all new code is loaded
             do_restart()
 
@@ -470,7 +470,7 @@ class SourceUpdater():
 
         # Restart HTPC Manager to make sure all new code is loaded
         self.logger.warning('Restarting HTPC Manager after update.')
-        htpc.settings.set('app_updated_at', time.time())
+        htpc.settings.set('app_updated_at', str(time.time()))
         do_restart()
 
     def __downloadTar(self, url, destination):
@@ -519,17 +519,29 @@ class SourceUpdater():
 
         self.logger.debug('Overwriting files.')
 
-        try:
-            existing_files = []
-            for src_dir, dirs, files in os.walk(htpc.RUNDIR):
-                for f in files:
-                    existing_files.append(os.path.join(src_dir, f))
+        # Add all existing files and folders to a list
+        # used to clean up old files and folders
+        all_files_n_folders = []
+        for src_dir, dirs, files in os.walk(htpc.RUNDIR):
+            for f in files:
+                if f != 'VERSION.txt' and not f.startswith('.'):
+                    all_files_n_folders.append(os.path.join(src_dir, f))
+            for fd in dirs:
+                all_files_n_folders.append(os.path.join(src_dir, fd))
 
+        try:
             # Loop files and folders and place them in the HTPC Manager path
             for src_dir, dirs, files in os.walk(contentdir):
                 dst_dir = src_dir.replace(contentdir, targetFolder)
+
+                try:
+                    all_files_n_folders.remove(dst_dir)
+                except ValueError:
+                    pass
+
                 if not os.path.exists(dst_dir):
                     os.mkdir(dst_dir)
+
                 for file_ in files:
                     src_file = os.path.join(src_dir, file_)
                     dst_file = os.path.join(dst_dir, file_)
@@ -538,22 +550,24 @@ class SourceUpdater():
                     shutil.move(src_file, dst_dir)
 
                     try:
-                        existing_files.remove(dst_file)
-                    except:
+                        #self.logger.debug('Tried to remove %s from all_files_n_folders' % dst_file)
+                        all_files_n_folders.remove(dst_file)
+                    except ValueError:
                         pass
 
             # Try to remove all old files
-            for existing_file in existing_files:
-                if htpc.DATADIR in existing_file:
+            for existing_file in all_files_n_folders:
+                if htpc.DATADIR in existing_file or '.git' in existing_file:
                     continue
 
                 try:
                     os.remove(existing_file)
-                except:
-                    self.logger.error('Failed to remove unused file %s' % existing_file)
+                    self.logger.debug('Successfully removed %s' % existing_file)
+                except Exception as e:
+                    pass
 
-        except:
-            self.logger.warning('Failed to overwrite old files')
+        except Exception as e:
+            self.logger.warning('Failed to overwrite old files %s' % e)
             self.__finishUpdate()
             return False
 

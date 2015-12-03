@@ -145,7 +145,7 @@ def main():
         ssl._create_default_https_context = ssl._create_unverified_context
 
     # Set datadir, create if it doesn't exist and exit if it isn't writable.
-    htpc.DATADIR = os.path.join(htpc.RUNDIR, 'userdata/')
+    htpc.DATADIR = os.path.join(htpc.RUNDIR, 'userdata')
     if args.datadir:
         htpc.DATADIR = args.datadir
     if not os.path.isdir(htpc.DATADIR):
@@ -153,7 +153,7 @@ def main():
     if not os.access(htpc.DATADIR, os.W_OK):
         sys.exit("No write access to userdata folder")
 
-    htpc.SCRIPTDIR = os.path.join(htpc.DATADIR, 'scripts/')
+    htpc.SCRIPTDIR = os.path.join(htpc.DATADIR, 'scripts')
 
     if not os.path.isdir(htpc.SCRIPTDIR):
         os.makedirs(htpc.SCRIPTDIR)

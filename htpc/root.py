@@ -21,6 +21,7 @@ def do_restart():
     arguments.insert(0, sys.executable)
     if sys.platform == 'win32':
         arguments = ['"%s"' % arg for arg in arguments]
+        
     os.chdir(os.getcwd())
     # Fix for rotation logs on windows
     logging.shutdown()
