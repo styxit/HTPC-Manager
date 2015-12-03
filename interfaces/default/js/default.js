@@ -191,7 +191,7 @@ $(document).ready(function () {
         e.preventDefault()
         var link = $(this)
         // to support tooltip
-        var t = (link.attr('title') == '') ? link.attr('data-original-title') : link.attr('title');
+        var t = (link.attr('title') == '' || typeof(link.attr('title')) == 'undefined') ? link.attr('data-original-title') : link.attr('title');
 
         if (confirm(t + '?')) {
             $.getJSON(link.attr('href'), function(data){
