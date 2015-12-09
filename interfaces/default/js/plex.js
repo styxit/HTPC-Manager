@@ -321,7 +321,7 @@ var episodeLoad = {
 }
 var currentShow = null;
 function loadEpisodes(options) {
-    if (options.f.length) {
+    if (typeof(options.f) != "undefined" && options.f.length) {
         $('#episode-grid').empty();
     }
     if (episodeLoad.last == 0) {
@@ -402,8 +402,9 @@ var artistLoad = {
     limit: 75,
     options: null
 }
+var currentArtist = null
 function loadArtists(options) {
-    if (options.f.length) {
+    if (typeof(options.f) != "undefined" && options.f.length) {
         $('#artist-grid').empty();
     }
     if (artistLoad.last == 0) {
@@ -468,7 +469,7 @@ var albumLoad = {
     artist: null
 }
 function loadAlbums(options) {
-    if (options.f.length){
+    if (typeof(options.f) != "undefined" && options.f.length){
         $('#album-grid').empty();
     }
     if (albumLoad.last == 0) {
@@ -560,18 +561,24 @@ var songsLoad = {
     options: {},
     albumid: ''
 }
+var currentAlbum = null
 function loadSongs(options) {
-    if (options.f.length) {
-        $('#songs-grid tbody').html('');
-    }
-    if (songsLoad.last == 0) {
-        $('#songs-grid').empty();
-    }
-
+    console.log('open')
+    /*
     if (options != undefined) {
+        songsLoad.last = 0
+        $('#songs-grid tbody').empty()
         songsLoad.options = options
+        currentAlbum = options.albumid
     }
+    */
+    // fix scrolling
 
+    var optionstr = JSON.stringify(options);
+    if (songsLoad.options != optionstr) {
+        songsLoad.last = 0;
+    }
+    
     var active = (songsLoad.request!=null && songsLoad.request.readyState!=4)
     if (active || songsLoad.last == -1) return
 
@@ -582,7 +589,7 @@ function loadSongs(options) {
     }
     $.extend(sendData, songsLoad.options)
 
-
+    console.log(sendData)
     $('.spinner').show();
     songsLoad.request = $.ajax({
         url: WEBDIR + 'plex/GetSongs',
@@ -624,6 +631,7 @@ function loadSongs(options) {
             }
         },
         complete: function() {
+            //$('a[href=#songs]').tab('show');
             $('.spinner').hide();
         }
     });
@@ -736,6 +744,7 @@ function reloadTab() {
     } else if ($('#albums').is(':visible')) {
         loadAlbums(options);
     } else if ($('#songs').is(':visible')) {
+        options = $.extend(options, {'albumid': currentAlbum});
         loadSongs(options);
     }
 }
