@@ -531,14 +531,16 @@ function loadAlbums(options) {
                     }
                     albumItem.append($('<img>').attr('src', src).addClass('thumbnail'));
 
-                    var albumCaption = $('<div>').addClass('grid-caption hide').append(
-                        $('<a>').attr('href', '#').append(
+                    var albumCaption = $('<div>').addClass('grid-caption hide').click(function(e) {
+                        e.preventDefault();
+                        loadSongs({'albumid': album.id});
+                        }).
+                        append(
+                            $('<a>').attr('href', '#').append(
                                 $('<h6>').html(album.title),
                                 $('<h6>').html(album.artist).addClass('artist')
-                            ).click(function(e) {
-                                e.preventDefault();
-                                loadSongs({'albumid': album.id});
-                            })
+                        )
+                         
                     )
                     albumItem.append(albumCaption);
                     elem.append(albumItem);
@@ -561,24 +563,27 @@ var songsLoad = {
     options: {},
     albumid: ''
 }
+
 var currentAlbum = null
 function loadSongs(options) {
-    console.log('open')
-    /*
-    if (options != undefined) {
-        songsLoad.last = 0
-        $('#songs-grid tbody').empty()
-        songsLoad.options = options
-        currentAlbum = options.albumid
+    currentAlbum = options.albumid;
+    // clear old results if it was a search
+    if (options.f) {
+        currentAlbum = null
+        $('#songs-grid tbody').empty();
     }
-    */
-    // fix scrolling
 
-    var optionstr = JSON.stringify(options);
+
+    var optionstr = JSON.stringify(options)
     if (songsLoad.options != optionstr) {
-        songsLoad.last = 0;
-    }
-    
+         songsLoad.last = 0;
+         $('#songs-grid tbody').empty();
+     }
+     if (songsLoad.last == 0) {
+        $('#songs-grid tbody').empty();
+     }
+     songsLoad.options = optionstr;
+
     var active = (songsLoad.request!=null && songsLoad.request.readyState!=4)
     if (active || songsLoad.last == -1) return
 
@@ -587,9 +592,8 @@ function loadSongs(options) {
         end: (songsLoad.last + songsLoad.limit),
         albumid: (options && options.albumid ? '' : songsLoad.albumid)
     }
-    $.extend(sendData, songsLoad.options)
+    $.extend(sendData, options)
 
-    console.log(sendData)
     $('.spinner').show();
     songsLoad.request = $.ajax({
         url: WEBDIR + 'plex/GetSongs',
@@ -631,7 +635,7 @@ function loadSongs(options) {
             }
         },
         complete: function() {
-            //$('a[href=#songs]').tab('show');
+            $('a[href=#songs]').tab('show');
             $('.spinner').hide();
         }
     });
