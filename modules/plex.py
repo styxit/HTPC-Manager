@@ -812,8 +812,9 @@ class Plex(object):
     @cherrypy.tools.json_out()
     def myPlexSignin(self, username='', password=''):
         try:
-            username = htpc.settings.get('plex_username', '')
-            password = htpc.settings.get('plex_password', '')
+
+            username = username or htpc.settings.get('plex_username', '')
+            password = password or htpc.settings.get('plex_password', '')
 
             if username and password:
                 self.logger.debug('Fetching auth token')
@@ -828,32 +829,27 @@ class Plex(object):
                 headers['X-Plex-Client-Platform'] = platform.system()
                 headers['X-Plex-Platform-Version'] = platform.version()
                 headers['X-Plex-Provides'] = 'controller'
-                r = Request('https://plex.tv/users/sign_in.xml', data='', headers=headers)
-                r = urlopen(r)
+                r = requests.post('https://plex.tv/users/sign_in.xml', headers=headers)
 
-                # If auth fails, disable the username and password
-                # so account dont get locked
-                if r.getcode() == 401:
+                if not r:
+                    r.raise_for_status()
+                else:
+                    compiled = re.compile('<authentication-token>(.*)<\/authentication-token>', re.DOTALL)
+                    authtoken = compiled.search(r.content).group(1).strip()
+
+                    if authtoken is not None:
+                        htpc.settings.set('plex_authtoken', authtoken)
+                        return authtoken
+                    else:
+                        self.logger.debug('Failed to get the myPlex token')
+
+        except Exception as e:
+            self.logger.error('Failed to get authtoken from plex %s' % e)
+            if r.status_code == 401:
+                    self.logger.debug('Clearing myplex token, username and password since authorization was denied')
+                    htpc.settings.set('plex_authtoken', '')
                     htpc.settings.set('plex_username', '')
                     htpc.settings.set('plex_password', '')
-                    return
-
-                compiled = re.compile('<authentication-token>(.*)<\/authentication-token>', re.DOTALL)
-                authtoken = compiled.search(r.read()).group(1).strip()
-
-                if authtoken is not None:
-                    htpc.settings.set('plex_authtoken', authtoken)
-                    return 'Logged in to myPlex'
-                else:
-                    return 'Failed to loggin to myPlex'
-            else:
-                if not htpc.settings.get('plex_authtoken', ''):
-                    htpc.settings.set('plex_authtoken', '')
-                    self.logger.debug('Removed myPlex Token')
-                return
-        except Exception as e:
-            self.logger.error('Exception: %s' % e)
-            return 'Failed to login to myPlex: %s' % str(e)
 
     def getHeaders(self):
         if self.headers is None:
@@ -1148,7 +1144,7 @@ class Plex(object):
                    }
             play = 'playback/playMedia%s' % joinArgs(arg)
             playcommand = b_url + play
-            r = requests.get(playcommand, headers=self.getHeaders())
+            requests.get(playcommand, headers=self.getHeaders())
             self.logger.debug("playcommand is %s" % playcommand)
 
         except Exception as e:
