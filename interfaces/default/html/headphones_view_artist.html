@@ -68,6 +68,7 @@
                     <thead>
                     <tr>
                         <th>Title</th>
+                        <th>Type</th>
                         <th>Release Date</th>
                         <th>Status</th>
                         <th>Action</th>
@@ -79,6 +80,7 @@
                         <td class="artist"><a href="${self.attr.webdir}headphones/viewAlbum/${album['AlbumID']}">
                             ${album['AlbumTitle']}
                         </a></td>
+                        <td>${album['Type']}</td>
                         <td>${album['ReleaseDate']}</td>
                         <td>${album['StatusText']}</td>
                         <td>
