@@ -14,8 +14,10 @@ $(document).ready(function () {
         var albumId = $parentRow.attr('data-albumid');
         var name = $(this).parents('tr').find('.artist').text();
         unquealbum(albumId, name);
-
     })
+    //Sort albums table on album type
+    $('.albums-table').trigger("sorton",[[[1,0]]]);
+    
     if(artistimg == "None") {
         $('.artist_img').attr('src', WEBDIR + 'img/no-cover-art.png')
      } else {
