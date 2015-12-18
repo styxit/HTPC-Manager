@@ -250,8 +250,11 @@ def resize_image(img, height, width, opacity, mode, dest):
     try:
         imagetype = imghdr.what(img)
         im = Image.open(img)
-    except IOError:
-        logger.error('Failed to open image %s dest %s' % (img, dest))
+    except IOError as e:
+        logger.error('Failed to open image %s dest %s %s' % (img, dest, e))
+        return
+    except Exception as e:
+        logger.error('%s %s %s' % (img, dest, e))
         return
 
     # Only resize if needed
