@@ -283,6 +283,9 @@ settings = self.attr.settings
     if (${int(settings.get('dash_wanted_albums', 0))}){
         modules['dash_wanted_albums'] = "loadWantedAlbums";
     }
+    if (${int(settings.get('dash_wanted_albums_list', 0))}){
+        modules['dash_wanted_albums_list'] = "loadWantedAlbumsList";
+    }
     if (${int(settings.get('dash_disks', 0))}){
         modules['dash_disks'] = "loaddiskinfo";
     }
