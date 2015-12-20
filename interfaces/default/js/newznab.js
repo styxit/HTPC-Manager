@@ -104,9 +104,6 @@ function search(query, catid, indexer) {
 			else if(main_category == 7) {
 			    var clean_category = "other"
 			}
-			else {
-			    var clean_category
-			}
 			// Subcategories
 			// 7020 = ebook
 			// 7030 = comics
@@ -115,9 +112,6 @@ function search(query, catid, indexer) {
 			}
 			else if(item.attr['category'] == 7030) {
 			    var clean_category = "comics"
-			}
-			else {
-			    var clean_category
 			}
 
                         var row = $('<tr>').attr('data-category', clean_category);
