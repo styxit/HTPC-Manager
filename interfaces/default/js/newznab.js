@@ -71,7 +71,48 @@ function search(query, catid, indexer) {
                         });
                         item.attr = attributes;
 
+			// First, assign download client category based on each individual usenet indexer
                         var clean_category = item.category.split(' > ')[0].toLowerCase().trim()
+			// Second, try to match with the newznab default to make it uniform across all indexers
+			// Maincategories
+			// 1 = console
+			// 2 = movies
+			// 3 = audio
+			// 4 = pc
+			// 5 = tv
+			// 6 = xxx
+			// 7 = other
+			var main_category = item.attr['category'].split("0",1)
+			if(main_category == 1) {
+			    clean_category = "console"
+			}
+			else if(main_category == 2) {
+			    clean_category = "movies"
+			}
+			else if(main_category == 3) {
+			    clean_category = "audio"
+			}
+			else if(main_category == 4) {
+			    clean_category = "pc"
+			}
+			else if(main_category == 5) {
+			    clean_category = "tv"
+			}
+			else if(main_category == 6) {
+			    clean_category = "xxx"
+			}
+			else if(main_category == 7) {
+			    clean_category = "other"
+			}
+			// Subcategories
+			// 7020 = ebook
+			// 7030 = comics
+			if(item.attr['category'] == 7020) {
+			    clean_category = "ebook"
+			}
+			else if(item.attr['category'] == 7030) {
+			    clean_category = "comics"
+			}
 
                         var row = $('<tr>').attr('data-category', clean_category);
                         var itemlink = $('<a>').attr('href', '#').text(item.title).click(function () {
