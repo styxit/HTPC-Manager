@@ -1,7 +1,7 @@
 var row_n = 0
 
 function loadWantedAlbumsList() {
-    if (!$('#wantedalbums_table_body').length) return
+    if (!$('#wantedalbumslist_table_body').length) return
     $.getJSON(WEBDIR + 'headphones/GetWantedList', function (data) {
         if (data == null) {
             $('#wantedalbumslist_table_body').append(
