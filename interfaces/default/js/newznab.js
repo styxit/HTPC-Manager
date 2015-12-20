@@ -84,34 +84,34 @@ function search(query, catid, indexer) {
 			// 7 = other
 			var main_category = item.attr['category'].split("0",1)
 			if(main_category == 1) {
-			    var clean_category = "console"
+			    clean_category = "console"
 			}
 			else if(main_category == 2) {
-			    var clean_category = "movies"
+			    clean_category = "movies"
 			}
 			else if(main_category == 3) {
-			    var clean_category = "audio"
+			    clean_category = "audio"
 			}
 			else if(main_category == 4) {
-			    var clean_category = "pc"
+			    clean_category = "pc"
 			}
 			else if(main_category == 5) {
-			    var clean_category = "tv"
+			    clean_category = "tv"
 			}
 			else if(main_category == 6) {
-			    var clean_category = "xxx"
+			    clean_category = "xxx"
 			}
 			else if(main_category == 7) {
-			    var clean_category = "other"
+			    clean_category = "other"
 			}
 			// Subcategories
 			// 7020 = ebook
 			// 7030 = comics
 			if(item.attr['category'] == 7020) {
-			    var clean_category = "ebook"
+			    clean_category = "ebook"
 			}
 			else if(item.attr['category'] == 7030) {
-			    var clean_category = "comics"
+			    clean_category = "comics"
 			}
 
                         var row = $('<tr>').attr('data-category', clean_category);
