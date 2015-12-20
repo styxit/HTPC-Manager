@@ -195,6 +195,21 @@ settings = self.attr.settings
                 </div>
             </div>
             %endif
+            %if settings.get('dash_wanted_albums_list', 0):
+            <div class="span4 dash-module" id="dash_wanted_albums_list">
+                <h3><a href="headphones/#wanted">Wanted Albums</a></h3>
+                <table class="table table-striped table-main">
+                    <thead>
+                        <tr>
+                            <th>Artist</th>
+                            <th>Album</th>
+                            <th>ReleaseDate</th>
+                        </tr>
+                    </thead>
+                    <tbody id="wantedalbums_table_body"></tbody>
+                </table>
+            </div>
+            %endif
             <div id="notConfigured">
                 <div class="row-fluid">
                         <h1 class="page-header page-title">
