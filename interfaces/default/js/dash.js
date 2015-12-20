@@ -398,7 +398,7 @@ function loadsonarrCalendar(options) {
             row.append(
             $('<td>').append(name),
             $('<td>').html('S' + pad(cal.seasonNumber, 2) + 'E' + pad(cal.episodeNumber, 2) + '&nbsp').append(img),
-            $('<td>').text(moment(cal.airDateUtc).fromNow())
+            $('<td>').addClass('pull-right').text(moment(cal.airDateUtc).fromNow())
             )
 
             $('#calendar_table_body').append(row);
@@ -439,7 +439,7 @@ function loadNextAiredSickrage(options) {
                 $('<tr>').append(
                     $('<td>').append(name),
                     $('<td>').html(tvshow.ep_name),
-                    $('<td>').addClass('alignright').html(tvshow.airdate)
+                    $('<td>').addClass('pull-right').html(tvshow.airdate)
                 )
             )
 
