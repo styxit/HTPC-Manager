@@ -1,5 +1,31 @@
 var row_n = 0
 
+function loadWantedAlbumsList() {
+    if (!$('#wantedalbums_table_body').length) return
+    $.getJSON(WEBDIR + 'headphones/GetWantedList', function (data) {
+        if (data == null) {
+            $('#wantedalbumslist_table_body').append(
+                $('<tr>').append($('<td>').html('No wanted albums found').attr('colspan', '2')),
+                $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
+                $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
+                $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
+                $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2'))
+            )
+            return
+        }
+        $.each(data, function(i, albums) {
+	    if (i >= 5) return
+            $('#wantedalbumslist_table_body').append(
+                $('<tr>').append(
+                    $('<td>').html(albums.ArtistName),
+		    $('<td>').html(albums.AlbumTitle),
+                    $('<td>').addClass('alignright').html(albums.ReleaseDate)
+                )
+            )
+        })
+    })
+}
+
 function loadWantedAlbums () {
     if (!$('#headphones-carousel').length) return
     $.get(WEBDIR + 'headphones/GetWantedList', function (data) {
@@ -79,6 +105,7 @@ function loadRecentMovies () {
         $('#movie-carousel').show()
     })
 }
+
 function loadRecentTVshows () {
     if (!$('#tvshow-carousel').length) return
     $.getJSON(WEBDIR + 'kodi/GetRecentShows', function (data) {
@@ -113,6 +140,7 @@ function loadRecentTVshows () {
         $('#tvshow-carousel').show()
     })
 }
+
 function loadRecentAlbumsOld () {
     if (!$('#albums-content').length) return
     $.getJSON(WEBDIR + 'kodi/GetRecentAlbums/4', function (data) {
@@ -202,6 +230,7 @@ function loadRecentMoviesPlex () {
         $('#movie-carousel-plex').show()
     })
 }
+
 function loadRecentTVshowsPlex () {
     if (!$('#tvshow-carousel-plex').length) return
     $.getJSON(WEBDIR + 'plex/GetRecentShows', function (data) {
@@ -229,6 +258,7 @@ function loadRecentTVshowsPlex () {
         $('#tvshow-carousel-plex').show()
     })
 }
+
 function loadRecentAlbumsPlex () {
     if (!$('#albums-content-plex').length) return
     $.getJSON(WEBDIR + 'plex/GetRecentAlbums', function (data) {
@@ -260,6 +290,7 @@ function loadRecentAlbumsPlex () {
         $('#albums-content-plex').parent().show()
     })
 }
+
 function loadDownloadHistory() {
     if (!$('#downloads_table_body').length) return
     $.getJSON(WEBDIR + 'sabnzbd/GetHistory?limit=5', function (data) {
@@ -277,6 +308,7 @@ function loadDownloadHistory() {
         })
     })
 }
+
 function loadNZBGetDownloadHistory() {
     if (!$('#nzbgetdownloads_table_body').length) return;
     $.getJSON(WEBDIR + 'nzbget/GetHistory', function (data) {
@@ -299,6 +331,7 @@ function loadNZBGetDownloadHistory() {
         });
     });
 }
+
 function loadWantedMovies() {
     if (!$('#wantedmovies_table_body').length) return
     $.getJSON(WEBDIR + 'couchpotato/GetMovieList/active/5', function (result) {
@@ -322,6 +355,7 @@ function loadWantedMovies() {
         })
     })
 }
+
 function loadNextAired(options) {
     if (!$('#nextaired_sickbeard_table_body').length) return
     $.getJSON(WEBDIR + 'sickbeard/GetNextAired', function (result) {
@@ -405,7 +439,7 @@ function loadNextAiredSickrage(options) {
                 $('<tr>').append(
                     $('<td>').append(name),
                     $('<td>').html(tvshow.ep_name),
-                    $('<td>').html(tvshow.airdate)
+                    $('<td>').addClass('alignright').html(tvshow.airdate)
                 )
             )
 
@@ -419,9 +453,7 @@ function dasherror(i, msg){
     $('#' + i).html('')
     var t = "<table class='table table-striped'><tr><td>"+ msg + "</td></tr></table>"
     $('#' + i).append(h, t)
-
 }
-
 
 function loadsysinfo(options) {
     start_refresh('sysinfo','loadsysinfo');
@@ -513,7 +545,6 @@ function loadsmartinfo() {
         }
     });
 }
-
 
 // For hdd. Converts bytes to filesize in kb,mb,gb
  function getReadableFileSizeStringHDD(fileSizeInBytes) {
