@@ -38,7 +38,9 @@ def start():
 
     # Wrap htpc manager in secure headers.
     # http://cherrypy.readthedocs.org/en/latest/advanced.html#securing-your-server
-    cherrypy.tools.secureheaders = cherrypy.Tool('before_finalize', secureheaders, priority=60)
+    if htpc.settings.get('app_use_secure_headers', True):
+        cherrypy.tools.secureheaders = cherrypy.Tool('before_finalize', secureheaders, priority=60)
+        cherrypy.config.update({'tools.secureheaders.on': True})
 
     # Enable auth if username and pass is set, add to db as admin
     if htpc.USERNAME and htpc.PASSWORD:
@@ -136,8 +138,7 @@ def start():
             'tools.encode.on': True,
             'tools.encode.encoding': 'utf-8',
             'tools.gzip.on': True,
-            'tools.gzip.mime_types': ['text/html', 'text/plain', 'text/css', 'text/javascript', 'application/json', 'application/javascript'],
-            'tools.secureheaders.on': True
+            'tools.gzip.mime_types': ['text/html', 'text/plain', 'text/css', 'text/javascript', 'application/json', 'application/javascript']
 
         },
         '/js': {

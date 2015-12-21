@@ -117,3 +117,9 @@
 	background-size: 100% 100%;
     background-repeat: no-repeat;
 }
+
+#dash_smart .table,
+#dash_sysinfo .table,
+#dash_disks .table{
+  table-layout: auto !important;
+}

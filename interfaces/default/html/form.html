@@ -21,10 +21,9 @@ settings =  htpc.settings
                 ##<% placeholder = field.get('placeholder') if field.get('placeholder') else '' %>
                 <input type="${field.get('type')}" name="${field.get('name')|h, entity}" id="${field.get('name')|h, entity}" autocapitalize="off" value="${value|h, entity}"/>
                 % elif field.get('type') == 'bool':
-                <% checked = field.get('checked') if field.get('checked') else settings.get(field.get('name')) %>
-                <input type="checkbox" name="${field.get('name')|h, entity}" id="${field.get('name')|h, entity}"${
-                ' checked="checked"' if checked else ''}${
-                ' class="enable-module"' if field.get('name').endswith('enable') else ''}/>
+                <% checked = 'checked' if field.get('checked') else '' %>
+                <input type="checkbox" name="${field.get('name')|h, entity}" id="${field.get('name')|h, entity}"
+                ${' class="enable-module"' if field.get('name').endswith('enable') else ''} ${checked}/>
                 % elif field.get('type') == 'select':
                 <select name="${field.get('name')|h, entity}" id="${field.get('name')|h, entity}">
                     % for option in field.get('options'):

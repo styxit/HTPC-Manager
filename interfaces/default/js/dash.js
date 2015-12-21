@@ -592,11 +592,11 @@ function loadqbit() {
                     numberofloop += 1;
                     if (numberofloop <= max) {
                         tr.append(
-                        $('<td>').addClass('span5 qbt_name').html(torrent.name),
-                        $('<td>').addClass('qbit_eta alignright').text(torrent.eta));
+                        $('<td>').addClass('qbt_name').html(torrent.name),
+                        $('<td>').addClass('qbit_eta pull-right').text(torrent.eta));
                         $('#dash_qbit_table_body').append(tr);
                     } else {
-                        tr.append($('<td>').addClass('span6 aligncenter').attr("colspan",2).html("<small>" + (i - max) + " more torrents</small>"))
+                        tr.append($('<td>').addClass('span6 pull-right').attr("colspan",2).html("<small>" + (i - max) + " more torrents</small>"))
                         $('#dash_qbit_table_body').append(tr);
                         return false;
                     }
