@@ -3,11 +3,17 @@ $(document).ready(function () {
     var albumid = $('h1.page-title').attr('data-albumid');
     var artistimg = $('h1.page-title').attr('data-artistimg');
     //$('#banner').css('background-image', 'url(' + WEBDIR + 'headphones/GetThumb/?url=' + artistimg + ')'); // encodeURIComponent should resize img?
-    $('#album-tracks .btn-search').click(function () {
+    $('#album-tracks .search-album-hp').click(function () {
         var $parentRow = $(this).parents('tr')
         var albumId = $parentRow.attr('data-albumid');
         var name = $(this).parents('tr').find('.artist').text();
         searchForAlbum(albumId, name);
+    })
+    $('#album-tracks .trynew-album-hp').click(function () {
+        var $parentRow = $(this).parents('tr')
+        var albumId = $parentRow.attr('data-albumid');
+        var name = $(this).parents('tr').find('.artist').text();
+        searchForNewDownload(albumId, name);
     })
     $('#album-tracks .unque-album-hp').click(function () {
         var $parentRow = $(this).parents('tr')
@@ -23,7 +29,6 @@ $(document).ready(function () {
      } else {
         $('.artist_img').attr('src', WEBDIR + 'headphones/GetThumb?url=' + encodeURIComponent(artistimg))
      }
-
 
 });
 
@@ -42,7 +47,36 @@ function searchForAlbum(albumId, name) {
             notify('OK', 'Found ' + name + ' album', 'success');
         },
         error: function (data) {
-            notify('Error', 'Episode not found.', 'error', 1);
+            notify('Error', 'Album not found.', 'error', 1);
+        },
+        complete: function (data) {
+            hideModal();
+            // Hate the reload but content is rendered from mako
+            location.reload()
+        }
+    });
+}
+
+function searchForNewDownload(albumId, name) {
+    var modalcontent = $('<div>');
+    modalcontent.append($('<p>').html('Looking for album &quot;'+ name +'&quot;.'));
+    modalcontent.append($('<div>').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'));
+    showModal('Searching for new album download "'+ name + '"', modalcontent, {});
+
+    $.ajax({
+        url: WEBDIR + 'headphones/QueueAlbum',
+        data: {
+			'albumId': albumId,
+			'new': 'True'
+			},
+        type: 'get',
+        dataType: 'json',
+        timeout: 40000,
+        success: function (data) {
+            notify('OK', 'Found ' + name + ' album', 'success');
+        },
+        error: function (data) {
+            notify('Error', 'Album not found.', 'error', 1);
         },
         complete: function (data) {
             hideModal();

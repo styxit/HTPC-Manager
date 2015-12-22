@@ -2,6 +2,7 @@ $(document).ready(function () {
     $(window).trigger('hashchange');
     loadArtists();
     loadWanteds();
+    loadUpcoming();
     loadHistory();
 
     var searchAction = function () {
@@ -37,43 +38,9 @@ $(document).ready(function () {
     $('.headphones_forceprocess').click(function(e) {
         e.preventDefault();
         Postprocess();
-    });
-
-    $('#album-tracks .btn-search').click(function () {
-        var $parentRow = $(this).parents('tr')
-        var albumId = $parentRow.attr('data-albumid');
-        var name = $(this).parents('tr').find('.artist').text();
-        searchForAlbum(albumId, name);
     })
+    
 });
-
-function searchForAlbum(albumId, name) {
-    var modalcontent = $('<div>');
-    modalcontent.append($('<p>').html('Looking for album &quot;'+ name +'&quot;.'));
-    modalcontent.append($('<div>').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'));
-    showModal('Searching for album "'+ name + '"', modalcontent, {});
-
-    $.ajax({
-        url: WEBDIR + 'headphones/QueueAlbum?albumId=' + albumId,
-        type: 'get',
-        dataType: 'json',
-        timeout: 40000,
-        success: function (data) {
-            // If result is not 'succes' it must be a failure
-            if (data.result != 'success') {
-                notify('Error', data.message, 'error');
-            } else {
-                notify('OK', name + ' ' + season + 'x'+episode+' found. ' + data.message, 'success');
-            }
-        },
-        error: function (data) {
-            notify('Error', 'Episode not found.', 'error', 1);
-        },
-        complete: function (data) {
-            hideModal();
-        }
-    });
-}
 
 function beginRefreshArtist(artistId) {
     var $div = $('div').html('Refreshing artist');
@@ -148,9 +115,6 @@ function searchForArtist(name, type) {
                     $('#add_artist_select').append(option);
                 });
             }
-
-
-
             $('#add_artist_name').hide();
             $('#cancel_artist_button').show();
             $('#add_artist_select').fadeIn();
@@ -201,6 +165,9 @@ function loadArtists() {
                     var name = $('<a>')
                         .attr('href',WEBDIR + 'headphones/viewArtist/' + artist.ArtistID)
                         .text(artist.ArtistName);
+                    var albumname = $('<a>')
+                        .attr('href',WEBDIR + 'headphones/viewAlbum/' + artist.AlbumID)
+                        .text(artist.LatestAlbum);
                     var row = $('<tr>')
 
                     var isError = artist.ArtistName.indexOf('Fetch failed') != -1;
@@ -229,7 +196,7 @@ function loadArtists() {
                     row.append(
                         $('<td>').append(div),
                         $('<td>').html(name),
-                        $('<td>').append(artist.LatestAlbum),
+                        $('<td>').html(albumname),
                         $('<td>').append(artist.ReleaseDate),
                         $statusRow
                     );
@@ -263,44 +230,32 @@ function loadWanteds() {
 
                     } else {
                         image.attr('src', '../img/no-cover-artist.png').css({'width' : '75px' , 'height' : '75px'})
-
                     }
 
-                    //var buttons = $('<div>').addClass('btn-group')
-                    var remove = $('<a class="btn btn-mini btn-cancel" title="Set Skipped"><i class="fa fa-step-forward"></i></a></td>').click(function () {
+                    var remove = $('<a class="btn btn-mini btn-cancel" title="Set skipped"><i class="fa fa-step-forward"></i></a></td>').click(function () {
                                 $.ajax({
                                     url: WEBDIR + 'headphones/UnqueueAlbum',
                                     data: {'albumId': wanted.AlbumID},
                                     type: 'get',
                                     complete: function (result) {
                                         loadWanteds()
-                                        notify('Set Skipped', wanted.ArtistName + ' - ' + wanted.AlbumTitle);
+                                        notify('Skipped', wanted.ArtistName + ' - ' + wanted.AlbumTitle, 'success');
                                     }
                                 })
                             })
-                    var search = $('<a class="btn btn-mini" title="Set wanted"><i class="fa fa-heart"></i></a></td>').click(function () {
+                    var force = $('<a class="btn btn-mini" title="Force search"><i class="fa fa-search"></i></a></td>').click(function () {
                                 $.ajax({
                                     url: WEBDIR + 'headphones/QueueAlbum',
                                     data: {'albumId': wanted.AlbumID},
                                     type: 'get',
                                     complete: function (result) {
-                                        notify('Set wanted', wanted.ArtistName + ' - ' + wanted.AlbumTitle);
-                                    }
-                                })
-                            })
-                    var force = $('<a class="btn btn-mini" title="Force Check"><i class="fa fa-search"></i></a></td>').click(function () {
-                                $.ajax({
-                                    url: WEBDIR + 'headphones/QueueAlbum&new=True',
-                                    data: {'albumId': wanted.AlbumID},
-                                    type: 'get',
-                                    complete: function (result) {
-                                        notify('Force Check', wanted.ArtistName + ' - ' + wanted.AlbumTitle);
+                                    	loadWanteds()
+                                        notify('Force search for', wanted.ArtistName + ' - ' + wanted.AlbumTitle, 'success');
                                     }
                                 })
                             })
 
-
-                    var div = $('<div>').addClass('btn-group').append(search, force, remove);
+                    var div = $('<div>').addClass('btn-group').append(force, remove);
                     row.append(
                         $('<td>').append(
                             $('<a>')
@@ -313,27 +268,108 @@ function loadWanteds() {
                                 .attr('href', WEBDIR + 'headphones/viewAlbum/' + wanted.AlbumID)
                                 .text(wanted.AlbumTitle)),
                         $('<td>').text(wanted.ReleaseDate),
+                        $('<td>').text(wanted.Type),
                         $('<td>').append(headphonesStatusLabel(wanted.Status)),
                         $('<td>').append(div)
-                        /*
-                        $('<td><a class="btn btn-mini"><i class="fa fa-minus-circle"></i></a></td>')
-
-
-                                $.get(WEBDIR + 'headphones/UnqueueAlbum', {'albumId': wanted.AlbumID}, function(r) {
-                                    alert(r);
-                                    if (r === "OK") {
-                                        $(this).closest('tr').remove();
-                                    }
-                                });
-
-                            })
-                        */
 
                     );
                     $('#wanted_table_body').append(row);
                 });
-                $('#wanteds_table_body').parent().trigger('update');
-                $('#wanteds_table_body').parent().trigger("sorton",[[[0,0]]]);
+                $('#wanted_table_body').parent().trigger('update');
+                // Sort on release date, latest releases on top
+                $('#wanted_table_body').parent().trigger("sorton",[[[2,1]]]);
+            }
+        }
+    })
+}
+
+function loadUpcoming() {
+    // Clear it incase off reload
+    $('#upcoming_table_body').empty();
+    $.ajax({
+        url: WEBDIR + 'headphones/GetUpcomingList',
+        type: 'get',
+        dataType: 'json',
+        success: function (result) {
+            if (result.length == 0) {
+                var row = $('<tr>')
+                row.append($('<td>').attr('colspan', '5').html('No upcoming albums found'));
+                $('#upcoming_table_body').append(row);
+            } else {
+                $.each(result, function (index, upcoming) {
+                    var row = $('<tr>');
+                    var image = $('<img>').addClass('img-polaroid img-rounded')
+                    if (upcoming.ThumbURL) {
+                        image.attr('src', WEBDIR + 'headphones/GetThumb?w=150&h=150&thumb=' + encodeURIComponent(upcoming.ThumbURL))
+
+                    } else {
+                        image.attr('src', '../img/no-cover-artist.png').css({'width' : '75px' , 'height' : '75px'})
+                    }
+
+                    var remove = $('<a class="btn btn-mini btn-cancel" title="Set skipped"><i class="fa fa-step-forward"></i></a></td>').click(function () {
+                                $.ajax({
+                                    url: WEBDIR + 'headphones/UnqueueAlbum',
+                                    data: {'albumId': upcoming.AlbumID},
+                                    type: 'get',
+                                    complete: function (result) {
+                                        loadUpcoming()
+                                        notify('Skipped', upcoming.ArtistName + ' - ' + upcoming.AlbumTitle, 'success');
+                                    }
+                                })
+                            })
+                    var search = $('<a class="btn btn-mini" title="Set wanted and search"><i class="fa fa-heart"></i></a></td>').click(function () {
+                                $.ajax({
+                                    url: WEBDIR + 'headphones/QueueAlbum',
+                                    data: {'albumId': upcoming.AlbumID},
+                                    type: 'get',
+                                    complete: function (result) {
+                                    	loadUpcoming()
+                                        notify('Set wanted and search for', upcoming.ArtistName + ' - ' + upcoming.AlbumTitle, 'success');
+                                    }
+                                })
+                            })
+                    var force = $('<a class="btn btn-mini" title="Force search"><i class="fa fa-search"></i></a></td>').click(function () {
+                                $.ajax({
+                                    url: WEBDIR + 'headphones/QueueAlbum',
+                                    data: {'albumId': upcoming.AlbumID},
+                                    type: 'get',
+                                    complete: function (result) {
+                                    	loadUpcoming()
+                                        notify('Force search for', upcoming.ArtistName + ' - ' + upcoming.AlbumTitle, 'success');
+                                    }
+                                })
+                            })
+                        
+			if (upcoming.Status == 'Wanted') {
+			var div = $('<div>').addClass('btn-group').append(force, remove);
+			} else if (upcoming.Status == 'Skipped') {
+			var div = $('<div>').addClass('btn-group').append(search, force);
+			} else {
+			var div = $('<div>').addClass('btn-group').append(search, force, remove);
+			}
+			
+                    	row.append(
+                        $('<td>').append(
+                            $('<a>')
+                                .addClass('headphones_upcoming_artistname')
+                                .attr('href', WEBDIR + 'headphones/viewArtist/' + upcoming.ArtistID)
+                                .text(upcoming.ArtistName)),
+                        $('<td>').append(
+                            $('<a>')
+                                .addClass('headphones_upcoming_artistalbum')
+                                .attr('href', WEBDIR + 'headphones/viewAlbum/' + upcoming.AlbumID)
+                                .text(upcoming.AlbumTitle)),
+                        $('<td>').text(upcoming.ReleaseDate),
+		                $('<td>').text(upcoming.Type),
+                        $('<td>').append(headphonesStatusLabel(upcoming.Status)),
+                        $('<td>').append(div)
+
+                    );
+                    $('#upcoming_table_body').append(row);
+                });
+                $('#upcoming_table_body').parent().trigger('update');
+                // Sort on release date, show albums with closest releasedate to now first
+                $('#upcoming_table_body').parent().trigger("sorton",[[[2,0]]]);
             }
         }
     })
@@ -352,34 +388,31 @@ function loadHistory() {
             }
             $.each(result, function(i, item) {
                 var row = $('<tr>');
+                var retry = $('<a class="btn btn-mini" title="Try new download, if available"><i class="fa fa-repeat"></i></a></td>').click(function () {
+                            $.ajax({
+                                url: WEBDIR + 'headphones/QueueAlbum',
+                                data: {
+				'albumId': item.AlbumID,
+				'new': 'True'
+				},
+                                type: 'get',
+                                complete: function (result) {
+                                    notify('Try new download, if available', 'success');
+                                }
+                            })
+                        })
+		if (item.Status == 'Snatched') {
+		var div = $('<div>').addClass('btn-group').append(retry);
+		} else if (item.Status == 'Unprocessed') {
+		var div = $('<div>').addClass('btn-group').append(retry);
+		} else {
+		var div = ''
+		}
                 row.append(
                     $('<td>').html(item.DateAdded),
                     $('<td>').html(item.Title),
-                    $('<td>').html(headphonesStatusLabel(item.Status))
-                );
-                $('#history_table_body').append(row);
-            });
-        }
-    });
-}
-
-function loadHistory() {
-    $.ajax({
-        url: WEBDIR + 'headphones/GetHistoryList',
-        type: 'get',
-        dataType: 'json',
-        success: function(result) {
-            if (result.length === 0) {
-                var row = $('<tr>')
-                row.append($('<td>').html('History is empty'));
-                $('#history_table_body').append(row);
-            }
-            $.each(result, function(i, item) {
-                var row = $('<tr>');
-                row.append(
-                    $('<td>').html(item.DateAdded),
-                    $('<td>').html(item.Title),
-                    $('<td>').html(headphonesStatusLabel(item.Status))
+                    $('<td>').html(headphonesStatusLabel(item.Status)),
+                    $('<td>').append(div)
                 );
                 $('#history_table_body').append(row);
             });
@@ -389,9 +422,9 @@ function loadHistory() {
 
 function headphonesStatusLabel(text) {
     var statusOK = ['Active', 'Downloaded', 'Processed'];
-    var statusInfo = ["Wanted"];
+    var statusInfo = ['Wanted'];
     var statusError = ['Paused', 'Unprocessed'];
-    var statusWarning = ['Skipped', 'Custom', 'Snatched'];
+    var statusWarning = ['Snatched'];
 
     var label = $('<span>').addClass('label').text(text);
 
@@ -420,7 +453,7 @@ var headphonesStatusMap = {
     'Snatched': 'fa fa-share-alt',
     'Skipped': 'fa fa-fast-forward',
     'Wanted': 'fa fa-heart',
-    'Processed': 'fa fa-ok',
+    'Processed': 'fa fa-check',
     'Unprocessed': 'fa fa-exclamation'
 }
 function headphonesStatusIcon(iconText, white){

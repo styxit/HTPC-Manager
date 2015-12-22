@@ -7,8 +7,5 @@ $(document).ready(function() {
 	 } else {
 	 	$('.album_img').attr('src', WEBDIR + 'headphones/GetThumb?url=' + albumimg)
 	 }
-	 // sort tracks desc
-	 $('.tracks-table').trigger("sorton",[[[0,0]]]);
-
 })
 

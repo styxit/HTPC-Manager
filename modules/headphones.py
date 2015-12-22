@@ -71,6 +71,8 @@ class Headphones(object):
         for a in response['albums']:
             a['StatusText'] = _get_status_icon(a['Status'])
             a['can_download'] = True if a['Status'] not in ('Downloaded', 'Snatched', 'Wanted') else False
+            a['can_skip'] = True if a['Status'] not in ('Downloaded', 'Snatched', 'Skipped') else False
+            a['can_trynew'] = True if a['Status'] in ('Snatched') else False
 
         template = htpc.LOOKUP.get_template('headphones_view_artist.html')
 

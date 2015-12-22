@@ -1,5 +1,31 @@
 var row_n = 0
 
+function loadUpcomingAlbumsList() {
+    if (!$('#upcomingalbumslist_table_body').length) return
+    $.getJSON(WEBDIR + 'headphones/GetUpcomingList', function (data) {
+        if (data == null) {
+            $('#upcomingalbumslist_table_body').append(
+                $('<tr>').append($('<td>').html('No upcoming albums found').attr('colspan', '2')),
+                $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
+                $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
+                $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
+                $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2'))
+            )
+            return
+        }
+        $.each(data, function(i, albums) {
+	    if (i >= 5) return
+            $('#upcomingalbumslist_table_body').append(
+                $('<tr>').append(
+                    $('<td>').html(albums.ArtistName),
+		    $('<td>').html(albums.AlbumTitle),
+                    $('<td>').append($('<div class="pull-right">').html(albums.ReleaseDate))
+                )
+            )
+        })
+    })
+}
+
 function loadWantedAlbumsList() {
     if (!$('#wantedalbumslist_table_body').length) return
     $.getJSON(WEBDIR + 'headphones/GetWantedList', function (data) {
@@ -19,7 +45,7 @@ function loadWantedAlbumsList() {
                 $('<tr>').append(
                     $('<td>').html(albums.ArtistName),
 		    $('<td>').html(albums.AlbumTitle),
-                    $('<td>').addClass('alignright').html(albums.ReleaseDate)
+                    $('<td>').append($('<div class="pull-right">').html(albums.ReleaseDate))
                 )
             )
         })
@@ -349,7 +375,7 @@ function loadWantedMovies() {
             $('#wantedmovies_table_body').append(
                 $('<tr>').append(
                     $('<td>').html(item.info.original_title),
-                    $('<td>').addClass('alignright').html(item.info.year)
+                    $('<td>').append($('<div class="pull-right">').html(item.info.year))
                 )
             )
         })
@@ -379,7 +405,7 @@ function loadNextAired(options) {
                 $('<tr>').append(
                     $('<td>').append(name),
                     $('<td>').html(tvshow.ep_name),
-                    $('<td>').html(tvshow.airdate)
+                    $('<td>').append($('<div class="pull-right">').html(tvshow.airdate))
                 )
             )
         })
@@ -398,7 +424,7 @@ function loadsonarrCalendar(options) {
             row.append(
             $('<td>').append(name),
             $('<td>').html('S' + pad(cal.seasonNumber, 2) + 'E' + pad(cal.episodeNumber, 2) + '&nbsp').append(img),
-            $('<td>').addClass('pull-right').text(moment(cal.airDateUtc).fromNow())
+            $('<td>').append($('<div class="pull-right">').text(moment(cal.airDateUtc).fromNow()))
             )
 
             $('#calendar_table_body').append(row);
@@ -439,7 +465,7 @@ function loadNextAiredSickrage(options) {
                 $('<tr>').append(
                     $('<td>').append(name),
                     $('<td>').html(tvshow.ep_name),
-                    $('<td>').addClass('pull-right').html(tvshow.airdate)
+                    $('<td>').append($('<div class="pull-right">').html(tvshow.airdate))
                 )
             )
 

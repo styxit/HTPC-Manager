@@ -86,14 +86,20 @@
                         <td>
                             <div class="btn-group">
                             % if album['can_download'] is True:
-                            <a class="btn btn-mini btn-search" title="Set as wanted">
+                            <a class="btn btn-mini search-album-hp" title="Set as wanted and search">
                                 <i class="fa fa-heart fa-fw"></i>
                             </a>
                             % endif
+                            % if album['can_skip'] is True:
                             <a class="btn btn-mini unque-album-hp" title="Set as skipped">
                                 <i class="fa fa-step-forward fa-fw"></i>
                             </a>
-
+                            % endif
+                            % if album['can_trynew'] is True:
+                            <a class="btn btn-mini trynew-album-hp" title="Try new download">
+                                <i class="fa fa-repeat fa-fw"></i>
+                            </a>
+                            % endif
                             </div>
                         </td>
                     </tr>

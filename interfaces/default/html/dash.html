@@ -25,13 +25,13 @@
                 </div>
             </div>
             %endif
-			%if settings.get('dash_rec_music_old', 0):
+	    %if settings.get('dash_rec_music_old', 0):
             <div class="span4 dash-module" id="dash_rec_music_old">
                 <h3><a href="kodi/#music">Latest Music</a></h3>
                 <ul id="albums-content" class="media-list"></ul>
             </div>
             %endif
-			%if settings.get('dash_rec_music', 0):
+	    %if settings.get('dash_rec_music', 0):
             <div class="span4 dash-module" id="dash_rec_music">
                 <h3><a href="kodi/#music">Latest Albums</a></h3>
                 <div id="music-carousel" class="carousel slide hide">
@@ -209,6 +209,21 @@
                 </table>
             </div>
             %endif
+            %if settings.get('dash_upcoming_albums_list', 0):
+            <div class="span4 dash-module" id="dash_upcoming_albums_list">
+                <h3><a href="headphones/#upcoming">Upcoming Albums</a></h3>
+                <table class="table table-striped table-main">
+                    <thead>
+                        <tr>
+                            <th>Artist</th>
+                            <th>Album</th>
+                            <th>ReleaseDate</th>
+                        </tr>
+                    </thead>
+                    <tbody id="upcomingalbumslist_table_body"></tbody>
+                </table>
+            </div>
+            %endif
             <div id="notConfigured">
                 <div class="row-fluid">
                         <h1 class="page-header page-title">
@@ -284,6 +299,9 @@
     }
     if (${int(settings.get('dash_wanted_albums_list', 0))}){
         modules['dash_wanted_albums_list'] = "loadWantedAlbumsList";
+    }
+    if (${int(settings.get('dash_upcoming_albums_list', 0))}){
+        modules['dash_upcoming_albums_list'] = "loadUpcomingAlbumsList";
     }
     if (${int(settings.get('dash_disks', 0))}){
         modules['dash_disks'] = "loaddiskinfo";
