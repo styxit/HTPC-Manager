@@ -151,6 +151,12 @@ class Headphones(object):
     @require()
     def GetWantedList(self):
         return self.fetch('getWanted')
+        
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    @require()
+    def GetUpcomingList(self):
+        return self.fetch('getUpcoming')
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
