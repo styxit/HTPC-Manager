@@ -97,7 +97,7 @@ class Newznab(object):
         return
 
     @cherrypy.expose()
-    @require(member_of("admin"))
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def changeindexer(self, id=0):
         try:
@@ -116,7 +116,7 @@ class Newznab(object):
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
-    @require(member_of("admin"))
+    @require(member_of(htpc.role_admin))
     def setindexer(self, **kw):
         """
         newznab_enable='',

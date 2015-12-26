@@ -3,7 +3,7 @@
 
 import cherrypy
 import htpc
-from cherrypy.lib.auth2 import require
+from cherrypy.lib.auth2 import require, member_of
 import requests
 import urllib
 import logging
@@ -92,7 +92,7 @@ class Sonarr(object):
             self.logger.error('Failed to fetch url=%s path=%s error %s' % (url, path, e))
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     def Version(self, sonarr_host, sonarr_port, sonarr_basepath, sonarr_apikey, sonarr_ssl=False, **kwargs):
         try:
             ssl = 's' if sonarr_ssl else ''
@@ -130,7 +130,7 @@ class Sonarr(object):
         return self.fetch('Series/%s' % id)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def Delete_Show(self, id, title, delete_date=None):
         self.logger.debug('Deleted tvshow %s' % title)
@@ -198,7 +198,7 @@ class Sonarr(object):
         return self.fetch('profile')
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def Command(self, **kwargs):
         k = kwargs
         cherrypy.response.headers['Content-Type'] = 'application/json'
@@ -288,7 +288,7 @@ class Sonarr(object):
             self.logger.error('Failed to add tvshow %s %s' % (tvdbid, e))
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def test(self):
         tvshow = self.fetch('Series/lookup?term=tvdbid:70327')

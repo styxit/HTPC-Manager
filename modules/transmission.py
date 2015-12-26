@@ -3,12 +3,10 @@
 
 import cherrypy
 import htpc
-import urllib2
 import requests
-import base64
-from json import loads, dumps
+from json import dumps
 import logging
-from cherrypy.lib.auth2 import require
+from cherrypy.lib.auth2 import require, member_of
 from htpc.helpers import fix_basepath, striphttp
 
 
@@ -54,7 +52,7 @@ class Transmission(object):
         return self.fetch('session-stats')
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def ping(self, **kwargs):
         ''' Test connection to Transmission '''
@@ -104,7 +102,7 @@ class Transmission(object):
         return self.fetch('session-get')
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def set_downspeed(self, speed):
         if int(speed) == 0:
@@ -112,7 +110,7 @@ class Transmission(object):
         return self.fetch('session-set', {'speed-limit-down': int(speed), 'speed-limit-down-enabled': True})
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def set_upspeed(self, speed):
         if int(speed) == 0:
@@ -121,7 +119,7 @@ class Transmission(object):
             return self.fetch('session-set', {'speed-limit-up': int(speed), 'speed-limit-up-enabled': 'true'})
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def start(self, torrentId=False):
         if torrentId is False:
@@ -134,7 +132,7 @@ class Transmission(object):
         return self.fetch('torrent-start-now', {'ids': torrentId})
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def stop(self, torrentId=False):
         if torrentId is False:
@@ -156,7 +154,7 @@ class Transmission(object):
         return self.fetch('torrent-add', {'filename': filename})
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def remove(self, torrentId):
         try:

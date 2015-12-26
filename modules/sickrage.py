@@ -6,7 +6,7 @@ import htpc
 from urllib import quote, urlencode
 import requests
 import logging
-from cherrypy.lib.auth2 import require
+from cherrypy.lib.auth2 import require, member_of
 from htpc.helpers import fix_basepath, get_image, striphttp
 
 
@@ -59,7 +59,7 @@ class Sickrage(object):
         return htpc.LOOKUP.get_template('sickrage_view.html').render(scriptname='sickrage_view', indexerid=indexerid)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def ping(self, sickrage_host, sickrage_port, sickrage_apikey, sickrage_basepath, sickrage_ssl=False, **kwargs):
         ssl = 's' if sickrage_ssl else ''
@@ -150,7 +150,7 @@ class Sickrage(object):
         return self.fetch('show.seasons&indexerid=' + indexerid + '&season=' + season)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def Postprocess(self, path='', force_replace=False, return_data=False, is_priority=False, type=False):
         self.logger.debug('Postprocess')
@@ -159,42 +159,42 @@ class Sickrage(object):
         return self.fetch('postprocess' + path, False, 120)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def Restart(self):
         self.logger.debug('Restart sr')
         return self.fetch('sb.restart', False, 15)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def SearchEpisodeDownload(self, indexerid, season, episode):
         self.logger.debug('Fetching Episode Downloads')
         return self.fetch('episode.search&indexerid=' + indexerid + '&season=' + season + '&episode=' + episode, False, 45)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def SearchSubtitle(self, indexerid, season, episode):
         self.logger.debug('Fetching subtitle')
         return self.fetch('episode.subtitlesearch&indexerid=' + indexerid + '&season=' + season + '&episode=' + episode, False, 45)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def Shutdown(self):
         self.logger.debug('Shutdown sickrage')
         return self.fetch('sb.shutdown', False, 20)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def ForceFullUpdate(self, indexerid):
         self.logger.debug('Force full update for indexerid %s' % indexerid)
         return self.fetch('show.update&indexerid=' + indexerid)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def RescanFiles(self, indexerid):
         self.logger.debug('Rescan all local files for indexerid %s' % indexerid)
@@ -202,7 +202,7 @@ class Sickrage(object):
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    @require()
+    @require(member_of(htpc.role_user))
     def RemoveShow(self, indexerid, show_name=''):
         self.logger.debug('Delete %s from Sickrage indexerid %s' % (show_name, indexerid))
         return self.fetch('show.delete&indexerid=%s' % indexerid)

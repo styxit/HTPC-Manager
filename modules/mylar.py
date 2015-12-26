@@ -5,7 +5,7 @@ import cherrypy
 import htpc
 import logging
 import requests
-from cherrypy.lib.auth2 import require
+from cherrypy.lib.auth2 import require, member_of
 from urllib import urlencode
 from json import loads
 from htpc.helpers import get_image
@@ -136,17 +136,17 @@ class Mylar(object):
         return self.fetch('refreshComic&id=%s' % Id, text=True)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def DeleteComic(self, Id):
         return self.fetch('delComic&id=%s' % Id, text=True)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def PauseComic(self, Id):
         return self.fetch('pauseComic&id=%s' % Id, text=True)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def ResumeComic(self, Id):
         return self.fetch('resumeComic&id=%s' % Id, text=True)
 
@@ -159,7 +159,7 @@ class Mylar(object):
         return self.fetch('queueIssue&id=%s' % issueid, text=True)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def UnqueueIssue(self, issueid, name=''):
         self.logger.debug('unqued %s' % name)
         return self.fetch('unqueueIssue&id=%s' % issueid, text=True)
@@ -192,34 +192,34 @@ class Mylar(object):
         return self.fetch('getHistory')
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def ForceSearch(self):
         return self.fetch('forceSearch', text=True)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def ForceProcess(self, dir_=None):
         if dir_:
             return self.fetch('forceProcess?dir_=%s' % dir_, text=True)
         return self.fetch('forceProcess', text=True)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def ForceActiveArtistsUpdate(self):
         return self.fetch('forceActiveComicsUpdate', text=True)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def ShutDown(self):
         return self.fetch('shutdown', text=True)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def UpDate(self):
         return self.fetch('update', text=True)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def ReStart(self):
         return self.fetch('restart', text=True)
 
@@ -255,7 +255,7 @@ class Mylar(object):
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def ping(self,
              mylar_enable, mylar_name,
              mylar_host, mylar_port,

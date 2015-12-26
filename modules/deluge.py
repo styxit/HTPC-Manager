@@ -6,7 +6,7 @@ import htpc
 import requests
 from json import dumps
 import logging
-from cherrypy.lib.auth2 import require
+from cherrypy.lib.auth2 import require, member_of
 from htpc.helpers import fix_basepath, striphttp
 
 
@@ -114,13 +114,13 @@ class Deluge(object):
         return self.fetch('core.resume_torrent', [[torrentId]])
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def stop(self, torrentId=None):
         return self.fetch('core.pause_torrent', [[torrentId]])
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def do_all(self, status):
         if status == 'resume':
@@ -141,7 +141,7 @@ class Deluge(object):
         return self.fetch(action, [int(port)])
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def set_dlspeed(self, speed):
         self.logger.debug('Set download speed to %s' % speed)
@@ -150,7 +150,7 @@ class Deluge(object):
         return self.fetch('core.set_config', [{'max_download_speed': int(speed)}])
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def set_ulspeed(self, speed):
         if speed == '0':
@@ -190,7 +190,7 @@ class Deluge(object):
             return result
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def remove(self, torrentId, removeData):
         removeDataBool = bool(int(removeData))

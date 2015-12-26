@@ -76,8 +76,8 @@ def require(*conditions):
 def member_of(groupname):
     def check():
         userexist = Manageusers.selectBy(username=cherrypy.request.login).getOne()
-        if userexist and userexist.role == groupname:
-            return cherrypy.request.login == userexist.username and groupname == userexist.role
+        if userexist and userexist.role in groupname:
+            return cherrypy.request.login == userexist.username and userexist.role in groupname
     return check
 
 

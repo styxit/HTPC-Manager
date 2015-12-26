@@ -6,7 +6,7 @@ __author__ = 'quentingerome'
 
 
 import requests
-from cherrypy.lib.auth2 import require
+from cherrypy.lib.auth2 import require, member_of
 import logging
 import htpc
 import cherrypy
@@ -143,25 +143,25 @@ class UTorrent(object):
             return {'result': 500}
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def start(self, torrent_id):
         return self.do_action('start', hash=torrent_id).json()
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def stop(self, torrent_id):
         return self.do_action('stop', hash=torrent_id).json()
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def remove(self, torrent_id):
         return self.do_action('remove', hash=torrent_id).json()
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def remove_data(self, torrent_id):
         return self.do_action('removedata', hash=torrent_id).json()
@@ -206,7 +206,7 @@ class UTorrent(object):
         return self.do_action('setprops', hash=hash, s='label', v=label)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def ping(self, utorrent_host='', utorrent_port='',
              utorrent_username='', utorrent_password='', **kwargs):
@@ -241,7 +241,7 @@ class UTorrent(object):
         return self.fetch('&action=%s%s&hash=%s' % (action, params_str, hash))
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def change_speed(self, **kw):
         if 'max_ul_rate' or 'max_dl_rate' in kw:
@@ -250,12 +250,12 @@ class UTorrent(object):
             logger.error('Wrong parameters given')
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def set_upspeed(self, speed, *arg, **kw):
         return self.fetch('&action=setsetting&s=max_ul_rate&v=' + speed)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def set_downspeed(self, speed, *arg, **kw):
         return self.fetch('&action=setsetting&s=max_dl_rate&v=' + speed)
 

@@ -110,7 +110,7 @@ class Log:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    @require(member_of('admin'))
+    @require(member_of(htpc.role_admin))
     def deletelog(self):
         try:
             open(self.logfile, 'w').close()
@@ -119,7 +119,7 @@ class Log:
             return 'Cannot delete log file: %s' % e
 
     @cherrypy.expose()
-    @require(member_of('admin'))
+    @require(member_of(htpc.role_admin))
     def downloadlog(self):
         try:
             htpc.LOGGER.flush()

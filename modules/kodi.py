@@ -13,7 +13,7 @@ from sqlobject import SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol, IntCol
 from htpc.helpers import get_image, cachedprime
 import logging
-from cherrypy.lib.auth2 import require
+from cherrypy.lib.auth2 import require, member_of
 import os
 import hashlib
 
@@ -118,7 +118,7 @@ class Kodi(object):
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    @require()
+    @require(member_of(htpc.role_admin))
     def primecache(self, t='all', wanted_art='all', async=True, resize=True):
         ''' find all images and cache them, might take a while...'''
         kodi = Server(self.url('/jsonrpc', True))
@@ -202,7 +202,7 @@ class Kodi(object):
             self.logger.debug('%s' % e)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def ping(self, kodi_server_host='', kodi_server_port='',
              kodi_server_username='', kodi_server_password='', **kwargs):
@@ -244,7 +244,7 @@ class Kodi(object):
         return {'current': current, 'servers': servers}
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def setserver(self, kodi_server_id, kodi_server_name, kodi_server_host, kodi_server_port,
                   kodi_server_username=None, kodi_server_password=None, kodi_server_mac=None, kodi_server_starterport=''):
@@ -288,7 +288,7 @@ class Kodi(object):
                 return 0
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     def delserver(self, id):
         """ Delete a server """
         self.logger.debug("Deleting server " + str(id))
@@ -481,7 +481,7 @@ class Kodi(object):
             return
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def ExecuteAddon(self, addon, cmd0='', cmd1=''):
         if cmd0 == 'undefined':
@@ -521,7 +521,7 @@ class Kodi(object):
             return kodi.Addons.ExecuteAddon(addonid=addon)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def Enable_DisableAddon(self, addonid=None, enabled=None):
         kodi = Server(self.url('/jsonrpc', True))
@@ -731,7 +731,7 @@ class Kodi(object):
             return
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def System(self, action=''):
         """ Various system commands """
@@ -754,7 +754,7 @@ class Kodi(object):
             return 'Rebooting kodi.'
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def Wake(self):
         """ Send WakeOnLan package """
@@ -781,7 +781,7 @@ class Kodi(object):
             return "Unable to send WOL packet"
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def Run(self):
         """ Send XBMC Starter packet """

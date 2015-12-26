@@ -14,7 +14,7 @@ import logging
 import urlparse
 import base64
 import platform
-from cherrypy.lib.auth2 import require
+from cherrypy.lib.auth2 import require, member_of
 import requests
 from uuid import getnode
 import os
@@ -76,7 +76,7 @@ class Plex(object):
         })
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def ping(self, plex_host='', plex_port='', **kwargs):
         ''' Tests settings, returns server name on success and null on fail '''
@@ -166,7 +166,7 @@ class Plex(object):
             return
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def primecache(self, disable_pil=0):
         plex_host = htpc.settings.get('plex_host')
@@ -765,7 +765,7 @@ class Plex(object):
             return
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def Wake(self):
         ''' Send WakeOnLan package '''
@@ -944,7 +944,7 @@ class Plex(object):
         return {'playing_items': playing_items}
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def UpdateLibrary(self, section_type=None):
         ''' Get information about current playing item '''
@@ -966,7 +966,7 @@ class Plex(object):
             return 'Failed to update library!'
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def ControlPlayer(self, player, action, value=''):
         ''' Various commands to control Plex Player '''
@@ -1025,7 +1025,7 @@ class Plex(object):
             return 'error'
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def GetServers(self, id=None):
         ''' Get list of servers '''
@@ -1044,6 +1044,7 @@ class Plex(object):
             GDM.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
             returnData = []
+
             try:
                 # Send data to the multicast group
                 self.logger.info('Sending discovery message: %s' % Msg_PlexGDM)
@@ -1105,7 +1106,7 @@ class Plex(object):
             return 'error'
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))  # req a user since it call play to "all"
     @cherrypy.tools.json_out()
     def PlayItem(self, playerip, machineid, item=None, type=None, offset=0, **kwargs):
         ''' Play a file in Plex '''

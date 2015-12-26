@@ -37,6 +37,7 @@ class Users(object):
                  'name': 'users_user_role',
                  'desc': 'Admin users can change settings whilst normal users can only view pages.',
                  'options': [
+                        {'name': 'restricted user', 'value': 'restricted_user'},
                         {'name': 'user', 'value': 'user'},
                         {'name': 'admin', 'value': 'admin'}
                     ]
@@ -45,7 +46,7 @@ class Users(object):
         })
 
     @cherrypy.expose()
-    @require(member_of("admin"))
+    @require(member_of(htpc.role_admin))
     def setusers(self, users_user_id, users_user_username, users_user_password, users_user_role):
         if users_user_id == "0":
             self.logger.debug('Creating Manage users in db')
@@ -72,7 +73,7 @@ class Users(object):
                 return
 
     @cherrypy.expose()
-    @require(member_of("admin"))
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def getuser(self, id=None):
         if id:
@@ -92,7 +93,7 @@ class Users(object):
         return {'users': users}
 
     @cherrypy.expose()
-    @require(member_of("admin"))
+    @require(member_of(htpc.role_admin))
     def deluser(self, id):
         """ Delete a user """
         self.logger.debug("Deleting user " + str(id))

@@ -32,7 +32,7 @@ class RestrictedArea:
     # all methods in this controller (and subcontrollers) is
     # open only to members of the admin group
     _cp_config = {
-        'auth.require': [member_of('admin')]
+        'auth.require': [member_of(htpc.role_admin)]
     }
 
 
@@ -58,7 +58,7 @@ class Root(object):
         return "An error occured"
 
     @cherrypy.expose()
-    @require(member_of("admin"))
+    @require(member_of(htpc.role_admin))
     def shutdown(self):
         """ Shutdown CherryPy and exit script """
         self.logger.info("Shutting down HTPC Manager.")
@@ -78,7 +78,7 @@ class Root(object):
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     def restart(self):
         """ Shutdown script and rerun with the same variables """
         self.logger.info("Restarting HTPC Manager.")
@@ -97,14 +97,14 @@ class Root(object):
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
-    @require(member_of("admin"))
+    @require(member_of(htpc.role_admin))
     def save_dash(self, dash_order=0):
         htpc.settings.set("dash_order", urllib.unquote(dash_order).decode('utf-8'))
         return "Dashboard saved."
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
-    @require(member_of("admin"))
+    @require(member_of(htpc.role_admin))
     def save_menu(self, menu_order=0):
         htpc.settings.set("menu_order", urllib.unquote(menu_order).decode('utf-8'))
         return "Menu order saved."

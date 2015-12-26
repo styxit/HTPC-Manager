@@ -328,6 +328,7 @@ class Stats(object):
     @cherrypy.expose()
     @require()
     def get_user(self, dash=False):
+        duser = {}
         try:
             for user in psutil.users():
                 duser = user._asdict()
@@ -473,7 +474,7 @@ class Stats(object):
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
-    @require(member_of('admin'))
+    @require(member_of(htpc.role_admin))
     def command(self, cmd=None, pid=None, signal=None):
         dmsg = {}
         try:
@@ -609,7 +610,7 @@ class Stats(object):
         return scripts
 
     @cherrypy.expose()
-    @require(member_of('admin'))
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def run_script(self, script, **kwargs):
         prefix = ''

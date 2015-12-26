@@ -3,14 +3,12 @@
 
 import cherrypy
 import htpc
-#from urllib2 import urlopen, Request
 import requests
 from requests.auth import HTTPBasicAuth
-#from json import loads
 import logging
 import base64
 import re
-from cherrypy.lib.auth2 import require
+from cherrypy.lib.auth2 import require, member_of
 from jsonrpclib import jsonrpc
 from htpc.helpers import fix_basepath, striphttp
 
@@ -78,7 +76,7 @@ class NZBGet(object):
         return url
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def version(self, nzbget_host, nzbget_basepath, nzbget_port, nzbget_username, nzbget_password, nzbget_ssl=False, **kwargs):
         self.logger.debug("Fetching version information from nzbget")
@@ -111,7 +109,7 @@ class NZBGet(object):
             self.logger.error("Failed to get history %s" % e)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def Swap(self, nzbid=None, oldpos=None, newpos=None):
         self.logger.debug('Moving %s from %s to %s' % (nzbid, oldpos, newpos))
@@ -155,7 +153,7 @@ class NZBGet(object):
         return r
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def ForceScan(self):
         self.logger.debug('Scan incoming directory')
@@ -186,7 +184,7 @@ class NZBGet(object):
         return categorys
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def ChangeCategory(self, nzbid=None, cat=None, nzbname=None):
         self.logger.debug('Change %s nzbname id %s to category %s' % (nzbname, nzbid, cat))
@@ -233,7 +231,7 @@ class NZBGet(object):
             self.logger.error("Failed to fetch queue %s" % e)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def QueueAction(self, action):
         try:
@@ -248,7 +246,7 @@ class NZBGet(object):
             self.logger.error("Failed to %s" % (action, e))
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def IndividualAction(self, nzbid='', name='', action=''):
         try:
@@ -269,7 +267,7 @@ class NZBGet(object):
             return False
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def SetSpeed(self, speed):
         try:

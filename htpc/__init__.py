@@ -35,3 +35,6 @@ BRANCH = None
 UPDATERTYPE = None
 UPDATED_AT = 0
 FANART_APIKEY = "411c7a5ec64e16e49e56339079d03e76"
+role_admin = ["admin"]
+role_user = ["admin", "user"]
+role_restriced = ["restricted_user"]

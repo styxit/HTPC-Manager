@@ -7,7 +7,7 @@ import json
 import logging
 import time
 import math
-from cherrypy.lib.auth2 import require
+from cherrypy.lib.auth2 import require, member_of
 from htpc.helpers import striphttp, sizeof
 import requests
 from requests.auth import HTTPDigestAuth
@@ -220,7 +220,7 @@ class Qbittorrent(object):
             self.logger.debug("Couldn't get global upload and download limits %s" % e)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def command(self, cmd=None, hash=None, name=None, dlurl=None):
         ''' Handles pause, resume, delete singel torrents '''
         try:
@@ -265,7 +265,7 @@ class Qbittorrent(object):
             self.logger.error('Failed to send %s %s to qBittorrent %s' % (link, torrentname, e))
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def set_speedlimit(self, type=None, speed=None):
         ''' Sets global upload and download speed '''
         try:
@@ -289,7 +289,7 @@ class Qbittorrent(object):
             self.logger.error('Failed to set %s to %s %s' % (type, speed, e))
 
     @cherrypy.expose()
-    @require()
+    @require()  # leave it as it uses this is get api version
     @cherrypy.tools.json_out()
     def ping(self, qbittorrent_host='', qbittorrent_port='', qbittorrent_username='', qbittorrent_password='', qbittorrent_ssl=False, **kw):
         self.logger.debug('Trying to connect to qBittorret')

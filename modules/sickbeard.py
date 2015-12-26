@@ -6,7 +6,7 @@ import htpc
 from urllib import quote_plus
 import requests
 import logging
-from cherrypy.lib.auth2 import require
+from cherrypy.lib.auth2 import require, member_of
 from htpc.helpers import fix_basepath, get_image, striphttp
 
 
@@ -60,7 +60,7 @@ class Sickbeard(object):
         return htpc.LOOKUP.get_template('sickbeard_view.html').render(scriptname='sickbeard_view', tvdbid=tvdbid)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def ping(self, sickbeard_host, sickbeard_port, sickbeard_apikey, sickbeard_basepath, sickbeard_ssl=False, **kwargs):
         self.logger.info('Testing connectivity')
@@ -158,21 +158,21 @@ class Sickbeard(object):
         return self.fetch('episode.search&tvdbid=' + tvdbid + '&season=' + season + '&episode=' + episode, False, 45)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def ForceFullUpdate(self, tvdbid):
         self.logger.debug('Force full update for tvdbid ' + tvdbid)
         return self.fetch('show.update&tvdbid=' + tvdbid)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def RescanFiles(self, tvdbid):
         self.logger.debug('Rescan all local files for tvdbid ' + tvdbid)
         return self.fetch('show.refresh&tvdbid=' + tvdbid)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def RemoveShow(self, tvdbid):
         self.logger.debug('Removing Show tvdbid ' + tvdbid)
@@ -191,7 +191,7 @@ class Sickbeard(object):
             return
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def Postprocess(self, path=''):
         if path:
             path = '&%s' % path
@@ -199,13 +199,13 @@ class Sickbeard(object):
         return self.fetch('postprocess' + path)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def Shutdown(self):
         self.logger.debug('Shutting down Sickbeard')
         return self.fetch('sb.shutdown')
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     def Restart(self):
         self.logger.debug('Restarting Sickbeard')
         return self.fetch('sb.restart')

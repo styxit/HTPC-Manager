@@ -4,7 +4,7 @@
 import cherrypy
 import htpc
 import requests
-from cherrypy.lib.auth2 import require
+from cherrypy.lib.auth2 import require, member_of
 import logging
 import hashlib
 from htpc.helpers import fix_basepath, get_image, striphttp, comp_table
@@ -132,7 +132,7 @@ class Couchpotato(object):
                 return results
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def ping(self, couchpotato_host, couchpotato_port, couchpotato_apikey, couchpotato_basepath, couchpotato_ssl=False, **kwargs):
         self.logger.debug('Testing connectivity to couchpotato')
@@ -151,7 +151,7 @@ class Couchpotato(object):
             return
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_admin))
     @cherrypy.tools.json_out()
     def getapikey(self, couchpotato_username, couchpotato_password, couchpotato_host, couchpotato_port, couchpotato_apikey, couchpotato_basepath, couchpotato_ssl=False, **kwargs):
         self.logger.debug('Testing connectivity to couchpotato')
@@ -270,21 +270,21 @@ class Couchpotato(object):
         return self.fetch('movie.add/?profile_id=' + profile + '&identifier=' + movieid + '&title=' + title)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def EditMovie(self, id, profile, title):
         self.logger.debug('Editing movie')
         return self.fetch('movie.edit/?id=' + id + '&profile_id=' + profile + '&default_title=' + title)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def RefreshMovie(self, id):
         self.logger.debug('Refreshing movie')
         return self.fetch('movie.refresh/?id=' + id)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def DeleteMovie(self, id=''):
         self.logger.debug('Deleting movie')
@@ -305,7 +305,7 @@ class Couchpotato(object):
         return self.fetch('release.manual_download/?id=' + id)
 
     @cherrypy.expose()
-    @require()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def IgnoreRelease(self, id=''):
         self.logger.debug('Downloading movie')
@@ -319,24 +319,28 @@ class Couchpotato(object):
         return self.fetch('profile.list/')
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def GetCategories(self):
         self.logger.debug('Feching categories')
         return self.fetch('category.list')
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def Suggestion(self):
         self.logger.debug('Fetching suggestion')
         return self.fetch('suggestion.view')
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def ChartsView(self):
         self.logger.debug('Fetching charts')
         return self.fetch('charts.view')
 
     @cherrypy.expose()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def SuggestionIgnore(self, imdb=None, seenit=None):
         u = 'suggestion.ignore/?imdb=%s' % imdb
@@ -346,31 +350,37 @@ class Couchpotato(object):
         return self.fetch(u)
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
     def DashboardSoon(self):
         return self.fetch('dashboard.soon')
 
     @cherrypy.expose()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def Restart(self):
         return self.fetch('app.restart')
 
     @cherrypy.expose()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def Shutdown(self):
         return self.fetch('app.shutdown')
 
     @cherrypy.expose()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def Update(self):
         return self.fetch('updater.update')
 
     @cherrypy.expose()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def SearchAllWanted(self):
         return self.fetch('movie.searcher.full_search')
 
     @cherrypy.expose()
+    @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def Postprocess(self, path=''):
         u = 'renamer.scan'
