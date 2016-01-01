@@ -54,6 +54,7 @@ webdir = htpc.WEBDIR
     % endif
     <link href="${htpc.WEBDIR}css/rg-icons.min.css${nocache}" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/fullcalendar.min.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/base.css${nocache}" rel="stylesheet">
     <link href="${self.attr.webdir}css/${scriptname}.css${nocache}" rel="stylesheet">
 </head>
@@ -215,11 +216,11 @@ ${self.body()}
 % if s.get('app_use_cdn', 0):
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-    <!-- dont remove this until squeezebox is checked -->
+  <!-- dont remove this until squeezebox is checked -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/js/jquery.tablesorter.combined.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/js/parsers/parser-ignore-articles.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/js/parsers/parser-ignore-articles.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/holder/1.9/holder.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.2/moment.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
@@ -227,7 +228,7 @@ ${self.body()}
 	<script src="${htpc.WEBDIR}js/libs/jquery.min.js"></script>
 	<script src="${htpc.WEBDIR}js/libs/jquery-ui.min.js"></script>
 
-    <!-- Leave this until squeezebox is checked -->
+  <!-- Leave this until squeezebox is checked -->
 	<script src="${htpc.WEBDIR}js/libs/jquery.cookie.min.js"></script>
 
 
@@ -235,13 +236,13 @@ ${self.body()}
 	<script src="${htpc.WEBDIR}js/libs/holder.js"></script>
 	<script src="${htpc.WEBDIR}js/libs/moment.js"></script>
 	<script src="${htpc.WEBDIR}js/libs/jquery.ui.touch-punch.min.js"></script>
-    <!-- Table sorter stuff  -->
-    <script src="${htpc.WEBDIR}js/libs/jquery.tablesorter.combined.min.js"></script>
-    <script src="${htpc.WEBDIR}js/libs/parsers/parser-ignore-articles.js"></script>
-    <!-- end tablesorter -->
-
+  <!-- Table sorter stuff  -->
+  <script src="${htpc.WEBDIR}js/libs/jquery.tablesorter.combined.min.js"></script>
+  <script src="${htpc.WEBDIR}js/libs/parsers/parser-ignore-articles.js"></script>
+  <!-- end tablesorter -->
+  <script src="${htpc.WEBDIR}js/libs/fullcalendar.min.js"></script>
 % endif
-<script src="${htpc.WEBDIR}js/libs/re-bootstrap.min.js"></script>
+  <script src="${htpc.WEBDIR}js/libs/re-bootstrap.min.js"></script>
 % if s.get('app_theme_mig') == 'aurora':
     <!--Triggers special feature of Aurora theme when that theme is selected!-->
     <script src="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig')}/aurora.min.js"></script>

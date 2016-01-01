@@ -209,6 +209,13 @@
                 </table>
             </div>
             %endif
+            %if settings.get('dash_sonarr_calendar', 0):
+            <div class="span4 dash-module" id="dash_sonarr_calendar">
+              <h3><a href="sonarr/#calendar_tab">sonarr calendar</a></h3>
+              <div id="dash_sonarr_cal"></div>
+
+            </div>
+            %endif
             %if settings.get('dash_upcoming_albums_list', 0):
             <div class="span4 dash-module" id="dash_upcoming_albums_list">
                 <h3><a href="headphones/#upcoming">Upcoming Albums</a></h3>
@@ -299,6 +306,9 @@
     }
     if (${int(settings.get('dash_wanted_albums_list', 0))}){
         modules['dash_wanted_albums_list'] = "loadWantedAlbumsList";
+    }
+    if (${int(settings.get('dash_sonarr_calendar', 0))}){
+        modules['dash_sonarr_calendar'] = "dash_sonarr_calendar";
     }
     if (${int(settings.get('dash_upcoming_albums_list', 0))}){
         modules['dash_upcoming_albums_list'] = "loadUpcomingAlbumsList";

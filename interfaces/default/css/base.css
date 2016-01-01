@@ -250,3 +250,12 @@ table th.tablesorter-header {
 .filtered {
  display: none;
 }
+
+.calendar_missing_file {
+  border-color: #d9534f;
+  background-color: #d9534f;
+}
+.calendar_has_file {
+  border-color: #5cb85c;
+  background-color: #5cb85c;
+}

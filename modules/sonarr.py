@@ -8,7 +8,6 @@ import requests
 import urllib
 import logging
 from json import loads, dumps
-import datetime as DT
 from htpc.helpers import fix_basepath, get_image, striphttp
 
 
@@ -35,7 +34,7 @@ class Sonarr(object):
     @cherrypy.expose()
     @require()
     def index(self):
-        return htpc.LOOKUP.get_template('sonarr.html').render(scriptname='sonarr', webinterface=self.webinterface())
+        return htpc.LOOKUP.get_template('sonarr.html').render(scriptname='sonarr', webinterface=self.webinterface(), quality=self.Profile())
 
     def webinterface(self):
         host = striphttp(htpc.settings.get('sonarr_host', ''))
@@ -145,8 +144,24 @@ class Sonarr(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def Calendar(self, param=None):
-        return self.fetch('Calendar?end=%s' % (DT.date.today() + DT.timedelta(days=7)))
+    def Calendar(self, param=None, *args, **kwargs):
+        p = urllib.urlencode(kwargs)
+        episodes = self.fetch('Calendar?%s' % p)
+        cal = []
+        for episode in episodes:
+            d = {
+                'title': episode['series']['title'],
+                'season': episode['seasonNumber'],
+                'episode': episode['episodeNumber'],
+                'start': episode['airDateUtc'],
+                'overview': episode.get('overview', ''),
+                'all': episode,
+                'allDay': False,
+            }
+
+            cal.append(d)
+
+        return cal
 
     @cherrypy.expose()
     @require()
