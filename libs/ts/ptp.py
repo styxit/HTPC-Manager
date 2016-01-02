@@ -81,5 +81,5 @@ def search(q, cat):
         return result_list
 
     except Exception as e:
-        logger.error('Error while fetching torrents from PTP %s %s' % (r.url, e))
+        logger.error('Error while fetching torrents from PTP %s' % e)
         return []

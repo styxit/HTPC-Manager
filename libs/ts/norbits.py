@@ -14,31 +14,32 @@ def search(q, cat):
     result_list = []
     # just a quick hack for cat incase i add categorys
     # Api was changed
-    #cat = '*'
+    # cat = ''
     category = {
-                    'all': 0,
-                    'movies': 1,
-                    'music': 5,
-                    'tv': 2,
-                    'software': 3,
-                    'games': 4,
-                    'books': 6
-                }
+        'all': 0,
+        'movies': 1,
+        'music': 5,
+        'tv': 2,
+        'software': 3,
+        'games': 4,
+        'books': 6
+    }
 
     payload = {
-                'username': username,
-                'passkey': passkey,
-                'search': str(q),
-                'limit': 3000
-            }
+        'username': username,
+        'passkey': passkey,
+        'search': str(q),
+        'limit': 3000
+    }
 
-    if cat:
-            payload['category'] = category[cat]
+    # if cat:
+    #        payload['category'] = category[cat]
 
     try:
-        result = requests.post('https://norbits.net/api2.php?action=torrents', data=json.dumps(payload))
+        result = requests.post(
+            'https://norbits.net/api2.php?action=torrents', data=json.dumps(payload))
         results = result.json()
-        logger.debug("Norbits returned %s" % results)
+        # logger.debug("Norbits returned %s" % results)
         if int(results['data']['total']) == 0:
             return []
 

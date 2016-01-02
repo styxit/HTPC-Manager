@@ -43,9 +43,9 @@ class Settings(object):
         """ Get a setting from the database """
         try:
             val = Setting.selectBy(key=key).getOne().val
-            if val == 'on':
+            if val in ['on', 1, '1']:
                 return True
-            elif val == "0":
+            elif val in ['off', "0", 0]:
                 return False
             return val
         except SQLObjectNotFound:

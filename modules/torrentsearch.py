@@ -75,9 +75,11 @@ class Torrentsearch(object):
             if htpc.settings.get('torrents_getstrike_enabled'):
                 r += self.search_getstrike(query, 'all')
         elif provider == 'kat':
-            self.logger.debug("PUSSY")
             if htpc.settings.get('torrents_ka_enabled'):
                 r += self.search_ka(query)
+        elif provider == 'norbits':
+            if htpc.settings.get('torrents_norbits_enabled'):
+                r += self.search_norbits(query, 'all')
 
         self.logger.debug('Found %s torrents in total' % len(r))
         return r
