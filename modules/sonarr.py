@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import datetime as DT
 import cherrypy
 import htpc
 from cherrypy.lib.auth2 import require, member_of
@@ -140,6 +141,12 @@ class Sonarr(object):
     @cherrypy.tools.json_out()
     def History(self):
         return self.fetch('History?page=1&pageSize=100&sortKey=date&sortDir=desc')
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def oldCalendar(self, param=None):
+        return self.fetch('Calendar?end=%s' % (DT.date.today() + DT.timedelta(days=7)))
 
     @cherrypy.expose()
     @require()

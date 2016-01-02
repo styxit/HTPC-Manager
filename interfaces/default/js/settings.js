@@ -1,6 +1,7 @@
 $(document).ready(function () {
     // Replace this and use the mako?
     get_branches()
+
     // Activates the tooltips
     $('.settingstooltip').tooltip({placement: 'right'})
 
@@ -296,15 +297,16 @@ function newznab_update_indexer(id) {
 function get_branches() {
     $.get(WEBDIR + 'update/branches', function (data) {
         var branches = $('#branch').empty();
+        if (data && !data.branches) {
+          // github has most likely sent 403..
+          branches.append($('<option>').text(data.branch).val(data.branch).attr('selected', 'selected'));
+          return false
+        }
         $.each(data.branches, function (i, item) {
             var option = $('<option>').text(item).val(item);
-            //if (data.branch == item) option.attr('selected', 'selected');
             branches.append(option);
         });
         branches.append($('<option>').text(data.branch).val(data.branch).attr('selected', 'selected'));
-        //if (!data.verified) {
-            //notify('Warning', 'Couldnt determine branch, select correct and save', 'warning');
-        //}
 
     }, 'json');
 }

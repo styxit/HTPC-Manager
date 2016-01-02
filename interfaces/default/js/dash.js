@@ -26,6 +26,8 @@ function dash_sonarr_calendar() {
       type: 'GET',
     },
     eventRender: function(event, element) {
+      var title = event.title + ' S' + pad(event.all.seasonNumber, 2) + 'E' + pad(event.all.episodeNumber, 2) + ' ' + event.all.title 
+      element.text(title) 
       if (event.all.hasFile) {
         element.addClass('calendar_has_file');
       } else {
@@ -452,7 +454,7 @@ function loadNextAired(options) {
 
 function loadsonarrCalendar(options) {
   if (!$('#calendar_table_body').length) return
-  $.getJSON(WEBDIR + 'sonarr/Calendar', function(result) {
+  $.getJSON(WEBDIR + 'sonarr/oldCalendar', function(result) {
     $.each(result, function(i, cal) {
       if (i >= 5) return
       var name = $('<a>').attr('href', 'sonarr/View/' + cal.seriesId + '/' + cal.series.tvdbId + '#' + cal.seasonNumber).html(cal.series.title)
