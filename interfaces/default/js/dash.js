@@ -22,12 +22,12 @@ function dash_sonarr_calendar() {
     height: 'auto',
 
     events: {
-      url: WEBDIR + '/sonarr/Calendar',
+      url: WEBDIR + 'sonarr/Calendar',
       type: 'GET',
     },
     eventRender: function(event, element) {
-      var title = event.title + ' S' + pad(event.all.seasonNumber, 2) + 'E' + pad(event.all.episodeNumber, 2) + ' ' + event.all.title 
-      element.text(title) 
+      var title = event.title + ' S' + pad(event.all.seasonNumber, 2) + 'E' + pad(event.all.episodeNumber, 2) + ' ' + event.all.title
+      element.text(title)
       if (event.all.hasFile) {
         element.addClass('calendar_has_file');
       } else {
