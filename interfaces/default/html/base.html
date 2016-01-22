@@ -47,14 +47,15 @@ webdir = htpc.WEBDIR
 	    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/minified/jquery-ui.min.css" rel="stylesheet">
 	    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/css/filter.formatter.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.css" rel="stylesheet">
     % else:
 	    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
 	    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
         <link href="${htpc.WEBDIR}css/filter.formatter.css" rel="stylesheet">
+        <link href="${htpc.WEBDIR}css/fullcalendar.min.css" rel="stylesheet">
     % endif
     <link href="${htpc.WEBDIR}css/rg-icons.min.css${nocache}" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/fullcalendar.min.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/base.css${nocache}" rel="stylesheet">
     <link href="${self.attr.webdir}css/${scriptname}.css${nocache}" rel="stylesheet">
 </head>
@@ -224,9 +225,11 @@ ${self.body()}
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/holder/1.9/holder.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.2/moment.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.js"></script>
 % else:
 	<script src="${htpc.WEBDIR}js/libs/jquery.min.js"></script>
 	<script src="${htpc.WEBDIR}js/libs/jquery-ui.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/fullcalendar.min.js"></script>
 
   <!-- Leave this until squeezebox is checked -->
 	<script src="${htpc.WEBDIR}js/libs/jquery.cookie.min.js"></script>
@@ -240,7 +243,6 @@ ${self.body()}
   <script src="${htpc.WEBDIR}js/libs/jquery.tablesorter.combined.min.js"></script>
   <script src="${htpc.WEBDIR}js/libs/parsers/parser-ignore-articles.js"></script>
   <!-- end tablesorter -->
-  <script src="${htpc.WEBDIR}js/libs/fullcalendar.min.js"></script>
 % endif
   <script src="${htpc.WEBDIR}js/libs/re-bootstrap.min.js"></script>
 % if s.get('app_theme_mig') == 'aurora':
