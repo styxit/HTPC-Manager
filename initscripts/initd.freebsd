@@ -15,7 +15,7 @@
 #                       as root.
 # htpc_manager_data_dir:        Directory where htpc-manager configuration
 #                               data is stored.
-#                               Default: /usr/local/htpc-manager
+#                               Default: /var/db/htpc-manager
 
 . /etc/rc.subr
 name="htpc"
@@ -23,13 +23,13 @@ rcvar="${name}_enable"
 load_rc_config ${name}
 
 : ${htpc_manager_enable:="NO"}
-: ${htpc_manager_user:="root"}
-: ${htpc_manager_group:="wheel"}
-: ${htpc_manager_data_dir:="/usr/local/HTPC-Manager"}
+: ${htpc_manager_user:="media"}
+: ${htpc_manager_group:="media"}
+: ${htpc_manager_data_dir:="/var/db/htpc-manager"}
 
-pidfile="/var/run/htpc-manager.pid"
-command="/usr/local/bin/python"
-command_args="${htpc_manager_data_dir}/Htpc.py --daemon --pid ${pidfile}"
+pidfile="/var/run/htpc-manager/htpc-manager.pid"
+command="/usr/local/bin/python2.7"
+command_args="/usr/local/share/HTPC-Manager/Htpc.py --datadir ${htpc_manager_data_dir} --daemon --pid ${pidfile}"
 
 start_precmd="htpc-manager_prestart"
 htpc-manager_prestart() {
