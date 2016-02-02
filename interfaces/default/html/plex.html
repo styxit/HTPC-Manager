@@ -3,7 +3,7 @@
 <div class="container-fluid">
     <div class="content">
             <h1 class="page-header page-title">
-            <a href="${webinterface}" target="_blank">${settings.get('plex_name', 'Plex')}</a>
+            <a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'}>${settings.get('plex_name', 'Plex')}</a>
             <div class="btn-toolbar pull-right">
                 <div class="btn-group">
                 <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wrench fa-lg"></i>

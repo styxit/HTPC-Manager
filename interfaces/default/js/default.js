@@ -9,6 +9,12 @@ $(document).ready(function () {
 		window.open(url);
 	});
 
+    $('.useiframe').click(function (e) {
+        e.preventDefault();
+        window.open(url);
+    });
+
+
     // use something like this? https://github.com/csnover/TraceKit
 
     window.onerror = function (message, file, line) {
@@ -32,6 +38,17 @@ $(document).ready(function () {
         var url = $(this).find("a").attr("href")
         if (pybooltojsbool(ALLOWIFRAME) === true && e.which==1) { //if iframe is on and left click
 			// open in iframe
+            location.href = WEBDIR + 'iframe?link=' + encodeURIComponent(url)
+        } else {
+            // Open link in a new tab
+            window.open(url);
+        }
+    });
+
+    $('.useiframe').mousedown(function(e){
+        var url = $(this).attr("href")
+        if (pybooltojsbool(ALLOWIFRAME) === true && e.which==1) { //if iframe is on and left click
+                // open in iframe
             location.href = WEBDIR + 'iframe?link=' + encodeURIComponent(url)
         } else {
             // Open link in a new tab

@@ -3,13 +3,13 @@
 <div class="container-fluid">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="${webinterface}" target="_blank" title="Open original NZBGet interface">${settings.get('nzbget_name', 'NZBGet')}</a>
+            <a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'} title="Open original NZBGet interface">${settings.get('nzbget_name', 'NZBGet')}</a>
             <small>
                 <strong>Speed:</strong> <span id="queue_speed"></span>
                 <strong>Status:</strong> <span id="queue_state"></span>
             </small>
         </h1>
-        
+
         <form name="add_nzb_form" id="add_nzb_form" method="post" class="well form-inline" action="">
             <input class="span5" id="nzb_url" name="nzb_url" type="text" placeholder="Paste NZB url" />
             <select class="span2" name="nzb_category" id="nzb_category"></select>

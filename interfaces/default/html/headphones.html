@@ -2,7 +2,7 @@
 <div class="container-fluid">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="${url}" target="_blank" title="Open original Headphones interface">${name}</a>
+            <a href="${url}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'} title="Open original Headphones interface">${name}</a>
             <div class="btn-group show-options-menu pull-right">
                 <a class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" href="#">
                     <i class="fa fa-wrench fa-lg"></i>

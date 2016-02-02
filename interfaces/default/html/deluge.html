@@ -3,7 +3,7 @@
 <div class="container-fluid">
     <div class="content">
       <h1 id="delugetitle" data-action="" class="page-header page-title">
-          <a href="${webinterface}" target="_blank">${settings.get('deluge_name', 'Deluge')}</a>
+          <a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'}>${settings.get('deluge_name', 'Deluge')}</a>
           <small>
             <i class="fa fa-arrow-down"></i> <span id="queue_download"></span>
             <i class="fa fa-arrow-up"></i> <span id="queue_upload"></span>
