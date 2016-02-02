@@ -55,7 +55,8 @@ $(document).ready(function() {
 
     $.get(WEBDIR + 'couchpotato/GetCategories', function(data) {
         if (data.categories.length <= 0) return
-        cpcat = $('<select>');
+        cpcat = $('<select id="category_id">');
+        cpcat.append($('<option>').val('').text(''));
         $.each(data.categories, function(i, item) {
             cpcat.append($('<option>').val(item._id).text(item.label))
         });
@@ -384,6 +385,7 @@ function showMovie(movie, was_search) {
     // Adds the category id showmovie was run from search
     if (was_search) {
         modalInfo.append(cpcat);
+        console.log(cpcat)
     }
 
     if (movie.releases && movie.releases.length > 0 && movie.releases.status !== 'done') {
