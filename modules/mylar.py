@@ -7,9 +7,9 @@ import logging
 import requests
 from cherrypy.lib.auth2 import require, member_of
 from urllib import urlencode
+
 from json import loads
-from htpc.helpers import get_image
-from htpc.helpers import fix_basepath
+from htpc.helpers import get_image, serve_template, fix_basepath
 from StringIO import StringIO
 from contextlib import closing
 
@@ -37,14 +37,11 @@ class Mylar(object):
     @cherrypy.expose()
     @require()
     def index(self):
-        template = htpc.LOOKUP.get_template('mylar.html')
-        settings = htpc.settings
+        return serve_template('mylar.html',
+                              scriptname='mylar',
+                              webinterface=Mylar.webinterface()
+                            )
 
-        return template.render(
-            scriptname='mylar',
-            url=Mylar.webinterface(),
-            name=settings.get('mylar_name', 'mylar')
-        )
 
     @cherrypy.expose()
     @require()
