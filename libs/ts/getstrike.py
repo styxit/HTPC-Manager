@@ -6,6 +6,9 @@ import logging
 import re
 import requests
 
+"""
+Disabled for now, hopefully someone will add/release the scrapers so clones pops up
+"""
 
 # Disable the damn warnings
 requests.packages.urllib3.disable_warnings()

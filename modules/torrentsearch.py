@@ -7,9 +7,9 @@ import jsonrpclib
 import logging
 from ts import norbits
 from ts import ka
-from ts import getstrike
 from ts import ptp
 from ts import rarbg
+from ts import torrentproject
 from cherrypy.lib.auth2 import require
 
 
@@ -34,7 +34,8 @@ class Torrentsearch(object):
                 {'type': 'password', 'label': 'PTP passkey', 'name': 'torrents_ptp_passkey'},
                 {'type': 'bool', 'label': 'Rarbg', 'name': 'torrents_rarbg_enabled'},
                 {'type': 'bool', 'label': 'KAT', 'name': 'torrents_ka_enabled'},
-                {'type': 'bool', 'label': 'Strike', 'name': 'torrents_getstrike_enabled', 'desc': 'DTH tracker'},
+                #{'type': 'bool', 'label': 'Strike', 'name': 'torrents_getstrike_enabled', 'desc': 'DTH tracker'},
+                {'type': 'bool', 'label': 'Torrent project', 'name': 'torrents_torrentproject_enabled', 'desc': 'DTH tracker'}
             ]
         })
 
@@ -64,6 +65,8 @@ class Torrentsearch(object):
                 r += self.search_ptp(query, 'movie')
             if htpc.settings.get('torrents_rarbg_enabled'):
                 r += self.search_rarbg(query, None)
+            if htpc.settings.get('torrents_torrentproject_enabled'):
+                r += self.search_torrentproject(query, None)
 
         elif provider == 'btn':
             if htpc.settings.get('torrents_btn_enabled'):
@@ -71,9 +74,12 @@ class Torrentsearch(object):
         elif provider == 'rarbg':
             if htpc.settings.get('torrents_rarbg_enabled'):
                 r += self.search_rarbg(query, None)
-        elif provider == 'getstrike':
-            if htpc.settings.get('torrents_getstrike_enabled'):
-                r += self.search_getstrike(query, 'all')
+        #elif provider == 'getstrike':
+        #    if htpc.settings.get('torrents_getstrike_enabled'):
+        #        r += self.search_getstrike(query, 'all')
+        elif provider == 'torrentproject':
+            if htpc.settings.get('torrents_torrentproject_enabled'):
+                r += self.search_torrentproject(query, 'all')
         elif provider == 'kat':
             if htpc.settings.get('torrents_ka_enabled'):
                 r += self.search_ka(query)
@@ -123,8 +129,9 @@ class Torrentsearch(object):
         if htpc.settings.get('torrents_ka_enabled') == 1:
             torrentproviders.append('KAT')
 
-        if htpc.settings.get('torrents_getstrike_enabled') == 1:
-            torrentproviders.append('GetStrike')
+        # hope it comes back
+        #if htpc.settings.get('torrents_getstrike_enabled') == 1:
+        #    torrentproviders.append('GetStrike')
 
         if (htpc.settings.get('torrents_ptp_enabled') == 1 and htpc.settings.get('torrents_ptp_passkey')
             and htpc.settings.get('torrents_ptp_username') and htpc.settings.get('torrents_ptp_password')):
@@ -132,6 +139,9 @@ class Torrentsearch(object):
 
         if htpc.settings.get('torrents_rarbg_enabled') == 1:
             torrentproviders.append('rarbg')
+
+        if htpc.settings.get('torrents_torrentproject_enabled') == 1:
+            torrentproviders.append('torrentproject')
 
         return torrentproviders
 
@@ -201,3 +211,6 @@ class Torrentsearch(object):
 
     def search_rarbg(self, q, cat):
         return self.rb.search(q, cat)
+
+    def search_torrentproject(self, q, cat):
+        return torrentproject.Torrentproject().search(q, cat)
