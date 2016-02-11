@@ -44,13 +44,8 @@ function loadUpcomingAlbumsList() {
   if (!$('#upcomingalbumslist_table_body').length) return
   $.getJSON(WEBDIR + 'headphones/GetUpcomingList', function(data) {
     if (data == null) {
-      $('#upcomingalbumslist_table_body').append(
-        $('<tr>').append($('<td>').html('No upcoming albums found').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2'))
-      )
+      dasherror('dash_upcoming_albums_list', 'No upcoming albums found')
+
       return
     }
     $.each(data, function(i, albums) {
@@ -70,13 +65,8 @@ function loadWantedAlbumsList() {
   if (!$('#wantedalbumslist_table_body').length) return
   $.getJSON(WEBDIR + 'headphones/GetWantedList', function(data) {
     if (data == null) {
-      $('#wantedalbumslist_table_body').append(
-        $('<tr>').append($('<td>').html('No wanted albums found').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2'))
-      )
+      dasherror('dash_wanted_albums_list', 'No wanted albums found')
+
       return
     }
     $.each(data, function(i, albums) {
@@ -176,20 +166,17 @@ function loadRecentMoviesList() {
   if (!$('#latestmovieslist_table_body').length) return
   $.getJSON(WEBDIR + 'kodi/GetRecentMovies', function(result) {
     if (result.movies[0] == null) {
-      $('#latestmovieslist_table_body').append(
-        $('<tr>').append($('<td>').html('No latest movies found').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2'))
-      )
+      dasherror('dash_rec_movies_list', 'No movies :(')
+
       return
     }
+    // add plot?
     $.each(result.movies, function(i, item) {
+       var year = (item.year && item.year != '0') ? item.year: '';
       $('#latestmovieslist_table_body').append(
         $('<tr>').append(
           $('<td>').html(item.title),
-          $('<td>').append($('<div class="pull-right">').html(item.year))
+          $('<td>').append($('<div class="pull-right">').html(year))
         )
       )
     })
@@ -232,23 +219,18 @@ function loadRecentTVshows() {
 }
 
 function loadRecentTVshowsList() {
-  if (!$('#latestmovieslist_table_body').length) return
+  if (!$('#latesttvlist_table_body').length) return
   $.getJSON(WEBDIR + 'kodi/GetRecentShows', function(result) {
     if (result.episodes[0] == null) {
-      $('#latesttvlist_table_body').append(
-        $('<tr>').append($('<td>').html('No latest tv shows found').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2'))
-      )
+      dasherror('dash_rec_tv_list', 'No latest tv shows found :(')
       return
     }
     $.each(result.episodes, function(i, item) {
       $('#latesttvlist_table_body').append(
         $('<tr>').append(
-          $('<td>').html(item.label),
-          $('<td>').append($('<div class="pull-right">').html(item.showtitle))
+          $('<td>').html(item.showtitle),
+          $('<td>').html('S' + pad(item.season, 2) + 'E' + pad(item.episode, 2)),
+          $('<td>').text(item.title)
         )
       )
     })
@@ -450,13 +432,7 @@ function loadWantedMovies() {
   if (!$('#wantedmovies_table_body').length) return
   $.getJSON(WEBDIR + 'couchpotato/GetMovieList/active/5', function(result) {
     if (result.movies[0] == null) {
-      $('#wantedmovies_table_body').append(
-        $('<tr>').append($('<td>').html('No wanted movies found').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2')),
-        $('<tr>').append($('<td>').html('&nbsp;').attr('colspan', '2'))
-      )
+      dasherror('dash_couchpotato', 'No wanted movies found')
       return
     }
     $.each(result.movies, function(i, item) {
@@ -474,13 +450,7 @@ function loadNextAired(options) {
   if (!$('#nextaired_sickbeard_table_body').length) return
   $.getJSON(WEBDIR + 'sickbeard/GetNextAired', function(result) {
     if (result === null || result.data.soon.length === 0) {
-      $('#nextaired_sickbeard_table_body').append(
-        $('<tr>').append($('<td>').html('No future episodes found')),
-        $('<tr>').append($('<td>').html('&nbsp;')),
-        $('<tr>').append($('<td>').html('&nbsp;')),
-        $('<tr>').append($('<td>').html('&nbsp;')),
-        $('<tr>').append($('<td>').html('&nbsp;'))
-      )
+      dasherror('dash_sickbeard', 'No future episodes found')
       return
     }
     var soonaired = result.data.soon
@@ -525,23 +495,12 @@ function loadNextAiredSickrage(options) {
   if (!$('#nextaired_sickrage_table_body').length) return
   $.getJSON(WEBDIR + 'sickrage/GetNextAired', function(result) {
     if (result === null) {
-      $('#nextairedsickrage_table_body').append(
-        $('<tr>').append($('<td>').html('No connection with sickrage')),
-        $('<tr>').append($('<td>').html('&nbsp;')),
-        $('<tr>').append($('<td>').html('&nbsp;')),
-        $('<tr>').append($('<td>').html('&nbsp;')),
-        $('<tr>').append($('<td>').html('&nbsp;'))
-      )
+      dasherror('dash_sickrage', "Can't reach Sickrage")
+
       return false
     };
     if (result.data.soon.length === 0 && result.data.later.length === 0 && result.data.today.length === 0 && result.data.missed.length === 0) {
-      $('#nextairedsickrage_table_body').append(
-        $('<tr>').append($('<td>').html('No future/missing episodes found')),
-        $('<tr>').append($('<td>').html('&nbsp;')),
-        $('<tr>').append($('<td>').html('&nbsp;')),
-        $('<tr>').append($('<td>').html('&nbsp;')),
-        $('<tr>').append($('<td>').html('&nbsp;'))
-      )
+      dasherror('dash_sickrage', "No future/missing episodes found")
       return false
     }
     var missed = result.data.missed;
@@ -714,18 +673,19 @@ function loadqbit() {
           numberofloop += 1;
           if (numberofloop <= max) {
             tr.append(
-              $('<td>').addClass('qbt_name').html(torrent.name),
-              $('<td>').addClass('qbit_eta pull-right').text(torrent.eta));
+              $('<td>').addClass('qbt_name span4').text(torrent.name),
+              $('<td>').addClass('qbit_eta').append('<div class="pull-right">' + torrent.eta + '</div>'));
             $('#dash_qbit_table_body').append(tr);
           } else {
-            tr.append($('<td>').addClass('span6 pull-right').attr("colspan", 2).html("<small>" + (i - max) + " more torrents</small>"))
+
+            tr.append($('<td>').addClass('').attr("colspan", 2).append('<div class="text-center"><small>' + (i - max) + ' more torrents</small></div>'))
             $('#dash_qbit_table_body').append(tr);
             return false;
           }
         });
       } else {
         tr = $('<tr>');
-        tr.append($('<td>').addClass('span6 aligncenter').attr("colspan", 2).html("<small>No active downloads</small>"))
+        tr.append($('<td>').attr("colspan", 2).append('<div class="text-center"><small>No active downloads</small></div>'))
         $('#dash_qbit_table_body').append(tr);
       }
     }
