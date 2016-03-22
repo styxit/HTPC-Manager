@@ -76,16 +76,23 @@ class Vnstat(object):
                 client = paramiko.SSHClient()
                 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
                 client.connect(hostname, username=username, password=password,
-                               allow_agent=False, look_for_keys=False, timeout=10)
+                               allow_agent=False, look_for_keys=False, timeout=15)
 
+
+                self.logger.debug('SSH cmd %s' % cmd)
                 stdin, stdout, stderr = client.exec_command(cmd)
                 data_out = stdout.read()
 
-                # Make json of shitty xml
-                if '--xml' in cmd:
-                    return xmltodict.parse(data_out)
+                if data_out:
+                    # Make json of shitty xml
+                    # remove this line later.
+                    self.logger.debug(data_out)
+                    if '--xml' in cmd:
+                        return xmltodict.parse(data_out)
+                    else:
+                        return data_out
                 else:
-                    return data_out
+                    self.logger.error('No data from paramiko')
 
             else:
                 # vnstat is running on the same computer as htpc manager
