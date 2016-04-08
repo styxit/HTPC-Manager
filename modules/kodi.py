@@ -27,7 +27,7 @@ class KodiServers(SQLObject):
     password = StringCol(default=None)
     mac = StringCol(default=None)
 
-    class sqlmeta:
+    class sqlmeta(object):
         fromDatabase = True
 
 
@@ -235,7 +235,7 @@ class Kodi(object):
         servers = []
         for s in KodiServers.select():
             servers.append({'id': s.id, 'name': s.name})
-        if len(servers) < 1:
+        if not servers:
             return
         try:
             current = self.current.name

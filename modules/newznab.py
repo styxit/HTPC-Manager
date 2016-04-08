@@ -24,7 +24,7 @@ class NewznabIndexers(SQLObject):
     use_ssl = StringCol(default=None)
     apiurl = StringCol(default=None)
 
-    class sqlmeta:
+    class sqlmeta(object):
         fromDatabase = True
 
 
@@ -79,8 +79,10 @@ class Newznab(object):
         all_indexers = []
         for i in NewznabIndexers.select():
             all_indexers.append({'id': i.id, 'name': i.name})
-        if len(all_indexers) < 1:
+
+        if not all_indexers:
             return
+
         try:
             current = self.current.name
         except AttributeError:

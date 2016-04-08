@@ -3,7 +3,7 @@
 <div class="container-fluid">
     <div class="content">
       <h1 class="page-header page-title">
-        <a href="http://${settings.get('transmission_host')}:${settings.get('transmission_port')}${settings.get('transmission_revproxy', '/')}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'}>${settings.get('transmission_name', 'Transmission')}</a>
+        <a href="http://${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'}>${settings.get('transmission_name', 'Transmission')}</a>
           <small>
             <i class="fa fa-arrow-down"></i> <span id="queue_download"></span>
             <i class="fa fa-arrow-up"></i> <span id="queue_upload"></span>

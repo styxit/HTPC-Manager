@@ -153,10 +153,13 @@ def cache_resize_image(item):
 
 
 @timeit_func
-def cachedprime(urls, headers={}, resize=False, plex_resize=False):
-    '''
+def cachedprime(urls, headers=None, resize=False, plex_resize=False):
+    """
     {'hash': '1dad1d1', fp': 'filepath', 'url': 'imgurl', 'resize': [[w, h, url, dest]}
-    '''
+    """
+
+    if headers is None:
+        headers = {}
 
     logger.debug('Got %s images' % len(urls))
     urls = remove_dict_dupe_from_list(urls, 'hash')

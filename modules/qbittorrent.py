@@ -80,7 +80,11 @@ class Qbittorrent(object):
             self.logger.error('Failed to auth with new api %s' % e)
             return
 
-    def _fetch(self, u, post=False, params={}, data=None):
+    def _fetch(self, u, post=False, params=None, data=None):
+
+        if params is None:
+            params = {}
+
         host = striphttp(htpc.settings.get('qbittorrent_host', ''))
         port = htpc.settings.get('qbittorrent_port', '')
         ssl = 's' if htpc.settings.get('qbittorrent_ssl') else ''

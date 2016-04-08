@@ -88,8 +88,10 @@ class Users(object):
         users = []
         for s in Manageusers.select():
             users.append({'id': s.id, 'name': s.username})
-        if len(users) < 1:
+
+        if not users:
             return
+
         return {'users': users}
 
     @cherrypy.expose()

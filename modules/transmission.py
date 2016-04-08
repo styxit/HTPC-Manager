@@ -26,7 +26,7 @@ class Transmission(object):
                 {'type': 'text', 'label': 'Menu name', 'name': 'transmission_name'},
                 {'type': 'text', 'label': 'IP / Host', 'placeholder': 'localhost', 'name': 'transmission_host'},
                 {'type': 'text', 'label': 'Port', 'placeholder': '9091', 'name': 'transmission_port'},
-                {'type': 'text', 'label': 'Reverse Proxy', 'placeholder': '', 'name': 'transmission_revproxy'},
+                {'type': 'text', 'label': 'Reverse Proxy', 'placeholder': '', 'name': 'transmission_reverse_proxy_link'},
                 {'type': 'text', 'label': 'Rpc url', 'placeholder': '', 'name': 'transmission_rpcbasepath'},
                 {'type': 'text', 'label': 'Username', 'name': 'transmission_username'},
                 {'type': 'password', 'label': 'Password', 'name': 'transmission_password'}
@@ -36,7 +36,32 @@ class Transmission(object):
     @cherrypy.expose()
     @require()
     def index(self):
-        return htpc.LOOKUP.get_template('transmission.html').render(scriptname='transmission')
+        return htpc.LOOKUP.get_template('transmission.html').render(scriptname='transmission',
+                                                                    webinterface=Transmission.webinterface())
+
+    @staticmethod
+    def webinterface():
+        if htpc.settings.get('transmission_reverse_proxy_link'):
+            url = htpc.settings.get('transmission_reverse_proxy_link')
+        else:
+            host = striphttp(htpc.settings.get('transmission_host', ''))
+            port = str(htpc.settings.get('transmission_port', ''))
+            basepath = htpc.settings.get('transmission_rpcbasepath')
+            username = htpc.settings.get('transmission_username')
+            password = htpc.settings.get('transmission_password')
+
+            auth = None
+
+            # Default basepath is transmission
+            if not basepath:
+                basepath = '/transmission/'
+
+            basepath = fix_basepath(basepath)
+
+            url = 'http://%s:%s%srpc/' % (host, str(port), basepath)
+
+        return url
+
 
     @cherrypy.expose()
     @require()

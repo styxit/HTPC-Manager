@@ -217,10 +217,11 @@ class Updater(object):
             Thread(target=self.updateEngine.update).start()
 
 
-class GitUpdater():
+class GitUpdater(object):
     """ Class to update HTPC Manager using git commands. """
+
     def __init__(self):
-        """ Set GitHub settings on load """
+        """ Set GitHub settings on load. """
         self.UPDATING = 0
         self.git = htpc.settings.get('git_path', 'git')
         self.logger = logging.getLogger('htpc.updater')
@@ -237,7 +238,7 @@ class GitUpdater():
             return htpc.settings.get('branch', 'master2')
 
     def latest(self):
-        """ Get hash of latest commit on github """
+        """ Get hash of latest commit on github. """
         self.logger.debug('Getting latest version from github.')
         try:
             url = 'https://api.github.com/repos/%s/%s/commits/%s' % (gitUser, gitRepo, self.current_branch_name())
@@ -252,7 +253,7 @@ class GitUpdater():
             return False
 
     def current(self):
-        """ Get hash of current Git commit """
+        """ Get hash of current Git commit. """
         self.logger.debug('Getting current version.')
         output = self.git_exec(self.git, 'rev-parse HEAD')
         self.logger.debug('Current version: ' + output)
@@ -286,7 +287,8 @@ class GitUpdater():
         return [d]
 
     def update(self):
-        """ Do update through git """
+        """ Do update through git. """
+
         self.logger.info("Attempting update through Git.")
         self.UPDATING = 1
 
@@ -314,7 +316,8 @@ class GitUpdater():
         self.UPDATING = 0
 
     def git_exec(self, gp, args):
-        """ Tool for running git program on system """
+        """ Tool for running git program on system. """
+
         try:
             proc = subprocess.Popen(gp + " " + args, stdout=subprocess.PIPE,
                                     stderr=subprocess.STDOUT, shell=True, cwd=htpc.RUNDIR)
@@ -340,7 +343,7 @@ class GitUpdater():
             return output.strip()
 
 
-class SourceUpdater():
+class SourceUpdater(object):
     """ Class to update HTPC Manager using Source code from Github. Requires a full download on every update."""
     def __init__(self):
         self.UPDATING = 0

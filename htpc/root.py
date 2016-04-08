@@ -21,14 +21,14 @@ def do_restart():
     arguments.insert(0, sys.executable)
     if sys.platform == 'win32':
         arguments = ['"%s"' % arg for arg in arguments]
-        
+
     os.chdir(os.getcwd())
     # Fix for rotation logs on windows
     logging.shutdown()
     os.execv(sys.executable, arguments)
 
 
-class RestrictedArea:
+class RestrictedArea(object):
     # all methods in this controller (and subcontrollers) is
     # open only to members of the admin group
     _cp_config = {
@@ -89,7 +89,7 @@ class Root(object):
     @require()
     def logout(self, from_page="/"):
         sess = cherrypy.session
-        username = sess.get(SESSION_KEY, None)
+        username = sess.get(SESSION_KEY)
         sess[SESSION_KEY] = None
         if username:
             cherrypy.request.login = None

@@ -416,7 +416,7 @@ class Plex(object):
 
                                     jmovie['type'] = movie['_elementType']
 
-                                    if len(genre):
+                                    if genre:
                                         jmovie['genre'] = genre
 
                                     movies.append(jmovie)
@@ -1089,7 +1089,7 @@ class Plex(object):
                                 update['version'] = each.split(':')[1].strip()
                     PMS_list.append(update)
 
-            if len(PMS_list) == 0:
+            if not PMS_list:
                 self.logger.info('GDM: No servers discovered')
             else:
                 self.logger.info('GDM: Servers discovered: %s' % str(len(PMS_list)))
@@ -1212,7 +1212,7 @@ class Plex(object):
 
 
                             }
-                            t = gen.get(v, None)
+                            t = gen.get(v)
                             if t is not None:
                                 d[k] = gen[v]
                             else:
@@ -1233,7 +1233,7 @@ class Plex(object):
                                     'track': 10,
                                     'tracks': 10
                             }
-                            t = gen.get(v, None)
+                            t = gen.get(v)
                             if t is not None:
                                 d[k] = gen[v]
                             else:

@@ -15,8 +15,9 @@ from cherrypy.lib.auth2 import require, member_of
 import colorama
 
 
-class Log:
+class Log(object):
     """ Root class """
+
     def __init__(self):
         """ Initialize the logger """
         self.logfile = os.path.join(htpc.DATADIR, 'htpcmanager.log')
