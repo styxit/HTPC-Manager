@@ -564,7 +564,7 @@ class Stats(object):
                         i += 1
                 return d
             except Exception as e:
-                self.logger.error('Pulling S.M.A.R.T. data %s' % e)
+                self.logger.exception('Error Pulling S.M.A.R.T. data %s' % e)
 
     @cherrypy.expose()
     @require()
