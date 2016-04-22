@@ -34,7 +34,6 @@ class Torrentsearch(object):
                 {'type': 'password', 'label': 'PTP passkey', 'name': 'torrents_ptp_passkey'},
                 {'type': 'bool', 'label': 'Rarbg', 'name': 'torrents_rarbg_enabled'},
                 {'type': 'bool', 'label': 'KAT', 'name': 'torrents_ka_enabled'},
-                #{'type': 'bool', 'label': 'Strike', 'name': 'torrents_getstrike_enabled', 'desc': 'DTH tracker'},
                 {'type': 'bool', 'label': 'Torrent project', 'name': 'torrents_torrentproject_enabled', 'desc': 'DTH tracker'}
             ]
         })
@@ -59,8 +58,6 @@ class Torrentsearch(object):
                 r += self.search_norbits(query, 'all')
             if htpc.settings.get('torrents_ka_enabled'):
                 r += self.search_ka(query)
-            if htpc.settings.get('torrents_getstrike_enabled'):
-                r += self.search_getstrike(query, 'all')
             if htpc.settings.get('torrents_ptp_enabled'):
                 r += self.search_ptp(query, 'movie')
             if htpc.settings.get('torrents_rarbg_enabled'):
@@ -74,9 +71,6 @@ class Torrentsearch(object):
         elif provider == 'rarbg':
             if htpc.settings.get('torrents_rarbg_enabled'):
                 r += self.search_rarbg(query, None)
-        #elif provider == 'getstrike':
-        #    if htpc.settings.get('torrents_getstrike_enabled'):
-        #        r += self.search_getstrike(query, 'all')
         elif provider == 'torrentproject':
             if htpc.settings.get('torrents_torrentproject_enabled'):
                 r += self.search_torrentproject(query, 'all')
@@ -128,10 +122,6 @@ class Torrentsearch(object):
 
         if htpc.settings.get('torrents_ka_enabled') == 1:
             torrentproviders.append('KAT')
-
-        # hope it comes back
-        #if htpc.settings.get('torrents_getstrike_enabled') == 1:
-        #    torrentproviders.append('GetStrike')
 
         if (htpc.settings.get('torrents_ptp_enabled') == 1 and htpc.settings.get('torrents_ptp_passkey')
             and htpc.settings.get('torrents_ptp_username') and htpc.settings.get('torrents_ptp_password')):
@@ -202,9 +192,6 @@ class Torrentsearch(object):
 
     def search_ka(self, q, cat="all"):
         return ka.search(q, cat)
-
-    def search_getstrike(self, q, cat):
-        return getstrike.search(q, cat)
 
     def search_ptp(self, q, cat):
         return ptp.search(q, cat)
