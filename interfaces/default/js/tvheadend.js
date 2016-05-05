@@ -148,6 +148,6 @@ function getRecordings() {
 
 $(document).ready(function () {
 	getChannelTags();
-	getChannels();
+	//getChannels();
 	getRecordings();
 });
