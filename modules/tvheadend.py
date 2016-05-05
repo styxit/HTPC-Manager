@@ -49,37 +49,39 @@ class TVHeadend(object):
     @require()
     @cherrypy.tools.json_out()
     def GetEPG(self, strLimit="300", strChannel=""):
-        return self.fetch("epg", {'limit': strLimit, 'start': "0", 'channel': strChannel })
+        return self.fetch("api/epg/events/grid", {'limit': strLimit, 'start': "0", 'channel': strChannel})
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def GetChannels(self):
-        return self.fetch("api/channel/grid", { 'dir': 'ASC', 'sort': 'tags', 'limit': 1000})
+        #return self.fetch("api/channel/grid", { 'dir': 'ASC', 'sort': 'tags', 'limit': 1000 })
+        return self.fetch("api/channel/grid", { 'sort': 'number', 'limit': 1000 })
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def GetChannelTags(self):
-        return self.fetch("channeltags", {'op': 'listTags'})
-
+        return self.fetch("api/channeltag/list", {'op': 'listTags'})
+ 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def DVRAdd(self, strEventID=""):
-        return self.fetch("dvr", {'eventId': strEventID, 'op': "recordEvent"})
+        return self.fetch("api/dvr/entry/create_by_event", {'event_id': strEventID, 'config_uuid': ''})
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def DVRDel(self, strEntryID=""):
-        return self.fetch("dvr", {'entryId': strEntryID, 'op': "cancelEntry"})
+        return self.fetch("api/idnode/delete", {'uuid': strEntryID})
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def DVRList(self, strType=""):
-        return self.fetch("dvrlist_" + strType, None)
+        return self.fetch("api/dvr/entry/grid_" + strType, None)
+        #return self.fetch("dvrlist_" + strType, None)
 
     def fetch(self, strQuery, rgpData):
         rgpHeaders = {}

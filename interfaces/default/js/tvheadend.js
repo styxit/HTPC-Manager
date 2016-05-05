@@ -30,11 +30,11 @@ function showEPG(pChannel) {
 				strTable.append($("<tr>")
 					.append($("<td>").text(pEntry.title))
 					.append($("<td>").text(convertTimestamp(pEntry.start)))
-					.append($("<td>").text(convertTimestamp(pEntry.end)))
+					.append($("<td>").text(convertTimestamp(pEntry.stop)))
 					.append($("<td>")
 						.append($("<a>").text("REC").click(function(pEvent) {
 							pEvent.preventDefault();
-							parseJSON("DVRAdd/" + pEntry.id, null);
+							parseJSON("DVRAdd/" + pEntry.eventId, null);
 						}))
 					));
 			});
@@ -57,15 +57,15 @@ function getChannelTags() {
 			// Add nav tabs
 			$(".nav.nav-tabs").append($("<li>")
 				.append($("<a>")
-					.attr("href", "#tag-" + pEntry.identifier)
+					.attr("href", "#tag-" + pEntry.key)
 					.attr("data-toggle", "tab")
-						.text(pEntry.name)));
+						.text(pEntry.val)));
 
 			// Add tab pane
-			var strTabPane = $("<div>").attr("id", "tag-" + pEntry.identifier)
+			var strTabPane = $("<div>").attr("id", "tag-" + pEntry.key)
 				.attr("class", "tab-pane");
 
-			$(".tab-content").append(strTabPane.append($("<ul>").attr("id", "tag-" + pEntry.identifier + "-grid").attr("class", "thumbnails")));
+			$(".tab-content").append(strTabPane.append($("<ul>").attr("id", "tag-" + pEntry.key + "-grid").attr("class", "thumbnails")));
 		});
 		getChannels();
 	});
@@ -75,24 +75,29 @@ function getChannelTags() {
 
 function getChannels() {
 	parseJSON("GetChannels", function(pResult) {
+
 		$.each(pResult.entries, function(nIndex, pEntry) {
-			var strHTML = $("<div>").attr("class", "channel");
-			var pHTMLEntry = null;
-
-			if (pEntry.icon != undefined) {
-				pHTMLEntry = $("<img>").attr("src", pEntry.icon);
-			}
-			else {
-				pHTMLEntry = $("<a>").text(pEntry.name);
-			}
-
-			pHTMLEntry.click(function (pEvent) {
-				showEPG(pEntry);
-			});
-
-			strHTML.append(pHTMLEntry);
 
 			$.each(pEntry.tags, function(nIndex, nTag) {
+
+				var strHTML = null;
+
+				var strHTML = $("<div>").attr("class", "channel");
+				var pHTMLEntry = null;
+
+				if (pEntry.icon != undefined) {
+					pHTMLEntry = $("<img>").attr("src", pEntry.icon);
+				}
+				else {
+					pHTMLEntry = $("<a>").text(pEntry.name);
+				}
+
+				pHTMLEntry.click(function (pEvent) {
+					showEPG(pEntry);
+				});
+	
+				strHTML.append(pHTMLEntry);
+
 				$("#tag-" + nTag + "-grid").append($("<li>").append(strHTML));
 			});
 		});
@@ -113,18 +118,18 @@ function parseRecordings(strType) {
 
 	parseJSON("DVRList/" + strType, function(pResult) {
 		$.each(pResult.entries, function(nIndex, pEntry) {
-			strTable.append($("<tr>").attr("id", "recording-" + pEntry.id)
-				.append($("<td>").text(pEntry.channel))
-				.append($("<td>").text(pEntry.title))
+			strTable.append($("<tr>").attr("id", "recording-" + pEntry.uuid)
+				.append($("<td>").text(pEntry.channelname))
+				.append($("<td>").text(pEntry.disp_title))
 				.append($("<td>").text(convertTimestamp(pEntry.start)))
-				.append($("<td>").text(convertTimestamp(pEntry.end)))
+				.append($("<td>").text(convertTimestamp(pEntry.stop)))
 				.append($("<td>").text(pEntry.status))
 				.append($("<td>").append($("<a>").text("DEL").click(function(pEvent) {
 						pEvent.preventDefault();
 
-						parseJSON("DVRDel/" + pEntry.id, function(pResult) {
+						parseJSON("DVRDel/" + pEntry.uuid, function(pResult) {
 							if (pResult.success == 1) {
-								$("#recording-" + pEntry.id).fadeOut();
+								$("#recording-" + pEntry.uuid).fadeOut();
 							}
 						});
 					})))
