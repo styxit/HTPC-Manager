@@ -152,6 +152,7 @@ class Sonarr(object):
     @require()
     @cherrypy.tools.json_out()
     def Calendar(self, param=None, *args, **kwargs):
+        kwargs.pop('_')
         p = urllib.urlencode(kwargs)
         episodes = self.fetch('Calendar?%s' % p)
         cal = []
