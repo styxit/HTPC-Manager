@@ -90,6 +90,7 @@ class Sonarr(object):
 
         except Exception as e:
             self.logger.error('Failed to fetch url=%s path=%s error %s' % (url, path, e))
+            return []
 
     @cherrypy.expose()
     @require(member_of(htpc.role_admin))
@@ -113,7 +114,7 @@ class Sonarr(object):
     @require()
     @cherrypy.tools.json_out()
     def Rootfolder(self):
-        return [folder['path'] for folder in self.fetch('Rootfolder')]
+        return [folder['path'] for folder in self.fetch('Rootfolder') if folder.get('path')]
 
     @cherrypy.expose()
     @require()
@@ -156,18 +157,19 @@ class Sonarr(object):
         p = urllib.urlencode(kwargs)
         episodes = self.fetch('Calendar?%s' % p)
         cal = []
-        for episode in episodes:
-            d = {
-                'title': episode['series']['title'],
-                'season': episode['seasonNumber'],
-                'episode': episode['episodeNumber'],
-                'start': episode['airDateUtc'],
-                'overview': episode.get('overview', ''),
-                'all': episode,
-                'allDay': False,
-            }
+        if episodes:
+            for episode in episodes:
+                d = {
+                    'title': episode['series']['title'],
+                    'season': episode['seasonNumber'],
+                    'episode': episode['episodeNumber'],
+                    'start': episode['airDateUtc'],
+                    'overview': episode.get('overview', ''),
+                    'all': episode,
+                    'allDay': False,
+                }
 
-            cal.append(d)
+                cal.append(d)
 
         return cal
 
