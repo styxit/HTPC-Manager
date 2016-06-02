@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import platform
 import hashlib
 import htpc
 import imghdr
@@ -459,3 +460,11 @@ def tvmaze(_id, img_provider, t):
     except Exception as e:
         logger.info('Failed to find any images from tvmaze %s' % e)
         return img_list
+
+OS = platform.system()
+
+def path_append():
+    ''' Appends the path for FreeBSD and FreeNAS '''
+    if OS == 'FreeBSD':
+        os.environ["PATH"] += '/sbin:/bin:/usr/sbin:/usr/bin:/usr/games:' +\
+                              '/usr/local/sbin:/usr/local/bin:/root/bin'

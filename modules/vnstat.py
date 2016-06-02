@@ -11,7 +11,7 @@ import subprocess
 import re
 import json
 from itertools import chain
-from htpc.helpers import serve_template
+from htpc.helpers import serve_template, path_append
 
 try:
     import paramiko
@@ -63,6 +63,8 @@ class Vnstat(object):
 
             if not parameters:
                 return
+            # Append path for FreeBSD and FreeNAS
+            path_append()
             cmd = 'vnstat %s' % parameters
 
             if htpc.settings.get('vnstat_db', ''):
