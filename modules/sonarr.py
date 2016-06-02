@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import datetime as DT
+from json import loads, dumps
+import logging
+import urllib
+
 import cherrypy
-import htpc
 from cherrypy.lib.auth2 import require, member_of
 import requests
-import urllib
-import logging
-from json import loads, dumps
+
+import htpc
 from htpc.helpers import fix_basepath, get_image, striphttp
 
 
@@ -25,7 +27,7 @@ class Sonarr(object):
                 {'type': 'text', 'label': 'IP / Host', 'placeholder': 'localhost', 'name': 'sonarr_host'},
                 {'type': 'text', 'label': 'Port', 'placeholder': '8989', 'name': 'sonarr_port'},
                 {'type': 'text', 'label': 'Basepath', 'placeholder': '/sonarr', 'name': 'sonarr_basepath'},
-                {'type': 'text', 'label': 'API', 'name': 'sonarr_apikey'},
+                {'type': 'text', 'label': 'API KEY', 'name': 'sonarr_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'sonarr_ssl'},
                 {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link, e.g. https://sonarr.domain.com', 'name': 'sonarr_reverse_proxy_link'},
 
