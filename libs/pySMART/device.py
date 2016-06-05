@@ -482,7 +482,10 @@ class Device(object):
                 self.model = line.split(':')[1].lstrip().rstrip()
                 self._guess_SMART_type(line.lower())
             if 'Serial Number' in line or 'Serial number' in line:
-                self.serial = line.split(':')[1].split()[0].rstrip()
+                try:
+                    self.serial = line.split(':')[1].split()[0].rstrip()
+                except IndexError:
+                    pass
             if 'LU WWN' in line:
                 self._guess_SMART_type(line.lower())
             if 'Firmware Version' in line or 'Revision' in line:
