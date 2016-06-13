@@ -91,32 +91,6 @@
                 </div>
             </div>
             %endif
-            %if settings.get('dash_current_plex', 0):
-            <div class="span4 dash-module" id="dash_current_plex">
-                  <h3><a href="plex/#shows">Now Playing in Plex</a></h3>
-                <table class="table table-striped table-main">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Title</th>
-							<th>Progress</th>
-                            <th>State</th>
-                        </tr>
-                    </thead>
-                    <tbody id="currentplex_table_body"></tbody>
-                </table>
-            </div>
-            %endif
-			%if settings.get('dash_current_plex_carousel', 0):
-            <div class="span4 dash-module" id="dash_current_plex_carousel">
-                <h3><a href="plex/#shows">Now Playing in Plex</a></h3>
-                <div id="nowplaying-carousel-plex" class="carousel slide hide">
-                    <div class="carousel-inner"></div>
-                    <a class="carousel-control left" href="#nowplaying-carousel-plex" data-slide="prev">&lsaquo;</a>
-                    <a class="carousel-control right" href="#nowplaying-carousel-plex" data-slide="next">&rsaquo;</a>
-                </div>
-            </div>
-            %endif
             %if settings.get('dash_rec_music_plex', 0):
             <div class="span4 dash-module" id="dash_rec_music_plex">
                 <h3><a href="plex/#music">Latest Music</a></h3>
@@ -137,22 +111,6 @@
                 </table>
             </div>
             %endif
-            %if settings.get('dash_sabnzbd2', 0):
-            <div class="span4 dash-module" id="dash_sabnzbd2">
-                <h3><a href="sabnzbd/#active">Queue</a></h3>
-                <table class="table table-striped table-main">
-                    <thead>
-                        <tr>
-                            <th>File</th>
-                            <th>Size Left</th>
-                            <th>Time Left</th>
-							<th>Remove</th>
-                        </tr>
-                    </thead>
-                    <tbody id="activedownloads_table_body"></tbody>
-                </table>
-            </div>
-	    %endif
             %if settings.get('dash_nzbget', 0):
             <div class="span4 dash-module" id="dash_nzbget">
                 <h3><a href="nzbget/#history">Latest Downloads</a></h3>
@@ -355,9 +313,6 @@
     if (${int(settings.get('dash_rec_movies', 0))}){
         modules['dash_rec_movies'] = "loadRecentMovies";
     }
-    if (${int(settings.get('dash_sabnzbd2', 0))}){
-       modules['dash_sabnzbd2'] = "loadActiveDownloads";
-    }
     if (${int(settings.get('dash_rec_movies_list', 0))}){
         modules['dash_rec_movies_list'] = "loadRecentMoviesList";
     }
@@ -378,12 +333,6 @@
     }
     if (${int(settings.get('dash_rec_music_plex', 0))}){
         modules['dash_rec_music_plex'] = "loadRecentAlbumsPlex";
-    }
-    if (${int(settings.get('dash_current_plex', 0))}){
-        modules['dash_current_plex'] = "loadCurrentPlex";
-    }
-    if (${int(settings.get('dash_current_plex_carousel', 0))}){
-        modules['dash_current_plex_carousel'] = "loadCurrentPlexCarousel";
     }
     if (${int(settings.get('dash_nzbget', 0))}){
         modules['dash_nzbget'] = "loadNZBGetDownloadHistory";
