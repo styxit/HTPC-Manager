@@ -79,19 +79,23 @@ webdir = htpc.WEBDIR
                             <input type="text" name="query" id="search" class="span6 search" accesskey="s" autocapitalize="off" placeholder="Search">
                         </form>
                     </div>
-                    <% customurls = s.getUrls() %>
-                    % if len(customurls) > 1:
-                    <li class="dropdown" id="nav-menu-others">
-                        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Other &nbsp<b class="fa fa-chevron-down fa-fw"></b></a>
-                        <ul class="dropdown-menu" id="dropdown-menu-others">
-                        % for link in customurls:
-                            <li class="nav-menu-item other-link-item"><a href="${link['url']|h, entity}" target="_blank">${link['name']|h, entity}</a></li>
-                        % endfor
-                        </ul>
-                    </li>
-                    % elif len(customurls) > 0:
-                      <li class="nav-menu-item other-link-item"><a href="${customurls[0]['url']|h, entity}" target="_blank">${customurls[0]['name']|h, entity}</a></li>
-                    % endif
+			<% customurls = s.getUrls() %>
+					%if (settings.get('other_dropdown', True)):
+						<li class="dropdown" id="nav-menu-others">
+							<a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Other &nbsp<b class="fa fa-chevron-down fa-fw"></b></a>
+							<ul class="dropdown-menu" id="dropdown-menu-others">
+							% for link in customurls:
+								<li class="nav-menu-item other-link-item"><a href="${link['url']|h, entity}" target="_blank">${link['name']|h, entity}</a></li>
+							% endfor
+							</ul>
+						</li>
+					%else:
+					<% tabcount = 0 %>
+					%for link in customurls:
+						<li class="nav-menu-item other-link-item"><a href="${customurls[tabcount]['url']|h, entity}" target="_blank">${customurls[tabcount]['name']|h, entity}</a></li>
+						<% tabcount = tabcount+1 %>
+					%endfor
+					%endif
                     <!-- start phone tablet -->
                     <li class="hidden-desktop visible-phone visible-tablet">
                         <a href="${htpc.WEBDIR}about"><i class="fa fa-info-circle fa-fw"></i>  About</a>

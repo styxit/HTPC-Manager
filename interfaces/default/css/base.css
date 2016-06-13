@@ -259,3 +259,11 @@ table th.tablesorter-header {
   border-color: #5cb85c;
   background-color: #5cb85c;
 }
+.calendar_unaired {
+  border-color: #4f90d9;
+  background-color: #4f90d9;
+}
+.calendar_airing_now {
+  border-color: #b85cb8;
+  background-color: #b85cb8;
+}
