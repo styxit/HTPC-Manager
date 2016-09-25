@@ -249,7 +249,7 @@ class Sonarr(object):
     @cherrypy.expose()
     @require()
     def AddShow(self, tvdbid, quality, monitor='all', seriestype='standard',
-                rootfolder='', seasonfolder='on', specials=False):
+                rootfolder='', seasonfolder='on', specials=False): # fix me
         d = {}
         try:
             tvshow = self.fetch('Series/lookup?term=tvdbid:%s' % tvdbid)
@@ -262,6 +262,7 @@ class Sonarr(object):
                 d['title'] = i['title']
                 d['tvdbId'] = int(i['tvdbId'])
                 d['qualityProfileId'] = int(quality)
+                d['profileId'] = int(quality)
                 d['titleSlug'] = i['titleSlug']
                 d['RootFolderPath'] = rootfolder
                 d['monitored'] = True
@@ -305,11 +306,11 @@ class Sonarr(object):
                 d['seasons'] = season
                 d['addOptions'] = options
 
-                self.logger.debug('%s' % dumps(d, indent=4))
+                i.update(d)
 
-            # Manually add correct headers since @cherrypy.tools.json_out() renders it wrong
-            cherrypy.response.headers['Content-Type'] = 'application/json'
-            return self.fetch('Series', data=d, type='post')
+                # Manually add correct headers since @cherrypy.tools.json_out() renders it wrong
+                cherrypy.response.headers['Content-Type'] = 'application/json'
+                return self.fetch('Series', data=i, type='post')
 
         except Exception, e:
             self.logger.error('Failed to add tvshow %s %s' % (tvdbid, e))
