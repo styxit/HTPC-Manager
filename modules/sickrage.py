@@ -222,17 +222,17 @@ class Sickrage(object):
         return self.fetch('shows.stats')
 
     def fetch(self, cmd, img=False, timeout=20):
+        
+        host = striphttp(htpc.settings.get('sickrage_host', ''))
+        port = str(htpc.settings.get('sickrage_port', ''))
+        apikey = htpc.settings.get('sickrage_apikey', '')
+        ssl = 's' if htpc.settings.get('sickrage_ssl', 0) else ''
+        sickrage_basepath = fix_basepath(htpc.settings.get('sickrage_basepath', '/'))
+
+        url = 'http%s://%s:%s%sapi/%s/?cmd=%s' % (ssl, host, port, sickrage_basepath, apikey, cmd)
+        self.logger.debug('Fetching information from: %s' % url)
+        
         try:
-            host = striphttp(htpc.settings.get('sickrage_host', ''))
-            port = str(htpc.settings.get('sickrage_port', ''))
-            apikey = htpc.settings.get('sickrage_apikey', '')
-            ssl = 's' if htpc.settings.get('sickrage_ssl', 0) else ''
-            sickrage_basepath = fix_basepath(htpc.settings.get('sickrage_basepath', '/'))
-
-            url = 'http%s://%s:%s%sapi/%s/?cmd=%s' % (ssl, host, port, sickrage_basepath, apikey, cmd)
-
-            self.logger.debug('Fetching information from: %s' % url)
-
             if img is True:
                 # Cache the images
                 return get_image(url)
