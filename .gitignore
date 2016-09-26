@@ -21,3 +21,4 @@ htpc_manager.log
 *.orig
 config.codekit
 .flux
+.python-version

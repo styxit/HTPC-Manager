@@ -105,7 +105,8 @@ def load_modules():
     htpc.ROOT.headphones = Headphones()
     from modules.mylar import Mylar
     htpc.ROOT.mylar = Mylar()
-
+    from modules.rtorrent import RTorrent
+    htpc.ROOT.rtorrent = RTorrent()
 
 def init_sched():
     from apscheduler.schedulers.background import BackgroundScheduler

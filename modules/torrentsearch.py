@@ -144,6 +144,7 @@ class Torrentsearch(object):
         trans = {}
         utor = {}
         delu = {}
+        rtor = {}
         if htpc.settings.get('qbittorrent_enable', ''):
             qbt['title'] = 'qBittorrent'
             qbt['active'] = 1
@@ -184,6 +185,17 @@ class Torrentsearch(object):
             utor['active'] = 0
             utor['path'] = 'utorrent/to_client/'
             l.append(utor)
+        if htpc.settings.get('rtorrent_enable', ''):
+            rtor['title'] = 'rTorrent'
+            rtor['active'] = 1
+            rtor['path'] = 'rtorrent/to_client'
+            l.append(rtor)
+        else:
+            rtor['title'] = 'rTorrent'
+            rtor['active'] = 0
+            rtor['path'] = 'rtorrent/to_client'
+            l.append(rtor)
+
         return l
 
     def search_norbits(self, q, cat):
