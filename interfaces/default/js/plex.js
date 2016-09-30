@@ -15,8 +15,9 @@ $(document).ready(function() {
         e.preventDefault()
     });
 
+    $(window).trigger('hashchange');
+
     $('.search').attr('placeholder', 'Filter movies')
-    $('a[href="#movies"]').tab('show')
     reloadTab();
 
     // Load data on tab display
@@ -540,7 +541,7 @@ function loadAlbums(options) {
                                 $('<h6>').html(album.title),
                                 $('<h6>').html(album.artist).addClass('artist')
                         )
-                         
+
                     )
                     albumItem.append(albumCaption);
                     elem.append(albumItem);
