@@ -543,7 +543,7 @@ function loadsysinfo(options) {
 
       $('<tr>').append(
         $('<td>').text('IP'),
-        $('<td>').append(
+        $('<td class="ip">').append(
           $('<div>').append(
             $('<div class="pull-left">').html(result.localip),
             $('<div class="pull-right">').html(result.externalip)
