@@ -58,7 +58,7 @@ class Transmission(object):
 
             basepath = fix_basepath(basepath)
 
-            url = 'http://%s:%s%srpc/' % (host, str(port), basepath)
+            url = 'http://%s:%s%srpc' % (host, str(port), basepath)
 
         return url
 
@@ -90,7 +90,7 @@ class Transmission(object):
 
         if not basepath:
             basepath = fix_basepath('/transmission/')
-        url = 'http://%s:%s%srpc/' % (striphttp(host), port, basepath)
+        url = 'http://%s:%s%srpc' % (striphttp(host), port, basepath)
 
         # format post data
         data = {'method': 'session-get'}
@@ -219,7 +219,7 @@ class Transmission(object):
 
         basepath = fix_basepath(basepath)
 
-        url = 'http://%s:%s%srpc/' % (host, str(port), basepath)
+        url = 'http://%s:%s%srpc' % (host, str(port), basepath)
 
         # format post data
         data = {'method': method}
