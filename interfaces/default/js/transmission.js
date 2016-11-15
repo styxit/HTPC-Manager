@@ -214,14 +214,14 @@ function session() {
     $.ajax({
         url: WEBDIR + 'transmission/session',
         success: function (response) {
-			if(response["arguments"]["speed-limit-down-enabled"])
-				$('#transmission_speed_down').attr('placeholder', response["arguments"]["speed-limit-down"]);
-			else
-				$('#transmission_speed_down').attr('placeholder', 0);
-			if(response["arguments"]["speed-limit-up"])
-				$('#transmission_speed_up').attr('placeholder', response["arguments"]["speed-limit-up"]);
-			else
-				$('#transmission_speed_up').attr('placeholder', 0);
+            if(response["arguments"]["speed-limit-down-enabled"])
+                $('#transmission_speed_down').attr('placeholder', response["arguments"]["speed-limit-down"]);
+            else
+                $('#transmission_speed_down').attr('placeholder', 0);
+            if(response["arguments"]["speed-limit-up"])
+                $('#transmission_speed_up').attr('placeholder', response["arguments"]["speed-limit-up"]);
+            else
+                $('#transmission_speed_up').attr('placeholder', 0);
         }
 
     });
