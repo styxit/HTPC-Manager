@@ -1,0 +1,124 @@
+<%inherit file="base.html"/>
+<%
+    haveissues = 0 if comic['Have'] is None else comic["Have"]
+    totalissues = 0 if comic['Total'] is None else comic['Total']
+%>
+
+<div class="container-fluid">
+    <div class="content maincontent mylar_comic">
+        <h1 class="page-header page-title" data-comicid="${comic_id}" data-comicimg="${comicimg}">
+            <span class="mylar_comicname">${comic['ComicName']}</span>
+            <div class="btn-group show-options-menu pull-right">
+                <a class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" href="#">
+                    <i class="fa fa-wrench fa-lg"></i>&nbsp;<span class="fa fa-chevron-down fa-fw"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="${self.attr.webdir}mylar/RefreshComic/${comic_id}" class="ajax-link"><i class="fa fa-refresh fa-fw"></i> Refresh</a></li>
+                    <li><a href="${self.attr.webdir}mylar/DeleteComic/${comic_id}" class="ajax-link"><i class="fa fa-trash fa-fw"></i> Delete</a></li>
+                    <li class="divider"></li>
+                    <li><a href="${self.attr.webdir}mylar/PauseComic/${comic_id}" class="ajax-link"><i class="fa fa-pause fa-fw"></i> Pause</a></li>
+                    <li><a href="${self.attr.webdir}mylar/ResumeComic/${comic_id}" class="ajax-link"><i class="fa fa-play fa-fw"></i> Resume</a></li>
+                </ul>
+            </div>
+        </h1>
+
+        <ul class="breadcrumb">
+            <li><a href="${self.attr.webdir}">Home</a> <span class="divider">/</span></li>
+            <li><a href="${self.attr.webdir}mylar">${module_name}</a> <span class="divider">/</span></li>
+            <li class="active mylar_showname">${comic['ComicName']}</li>
+        </ul>
+        ##${comic}
+        <div id="banner" class="row-fluid banner">
+            <div class="span8" style="min-height: 0px;"><img class="img-polaroid img-rounded comic_img"></div>
+            <div class="comic_details span4 pull-right">
+                <div id="comic_details_top" class="span4"></div>
+                <strong>Comic details</strong>
+                <table class="table table-condensed">
+                    <tr>
+                        <td>Published</td>
+                        <td class="">${comic.get('ComicPublished', '')}</td>
+                    </tr>
+                    <tr>
+                        <td>Publisher</td>
+                        <td class="">${comic.get('ComicPublisher', '')}</td>
+                    </tr>
+                    <tr><td>Issues</td><td class="mylar_total_tracks"> ${haveissues} / ${totalissues}</td></tr>
+                    <tr><td>Status</td><td class="mylar_status">${comic['Status']}</td></tr>
+                    %if comic['ComicID'] is not None:
+                        <tr>
+                            <td>Last comic</td>
+                            <td class="mylar_last_comic">${comic['LatestIssue']} (${comic['LatestDate']})</a></td>
+                        </tr>
+                    %else:
+                        <tr>
+                            <td>Last comic</td>
+                            <td>N/A</td>
+                        </tr>
+                    %endif
+                    <tr>
+                        <td>Location</td>
+                        <td>${comic.get('ComicLocation', '')}</td>
+                    </tr>
+
+                </table>
+                <div id="comic_details_bottom" class="span4"></div>
+            </div>
+        </div>
+
+        <ul class="nav nav-tabs">
+            <li class="">
+                <a href="#comics" data-toggle="tab">Comics</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div id="comics" class="tab-pane">
+                <table class="table table-striped table-condensed table-sortable">
+                    <thead>
+                    <tr>
+                        <th>Issue</th>
+                        <th>Title</th>
+                        <th>Release Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody id="comic-issues">
+                    % for issue in issues:
+                    ##<div>${issue}</div>
+                    <tr data-comicid="${comic['ComicID']}" data-issueid="${issue['IssueID']}">
+                        <td>${issue['Issue_Number']}</td>
+                        % if issue['IssueName'] != "None":
+                            <td class="comic">${issue['IssueName']}</td>
+                        % else:
+                            <td></td>
+                        % endif
+                        </a></td>
+                        <td>${issue['ReleaseDate']}</td>
+                        <td>${issue['Status']}</td>
+                        <td>
+                            <div class="btn-group">
+                            ## % if issue['can_download'] is True:
+                            <a class="btn btn-mini btn-search" title="Set as wanted">
+                                <i class="fa fa-heart fa-fw"></i>
+                            </a>
+                            ## % endif
+                            <a class="btn btn-mini unque-issue-mylar" title="Set as skipped">
+                                <i class="fa fa-step-forward fa-fw"></i>
+                            </a>
+                            % if issue['Status'] == 'Downloaded':
+                                <a href="${self.attr.webdir}mylar/DownloadIssue?issueid=${issue['IssueID']}&name=${issue['Location']}"class="btn btn-mini" title="Download to browser" download="${issue['Location']}">
+                                    <i class="fa fa-download fa-fw"></i>
+                                </a>
+                            % endif
+
+                            </div>
+                        </td>
+                    </tr>
+                    % endfor
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

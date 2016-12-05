@@ -1,0 +1,79 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+<div class="container-fluid">
+    <div class="content maincontent sonarr_show">
+        <h1 class="page-header page-title" data-showid="${tvdbid}" data-id="${id}">
+            <span class="sonarr_showname">Show details</span>
+            <div class="btn-group show-options-menu pull-right">
+                <a class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" href="#">
+                    <i class="fa fa-cogs fa-lg"></i>
+                    <i class="fa fa-chevron-down"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="full-update dostuff"><i class="fa fa-refresh fa-fw"></i> Force full update</a></li>
+                    <li><a href="#" class="rescan-files dostuff"><i class="fa fa-refresh fa-fw"></i> Rescan files</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#" class="search_all_ep_in_show dostuff"><i class="fa fa-search fa-fw"></i> Search for all episodes</a></li>
+                    <li class="divider"></li>
+                    <!--<li><a href="#" class="edit_show"><i class="fa fa-pencil fa-fw"></i> Edit show</a></li>--> <!--TODO -->
+                    <li><a href="#" class="delete_show"><i class="fa fa-trash-o fa-fw"></i> Delete show</a> <!-- not done yet --></li>
+                </ul>
+            </div>
+        </h1>
+
+        <ul class="breadcrumb">
+            <li><a href="${self.attr.webdir}">Home</a> <span class="divider">/</span></li>
+            <li><a href="${self.attr.webdir}sonarr">${settings.get('sonarr_name', 'Sonarr')}</a> <span class="divider">/</span></li>
+            <li class="active sickbeard_showname">Show details</li>
+        </ul>
+
+        <div id="banner" class="row-fluid banner">
+            <div class="span8" style="min-height: 0px;"></div>
+            <div class="show_details span4 pull-right">
+                <strong>Show details</strong>
+                <table class="table table-condensed">
+                    <tr>
+                        <td>Quality</td><td class="sonarr_want_quality"/>
+                    </tr>
+                    <tr>
+                        <td>Next episode</td><td class="sonarr_next_air"/>
+                    </tr>
+                    <tr>
+                        <td>Airs</td><td class="sonarr_airs"/>
+                    </tr>
+                    <tr>
+                        <td>Status</td><td class="sonarr_status"/>
+                    </tr>
+                    <tr>
+                        <td>Network</td><td class="sonarr_network"/>
+                    </tr>
+                    <tr>
+                        <td>Location</td><td class="sonarr_location"/>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="page-header">
+            <h2>Seasons</h2>
+        </div>
+
+        <ul class="nav nav-pills" id="season-list"></ul>
+
+        <div class="mofa">
+            <table class="table table-striped table-condensed table-sortable">
+                <thead>
+                    <tr>
+                        <th>Episode</th>
+                        <th>Name</th>
+                        <th>Air Date</th>
+                        <th>status</th>
+                        <th>Quality</th>
+                        <th class="span1">Search</th>
+                    </tr>
+                </thead>
+                <tbody id="season-content"></tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 from sqlobject import *
+from sqlobject.col import validators
 from sqlobject.tests.dbtest import *
-from formencode import validators
 
 ########################################
 ## Validation/conversion

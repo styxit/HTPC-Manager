@@ -640,21 +640,22 @@ class DBAPI(DBConnection):
 
     def _SO_columnClause(self, soClass, kw):
         ops = {None: "IS"}
-        data = {}
+        data = []
         if 'id' in kw:
-            data[soClass.sqlmeta.idName] = kw.pop('id')
-        for key, col in soClass.sqlmeta.columns.items():
+            data.append((soClass.sqlmeta.idName, kw.pop('id')))
+        for soColumn in soClass.sqlmeta.columnList:
+            key = soColumn.name
             if key in kw:
-                value = kw.pop(key)
-                if col.from_python:
-                    value = col.from_python(value, sqlbuilder.SQLObjectState(soClass, connection=self))
-                data[col.dbName] = value
-            elif col.foreignName in kw:
-                obj = kw.pop(col.foreignName)
+                val = kw.pop(key)
+                if soColumn.from_python:
+                    val = soColumn.from_python(val, sqlbuilder.SQLObjectState(soClass, connection=self))
+                data.append((soColumn.dbName, val))
+            elif soColumn.foreignName in kw:
+                obj = kw.pop(soColumn.foreignName)
                 if isinstance(obj, main.SQLObject):
-                    data[col.dbName] = obj.id
+                    data.append((soColumn.dbName, obj.id))
                 else:
-                    data[col.dbName] = obj
+                    data.append((soColumn.dbName, obj))
         if kw:
             # pick the first key from kw to use to raise the error,
             raise TypeError, "got an unexpected keyword argument(s): %r" % kw.keys()
@@ -665,7 +666,7 @@ class DBAPI(DBConnection):
             ['%s %s %s' %
              (dbName, ops.get(value, "="), self.sqlrepr(value))
              for dbName, value
-             in data.items()])
+             in data])
 
     def sqlrepr(self, v):
         return sqlrepr(v, self.dbName)
@@ -682,6 +683,8 @@ class DBAPI(DBConnection):
             return
         self._poolLock.acquire()
         try:
+            if not self._pool: # _pool could be filled in a different thread
+                return
             conns = self._pool[:]
             self._pool[:] = []
             for conn in conns:

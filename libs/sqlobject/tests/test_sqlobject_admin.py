@@ -4,8 +4,6 @@ These Tests are not enabled yet, but here are some working examples of using cre
 
 from sqlobject import *
 
-sqlhub.processConnection = connectionForURI('postgres://pgsql@/db_test')
-
 class Test1(SQLObject):
     class sqlmeta:
         createSQL = "CREATE SEQUENCE db_test1_seq;"

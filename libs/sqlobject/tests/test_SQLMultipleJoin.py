@@ -53,4 +53,5 @@ def test_multiple_join_transaction():
         assert namek.fightersAsSResult.count() == 1
         assert namek.fightersAsSResult[0]._connection == trans
     finally:
+        trans.commit(True)
         Race._connection.autoCommit = True

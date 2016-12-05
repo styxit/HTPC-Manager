@@ -21,7 +21,9 @@ def test_pickleCol():
     pickle_data = pickle.dumps(test, pickle.HIGHEST_PROTOCOL)
     connection.cache.clear()
     test = pickle.loads(pickle_data)
+    test2 = connection.cache.tryGet(test.id, TestPickle)
 
+    assert test2 is test
     assert test.question == test_question
     assert test.answer == test_answer
 

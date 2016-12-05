@@ -1,15 +1,25 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
+<div class="container-fluid">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="http://${settings.get('sickbeard_host')}:${settings.get('sickbeard_port') + settings.get('sickbeard_basepath')}" target="_blank" title="Open original Sickbeard interface">${settings.get('sickbeard_name', 'Sickbeard')}</a>
+            <a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'} title="Open original Sick Beard interface">${settings.get('sickbeard_name', 'Sick Beard')}</a>
+            <div class="btn-group pull-right">
+                 <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wrench fa-lg"></i>
+                     <i class="fa fa-chevron-down fa-fw"></i></a>
+                    <ul class="dropdown-menu pull-right"> <!-- Skeleton -->
+                    	<li><a id="postprocess" href="#" title="Postprocess"><i class="fa fa-hdd-o fa-fw"></i> Postprocess</a></li>
+                    	<li class="divider"></li>
+                        <li><a href="Restart" class="ajax-confirm" title="Restart Sickbeard"><i class="fa fa-refresh fa-fw"></i> Restart</a></li>
+                        <li><a href="Shutdown" class="ajax-confirm" title="Shutdown Sickbeard"><i class="fa fa-power-off fa-fw"></i> Shutdown</a></li>
+                    </ul>
+            </div>
         </h1>
         <div class="well form-inline">
             <input class="span6" id="add_show_name" name="add_show_name" type="text" />
             <select class="span6" style="display:none;" id="add_show_select" name="add_show_select"></select>
-            <button class="btn btn-success" type="button" id="add_show_button"><i class="icon-plus icon-white"></i> Add show</button>
-            <button class="btn btn-success hide" type="button" id="add_tvdbid_button"><i class="icon-ok icon-white"></i> Add show</button>
+            <button class="btn btn-success" type="button" id="add_show_button"><i class="fa fa-plus fa-inverse fa-fw"></i> Add show</button>
+            <button class="btn btn-success hide" type="button" id="add_tvdbid_button"><i class="fa fa-check fa-inverse fa-fw"></i> Add show</button>
             <button class="btn hide" type="button" id="cancel_show_button"> Cancel</button>
         </div>
         <ul class="nav nav-tabs">
@@ -39,7 +49,7 @@
                         <tr>
                             <th>Showname</th>
                             <th>Episode</th>
-                            <th>Airdate</th>
+                            <th>Air Date</th>
                         </tr>
                     </thead>
                     <tbody id="nextaired_table_body"></tbody>

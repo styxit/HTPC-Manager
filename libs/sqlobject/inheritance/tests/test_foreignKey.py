@@ -19,7 +19,7 @@ class EmployeeWithNotes(PersonWithNotes):
     paper = ForeignKey("Paper", default=None)
 
 def test_foreignKey():
-    setupClass([Note, PersonWithNotes, Paper, EmployeeWithNotes])
+    setupClass([Note, PersonWithNotes, Paper, EmployeeWithNotes], force=True)
 
     note = Note(text="person")
     PersonWithNotes(firstName='Oneof', lastName='Authors', note=note)

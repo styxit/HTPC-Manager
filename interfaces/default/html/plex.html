@@ -1,44 +1,44 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
+<div class="container-fluid">
     <div class="content">
             <h1 class="page-header page-title">
-            <a href="webinterface" target="_blank">${settings.get('plex_name', 'Plex')}</a>
+            <a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'}>${settings.get('plex_name', 'Plex')}</a>
             <div class="btn-toolbar pull-right">
-
                 <div class="btn-group">
-                    <a href="#" class="btn dropdown-toggle" data-toggle="dropdown"><i class="icon-th-list"></i>
-                    <i class="caret"></i></a>
+                <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wrench fa-lg"></i>
+                <i class="fa fa-chevron-down fa-fw"></i></a>
                     <ul class="dropdown-menu pull-right">
                         %if settings.get('plex_hide_watched', 0):
-                        <li><a href="#" id="hidewatched" class="active"><i class="icon-eye-open"></i> Show Watched</a></li>
+                    <li><a href="#" id="hidewatched" class="active"><i class="fa fa-eye fa-fw"></i> Show Watched</a></li>
                         %else:
-                        <li><a href="#" id="hidewatched"><i class="icon-eye-open"></i> Hide Watched</a></li>
+                    <li><a href="#" id="hidewatched"><i class="fa fa-eye-slash fa-fw"></i> Hide Watched</a></li>
                         %endif
-                        <li><a href="UpdateLibrary" class="ajax-link"><i class="icon-search"></i> Update All Sections</a></li>
-                        <li><a href="UpdateLibrary?section_type=movie" class="ajax-link"><i class="icon-search"></i> Update Movie Section</a></li>
-                        <li><a href="UpdateLibrary?section_type=show" class="ajax-link"><i class="icon-search"></i> Update TV Show Section</a></li>
-                        <li><a href="UpdateLibrary?section_type=artist" class="ajax-link"><i class="icon-search"></i> Update Music Section</a></li>
+                    <li class="divider"></li>
+                    <li><a href="UpdateLibrary" class="ajax-link"><i class="fa fa-refresh fa-fw"></i> Update All Sections</a></li>
+                    <li><a href="UpdateLibrary?section_type=movie" class="ajax-link"><i class="fa fa-refresh fa-fw"></i> Update Movies</a></li>
+                    <li><a href="UpdateLibrary?section_type=show" class="ajax-link"><i class="fa fa-refresh fa-fw"></i> Update TV Shows</a></li>
+                    <li><a href="UpdateLibrary?section_type=artist" class="ajax-link"><i class="fa fa-refresh fa-fw"></i> Update Music</a></li>
                     </ul>
                 </div>
                 %if settings.get('plex_mac', 0):
                 <div class="btn-group">
-                    <a href="Wake" id="plex_wake_button" class="ajax-link btn"><i class="icon-off"></i> Wake</a>
+                <a href="Wake" id="plex_wake_button" class="ajax-link btn"><i class="fa fa-power-off fa-fw"></i> Wake</a>
                 </div>
                 %endif
             </div>
         </h1>
             <div class="well hide" id="nowplaying">
             </div>
-        
 
-        <ul class="nav nav-tabs">
+
+        <ul class="nav nav-tabs tabs">
             <li><a href="#movies" data-toggle="tab">Movies</a></li>
             <li><a href="#shows" data-toggle="tab">TV Shows</a></li>
             <li class="hide"><a href="#episodes" data-toggle="tab">Episodes</a></li>
             <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Music
-                <i class="caret"></i></a>
+                <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Music
+                <i class="fa fa-chevron-down fa-fw"></i></a>
                 <ul class="dropdown-menu">
                     <li><a href="#artists" data-toggle="tab">Artists</a></li>
                     <li><a href="#albums" data-toggle="tab">Albums</a></li>
@@ -63,7 +63,7 @@
                 <ul id="album-grid" class="artist-albums thumbnails"></ul>
             </div>
             <div id="songs" class="tab-pane">
-                <table id="songs-grid" class="table table-striped table-hover">
+                <table id="songs-grid" class="table table-striped">
                     <thead>
                         <tr>
                             <th>Title</th>

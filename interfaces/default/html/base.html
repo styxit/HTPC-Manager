@@ -1,121 +1,197 @@
 <%!
-import htpc
+import htpc, time
 settings = htpc.settings
 webdir = htpc.WEBDIR
-%><% s = self.attr.settings %><!DOCTYPE html>
+%>
+<% s = self.attr.settings %>
+<%
+    if settings.get('app_disable_cache_on_update', True) is True:
+        ## lets not use time.time() unless we really have to..
+        if float(htpc.settings.get('app_updated_at', 1)) <= (time.time() + 129600):
+            nocache = '?' + str(time.time())
+    else:
+        nocache = ''
+    if htpc.LOGLEVEL in ['debug', 'error', 'warning']:
+        jslogconsole = 1
+    else:
+        jslogconsole = 0
+
+    if settings.get('app_disable_menu_highlight', True) is True:
+        highlight_menu = 1
+    else:
+        highlight_menu = 0
+%>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <title>HTPC Manager</title>
     <link href="${htpc.WEBDIR}favicon.ico" type="image/x-icon" rel="icon">
-    <link rel="apple-touch-icon" href="${htpc.WEBDIR}img/ios/homescreen.png">
+    <link rel="apple-touch-icon" href="${htpc.WEBDIR}img/homescreen.png">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
-    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/bootstrap.min.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/bootstrap-responsive.min.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/base.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme','default')}/style.css" rel="stylesheet">
-    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
-    <link href="${self.attr.webdir}css/${scriptname}.css" rel="stylesheet">
     <script type="text/javascript">var WEBDIR="${htpc.WEBDIR}";</script>
+    <script type="text/javascript">var ALLOWIFRAME="${s.get('app_open_otherlink_in_iframe', 'false')}"</script>
+    <script type="text/javascript">var JSLOGCONSOLE="${jslogconsole}"</script>
+    <script type="text/javascript">var HIGHLIGHT_MENU="${highlight_menu}"</script>
+    <link href="${htpc.WEBDIR}css/bootstrap-slider.css" rel="stylesheet">
+    % if s.get('app_use_heavy_font',0):
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/xl.bootstrap.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/xl.bootstrap-responsive.min.css" rel="stylesheet">
+    % else:
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/bootstrap.min.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/bootstrap-responsive.min.css" rel="stylesheet">
+    % endif
+    % if s.get('app_use_cdn', 0):
+	    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/minified/jquery-ui.min.css" rel="stylesheet">
+	    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/css/filter.formatter.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.css" rel="stylesheet">
+    % else:
+	    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
+	    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
+        <link href="${htpc.WEBDIR}css/filter.formatter.css" rel="stylesheet">
+        <link href="${htpc.WEBDIR}css/fullcalendar.min.css" rel="stylesheet">
+    % endif
+    <link href="${htpc.WEBDIR}css/rg-icons.min.css${nocache}" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
+    <link href="${htpc.WEBDIR}css/base.css${nocache}" rel="stylesheet">
+    <link href="${self.attr.webdir}css/${scriptname}.css${nocache}" rel="stylesheet">
 </head>
 
 <body>
-
 <div class="navbar navbar-fixed-top navbar-inverse">
     <div class="navbar-inner">
-        <div class="container">
+        <div class="container-fluid">
             <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                <i class="icon-th icon-white"></i>
+                <i class="fa fa-bars fa-inverse"></i>
             </a>
-            <a href="${htpc.WEBDIR}" class="brand">HTPC Manager</a>
+            <a href="${htpc.WEBDIR}"><i class="rg rg-htpc brand"></i></a>
             <div class="nav-collapse">
-                <ul class="nav">
-                    % for m in htpc.MODULES:
-                    % if s.get(m.get('id')+'_enable') and m.get('id') != 'nzbsearch':
-                    <li id="nav-${m.get('id')}"><a href="${htpc.WEBDIR}${m.get('id')}/">${s.get(m.get('id')+'_name')}</a></li>
-                    %endif
-                    % endfor
+                <ul class="nav" id="nav-menu">
+                    <div class="mobile-search hidden-desktop visible-phone visible-tablet">
+                        %if s.get('newznab_enable'):
+                            <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}newznab/" method="get">
+                        %else:
+                            <form class="navbar-form pull-right disabled formsearch">
+                        %endif
+                            <input type="text" name="query" id="search" class="span6 search" accesskey="s" autocapitalize="off" placeholder="Search">
+                        </form>
+                    </div>
                     <% customurls = s.getUrls() %>
                     % if len(customurls) > 1:
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Other <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
+                    <li class="dropdown" id="nav-menu-others">
+                        <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Other &nbsp<b class="fa fa-chevron-down fa-fw"></b></a>
+                        <ul class="dropdown-menu" id="dropdown-menu-others">
                         % for link in customurls:
-                            <li><a href="${link['url']}" target="_blank">${link['name']}</a></li>
+                            <li class="nav-menu-item other-link-item"><a href="${link['url']|h, entity}" target="_blank">${link['name']|h, entity}</a></li>
                         % endfor
                         </ul>
                     </li>
                     % elif len(customurls) > 0:
-                      <li><a href="${customurls[0]['url']}" target="_blank">${customurls[0]['name']}</a></li>
+                      <li class="nav-menu-item other-link-item"><a href="${customurls[0]['url']|h, entity}" target="_blank">${customurls[0]['name']|h, entity}</a></li>
                     % endif
-
+                    <!-- start phone tablet -->
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="#" class="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a>
+                        <a href="${htpc.WEBDIR}about"><i class="fa fa-info-circle fa-fw"></i>  About</a>
                     </li>
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a>
+                        <a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="fa fa-cog fa-fw"></i> Settings</a>
                     </li>
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a>
+                        <a href="#" class="btn-check-update"><i class="fa fa-eye fa-fw"></i> Check for update</a>
                     </li>
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a href="${htpc.WEBDIR}log/" id="btn-log"><i class="fa fa-list fa-fw"></i> Log</a>
+                    </li>
+                    <li class="hidden-desktop visible-phone visible-tablet divider"></li>
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a class="dash-edit" href="#"><i id="" class="fa fa-arrows fa-fw"></i> Edit Dash</a>
+                    </li>
+                    <!-- Didnt find a good way to add this in mobile/tablet view.
+                    <li class="hidden-desktop visible-phone visible-tablet">
+                        <a href="#" class="btn-menuorder"><i class="fa fa-unsorted"></i> Edit Menu</a>
+                    </li>
+                    -->
+                    <li class="hidden-desktop visible-phone visible-tablet divider"></li>
                     % if htpc.AUTH:
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC-Manager"><i class="icon-signout"></i> Logout</a>
+                        <a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC Manager"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                     </li>
                     % endif
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC-Manager"><i class="icon-refresh"></i> Restart</a>
+                        <a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC Manager"><i class="fa fa-refresh fa-fw"></i> Restart</a>
                     </li>
                     <li class="hidden-desktop visible-phone visible-tablet">
-                        <a href="${htpc.WEBDIR}shutdown" class="confirm" title="Shutdown HTPC-Manager"><i class="icon-off"></i> Shutdown</a>
+                        <a href="${htpc.WEBDIR}shutdown" class="confirm" title="Shutdown HTPC Manager"><i class="fa fa-power-off fa-fw"></i> Shutdown</a>
                     </li>
-
                 </ul>
-                <div class="mobile-search hidden-desktop visible-phone visible-tablet">
-                    %if s.get('nzbsearch_enable'):
-                        <form action="${htpc.WEBDIR}search/" method="get">
-                    %else:
-                        <form class="disabled">
-                    %endif
-                        <input type="text" name="query" id="search" class="span6 search" accesskey="s" placeholder="Search">
-                    </form>
-                </div>
+                <!-- end phone tablet -->
+
                 <div class="pull-right hidden-tablet hidden-phone visible-desktop">
-                    %if s.get('nzbsearch_enable'):
-                    <form action="${htpc.WEBDIR}search/" method="get" class="navbar-form pull-right">
+                    %if s.get('newznab_enable'):
+                    <form class="navbar-form pull-right formsearch" action="${htpc.WEBDIR}newznab/" method="get" id="menu-search">
                     %else:
-                    <form class="navbar-form pull-right disabled">
+                    <form class="navbar-form pull-right disabled formsearch" id="menu-search">
                     %endif
                     <input type="text" name="query" id="search" class="span3 search" accesskey="s" placeholder="Search">
-                        <div class="btn-group">
-                          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="icon-cogs"></i>
-                            <span class="caret"></span>
+                        <div class="btn-group" id="menu-settings">
+                          <a class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" href="#">
+                            <i class="fa fa-bars fa-inverse"></i>
                           </a>
                           <ul class="dropdown-menu pull-right">
-                            <li><a href="http://github.com/styxit/HTPC-Manager"><i class="icon-github"></i> Github project</a></li>
-                            <li><a href="#" class="btn-check-update"><i class="icon-eye-open"></i> Check for updates</a></li>
-                            <li><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="icon-cog"></i> Settings</a></li>
-                            <li><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="icon-list"></i> Log</a></li>
+                            <li><a href="${htpc.WEBDIR}about"><i class="fa fa-info-circle fa-fw"></i> About</a></li>
+                            <li><a href="${htpc.WEBDIR}settings/" id="btn-settings"><i class="fa fa-cog fa-fw"></i> Settings</a></li>
+                            <li><a href="#" class="btn-check-update"><i class="fa fa-eye fa-fw"></i> Check for update</a></li>
+                            <li><a href="${htpc.WEBDIR}log/" id="btn-log"><i class="fa fa-list fa-fw"></i> Log</a></li>
+                            <li class="divider"></li>
+                            <li><a href="${htpc.WEBDIR}#edit" class="dash-edit"><i class="fa fa-arrows fa-fw"></i> Edit Dash</a></li>
+                            <li><a href="#" class="btn-menuorder"><i class="fa fa-sort fa-fw"></i> Edit Menu</a></li>
+                            <li class="divider"></li>
                             % if htpc.AUTH:
-                            <li><a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC-Manager"><i class="icon-signout"></i> Logout</a></li>
+                            <li><a href="${htpc.WEBDIR}logout" class="confirm" title="Logout of HTPC Manager"><i class="fa fa-sign-out fa-fw"></i> Logout</a></li>
                             % endif
-                            <li><a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC-Manager"><i class="icon-refresh"></i> Restart</a></li>
-                            <li><a href="${htpc.WEBDIR}shutdown" class="confirm" title="Shutdown HTPC-Manager"><i class="icon-off"></i> Shutdown</a></li>
+                            <li><a href="${htpc.WEBDIR}restart" class="ajax-confirm" title="Restart HTPC Manager"><i class="fa fa-refresh fa-fw"></i> Restart</a></li>
+                            <li><a href="${htpc.WEBDIR}shutdown" class="confirm" title="Shutdown HTPC Manager"><i class="fa fa-power-off fa-fw"></i> Shutdown</a></li>
                           </ul>
                         </div>
                     </form>
+                    <div class="btn-group hide" id="menu-editing">
+                        <i id="menu-save" class="btn btn-success fa fa-check fa-fw" title="Save"></i>
+                        <i id="menu-cancel" class="btn btn-danger fa fa-times fa-fw" title="Discard"></i>
+                    </div>
                 </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+${self.body()}
+
+% if htpc.CURRENT_HASH is False:
+    <div class="footer2">
+        <div class="navbar navbar-fixed-bottom footer2">
+            <div class="container-fluid">
+                    You're running an unknown version of HTPC Manager. Use the updater <a href="${htpc.WEBDIR}update">Update</a>
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <div>
+        </div>
+    </div>
+
+% elif s.get('check_for_updates') and htpc.CURRENT_HASH != htpc.LATEST_HASH and htpc.COMMITS_BEHIND > 0:
+    <div class="footer2">
+        <div class="navbar navbar-fixed-bottom">
+            <div class="container-fluid">
+                A<a href="https://github.com/Hellowlol/HTPC-Manager/compare/${htpc.CURRENT_HASH}...${htpc.LATEST_HASH}"> newer version</a> is available. You're ${htpc.COMMITS_BEHIND} commits behind. <a href="do_update">Update</a>
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
             </div>
         </div>
     </div>
-</div>
-${self.body()}
+% endif
 <div id="modal_dialog" class="modal fade hide">
     <div class="modal-header">
         <button class="close" data-dismiss="modal">&times;</button>
@@ -125,19 +201,63 @@ ${self.body()}
     <div class="modal-footer"></div>
 </div>
 
-<script src="${htpc.WEBDIR}js/libs/jquery.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery-ui.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.form.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.cookie.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.metadata.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.tablesorter.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/jquery.raty.min.js"></script>
+<script>
+    menus = {}
+    %for m in htpc.MODULES:
+       %if s.get(m.get('id')+'_enable') and m.get('id') == 'newznab' and not s.get('newznab_show_in_menu'):
+            <% continue %>
+        %endif
+        %if s.get(m.get('id')+'_enable'):
+            menus['nav-${m.get('id')}'] = '<li class="nav-menu-item" id="nav-${m.get('id')|h, entity}"><a href="${htpc.WEBDIR}${m.get('id')|h, entity}/">${m.get('name') if s.get(m.get('id')+'_name').strip() == "" else s.get(m.get('id')+'_name')|h, entity}</a></li>';
+
+        %endif
+    %endfor
+    menu_order = "${settings.get('menu_order', 0)}";
+</script>
+% if s.get('app_use_cdn', 0):
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+  <!-- dont remove this until squeezebox is checked -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/js/jquery.tablesorter.combined.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/js/parsers/parser-ignore-articles.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/holder/1.9/holder.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.2/moment.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.js"></script>
+% else:
+	<script src="${htpc.WEBDIR}js/libs/jquery.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery-ui.min.js"></script>
+
+    <!-- Leave this until squeezebox is checked -->
+	<script src="${htpc.WEBDIR}js/libs/jquery.cookie.min.js"></script>
+
+
+	<script src="${htpc.WEBDIR}js/libs/bootstrap.min.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/holder.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/moment.js"></script>
+	<script src="${htpc.WEBDIR}js/libs/jquery.ui.touch-punch.min.js"></script>
+    <script src="${htpc.WEBDIR}js/libs/fullcalendar.min.js"></script>
+    <!-- Table sorter stuff  -->
+    <script src="${htpc.WEBDIR}js/libs/jquery.tablesorter.combined.min.js"></script>
+    <script src="${htpc.WEBDIR}js/libs/parsers/parser-ignore-articles.js"></script>
+    <!-- end tablesorter -->
+% endif
+  <script src="${htpc.WEBDIR}js/libs/re-bootstrap.min.js"></script>
+% if s.get('app_theme_mig') == 'aurora':
+    <!--Triggers special feature of Aurora theme when that theme is selected!-->
+    <script src="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig')}/aurora.min.js"></script>
+% endif
+<script src="${htpc.WEBDIR}js/libs/jquery.raty.js"></script>
 <script src="${htpc.WEBDIR}js/libs/jquery.pnotify.min.js"></script>
 <script src="${htpc.WEBDIR}js/libs/jquery.pager.js"></script>
-<script src="${htpc.WEBDIR}js/libs/bootstrap.min.js"></script>
-<script src="${htpc.WEBDIR}js/libs/holder.js"></script>
-<script src="${htpc.WEBDIR}js/default.js"></script>
-<script src="${htpc.WEBDIR}js/${scriptname}.js"></script>
-
+<script src="${htpc.WEBDIR}js/libs/bootstrap-slider.js"></script>
+<script src="${htpc.WEBDIR}js/libs/ChartNew.min.js"></script>
+<script src="${htpc.WEBDIR}js/libs/download.js"></script>
+<script src="${htpc.WEBDIR}js/libs/jquery.treegrid.min.js"></script>
+<script src="${htpc.WEBDIR}js/libs/jquery.treegrid.bootstrap2.js"></script>
+<script src="${htpc.WEBDIR}js/default.js${nocache}"></script>
+<script src="${htpc.WEBDIR}js/${scriptname}.js${nocache}"></script>
 </body>
 </html>

@@ -89,11 +89,7 @@ class SQLiteConnection(DBAPI):
         self._threadPool = {}
         self._threadOrigination = {}
         if self._memory:
-            self._memoryConn = sqlite.connect(
-                self.filename, **self._connOptions)
-            # Convert text data from SQLite to str, not unicode -
-            # SQLObject converts it to unicode itself.
-            self._memoryConn.text_factory = str
+            self.makeMemoryConnection()
 
     @classmethod
     def _connectionFromParams(cls, user, password, host, port, path, args):
@@ -184,6 +180,13 @@ class SQLiteConnection(DBAPI):
             return
         conn.isolation_level = level
 
+    def makeMemoryConnection(self):
+        self._memoryConn = self.module.connect(
+            self.filename, **self._connOptions)
+        # Convert text data from SQLite to str, not unicode -
+        # SQLObject converts it to unicode itself.
+        self._memoryConn.text_factory = str
+
     def makeConnection(self):
         if self._memory:
             return self._memoryConn
@@ -194,6 +197,9 @@ class SQLiteConnection(DBAPI):
     def close(self):
         DBAPI.close(self)
         self._threadPool = {}
+        if self._memory:
+            self._memoryConn.close()
+            self.makeMemoryConnection()
 
     def _executeRetry(self, conn, cursor, query):
         if self.debug:
@@ -204,7 +210,8 @@ class SQLiteConnection(DBAPI):
             raise OperationalError(ErrorMessage(e))
         except self.module.IntegrityError, e:
             msg = ErrorMessage(e)
-            if msg.startswith('column') and msg.endswith('not unique'):
+            if msg.startswith('column') and msg.endswith('not unique') \
+            or msg.startswith('UNIQUE constraint failed:'):
                 raise DuplicateEntryError(msg)
             else:
                 raise IntegrityError(msg)
@@ -389,6 +396,14 @@ class SQLiteConnection(DBAPI):
             return col.BoolCol, {}
         else:
             return col.Col, {}
+
+    def listTables(self):
+        return [v[0] for v in self.queryAll(
+            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")]
+
+    def listDatabases(self):
+        # The pragma returns a list of (index, name, filename)
+        return [v[1] for v in self.queryAll("PRAGMA database_list")]
 
     def createEmptyDatabase(self):
         if self._memory:

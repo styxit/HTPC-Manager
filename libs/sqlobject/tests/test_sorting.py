@@ -56,7 +56,7 @@ def test_singleUntranslatedColumnOrder():
            ['aj', 'joe', 'joe', 'tim', 'zoe']
     assert firstList(Names.select().orderBy('-firstName')) == \
            ['zoe', 'tim', 'joe', 'joe', 'aj']
-    assert firstList(Names.select().orderBy('-first_name')) == \
+    assert firstList(Names.select().orderBy(u'-first_name')) == \
            ['zoe', 'tim', 'joe', 'joe', 'aj']
     assert firstList(Names.select().orderBy(Names.q.firstName)) == \
            ['aj', 'joe', 'joe', 'tim', 'zoe']

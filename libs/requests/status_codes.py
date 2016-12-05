@@ -18,7 +18,8 @@ _codes = {
     205: ('reset_content', 'reset'),
     206: ('partial_content', 'partial'),
     207: ('multi_status', 'multiple_status', 'multi_stati', 'multiple_stati'),
-    208: ('im_used',),
+    208: ('already_reported',),
+    226: ('im_used',),
 
     # Redirection.
     300: ('multiple_choices',),
@@ -29,7 +30,8 @@ _codes = {
     305: ('use_proxy',),
     306: ('switch_proxy',),
     307: ('temporary_redirect', 'temporary_moved', 'temporary'),
-    308: ('resume_incomplete', 'resume'),
+    308: ('permanent_redirect',
+          'resume_incomplete', 'resume',), # These 2 to be removed in 3.0
 
     # Client Error.
     400: ('bad_request', 'bad'),

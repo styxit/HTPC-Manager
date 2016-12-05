@@ -85,10 +85,6 @@ def test_select():
 
 def test_dbEncoding():
     setup()
-    assert TestUnicode.sqlmeta.dbEncoding is None
-    assert not hasattr(TestUnicode._connection, 'dbEncoding') or \
-        TestUnicode._connection.dbEncoding is None
-
     TestUnicode.sqlmeta.dbEncoding = 'utf-8'
     _test_select()
     TestUnicode.sqlmeta.dbEncoding = 'latin-1'
@@ -104,3 +100,4 @@ def test_dbEncoding():
     TestUnicode._connection.dbEncoding = 'ascii'
     raises(UnicodeEncodeError, _test_select)
     del TestUnicode.sqlmeta.dbEncoding
+    TestUnicode._connection.dbEncoding = 'utf-8'

@@ -4,20 +4,34 @@ var hideWatched = 0;
 var movieLoad = {
     last: 0,
     request: null,
-    limit: 50,
-    options: null
+    limit: 75,
+    options: null,
 }
 
 $(document).ready(function() {
     hideWatched = $('#hidewatched').hasClass('active')?1:0;
     playerLoader = setInterval('loadNowPlaying()', 4000);
+    $('.formsearch').submit(function(e) {
+        e.preventDefault()
+    });
+
+    $(window).trigger('hashchange');
+
+    $('.search').attr('placeholder', 'Filter movies')
+    reloadTab();
 
     // Load data on tab display
-    $('a[data-toggle=\'tab\']').click(function(e) {
-        $('#search').val('');
+    $('a[data-toggle="tab"]').click(function(e) {
+        $('.search').val('');
+        $('.search').attr('placeholder', 'Filter ' + $(this).text());
         searchString = '';
+        movieLoad.last = 0;
+        showLoad.last = 0;
+        episodeLoad.last = 0;
+        artistLoad.last = 0;
+        albumLoad.last = 0;
+        songsLoad.last = 0;
     }).on('shown', reloadTab);
-    $(window).trigger('hashchange')
 
      // Load more titles on scroll
     $(window).scroll(function() {
@@ -26,12 +40,24 @@ $(document).ready(function() {
         }
     });
 
-    // Toggle wether to show already seen episodes
+    $(".search").on('keyup', function (e) {
+        searchString = $(this).val();
+        // reset so only load what we should
+        movieLoad.last = 0;
+        showLoad.last = 0;
+        episodeLoad.last = 0;
+        artistLoad.last = 0;
+        albumLoad.last = 0;
+        songsLoad.last = 0;
+        reloadTab()
+    });
+
+    // Toggle whether to show already seen episodes
     $('#hidewatched').click(function(e) {
         e.preventDefault();
         hideWatched = $(this).toggleClass('active').hasClass('active')?1:0;
         $(this).text(hideWatched?' Show Watched':' Hide Watched');
-        $(this).prepend('<i class="icon-eye-open"></i>');
+        $(this).prepend('<i class="fa fa-eye"></i>');
         $.get(WEBDIR + 'settings?plex_hide_watched='+hideWatched);
         reloadTab();
     });
@@ -47,10 +73,19 @@ $(document).delegate('[data-player-control]', 'click', function () {
 
 function playItem(item, player) {
     type = typeof type !== 'undefined';
-    $.get(WEBDIR + 'plex/PlayItem?item='+item+ '&player='+player);
+    d = {'item': item,
+        'playerip': player.address,
+        'machineid': player.machineIdentifier}
+    $.get(WEBDIR + 'plex/PlayItem', d);
 }
 
 function loadMovies(options) {
+    if (options.f.length) {
+        $('#movie-grid').empty();
+    }
+    if (movieLoad.last == 0) {
+        $('#movie-grid').empty();
+    }
     var optionstr = JSON.stringify(options) + hideWatched;
     if (movieLoad.options != optionstr) {
         movieLoad.last = 0;
@@ -95,15 +130,15 @@ function loadMovies(options) {
 
                     var src = 'holder.js/100x150/text:No artwork';
                     if (movie.thumbnail != undefined) {
-                        src = WEBDIR + 'plex/GetThumb?w=100&h=150&thumb='+encodeURIComponent(movie.thumbnail);
+                        src = WEBDIR + 'plex/GetThumb?w=225&h=338&thumb='+encodeURIComponent(movie.thumbnail);
                     }
                     movieAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (movie.playcount >= 1) {
-                        movieAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched'));
+                        movieAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-inverse fa-check-circle watched'));
                     }
 
-                    movieAnchor.append($('<h6>').addClass('title').html(shortenText(movie.title, 12)));
+                    movieAnchor.append($('<h6>').addClass('title').html(shortenText(movie.title, 16)));
 
                     movieItem.append(movieAnchor);
 
@@ -119,7 +154,7 @@ function loadMovies(options) {
 }
 
 function loadMovie(movie) {
-    var poster = WEBDIR + 'plex/GetThumb?w=200&h=300&thumb='+encodeURIComponent(movie.thumbnail)
+    var poster = WEBDIR + 'plex/GetThumb?w=375&h=563&thumb='+encodeURIComponent(movie.thumbnail)
     var info = $('<div>').addClass('modal-movieinfo');
     if (movie.runtime) {
     info.append($('<p>').html('<b>Runtime:</b> ' + movie.runtime + ' min'));
@@ -136,7 +171,7 @@ function loadMovie(movie) {
     if (movie.rating) {
         info.append($('<span>').raty({
             readOnly: true,
-            path: WEBDIR + 'img',
+            path: null,
             score: (movie.rating / 2),
         }));
     }
@@ -150,8 +185,8 @@ function loadMovie(movie) {
     $.get(WEBDIR + 'plex/GetPlayers?filter=playback', function(data) {
         $.each(data.players, function (i, player) {
         $('.modal-footer').prepend(
-            $('<button>').html('Play on ' + player.name).addClass('btn btn-primary').click(function() {
-                playItem(movie.id, player.address);
+            $('<button>').html('<i class="fa fa-play fa-inverse fa-fw"></i>' + 'Play on ' + player.name).addClass('btn btn-primary').click(function() {
+                playItem(movie.id, player);
                 hideModal();
             })
         )
@@ -159,12 +194,12 @@ function loadMovie(movie) {
         }, 'json');
 
     $('.modal-fanart').css({
-        'background-image' : 'url('+WEBDIR+'plex/GetThumb?w=675&h=400&o=10&thumb='+encodeURIComponent(movie.fanart)+')'
+        'background-image' : 'url('+WEBDIR+'plex/GetThumb?w=1013&h=600&o=10&thumb='+encodeURIComponent(movie.fanart)+')'
     });
 }
 
 function loadEpisode(episode) {
-    var poster = WEBDIR + 'plex/GetThumb?w=200&h=300&thumb='+encodeURIComponent(episode.thumbnail)
+    var poster = WEBDIR + 'plex/GetThumb?w=375&h=563&thumb='+encodeURIComponent(episode.thumbnail)
     var info = $('<div>').addClass('modal-episodeinfo');
     if (episode.runtime) {
     info.append($('<p>').html('<b>Runtime:</b> ' + episode.runtime + ' min'));
@@ -175,7 +210,7 @@ function loadEpisode(episode) {
     if (episode.rating) {
         info.append($('<span>').raty({
             readOnly: true,
-            path: WEBDIR + 'img',
+            path: null,
             score: (episode.rating / 2),
         }));
     }
@@ -189,8 +224,8 @@ function loadEpisode(episode) {
     $.get(WEBDIR + 'plex/GetPlayers?filter=playback', function(data) {
         $.each(data.players, function (i, player) {
         $('.modal-footer').prepend(
-            $('<button>').html('Play on ' + player.name).addClass('btn btn-primary').click(function() {
-                playItem(episode.id, player.address);
+            $('<button>').html('<i class="fa fa-play fa-inverse fa-fw"></i>' + 'Play on ' + player.name).addClass('btn btn-primary').click(function() {
+                playItem(episode.id, player);
                 hideModal();
             })
         )
@@ -201,12 +236,18 @@ function loadEpisode(episode) {
 var showLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 75,
     options: null
 };
 var currentShow = null;
 
 function loadShows(options) {
+    if (options.f.length){
+        $('#show-grid').empty();
+    }
+    if (showLoad.last == 0) {
+        $('#show-grid').empty();
+    }
     var optionstr = JSON.stringify(options) + hideWatched;
     if (showLoad.options != optionstr) {
         showLoad.last = 0;
@@ -250,15 +291,15 @@ function loadShows(options) {
 
                     var src = 'holder.js/100x150/text:No artwork';
                     if (show.thumbnail != undefined) {
-                        src = WEBDIR + 'plex/GetThumb?w=100&h=150&thumb='+encodeURIComponent(show.thumbnail);
+                        src = WEBDIR + 'plex/GetThumb?w=225&h=338&thumb='+encodeURIComponent(show.thumbnail);
                     }
                     showAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (show.playcount >= show.itemcount) {
-                        showAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched'));
+                        showAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-inverse fa-check-circle watched'));
                     }
 
-                    showAnchor.append($('<h6>').addClass('title').html(shortenText(show.title, 11)));
+                    showAnchor.append($('<h6>').addClass('title').html(shortenText(show.title, 17)));
 
                     showItem.append(showAnchor);
 
@@ -276,11 +317,17 @@ function loadShows(options) {
 var episodeLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 75,
     options: null
 }
 var currentShow = null;
 function loadEpisodes(options) {
+    if (typeof(options.f) != "undefined" && options.f.length) {
+        $('#episode-grid').empty();
+    }
+    if (episodeLoad.last == 0) {
+        $('#episode-grid').empty();
+    }
     currentShow = options.tvshowid;
     var optionstr = JSON.stringify(options) + hideWatched;
     if (episodeLoad.options != optionstr) {
@@ -325,15 +372,15 @@ function loadEpisodes(options) {
 
                     var src = 'holder.js/150x85/text:No artwork';
                     if (episode.thumbnail != '') {
-                        src = WEBDIR + 'plex/GetThumb?w=150&h=85&thumb='+encodeURIComponent(episode.thumbnail);
+                        src = WEBDIR + 'plex/GetThumb?w=375&h=210&thumb='+encodeURIComponent(episode.thumbnail);
                     }
                     episodeAnchor.append($('<img>').attr('src', src).addClass('thumbnail'));
 
                     if (episode.playcount >= 1) {
-                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('icon-white icon-ok-sign watched_episode'));
+                        episodeAnchor.append($('<i>').attr('title', 'Watched').addClass('fa fa-inverse fa-check-circle watched_episode'));
                     }
 
-                    episodeAnchor.append($('<h6>').addClass('title').html(shortenText(episode.label, 18)));
+                    episodeAnchor.append($('<h6>').addClass('title').html(shortenText(episode.label, 17)));
 
                     episodeItem.append(episodeAnchor);
 
@@ -353,10 +400,17 @@ function loadEpisodes(options) {
 var artistLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 75,
     options: null
 }
+var currentArtist = null
 function loadArtists(options) {
+    if (typeof(options.f) != "undefined" && options.f.length) {
+        $('#artist-grid').empty();
+    }
+    if (artistLoad.last == 0) {
+        $('#artist-grid').empty();
+    }
     var optionstr = JSON.stringify(options);
     if (artistLoad.options != optionstr) {
         artistLoad.last = 0;
@@ -411,11 +465,17 @@ function loadArtists(options) {
 var albumLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 75,
     options: null,
     artist: null
 }
 function loadAlbums(options) {
+    if (typeof(options.f) != "undefined" && options.f.length){
+        $('#album-grid').empty();
+    }
+    if (albumLoad.last == 0) {
+        $('#album-grid').empty();
+    }
     var elem = $('#album-grid');
     if (options && options.artistid!=undefined) {
         $('.artist-albums:visible').slideUp(300, function() {
@@ -468,18 +528,20 @@ function loadAlbums(options) {
 
                     var src = 'holder.js/150x150/text:No artwork';
                     if (album.thumbnail != '') {
-                        src = WEBDIR + 'plex/GetThumb?w=150&h=150&thumb='+encodeURIComponent(album.thumbnail);
+                        src = WEBDIR + 'plex/GetThumb?w=300&h=300&thumb='+encodeURIComponent(album.thumbnail);
                     }
                     albumItem.append($('<img>').attr('src', src).addClass('thumbnail'));
 
-                    var albumCaption = $('<div>').addClass('grid-caption hide').append(
-                        $('<a>').attr('href', '#').append(
+                    var albumCaption = $('<div>').addClass('grid-caption hide').click(function(e) {
+                        e.preventDefault();
+                        loadSongs({'albumid': album.id});
+                        }).
+                        append(
+                            $('<a>').attr('href', '#').append(
                                 $('<h6>').html(album.title),
                                 $('<h6>').html(album.artist).addClass('artist')
-                            ).click(function(e) {
-                                e.preventDefault();
-                                loadSongs({'albumid': album.id});
-                            })
+                        )
+
                     )
                     albumItem.append(albumCaption);
                     elem.append(albumItem);
@@ -498,16 +560,30 @@ function loadAlbums(options) {
 var songsLoad = {
     last: 0,
     request: null,
-    limit: 50,
+    limit: 75,
     options: {},
     albumid: ''
 }
+
+var currentAlbum = null
 function loadSongs(options) {
-    if (options != undefined) {
-        songsLoad.last = 0
-        $('#songs-grid tbody').empty()
-        songsLoad.options = options
-        }
+    currentAlbum = options.albumid;
+    // clear old results if it was a search
+    if (options.f) {
+        currentAlbum = null
+        $('#songs-grid tbody').empty();
+    }
+
+
+    var optionstr = JSON.stringify(options)
+    if (songsLoad.options != optionstr) {
+         songsLoad.last = 0;
+         $('#songs-grid tbody').empty();
+     }
+     if (songsLoad.last == 0) {
+        $('#songs-grid tbody').empty();
+     }
+     songsLoad.options = optionstr;
 
     var active = (songsLoad.request!=null && songsLoad.request.readyState!=4)
     if (active || songsLoad.last == -1) return
@@ -517,7 +593,7 @@ function loadSongs(options) {
         end: (songsLoad.last + songsLoad.limit),
         albumid: (options && options.albumid ? '' : songsLoad.albumid)
     }
-    $.extend(sendData, songsLoad.options)
+    $.extend(sendData, options)
 
     $('.spinner').show();
     songsLoad.request = $.ajax({
@@ -538,7 +614,7 @@ function loadSongs(options) {
                     var row = $('<tr>');
                     row.append(
                         $('<td>').append(
-                            
+
                             $('<a>').attr('href','#').text(' ' + song.label).click(function(e) {
                                 e.preventDefault();
                             })
@@ -585,7 +661,7 @@ function loadNowPlaying() {
                 $.each(data.playing_items, function (i, item) {
                 var playingTitle = '';
                 var playingSubtitle = '';
-                var username = $('<span>').addClass('pull-right muted nowplayinguser').text(item.user);
+                var username = $('<span>').addClass('pull-right muted nowplayinguser').text(item.user + '@' + item.player);
                 var nowPlayingThumb = encodeURIComponent(item.thumbnail);
                 var thumbnail = $('<img>').addClass("img-polaroid img-rounded").attr('alt', item.label);
                 if (nowPlayingThumb == '') {
@@ -595,16 +671,16 @@ function loadNowPlaying() {
                 } else {
                     switch(item.type) {
                         case 'episode':
-                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=150&h=75&thumb='+nowPlayingThumb);
+                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=525&h=300&thumb='+nowPlayingThumb);
                             thumbnail.attr('width', '150').attr('height', '75');
                             break;
                         case 'movie':
-                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=100&h=150&thumb='+nowPlayingThumb);
+                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=225&h=338&thumb='+nowPlayingThumb);
                             thumbnail.attr('width', '100').attr('height', '150');
                             break;
                         default:
-                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=140&h=140&thumb='+nowPlayingThumb);
-                            thumbnail.attr('width', '140').attr('height', '140');
+                            thumbnail.attr('src', WEBDIR + 'plex/GetThumb?w=300&h=300&thumb='+nowPlayingThumb);
+                            thumbnail.attr('width', '150').attr('height', '150');
                     }
                 }
                 if (item.type == 'episode') {
@@ -630,36 +706,36 @@ function loadNowPlaying() {
                 if (item.protocolCapabilities.indexOf('playback') != -1) {
                     var btn_toolbar = $('<div id="nowplaying_control"/>').addClass("btn-toolbar");
                     var btn_group = $('<div>').addClass("btn-group");
-                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'skipPrevious').attr('data-player', item.address).append('<i class="icon-fast-backward"></i>'));
-                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stepBack').attr('data-player', item.address).append('<i class="icon-backward"></i>'));
-                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stop').attr('data-player', item.address).append('<i class="icon-stop"></i>'));
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'skipPrevious').attr('data-player', item.address).append('<i class="fa fa-fast-backward"></i>'));
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stepBack').attr('data-player', item.address).append('<i class="fa fa-backward"></i>'));
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stop').attr('data-player', item.address).append('<i class="fa fa-stop"></i>'));
                     if (item.state == 'playing') {
-                        btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'play').attr('data-player', item.address).append('<i class="icon-pause"></i>'));
+                        btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'pause').attr('data-player', item.address).append('<i class="fa fa-pause"></i>'));
                     } else {
-                        btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'play').attr('data-player', item.address).append('<i class="icon-play"></i>'));
+                        btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'play').attr('data-player', item.address).append('<i class="fa fa-play"></i>'));
                     }
-                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stepForward').attr('data-player', item.address).append('<i class="icon-forward"></i>'));
-                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'skipNext').attr('data-player', item.address).append('<i class="icon-fast-forward"></i>'));
-                    
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'stepForward').attr('data-player', item.address).append('<i class="fa fa-forward"></i>'));
+                    btn_group.append($('<button>').addClass("btn btn-small").attr('data-player-control', 'skipNext').attr('data-player', item.address).append('<i class="fa fa-fast-forward"></i>'));
+
                     btn_toolbar.append(btn_group);
                     info.append(btn_toolbar);
-                    
+
                 }
-                
+
                 var row = $('<div>').addClass("row").append(thumb, info);
-                
+
                 $('#nowplaying').append(row);
                 });
                 $('#nowplaying').slideDown();
-    }
-}
-});
+            }
+        }
+    });
 }
 
 
 
 function reloadTab() {
-    var options = {};
+    var options = {'f': searchString};
 
     if ($('#movies').is(':visible')) {
         loadMovies(options);
@@ -673,8 +749,9 @@ function reloadTab() {
     } else if ($('#albums').is(':visible')) {
         loadAlbums(options);
     } else if ($('#songs').is(':visible')) {
-        loadSongs();
-}
+        options = $.extend(options, {'albumid': currentAlbum});
+        loadSongs(options);
+    }
 }
 
 function hideWatched() {

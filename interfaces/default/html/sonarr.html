@@ -1,0 +1,115 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+  <div class="container-fluid">
+    <div class="content maincontent">
+      <h1 class="page-header page-title data-quality=${quality}">
+        <a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'} title="Open original Sonarr interface">${settings.get('sonarr_name', 'Sonarr')}</a>
+        <div class="btn-group pull-right">
+          <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wrench fa-lg"></i>
+                <i class="fa fa-chevron-down fa-fw"></i></a>
+          <ul class="dropdown-menu pull-right">
+            <!-- Skeleton -->
+            <li><a id="scanfolder" href="#" title="Scan DroneFactoryFolder"><i class="fa fa-search fa-fw"></i> Scan DroneFactory Folder</a></li>
+            <li class="divider"></li>
+            <li><a href="Command?method=restart" class="ajax-confirm" title="Restart Sonarr"><i class="fa fa-refresh fa-fw"></i> Restart</a></li>
+            <li><a href="Command/?method=shutdown" class="ajax-confirm" title="Shutdown Sonarr"><i class="fa fa-power-off fa-fw"></i> Shutdown</a></li>
+          </ul>
+        </div>
+      </h1>
+      <div class="well form-inline">
+        <input class="span6" id="add_show_name" name="add_show_name" type="text" />
+        <select class="span3" style="display:none;" id="add_show_select" name="add_show_select"></select>
+        <select class="span1" style="display:none;" id="add_show_quality" name="add_show_quality"></select>
+        <select class="span1" style="display:none;" id="add_show_monitor" name="add_show_monitor">
+          <option value="all">All</option>
+          <option value="future">Future</option>
+          <option value="missing">Missing</option>
+          <option value="latest">Latest</option>
+          <option value="first">First</option>
+          <option value="none">None</option>
+          <option value="existing">Existing</option>
+        </select>
+        <select class="span2" style="display:none;" id="add_show_type" name="add_show_type">
+          <option value="standard">Standard</option>
+          <option value="daily">Daily</option>
+          <option value="anime">Anime</option>
+        </select>
+        <select class="span2" style="display:none;" id="add_show_folder" name="add_show_folder"></select>
+
+        <label style="display:none;padding-left: 5px;padding-right: 5px;" class="checkbox sonarr_checkboxs"> Season folders:
+          <input type="checkbox" class="sonarr_checkboxs" style="display:none;" id="add_show_seasonfolder" name="add_show_seasonfolder" value="on" checked>
+        </label>
+        <label style="display:none;padding-left: 5px;padding-right: 5px;" class="checkbox sonarr_checkboxs"> Specials:
+          <input type="checkbox" class="sonarr_checkboxs" style="display:none;" id="add_show_specials" name="add_show_specials">
+        </label>
+        <button class="btn btn-success" type="button" id="add_show_button"><i class="fa fa-plus fa-inverse fa-fw"></i> Add show</button>
+        <button class="btn btn-success hide" type="button" id="add_tvdbid_button"><i class="fa fa-check fa-inverse fa-fw"></i> Add show</button>
+        <button class="btn hide" type="button" id="cancel_show_button"> Cancel</button>
+      </div>
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#tvshows" data-toggle="tab">TV Shows</a></li>
+        <li><a href="#calendar_tab" data-toggle="tab">Calendar</a></li>
+        <li><a href="#history" data-toggle="tab">History</a></li>
+        <!--<li><a href="#log" data-toggle="tab">Log</a></li>-->
+      </ul>
+      <div class="tab-content">
+        <div id="tvshows" class="tab-pane mofa active">
+          <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
+            <thead>
+              <tr>
+                <th data-ignore-articles="en" data-sorter="ignoreArticles">Showname</th>
+                <th>Status</th>
+                <th>Next ep</th>
+                <th>Downloads</th>
+                <th>Network</th>
+                <th>Quality</th>
+              </tr>
+            </thead>
+            <tbody id="tvshows_table_body"></tbody>
+          </table>
+        </div>
+        <div id="calendar_tab" class="tab-pane">
+          <div id="cal"></div>
+        </div>
+        <div id="calendar_orgin" class="tab-pane mofa">
+          <table class="table table-striped table-sortable">
+            <thead>
+              <tr>
+                <th>Showname</th>
+                <th>Episode</th>
+                <th>Title</th>
+                <th>Air Date</th>
+              </tr>
+            </thead>
+            <tbody id="calendar_table_body"></tbody>
+          </table>
+        </div>
+        <div id="history" class="tab-pane mofa">
+          <table class="table table-striped table-sortable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Action</th>
+                <th>Showname</th>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Quality</th>
+              </tr>
+            </thead>
+            <tbody id="history_table_body"></tbody>
+          </table>
+        </div>
+        <!--<div id="log" class="tab-pane mofa">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Logitem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log_table_body"></tbody>
+                </table>
+            </div>-->
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>

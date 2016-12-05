@@ -1,0 +1,179 @@
+a:Hover {
+    text-decoration: none;
+}
+.thumbnails li {
+    position: relative;
+	float: left;
+}
+#addons-grid img.thumbnail,
+#movie-grid img.thumbnail,
+#show-grid img.thumbnail {
+    height: 150px;
+    width: 100px;
+}
+#episode-grid img.thumbnail {
+    position: relative;
+    height: 85px;
+    width: 150px;
+}
+#album-grid img.thumbnail,
+#artist-grid img.thumbnail {
+    height: 150px;
+    width: 150px;
+}
+#pvr-grid img.thumbnail {
+    height: 75px;
+    width: 75px;
+}
+
+.watched {
+    position: absolute;
+    top: 138px;
+    right: 5px;
+    width: 16px;
+    height: 16px;
+}
+.watched-episode {
+    position: absolute;
+    top: 74px;
+    right: 4px;
+    width: 16px;
+    height: 16px;
+}
+.grid-caption {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    background: rgba(0,0,0,0.75);
+    padding: 10px;
+    width: 130px;
+    height: 130px;
+}
+.grid-caption h6 {
+    color: #fff;
+    font-family: inherit;
+    margin: 0;
+}
+.grid-caption h6.artist {
+    font-weight: normal;
+}
+.grid-control {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+}
+.grid-control a:first-child {
+    margin-right: 35px;
+}
+h6.title {
+    color: #555555;
+    text-align: center;
+    margin: 0;
+    padding-top: 4px;
+}
+#artist-grid tr td:first-child {
+    width: 35px;
+}
+#artist-grid a.artist-link {
+    display: block;
+}
+#artist-grid i,
+#playlist-table i {
+    margin: 0 5px 0 0;
+}
+#nowplaying #player-progressbar,
+#playlist tr td {
+    cursor: pointer;
+}
+#player-volume-progressbar {
+	height: 25px !important;
+	margin: 0px !important;
+	cursor: pointer;
+	background-color: #222222 !important;
+}
+#nowplaying {
+    background-size: 100%;
+    background-position: 50% 20%;
+    background-repeat: no-repeat;
+    margin-bottom: 10px;
+}
+#playlist-table tr td:last-child {
+    width: 35px;
+}
+.modal-fanart {
+    background: #fff top center no-repeat;
+    background-size: 100%;
+}
+.modal .movie-poster {
+    height: 300px;
+    width: 200px;
+}
+.modal .episode-poster {
+    height: 100px;
+    width: 150px;
+}
+/*
+.modal .modal-movieinfo {
+    margin-left: 171px;
+}
+*/
+.modal .modal-episodeinfo {
+    margin-left: 171px;
+}
+
+.modal-body {
+	overflow: hidden;
+}
+
+.modal .modal-youtube {
+    border: 0;
+    height: 400px;
+	width: 100%;
+	overflow: hidden;
+}
+
+@media (max-width: 767px) {
+.thumbnails>li{margin-left:4px}
+}
+
+@media (max-width: 320px) {
+	.modal .movie-poster {
+		height: 207px !important;
+		width: 144px !important;
+        margin-right: 8px;
+	}
+    .page-header .header-toolbar {
+        margin-top: 10px!important;
+    }
+	.modal-body {
+		max-height: 280px;
+	}
+	.modal .modal-youtube {
+		max-height: 200px;
+	}
+    #episode-grid.thumbnails>li {
+        padding: 0px;
+        margin-left: 63px !important;
+
+    }
+	.thumbnails>li {
+		padding: 0px;
+		margin-left: 15px !important;
+	}
+	.thumbnail {
+		padding: 6px;
+	}
+	.modal .modal-movieinfo {
+		margin-left: 0px;
+	}
+    .modal .modal-episodeinfo {
+        margin-left: 0px;
+    }
+    .modal .episode-poster {
+        margin-right: 8px;
+    }
+    .dropdown-menu {
+        right:initial!important;
+        left: 0 !important;
+    }
+}

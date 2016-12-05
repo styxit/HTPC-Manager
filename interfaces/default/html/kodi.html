@@ -1,0 +1,170 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+<div class="container-fluid">
+    <div class="content">
+	        <h1 class="page-header page-title">
+	        <a href="webinterface" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'}>${settings.get('kodi_name', 'Kodi')}</a>
+	        <div class="header-toolbar pull-right">
+	            <div class="btn-group">
+	                <select id="servers"></select>
+	            </div>
+	            <div class="btn-group">
+	                <a href="#" id="kodi-notify" class="btn" title="Send notification"><i class="fa fa-envelope"></i></a>
+	            </div>
+	            <div class="btn-group">
+	                <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" title="Sort by"><i class="fa fa-sort-amount-desc fa-fw"></i>
+	                <i class="fa fa-chevron-down fa-fw"></i></a>
+	                <ul class="dropdown-menu pull-right">
+	                    <li><a href="#" class="active" data-sort-method="title" data-sort-order="ascending"><i class="fa fa-sort-alpha-asc fa-fw"></i> Title (ascending)</a></li>
+	                    <li><a href="#" data-sort-method="title" data-sort-order="descending"><i class="fa fa-sort-alpha-desc fa-fw"></i> Title (descending)</a></li>
+	                    <li><a href="#" data-sort-method="dateadded" data-sort-order="descending"><i class="fa fa-sort-amount-desc fa-fw"></i> Recently Added</a></li>
+	                    <li><a href="#" data-sort-method="rating" data-sort-order="descending"><i class="fa fa-sort-amount-desc fa-fw"></i> Rating</a></li>
+	                    <li><a href="#" data-sort-method="year" data-sort-order="descending"><i class="fa fa-sort-numeric-desc fa-fw"></i> Year</a></li>
+	                </ul>
+	            </div>
+	            <div class="btn-group">
+	                <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wrench fa-lg"></i>
+	                <i class="fa fa-chevron-down fa-fw"></i></a>
+	                <ul class="dropdown-menu pull-right">
+	                    %if settings.get('kodi_hide_watched', 0):
+	                    <li><a href="#" id="hidewatched" class="active"><i class="fa fa-eye fa-fw"></i> Show Watched</a></li>
+	                    %else:
+	                    <li><a href="#" id="hidewatched"><i class="fa fa-eye-slash fa-fw"></i> Hide Watched</a></li>
+	                    %endif
+	                    <li><a href="ControlPlayer?action=party" class="ajax-link"><i class="fa fa-glass fa-fw"></i> Party Mode</a></li>
+	                    <li class="divider"></li>
+	                    <li><a href="Library/scan/video" class="ajax-link"><i class="fa fa-refresh fa-fw"></i> Update Video Library</a></li>
+	                    <li><a href="Library/clean/video" class="ajax-link"><i class="fa fa-trash-o fa-fw"></i> Clean Video Library</a></li>
+	                    <li class="divider"></li>
+	                    <li><a href="Library/scan/audio" class="ajax-link"><i class="fa fa-refresh fa-fw"></i> Update Music Library</a></li>
+	                    <li><a href="Library/clean/audio" class="ajax-link"><i class="fa fa-trash-o fa-fw"></i> Clean Music Library</a></li>
+	                </ul>
+	            </div>
+	            <div class="btn-group">
+	                <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-power-off fa-fw"></i>
+	                <i class="fa fa-chevron-down fa-fw"></i></a>
+	                <ul class="dropdown-menu pull-right">
+	                    <li><a href="Wake" class="ajax-link" title="Send WakeOnLan"><i class="fa fa-power-off fa-fw"></i> Wake</a></li>
+	                    <li><a href="System?action=Suspend" class="ajax-confirm" title="Suspend kodi"><i class="fa fa-pause fa-fw"></i> Suspend</a></li>
+	                    <li class="divider"></li>
+	                    <li><a href="Run" class="ajax-link" title="Start kodi"><i class="fa fa-play-circle-o fa-fw"></i> Start</a></li>
+						<li><a href="System?action=Quit" class="ajax-confirm" title="Quit kodi"><i class="fa fa-times-circle-o fa-fw"></i> Quit</a></li>
+						<li class="divider"></li>
+	                    <li><a href="System?action=Reboot" class="ajax-confirm" title="Restart kodi"><i class="fa fa-refresh fa-fw"></i> Restart</a></li>
+	                    <li><a href="System?action=Shutdown" class="ajax-confirm" title="Shutdown kodi"><i class="fa fa-power-off fa-fw"></i> Shutdown</a></li>
+	                </ul>
+	            </div>
+	        </div>
+	        </h1>
+        <div class="well hide" id="nowplaying">
+            <div class="row">
+                <div class="span2 hidden-phone thumb">
+                    <img class="img-polaroid img-rounded" />
+                </div>
+                <div class="span9">
+                    <h2>
+                        <span id="player-item-title"></span>&nbsp;
+                        <small id="player-item-subtitle" class="muted"></small>
+                    </h2>
+                    <h2><small id="player-item-time"></small></h2>
+                    <div class="progress" id="player-progressbar">
+                        <div class="bar active"></div>
+                    </div>
+                    <div class="btn-toolbar">
+                        <div class="btn-group">
+                            <button class="btn btn-small" data-player-control="skipprevious"><i class="fa fa-fast-backward fa-fw"></i></button>
+                            <button class="btn btn-small" data-player-control="stepback"><i class="fa fa-backward fa-fw"></i></button>
+                            <button class="btn btn-small" data-player-control="stop"><i class="fa fa-stop fa-fw"></i></button>
+                            <button class="btn btn-small" data-player-control="playpause"><i class="fa fa-pause fa-fw"></i></button>
+                            <button class="btn btn-small" data-player-control="stepforward"><i class="fa fa-forward fa-fw"></i></button>
+                            <button class="btn btn-small" data-player-control="skipnext"><i class="fa fa-fast-forward fa-fw"></i></button>
+                            <button class="btn btn-small" data-player-control="getsub"><i class="fa fa-text-width fa-fw"></i></button>
+                        </div>
+                        <div class="input-prepend pull-right">
+                            <span class="add-on"><i class="fa fa-text-width fa-fw"></i></span>
+                            <select id="subtitles"></select>
+                        </div>
+                        <div class="input-prepend pull-right">
+                            <span class="add-on"><i class="fa fa-volume-up fa-fw"></i></span>
+                            <select id="audio"></select>
+                        </div>
+                    </div>
+                    <div class="btn-toolbar">
+                        <button class="btn btn-small" data-player-control="mute"><i class="fa fa-volume-off fa-lg"></i></button>
+                        <input id="ex1" class="span1" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="0"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ul class="nav nav-tabs">
+            <li><a href="#movies" data-toggle="tab">Movies</a></li>
+            <li><a href="#shows" data-toggle="tab">TV Shows</a></li>
+            <li><a href="#addons" data-toggle="tab">Addons</a></li>
+            <li class="hide"><a href="#episodes" data-toggle="tab">Episodes</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Music
+                <i class="fa fa-chevron-down"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#artists" data-toggle="tab">Artists</a></li>
+                    <li><a href="#albums" data-toggle="tab">Albums</a></li>
+                    <li><a href="#songs" data-toggle="tab">Songs</a></li>
+                </ul>
+            </li>
+            %if settings.get('kodi_enable_pvr', 0):
+            <li><a href="#pvr" data-toggle="tab">PVR</a></li>
+            %endif
+            <li class="hide"><a href="#playlist" data-toggle="tab">Playlist</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="movies" class="tab-pane">
+                <ul id="movie-grid" class="thumbnails"></ul>
+            </div>
+            <div id="shows" class="tab-pane">
+                <ul id="show-grid" class="thumbnails"></ul>
+            </div>
+            <div id="addons" class="tab-pane">
+                <ul id="addons-grid" class="thumbnails"></ul>
+            </div>
+            <div id="episodes" class="tab-pane">
+                <ul id="episode-grid" class="thumbnails"></ul>
+            </div>
+            <div id="artists" class="tab-pane">
+                <table id="artist-grid" class="table table-striped table-hover"></table>
+            </div>
+            <div id="albums" class="tab-pane">
+                <ul id="album-grid" class="artist-albums thumbnails"></ul>
+            </div>
+            <div id="songs" class="tab-pane">
+                <table id="songs-grid" class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Artist</th>
+                            <th>Album</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="playlist" class="tab-pane">
+                <table id="playlist-table" class="table table-striped table-hover playlist">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Artist</th>
+                            <th>Album</th>
+                            <th>Duration</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="pvr" class="tab-pane">
+                <ul id="pvr-grid" class="thumbnails"></ul>
+            </div>
+        </div>
+        <div class="spinner"></div>
+    </div>
+</div>

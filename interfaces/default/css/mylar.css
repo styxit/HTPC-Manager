@@ -1,0 +1,22 @@
+table td{
+	vertical-align: middle !important;
+}
+
+/*
+.artistthumbdiv {
+	overflow: hidden;
+	height: 50px;
+	width: 50px
+}
+*/
+
+.artistimgtab {
+	height: 64px;
+	width: 64px;
+	/*
+	min-height: 100%;
+	min-width: 100%;
+	max-width: 250px;
+	max-height: 300px;
+	*/
+}

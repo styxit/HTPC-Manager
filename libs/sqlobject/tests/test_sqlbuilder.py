@@ -60,6 +60,10 @@ def test_str_or_sqlrepr():
     assert sqlrepr(update, 'sqlite') == \
         "UPDATE employees SET name='test' WHERE id=1"
 
+    update = Update('employees', {'name': 'test', 'age': 42}, where='id=1')
+    assert sqlrepr(update, 'sqlite') == \
+        "UPDATE employees SET age=42, name='test' WHERE id=1"
+
     delete = Delete('employees', where='id=1')
     assert sqlrepr(delete, 'sqlite') == \
         "DELETE FROM employees WHERE id=1"

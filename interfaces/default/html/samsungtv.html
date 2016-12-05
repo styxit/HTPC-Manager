@@ -1,0 +1,113 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+
+<div class="container-fluid">
+  <div class="content">
+    <h1 class="page-header page-title">
+      <span>${settings.get('samsungtv_name', 'TV')}</span>
+    </h1>
+
+    <div class="row-fluid">
+        <div class="span4 hidden-phone hidden-tablet"></div>
+        <div id="samsungt" class="span4">
+            <table class="samsung_tvremote table">
+                <tbody>
+                    <tr>
+                        <td><button class="btn text-center" data-player-control="KEY_POWEROFF"><i class="fa fa-power-off fa-fw"></i></button></td>
+                        <td>&nbsp;</td>
+                        <td><button class="btn" data-player-control="KEY_SOURCE">Source &nbsp;</button></td>
+                    </tr>
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td><button class="btn" data-player-control="KEY_HDMI">HDMI</button></td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn" data-player-control="KEY_1">1</button></td>
+                        <td><button class="btn" data-player-control="KEY_2">2</button></td>
+                        <td><button class="btn" data-player-control="KEY_3">3</button></td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn" data-player-control="KEY_4">4</button></td>
+                        <td><button class="btn" data-player-control="KEY_5">5</button></td>
+                        <td><button class="btn" data-player-control="KEY_6">6</button></td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn" data-player-control="KEY_7">7</button></td>
+                        <td><button class="btn" data-player-control="KEY_8">8</button></td>
+                        <td><button class="btn" data-player-control="KEY_9">9</button></td>
+                    </tr>
+                    <tr>
+                        <td><button id="ttxmix" class="btn" data-player-control="KEY_TT_MIX">TTX/Mix</button></td>
+                        <td><button class="btn" data-player-control="KEY_0">0</button></td>
+                        <td><button class="btn" data-player-control="KEY_PRECH">Pre-Ch</button></td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn" data-player-control="KEY_VOLUP">Vol &nbsp;<i class="fa fa-plus fa-fw"></i></button></td>
+                        <td><button class="btn" style="font-size:14px" data-player-control="KEY_MUTE"><i class="fa fa-volume-off fa-fw"></i><i class="fa fa-remove fa-fw"></i></button></td>
+                        <td><button class="btn" data-player-control="KEY_CHUP">P &nbsp;<i class="fa fa-chevron-up fa-fw"></button></td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn" data-player-control="KEY_VOLDOWN">Vol &nbsp;<i class="fa fa-minus fa-fw"></i></button></td>
+                        <td><button class="btn" data-player-control="KEY_CH_LIST">Ch List</button></td>
+                        <td><button class="btn" data-player-control="KEY_CHDOWN">P &nbsp;<i class="fa fa-chevron-down fa-fw"></i></button></td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn" data-player-control="KEY_CONTENTS">Content</button></td>
+                        <td><button class="btn" data-player-control="KEY_MENU">Menu</button></td>
+                        <td><button class="btn" data-player-control="KEY_GUIDE">Guide</button></td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn" data-player-control="KEY_TOOLS">Tools<a/></td>
+                        <td><button class="btn" data-player-control="KEY_UP"><i class="fa fa-arrow-up fa-fw"></i></button></td>
+                        <td><button class="btn" data-player-control="KEY_INFO"><i class="fa fa-info fa-fw"></i></button></td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn" data-player-control="KEY_LEFT"><i class="fa fa-arrow-left fa-fw"></i></button></td>
+                        <td><button class="btn" data-player-control="KEY_ENTER">Enter</button></td>
+                        <td><button class="btn" data-player-control="KEY_RIGHT"><i class="fa fa-arrow-right fa-fw"></i></button></td>
+                    </tr>
+                    <tr>
+                        <td><button class="btn" data-player-control="KEY_RETURN"><i class="fa fa-undo fa-fw"></i></button></td>
+                        <td><button class="btn" data-player-control="KEY_DOWN"><i class="fa fa-arrow-down fa-fw"></i></button></td>
+                        <td><button class="btn" data-player-control="KEY_EXIT">Exit</button></td>
+                    </tr>
+                    <tr>
+                        <td colspan=3>
+                            <table id="lettertable" width="100%" style="text-align: center;">
+                                <td><button class="btn btn2 btn-red" data-player-control="KEY_RED">A</button></td>
+                                <td><button class="btn btn2 btn-green" data-player-control="KEY_GREEN">B</button></td>
+                                <td><button class="btn btn2 btn-yellow" data-player-control="KEY_YELLOW">C</button></td>
+                                <td><button class="btn btn2 btn-blue" data-player-control="KEY_CYAN">D</button></td>
+                            </table>
+                        </td>
+                    </tr>
+                <tr>
+                    <td><button class="btn" data-player-control="KEY_W_LINK"><i class="fa fa-globe fa-fw"></i></button></td>
+                    <td><button class="btn" data-player-control="KEY_RSS"><i class="fa fa-search fa-fw"></i></button></td>
+                    <td><button class="btn" data-player-control="KEY_MTS">3D</button></td>
+                </tr>
+                <tr>
+                    <td><button class="btn" data-player-control="KEY_TOPMENU">EManual</button></td>
+                    <td><button class="btn" data-player-control="KEY_PICTURE_SIZE">P Size</button></td>
+                    <td><button class="btn" data-player-control="KEY_CAPTION">Subt</button></td>
+                </tr>
+                <tr>
+                    <td><button class="btn" data-player-control="KEY_REWIND"><i class="fa fa-backward fa-fw"></i></button></td>
+                    <td><button class="btn" data-player-control="KEY_PAUSE"><i class="fa fa-pause fa-fw"></i></button></td>
+                    <td><button class="btn" data-player-control="KEY_FF"><i class="fa fa-forward fa-fw"></i></button></td>
+                </tr>
+                <tr>
+                    <td><button class="btn" data-player-control="KEY_REC"><i class="fa fa-circle fa-fw"></button></td>
+                    <td><button class="btn" data-player-control="KEY_PLAY"><i class="fa fa-play fa-fw"></i></button></td>
+                    <td><button class="btn" data-player-control="KEY_STOP"><i class="fa fa-stop fa-fw"></button></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="input-append">
+            <input type="text" id="msg" placeholder="Search">
+            <button class="btn send" data-player-control="">Send</button>
+        </div>
+    </div>
+  </div>
+</div>

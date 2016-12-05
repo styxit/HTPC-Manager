@@ -1,0 +1,39 @@
+<%inherit file="base.html"/>
+<% import platform %>
+<% settings = self.attr.settings %>
+<div class="container-fluid">
+  <div class="content">
+
+    <h1 class="page-header page-title">
+      <span>${settings.get('vnstat_name', 'vnStat')}</span>
+      <small>
+        <i class="fa fa-arrow-down"></i><span id="vnstat-rx"></span>
+        <i class="fa fa-arrow-up"></i><span id="vnstat-tx"></span>
+      </small>
+    </h1>
+
+    % if not importParamiko and platform.system() == 'win32':
+    <div class="row-fluid">
+      <div class="alert alert-error">
+        <h4>Paramiko was not found on your system</h4>
+        <p>Download and install http://www.voidspace.org.uk/python/modules.shtml#pycrypto</p>
+        <p>Then pip install paramiko</p>
+      </div>
+    </div>
+
+    % else:
+    <div class="retard"></div>
+
+    % endif
+    <div class="spinner"></div>
+    <span id="error_message"></span>
+  </div>
+</div>
+
+<script type="text/javascript">
+  % if importParamiko:
+    importParamiko = true;
+  % else :
+    importParamiko = false;
+  % endif
+</script>

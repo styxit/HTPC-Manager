@@ -42,7 +42,7 @@ class SOHashCol( sqlobject.col.SOStringCol ):
 
     def __init__( self, **kw ):
         if 'hashMethod' not in kw:
-            from md5 import md5
+            from hashlib import md5
             self.hashMethod = lambda v: md5( v ).hexdigest()
             if 'length' not in kw:
                 kw['length'] = 32

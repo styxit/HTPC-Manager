@@ -7,13 +7,14 @@ timeout = 1
 
 
 import cherrypy
-from cherrypy._cpcompat import HTTPConnection, HTTPSConnection, NotConnected, BadStatusLine
-from cherrypy._cpcompat import ntob, urlopen, unicodestr
+from cherrypy._cpcompat import HTTPConnection, HTTPSConnection, NotConnected
+from cherrypy._cpcompat import BadStatusLine, ntob, tonative, urlopen, unicodestr
 from cherrypy.test import webtest
 from cherrypy import _cperror
 
 
 pov = 'pPeErRsSiIsStTeEnNcCeE oOfF vViIsSiIoOnN'
+
 
 def setup_server():
 
@@ -93,10 +94,11 @@ def setup_server():
     cherrypy.config.update({
         'server.max_request_body_size': 1001,
         'server.socket_timeout': timeout,
-        })
+    })
 
 
 from cherrypy.test import helper
+
 
 class ConnectionCloseTests(helper.CPWebCase):
     setup_server = staticmethod(setup_server)
@@ -131,10 +133,22 @@ class ConnectionCloseTests(helper.CPWebCase):
         self.assertRaises(NotConnected, self.getPage, "/")
 
     def test_Streaming_no_len(self):
-        self._streaming(set_cl=False)
+        try:
+            self._streaming(set_cl=False)
+        finally:
+            try:
+                self.HTTP_CONN.close()
+            except (TypeError, AttributeError):
+                pass
 
     def test_Streaming_with_len(self):
-        self._streaming(set_cl=True)
+        try:
+            self._streaming(set_cl=True)
+        finally:
+            try:
+                self.HTTP_CONN.close()
+            except (TypeError, AttributeError):
+                pass
 
     def _streaming(self, set_cl):
         if cherrypy.server.protocol_version == "HTTP/1.1":
@@ -179,10 +193,12 @@ class ConnectionCloseTests(helper.CPWebCase):
                 else:
                     self.assertHeader("Connection", "close")
 
-                    # Make another request on the same connection, which should error.
+                    # Make another request on the same connection, which should
+                    # error.
                     self.assertRaises(NotConnected, self.getPage, "/")
 
-                # Try HEAD. See http://www.cherrypy.org/ticket/864.
+                # Try HEAD. See
+                # https://bitbucket.org/cherrypy/cherrypy/issue/864.
                 self.getPage("/stream", method='HEAD')
                 self.assertStatus('200 OK')
                 self.assertBody('')
@@ -220,7 +236,8 @@ class ConnectionCloseTests(helper.CPWebCase):
                 self.assertNoHeader("Connection", "Keep-Alive")
                 self.assertNoHeader("Transfer-Encoding")
 
-                # Make another request on the same connection, which should error.
+                # Make another request on the same connection, which should
+                # error.
                 self.assertRaises(NotConnected, self.getPage, "/")
 
     def test_HTTP10_KeepAlive(self):
@@ -235,7 +252,7 @@ class ConnectionCloseTests(helper.CPWebCase):
         self.assertStatus('200 OK')
         self.assertBody(pov)
         # Apache, for example, may emit a Connection header even for HTTP/1.0
-##        self.assertNoHeader("Connection")
+# self.assertNoHeader("Connection")
 
         # Test a keep-alive HTTP/1.0 request.
         self.persistent = True
@@ -250,7 +267,7 @@ class ConnectionCloseTests(helper.CPWebCase):
         self.assertStatus('200 OK')
         self.assertBody(pov)
         # Apache, for example, may emit a Connection header even for HTTP/1.0
-##        self.assertNoHeader("Connection")
+# self.assertNoHeader("Connection")
 
 
 class PipelineTests(helper.CPWebCase):
@@ -361,7 +378,6 @@ class PipelineTests(helper.CPWebCase):
         self.body = response.read()
         self.assertBody(pov)
 
-
         # Make another request on the same socket,
         # but timeout on the headers
         conn.send(ntob('GET /hello HTTP/1.1'))
@@ -444,47 +460,53 @@ class PipelineTests(helper.CPWebCase):
         # Try a page without an Expect request header first.
         # Note that httplib's response.begin automatically ignores
         # 100 Continue responses, so we must manually check for it.
-        conn.putrequest("POST", "/upload", skip_host=True)
-        conn.putheader("Host", self.HOST)
-        conn.putheader("Content-Type", "text/plain")
-        conn.putheader("Content-Length", "4")
-        conn.endheaders()
-        conn.send(ntob("d'oh"))
-        response = conn.response_class(conn.sock, method="POST")
-        version, status, reason = response._read_status()
-        self.assertNotEqual(status, 100)
-        conn.close()
+        try:
+            conn.putrequest("POST", "/upload", skip_host=True)
+            conn.putheader("Host", self.HOST)
+            conn.putheader("Content-Type", "text/plain")
+            conn.putheader("Content-Length", "4")
+            conn.endheaders()
+            conn.send(ntob("d'oh"))
+            response = conn.response_class(conn.sock, method="POST")
+            version, status, reason = response._read_status()
+            self.assertNotEqual(status, 100)
+        finally:
+            conn.close()
 
         # Now try a page with an Expect header...
-        conn.connect()
-        conn.putrequest("POST", "/upload", skip_host=True)
-        conn.putheader("Host", self.HOST)
-        conn.putheader("Content-Type", "text/plain")
-        conn.putheader("Content-Length", "17")
-        conn.putheader("Expect", "100-continue")
-        conn.endheaders()
-        response = conn.response_class(conn.sock, method="POST")
+        try:
+            conn.connect()
+            conn.putrequest("POST", "/upload", skip_host=True)
+            conn.putheader("Host", self.HOST)
+            conn.putheader("Content-Type", "text/plain")
+            conn.putheader("Content-Length", "17")
+            conn.putheader("Expect", "100-continue")
+            conn.endheaders()
+            response = conn.response_class(conn.sock, method="POST")
 
-        # ...assert and then skip the 100 response
-        version, status, reason = response._read_status()
-        self.assertEqual(status, 100)
-        while True:
-            line = response.fp.readline().strip()
-            if line:
-                self.fail("100 Continue should not output any headers. Got %r" % line)
-            else:
-                break
+            # ...assert and then skip the 100 response
+            version, status, reason = response._read_status()
+            self.assertEqual(status, 100)
+            while True:
+                line = response.fp.readline().strip()
+                if line:
+                    self.fail(
+                        "100 Continue should not output any headers. Got %r" %
+                        line)
+                else:
+                    break
 
-        # ...send the body
-        body = ntob("I am a small file")
-        conn.send(body)
+            # ...send the body
+            body = ntob("I am a small file")
+            conn.send(body)
 
-        # ...get the final response
-        response.begin()
-        self.status, self.headers, self.body = webtest.shb(response)
-        self.assertStatus(200)
-        self.assertBody("thanks for '%s'" % body)
-        conn.close()
+            # ...get the final response
+            response.begin()
+            self.status, self.headers, self.body = webtest.shb(response)
+            self.assertStatus(200)
+            self.assertBody("thanks for '%s'" % body)
+        finally:
+            conn.close()
 
 
 class ConnectionTests(helper.CPWebCase):
@@ -596,7 +618,7 @@ class ConnectionTests(helper.CPWebCase):
             return self.skip()
 
         if (hasattr(self, 'harness') and
-            "modpython" in self.harness.__class__.__name__.lower()):
+                "modpython" in self.harness.__class__.__name__.lower()):
             # mod_python forbids chunked encoding
             return self.skip()
 
@@ -608,8 +630,8 @@ class ConnectionTests(helper.CPWebCase):
 
         # Try a normal chunked request (with extensions)
         body = ntob("8;key=value\r\nxx\r\nxxxx\r\n5\r\nyyyyy\r\n0\r\n"
-                "Content-Type: application/json\r\n"
-                "\r\n")
+                    "Content-Type: application/json\r\n"
+                    "\r\n")
         conn.putrequest("POST", "/upload", skip_host=True)
         conn.putheader("Host", self.HOST)
         conn.putheader("Transfer-Encoding", "chunked")
@@ -680,8 +702,9 @@ class ConnectionTests(helper.CPWebCase):
         # the actual bytes in the response body.
         self.persistent = True
         conn = self.HTTP_CONN
-        conn.putrequest("GET", "/custom_cl?body=I+too&body=+have+too+many&cl=5",
-                        skip_host=True)
+        conn.putrequest(
+            "GET", "/custom_cl?body=I+too&body=+have+too+many&cl=5",
+            skip_host=True)
         conn.putheader("Host", self.HOST)
         conn.endheaders()
         response = conn.getresponse()
@@ -692,7 +715,7 @@ class ConnectionTests(helper.CPWebCase):
 
     def test_598(self):
         remote_data_conn = urlopen('%s://%s:%s/one_megabyte_of_a/' %
-                                          (self.scheme, self.HOST, self.PORT,))
+                                   (self.scheme, self.HOST, self.PORT,))
         buf = remote_data_conn.read(512)
         time.sleep(timeout * 0.6)
         remaining = (1024 * 1024) - 512
@@ -709,6 +732,92 @@ class ConnectionTests(helper.CPWebCase):
         self.assertEqual(remaining, 0)
         remote_data_conn.close()
 
+
+def setup_upload_server():
+
+    class Root:
+        def upload(self):
+            if not cherrypy.request.method == 'POST':
+                raise AssertionError("'POST' != request.method %r" %
+                                     cherrypy.request.method)
+            return "thanks for '%s'" % tonative(cherrypy.request.body.read())
+        upload.exposed = True
+
+    cherrypy.tree.mount(Root())
+    cherrypy.config.update({
+        'server.max_request_body_size': 1001,
+        'server.socket_timeout': 10,
+        'server.accepted_queue_size': 5,
+        'server.accepted_queue_timeout': 0.1,
+    })
+
+import errno
+socket_reset_errors = []
+# Not all of these names will be defined for every platform.
+for _ in ("ECONNRESET", "WSAECONNRESET"):
+    if _ in dir(errno):
+        socket_reset_errors.append(getattr(errno, _))
+
+class LimitedRequestQueueTests(helper.CPWebCase):
+    setup_server = staticmethod(setup_upload_server)    
+
+    def test_queue_full(self):
+        conns = []
+        overflow_conn = None
+        
+        try:
+            # Make 15 initial requests and leave them open, which should use
+            # all of wsgiserver's WorkerThreads and fill its Queue.
+            import time
+            for i in range(15):
+                conn = self.HTTP_CONN(self.HOST, self.PORT)
+                conn.putrequest("POST", "/upload", skip_host=True)
+                conn.putheader("Host", self.HOST)
+                conn.putheader("Content-Type", "text/plain")
+                conn.putheader("Content-Length", "4")
+                conn.endheaders()
+                conns.append(conn)
+            
+            # Now try a 16th conn, which should be closed by the server immediately.
+            overflow_conn = self.HTTP_CONN(self.HOST, self.PORT)
+            # Manually connect since httplib won't let us set a timeout
+            for res in socket.getaddrinfo(self.HOST, self.PORT, 0,
+                                          socket.SOCK_STREAM):
+                af, socktype, proto, canonname, sa = res
+                overflow_conn.sock = socket.socket(af, socktype, proto)
+                overflow_conn.sock.settimeout(5)
+                overflow_conn.sock.connect(sa)
+                break
+            
+            overflow_conn.putrequest("GET", "/", skip_host=True)
+            overflow_conn.putheader("Host", self.HOST)
+            overflow_conn.endheaders()
+            response = overflow_conn.response_class(overflow_conn.sock, method="GET")
+            try:
+                response.begin()
+            except socket.error as exc:
+                if exc.args[0] in socket_reset_errors:
+                    pass # Expected.
+                else:
+                    raise AssertionError("Overflow conn did not get RST. "
+                                         "Got %s instead" % repr(exc.args))
+            except BadStatusLine:
+                # This is a special case in OS X. Linux and Windows will
+                # RST correctly.
+                assert sys.platform == 'darwin'
+            else:
+                raise AssertionError("Overflow conn did not get RST ")
+        finally:
+            for conn in conns:
+                conn.send(ntob("done"))
+                response = conn.response_class(conn.sock, method="POST")
+                response.begin()
+                self.body = response.read()
+                self.assertBody("thanks for 'done'")
+                self.assertEqual(response.status, 200)
+                conn.close()
+            if overflow_conn:
+                overflow_conn.close()
 
 class BadRequestTests(helper.CPWebCase):
     setup_server = staticmethod(setup_server)
@@ -731,4 +840,3 @@ class BadRequestTests(helper.CPWebCase):
         self.body = response.read()
         self.assertBody("HTTP requires CRLF terminators")
         conn.close()
-

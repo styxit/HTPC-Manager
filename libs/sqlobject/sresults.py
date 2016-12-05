@@ -67,7 +67,7 @@ class SelectResults(object):
         return conn.queryForSelect(self)
 
     def _mungeOrderBy(self, orderBy):
-        if isinstance(orderBy, str) and orderBy.startswith('-'):
+        if isinstance(orderBy, basestring) and orderBy.startswith('-'):
             orderBy = orderBy[1:]
             desc = True
         else:
@@ -122,7 +122,7 @@ class SelectResults(object):
             return self
         clause = self.clause
         if isinstance(clause, basestring):
-            clause = sqlbuilder.SQLConstant('(%s)' % self.clause)
+            clause = sqlbuilder.SQLConstant('(%s)' % clause)
         return self.newClause(sqlbuilder.AND(clause, filter_clause))
 
     def __getitem__(self, value):

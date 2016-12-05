@@ -3,11 +3,15 @@
 
 import cherrypy
 import htpc
+import logging
 from htpc.manageusers import Manageusers
 from sqlobject import SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol
 
 SESSION_KEY = '_cp_username'
+
+logger = logging.getLogger('authentication')
+
 
 def check_credentials(username, password):
     """Verifies credentials for username and password.
@@ -18,10 +22,13 @@ def check_credentials(username, password):
         userexist = Manageusers.selectBy(username=username).getOne()
 
         if userexist and userexist.password == password:
+            logger.debug("%s %s logged in from %s" % (userexist.role.upper(), userexist.username, cherrypy.request.remote.ip))
             return None
         else:
+            logger.warning("Failed login attempt with username: %s password: %s from ip: %s" % (username, password, cherrypy.request.remote.ip))
             return u"Incorrect username or password."
     except Exception as e:
+        logger.warning("Failed login attempt with username: %s password: %s from IP: %s" % (username, password, cherrypy.request.remote.ip))
         return u"Incorrect username or password."
 
 
@@ -69,14 +76,14 @@ def require(*conditions):
 def member_of(groupname):
     def check():
         userexist = Manageusers.selectBy(username=cherrypy.request.login).getOne()
-        if userexist and userexist.role == groupname:
-            return cherrypy.request.login == userexist.username and groupname == userexist.role
+        if userexist and userexist.role in groupname:
+            return cherrypy.request.login == userexist.username and userexist.role in groupname
     return check
+
 
 def name_is(reqd_username):
     return lambda: reqd_username == cherrypy.request.login
 
-# These might be handy
 
 def any_of(*conditions):
     """Returns True if any of the conditions match"""
@@ -86,6 +93,7 @@ def any_of(*conditions):
                 return True
         return False
     return check
+
 
 # By default all conditions are required, but this might still be
 # needed if you want to use it inside of an any_of(...) condition
@@ -101,7 +109,6 @@ def all_of(*conditions):
 
 # Controller to provide login and logout actions
 class AuthController(object):
-
 
     def get_loginform(self, username, msg="Enter login information", from_page="/"):
         return htpc.LOOKUP.get_template('loginform.html').render(scriptname='formlogin', from_page=htpc.WEBDIR, msg=msg)

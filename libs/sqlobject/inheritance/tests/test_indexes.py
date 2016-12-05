@@ -4,8 +4,8 @@ from sqlobject.inheritance import InheritableSQLObject
 
 
 class InheritedPersonIndexGet(InheritableSQLObject):
-    first_name  = StringCol(notNone=True)
-    last_name   = StringCol(notNone=True)
+    first_name  = StringCol(notNone=True, length=100)
+    last_name   = StringCol(notNone=True, length=100)
     age         = IntCol()
     pk          = DatabaseIndex(first_name, last_name, unique=True)
 

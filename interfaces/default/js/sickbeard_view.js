@@ -1,7 +1,7 @@
 $(document).ready(function () {
     var showid = $('h1.page-title').attr('data-showid');
     loadShowData(showid);
-    $('#banner').css('background-image', 'url(' + WEBDIR + 'sickbeard/GetBanner/' + showid + ')');
+    $('#banner').css('background-image', 'url(' + WEBDIR + 'sickbeard/GetBanner?tvdbid=' + showid + ')');
 });
 
 function loadShowData(showid){
@@ -33,6 +33,11 @@ function loadShowData(showid){
       $('.full-update', menu).click(function(evt) {
         evt.preventDefault();
         forceFullUpdate(showid, data.show_name);
+      });
+
+      $('.remove-show', menu).click(function(evt) {
+        evt.preventDefault();
+        removeShow(showid, data.show_name);
       });
 
       renderSeasonTabs(showid, data.season_list);
@@ -79,14 +84,14 @@ function showEpisodeInfo(nShowID, nSeason, nEpisode) {
 			.append($("<tr>")
 				.append($("<td>").html("<b>Description</b>"))
 				.append($("<td>").text(pResult.data.description)));
-				
+
 				if (pResult.data.status == "Downloaded") {
 					strHTML.append($("<tr>")
 						.append($("<td>").html("<b>Air date</b>"))
 						.append($("<td>").text(pResult.data.airdate)))
 					.append($("<tr>")
 						.append($("<td>").html("<b>Quality</b>"))
-						.append($("<td>").text(pResult.data.quality)))						
+						.append($("<td>").text(pResult.data.quality)))
 					.append($("<tr>")
 						.append($("<td>").html("<b>File size</b>"))
 						.append($("<td>").text(pResult.data.file_size_human)))
@@ -94,7 +99,7 @@ function showEpisodeInfo(nShowID, nSeason, nEpisode) {
 						.append($("<td>").html("<b>Location</b>"))
 						.append($("<td>").text(pResult.data.location)));
 				}
-	
+
 		showModal(pResult.data.name, strHTML, []);
 	});
 }
@@ -124,7 +129,7 @@ function renderSeason(){
       $.each(data.data, function(index, value){
         var row = $('<tr>');
 
-        var search_link = $('<a>').addClass('btn btn-mini').attr('title', 'Search new download').append($('<i>').addClass('icon-search')).on('click', function(){
+        var search_link = $('<a>').addClass('btn btn-mini').attr('title', 'Search new download').append($('<i>').addClass('fa fa-search')).on('click', function(){
           searchEpisode(showid, season, index, value.name);
         });
 
@@ -190,18 +195,18 @@ function sickbeardStatusIcon(iconText, white){
     'Skipped'
   ];
   var icons = [
-    'icon-download-alt',
-    'icon-repeat',
-    'icon-share-alt',
-    'icon-time',
-    'icon-lock',
-    'icon-fast-forward'
+    'fa fa-download',
+    'fa fa-rotate-right',
+    'fa fa-share-alt',
+    'fa fa-clock-o',
+    'fa fa-lock',
+    'fa fa-fast-forward'
   ];
 
   if (text.indexOf(iconText) != -1) {
     var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
     if (white == true) {
-      icon.addClass('icon-white');
+      icon.addClass('fa-inverse');
     }
     return icon;
   }
@@ -266,6 +271,39 @@ function rescanFiles(tvdbid, name) {
       hideModal();
     }
   });
+}
+
+function removeShow(tvdbid, name) {
+  if (confirm('Are you sure you want to remove ' + name +'?')) {
+    var modalcontent = $('<div>');
+    modalcontent.append($('<p>').html('Removing &quot;' + name +' &quot; from list'));
+    modalcontent.append($('<div>').html('<div class="progress progress-striped active"><div class="bar" style="width: 100%;"></div></div>'));
+    showModal('Removing...', modalcontent, {});
+
+    $.ajax({
+      url: WEBDIR + 'sickbeard/RemoveShow?tvdbid=' + tvdbid,
+      type: 'get',
+      dataType: 'json',
+      timeout: 15000,
+      success: function (data) {
+        // If result is not 'succes' it must be a failure
+        if (data.result != 'success') {
+          notify('Error', data.message, 'error');
+          return;
+        } else {
+          notify('OK', data.message, 'success');
+          document.location.href = '../';
+          return;
+        }
+      },
+      error: function (data) {
+        notify('Error', 'Unable to remove tv show from list.', 'error', 1);
+      },
+      complete: function (data) {
+        hideModal();
+      }
+    });
+  }
 }
 
 function searchEpisode(tvdbid, season, episode, name) {

@@ -88,11 +88,11 @@ def test_bool():
 
 def test_datetime():
     from datetime import datetime, date, time
-    assert sqlrepr(datetime(2005, 7, 14, 13, 31, 2)) == "'2005-07-14 13:31:02'"
+    assert sqlrepr(datetime(2005, 7, 14, 13, 31, 2)) == "'2005-07-14 13:31:02.000000'"
     assert sqlrepr(date(2005, 7, 14)) == "'2005-07-14'"
-    assert sqlrepr(time(13, 31, 2)) == "'13:31:02'"
+    assert sqlrepr(time(13, 31, 2)) == "'13:31:02.000000'"
     # now dates before 1900
-    assert sqlrepr(datetime(1428, 7, 14, 13, 31, 2)) == "'1428-07-14 13:31:02'"
+    assert sqlrepr(datetime(1428, 7, 14, 13, 31, 2)) == "'1428-07-14 13:31:02.000000'"
     assert sqlrepr(date(1428, 7, 14)) == "'1428-07-14'"
 
 def test_instance():
@@ -142,12 +142,12 @@ def test_insert():
 
     # Multiple columns, implicit template (dictionary value).
     instance7 = Insert('test', valueList=[{'col1': 'a1', 'col2': 'b1'}])
-    assert sqlrepr(instance7, 'mysql') == "INSERT INTO test (col2, col1) VALUES ('b1', 'a1')"
+    assert sqlrepr(instance7, 'mysql') == "INSERT INTO test (col1, col2) VALUES ('a1', 'b1')"
 
     # Multiple rows, Multiple columns, implicit template.
     instance8 = Insert('test', valueList=[{'col1': 'a1', 'col2': 'b1'},
                                         {'col1': 'a2', 'col2': 'b2'}])
-    assert sqlrepr(instance8, 'mysql') == "INSERT INTO test (col2, col1) VALUES ('b1', 'a1'), ('b2', 'a2')"
+    assert sqlrepr(instance8, 'mysql') == "INSERT INTO test (col1, col2) VALUES ('a1', 'b1'), ('a2', 'b2')"
 
 def test_update():
     instance = Update('test', {'test':'test'})
@@ -191,13 +191,6 @@ def test_sets():
         pass
     else:
         assert sqlrepr(set([1])) == "(1)"
-    if sys.version_info[:3] < (2, 6, 0): # Module sets was deprecated in Python 2.6
-        try:
-            from sets import Set
-        except ImportError:
-            pass
-        else:
-            assert sqlrepr(Set([1])) == "(1)"
 
 def test_timedelta():
     assert sqlrepr(timedelta(seconds=30*60)) == \

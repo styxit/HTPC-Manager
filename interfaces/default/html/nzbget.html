@@ -1,14 +1,27 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
+<div class="container-fluid">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="http://${settings.get('nzbget_host')}:${settings.get('nzbget_port') + settings.get('nzbget_basepath')}" target="_blank" title="Open original NZBGet interface">${settings.get('nzbget_name', 'NZBGet')}</a>
+            <a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'} title="Open original NZBGet interface">${settings.get('nzbget_name', 'NZBGet')}</a>
             <small>
                 <strong>Speed:</strong> <span id="queue_speed"></span>
-                <!-- <strong>Status:</strong> <span id="queue_state"></span> -->
+                <strong>Status:</strong> <span id="queue_state"></span>
             </small>
         </h1>
+
+        <form name="add_nzb_form" id="add_nzb_form" method="post" class="well form-inline" action="">
+            <input class="span5" id="nzb_url" name="nzb_url" type="text" placeholder="Paste NZB url" />
+            <select class="span2" name="nzb_category" id="nzb_category"></select>
+            <button class="btn btn-success" id="add_nzb_button"><i class="fa fa-plus fa-inverse fa-fw"></i> Add NZB</button>
+            <!-- Fake click as type=file is ugly in bootstrap -->
+            <a class="btn btn-info" onclick="$('#add_nzb_file').click();"><i class="fa fa-file fa-fw"></i> Browse</a>
+            <input id="add_nzb_file" style="display:none;" type="file">
+            <button class="btn btn-danger" id="nzb_force_scan"><i class="fa fa-search fa-fw"></i> Scan</button>
+            <button class="btn" id="nzb_pause_button"><i class="fa fa-pause fa-fw"></i> Pause</button>
+            <input type="text" class="span1" id="nzb_get_speed" placeholder="Kb/s" value="" />
+            <button class="btn" id="nzb_set_speed"><i class="fa fa-arrow-circle-down fa-fw"></i> Set speed</button>
+        </form>
 
         <ul class="nav nav-tabs">
             <li class="active"><a href="#active" data-toggle="tab">Active</a></li>
@@ -22,8 +35,10 @@
                     <tr>
                         <th>Status</th>
                         <th>File</th>
+                        <th>Category</th>
                         <th>Progress</th>
                         <th>Remaining</th>
+                        <th>&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody id="active_table_body"></tbody>

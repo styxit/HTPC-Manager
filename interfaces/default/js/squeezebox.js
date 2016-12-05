@@ -98,7 +98,7 @@ function refreshPlayer() {
         $('#player-item-time').text(parseSec(player.time) + ' / ' + parseSec(player.duration));
         $('#player-progressbar').children().width((player.time / player.duration * 100) + '%');
         var playPauseIcon = $('[data-player-control=PlayPause]').find('i');
-        var icon = (player.mode=='play')?'icon-pause':'icon-play';
+        var icon = (player.mode=='play')?'fa fa-pause':'fa fa-play';
         playPauseIcon.removeClass().addClass(icon);
         var powerIcon = $('[data-player-control=Power]');
         powerIcon.toggleClass('active',(player.power=='1'));
@@ -110,12 +110,12 @@ function refreshPlayer() {
             var play = $('<a>').attr('href','#').click(function(e) {
                 e.preventDefault();
                 sendCommand('playlist jump '+t);
-            }).append($('<i>').addClass('icon-play'));
+            }).append($('<i>').addClass('fa fa-play'));
             current.append(play);
             var remove = $('<a>').attr('href','#').click(function(e) {
                 e.preventDefault();
                 sendCommand('playlist delete '+t);
-            }).append($('<i>').addClass('icon-remove'));
+            }).append($('<i>').addClass('fa fa-times'));
             current.append(remove);
             var title = $('<a>').attr('href','#').text(track.title).click(function(e) {
                 e.preventDefault();
@@ -147,12 +147,12 @@ function getArtists() {
             listitem = $('<li>');
             artist_id[item.artist] = item.id;
             var control = $('<div>').addClass('control');
-            var playIcon = $('<i>').addClass('icon-play');
+            var playIcon = $('<i>').addClass('fa fa-play');
             var play = $('<a>').attr('href','#').html(playIcon).click(function(e) {
                 e.preventDefault();
                 sendCommand('playlistcontrol cmd:load artist_id:'+item.id);
             });
-            var addIcon = $('<i>').addClass('icon-plus');
+            var addIcon = $('<i>').addClass('fa fa-plus');
             var add = $('<a>').attr('href','#').html(addIcon).click(function(e) {
                 e.preventDefault();
                 sendCommand('playlistcontrol cmd:add artist_id:'+item.id);
@@ -184,12 +184,12 @@ function getAlbums(link, artist) {
             listitem = $('<li>');
             album_id[item.album] = item.id;
             var control = $('<div>').addClass('control');
-            var playIcon = $('<i>').addClass('icon-play');
+            var playIcon = $('<i>').addClass('fa fa-play');
             var play = $('<a>').attr('href','#').html(playIcon).click(function(e) {
                 e.preventDefault();
                 sendCommand('playlistcontrol cmd:load album_id:'+item.id);
             });
-            var addIcon = $('<i>').addClass('icon-plus');
+            var addIcon = $('<i>').addClass('fa fa-plus');
             var add = $('<a>').attr('href','#').html(addIcon).click(function(e) {
                 e.preventDefault();
                 sendCommand('playlistcontrol cmd:add album_id:'+item.id);

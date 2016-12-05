@@ -1,12 +1,14 @@
 """Tests for the CherryPy configuration system."""
 
-import os, sys
-localDir = os.path.join(os.getcwd(), os.path.dirname(__file__))
-
-from cherrypy._cpcompat import ntob, StringIO
+import os
+import sys
 import unittest
 
 import cherrypy
+import cherrypy._cpcompat as compat
+
+localDir = os.path.join(os.getcwd(), os.path.dirname(__file__))
+
 
 def setup_server():
 
@@ -41,7 +43,7 @@ def setup_server():
         plain._cp_config = {'request.body.attempt_charsets': ['utf-16']}
 
         favicon_ico = cherrypy.tools.staticfile.handler(
-                        filename=os.path.join(localDir, '../favicon.ico'))
+            filename=os.path.join(localDir, '../favicon.ico'))
 
     class Foo:
 
@@ -57,7 +59,7 @@ def setup_server():
             return 'Hello world'
         silly.exposed = True
         silly._cp_config = {'response.headers.X-silly': 'sillyval'}
-        
+
         # Test the expose and config decorators
         #@cherrypy.expose
         #@cherrypy.config(foo='this3', **{'bax': 'this4'})
@@ -72,10 +74,10 @@ def setup_server():
             return str(cherrypy.request.config.get(key, "None"))
         index.exposed = True
 
-
     def raw_namespace(key, value):
         if key == 'input.map':
             handler = cherrypy.request.handler
+
             def wrapper():
                 params = cherrypy.request.params
                 for name, coercer in list(value.items()):
@@ -87,6 +89,7 @@ def setup_server():
             cherrypy.request.handler = wrapper
         elif key == 'output':
             handler = cherrypy.request.handler
+
             def wrapper():
                 # 'value' is a type (like int or str).
                 return value(handler())
@@ -101,12 +104,18 @@ def setup_server():
         incr.exposed = True
         incr._cp_config = {'raw.input.map': {'num': int}}
 
-    ioconf = StringIO("""
+    if not compat.py3k:
+        thing3 = "thing3: unicode('test', errors='ignore')"
+    else:
+        thing3 = ''
+
+    ioconf = compat.StringIO("""
 [/]
 neg: -1234
 filename: os.path.join(sys.prefix, "hello.py")
 thing1: cherrypy.lib.httputil.response_codes[404]
 thing2: __import__('cherrypy.tutorial', globals(), locals(), ['']).thing2
+%s
 complex: 3+2j
 mul: 6*3
 ones: "11"
@@ -115,7 +124,7 @@ stradd: %%(ones)s + %%(twos)s + "33"
 
 [/favicon.ico]
 tools.staticfile.filename = %r
-""" % os.path.join(localDir, 'static/dirback.jpg'))
+""" % (thing3, os.path.join(localDir, 'static/dirback.jpg')))
 
     root = Root()
     root.foo = Foo()
@@ -133,6 +142,7 @@ tools.staticfile.filename = %r
 
 from cherrypy.test import helper
 
+
 class ConfigTests(helper.CPWebCase):
     setup_server = staticmethod(setup_server)
 
@@ -147,8 +157,9 @@ class ConfigTests(helper.CPWebCase):
             ('/foo/',    'bax', 'None'),
             ('/foo/bar', 'baz', "'that2'"),
             ('/foo/nex', 'baz', 'that2'),
-            # If 'foo' == 'this', then the mount point '/another' leaks into '/'.
-            ('/another/','foo', 'None'),
+            # If 'foo' == 'this', then the mount point '/another' leaks into
+            # '/'.
+            ('/another/', 'foo', 'None'),
         ]
         for path, key, expected in tests:
             self.getPage(path + "?key=" + key)
@@ -161,7 +172,7 @@ class ConfigTests(helper.CPWebCase):
             'request.show_tracebacks': True,
             'log.screen': False,
             'environment': 'test_suite',
-            'engine.autoreload_on': False,
+            'engine.autoreload.on': False,
             # From global config
             'luxuryyacht': 'throatwobblermangrove',
             # From Root._cp_config
@@ -171,7 +182,7 @@ class ConfigTests(helper.CPWebCase):
             # From Foo.bar._cp_config
             'foo': 'this3',
             'bax': 'this4',
-            }
+        }
         for key, expected in expectedconf.items():
             self.getPage("/foo/bar?key=" + key)
             self.assertBody(repr(expected))
@@ -192,6 +203,10 @@ class ConfigTests(helper.CPWebCase):
             self.getPage("/repr?key=thing2")
             from cherrypy.tutorial import thing2
             self.assertBody(repr(thing2))
+
+        if not compat.py3k:
+            self.getPage("/repr?key=thing3")
+            self.assertBody(repr(unicode('test')))
 
         self.getPage("/repr?key=complex")
         self.assertBody("(3+2j)")
@@ -226,7 +241,7 @@ class ConfigTests(helper.CPWebCase):
         self.getPage("/plain", method='POST', headers=[
             ('Content-Type', 'application/x-www-form-urlencoded'),
             ('Content-Length', '13')],
-            body=ntob('\xff\xfex\x00=\xff\xfea\x00b\x00c\x00'))
+            body=compat.ntob('\xff\xfex\x00=\xff\xfea\x00b\x00c\x00'))
         self.assertBody("abc")
 
 
@@ -248,9 +263,9 @@ class VariableSubstitutionTests(unittest.TestCase):
 
         """)
 
-        fp = StringIO(conf)
+        fp = compat.StringIO(conf)
 
         cherrypy.config.update(fp)
         self.assertEqual(cherrypy.config["my"]["my.dir"], "/some/dir/my/dir")
-        self.assertEqual(cherrypy.config["my"]["my.dir2"], "/some/dir/my/dir/dir2")
-
+        self.assertEqual(cherrypy.config["my"]
+                         ["my.dir2"], "/some/dir/my/dir/dir2")

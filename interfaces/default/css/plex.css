@@ -40,8 +40,8 @@ a:Hover {
 }
 .grid-caption {
     position: absolute;
-    bottom: 5px;
-    left: 5px;
+    bottom: 1px;
+    left: 1px;
     background: rgba(0,0,0,0.75);
     padding: 10px;
     width: 130px;
@@ -64,7 +64,6 @@ a:Hover {
     margin-right: 35px;
 }
 h6.title {
-    color: #555555;
     text-align: center;
     margin: 0;
     padding-top: 4px;
@@ -92,9 +91,7 @@ h6.title {
 #playlist-table tr td:last-child {
     width: 35px;
 }
-.modal {
-    width: 700px;
-}
+
 .modal-fanart {
     background: #fff top center no-repeat;
     background-size: 100%;
@@ -122,14 +119,13 @@ h6.title {
 @media (max-width: 767px) {
 	.thumbnails>li{margin-left:4px}
 	}
-	.modal {
-		width: initial;
-	}
+
 
 @media (max-width: 320px) {
 	.modal .movie-poster {
-		height: 207px !important;
-		width: 144px !important;
+		height: 151px !important;
+		width: 104px !important;
+        margin-right: 8px;
 	}
 	.modal-body {
 		max-height: 280px;
@@ -141,10 +137,29 @@ h6.title {
 		padding: 0px;
 		margin-left: 12px;
 	}
-	.thumbnail {
-		padding: 6px;
+    .thumbnail {
+        margin:15px;
+    }
+
+	.modal .thumbnail {
+        margin: 0px 8px 0px 0px;
 	}
 	.modal .modal-movieinfo {
 		margin-left: 0px;
 	}
+    #episode-grid.thumbnails>li {
+        padding: 0px;
+        margin-left: 63px !important;
+
+    }
+    .modal .modal-episodeinfo {
+    margin-left: 0px;
+}
+    .modal .episode-poster {
+        height: 100px !important;
+        width: 150px !important;
+    }
+    #episode-grid > li  .thumbnail {
+        margin:0px;
+    }
 }

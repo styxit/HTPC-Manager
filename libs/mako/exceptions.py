@@ -1,13 +1,14 @@
 # mako/exceptions.py
-# Copyright (C) 2006-2012 the Mako authors and contributors <see AUTHORS file>
+# Copyright (C) 2006-2015 the Mako authors and contributors <see AUTHORS file>
 #
 # This module is part of Mako and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 
 """exception classes"""
 
-import traceback, sys, re
-from mako import util
+import traceback
+import sys
+from mako import util, compat
 
 class MakoException(Exception):
     pass
@@ -26,7 +27,7 @@ class CompileException(MakoException):
     def __init__(self, message, source, lineno, pos, filename):
         MakoException.__init__(self,
                               message + _format_filepos(lineno, pos, filename))
-        self.lineno =lineno
+        self.lineno = lineno
         self.pos = pos
         self.filename = filename
         self.source = source
@@ -35,7 +36,7 @@ class SyntaxException(MakoException):
     def __init__(self, message, source, lineno, pos, filename):
         MakoException.__init__(self,
                               message + _format_filepos(lineno, pos, filename))
-        self.lineno =lineno
+        self.lineno = lineno
         self.pos = pos
         self.filename = filename
         self.source = source
@@ -75,7 +76,6 @@ class RichTraceback(object):
         self.records = self._init(traceback)
 
         if isinstance(self.error, (CompileException, SyntaxException)):
-            import mako.template
             self.source = self.error.source
             self.lineno = self.error.lineno
             self._has_source = True
@@ -84,12 +84,12 @@ class RichTraceback(object):
 
     @property
     def errorname(self):
-        return util.exception_name(self.error)
+        return compat.exception_name(self.error)
 
     def _init_message(self):
         """Find a unicode representation of self.error"""
         try:
-            self.message = unicode(self.error)
+            self.message = compat.text_type(self.error)
         except UnicodeError:
             try:
                 self.message = str(self.error)
@@ -97,8 +97,8 @@ class RichTraceback(object):
                 # Fallback to args as neither unicode nor
                 # str(Exception(u'\xe6')) work in Python < 2.6
                 self.message = self.error.args[0]
-        if not isinstance(self.message, unicode):
-            self.message = unicode(self.message, 'ascii', 'replace')
+        if not isinstance(self.message, compat.text_type):
+            self.message = compat.text_type(self.message, 'ascii', 'replace')
 
     def _get_reformatted_records(self, records):
         for rec in records:
@@ -150,7 +150,7 @@ class RichTraceback(object):
                     template_filename = info.template_filename or filename
                 except KeyError:
                     # A normal .py file (not a Template)
-                    if not util.py3k:
+                    if not compat.py3k:
                         try:
                             fp = open(filename, 'rb')
                             encoding = util.parse_encoding(fp)
@@ -165,19 +165,19 @@ class RichTraceback(object):
                                             None, None, None, None))
                     continue
 
-                template_ln = module_ln = 1
-                line_map = {}
-                for line in module_source.split("\n"):
-                    match = re.match(r'\s*# SOURCE LINE (\d+)', line)
-                    if match:
-                        template_ln = int(match.group(1))
-                    module_ln += 1
-                    line_map[module_ln] = template_ln
+                template_ln = 1
+
+                source_map = mako.template.ModuleInfo.\
+                                get_module_source_metadata(
+                                    module_source, full_line_map=True)
+                line_map = source_map['full_line_map']
+
                 template_lines = [line for line in
                                     template_source.split("\n")]
                 mods[filename] = (line_map, template_lines)
 
-            template_ln = line_map[lineno]
+            template_ln = line_map[lineno - 1]
+
             if template_ln <= len(template_lines):
                 template_line = template_lines[template_ln - 1]
             else:
@@ -186,7 +186,7 @@ class RichTraceback(object):
                                 line, template_filename, template_ln,
                                 template_line, template_source))
         if not self.source:
-            for l in range(len(new_trcback)-1, 0, -1):
+            for l in range(len(new_trcback) - 1, 0, -1):
                 if new_trcback[l][5]:
                     self.source = new_trcback[l][7]
                     self.lineno = new_trcback[l][5]
@@ -233,14 +233,24 @@ ${tback.errorname}: ${tback.message}
 """)
 
 
-try:
+def _install_pygments():
+    global syntax_highlight, pygments_html_formatter
     from mako.ext.pygmentplugin import syntax_highlight,\
             pygments_html_formatter
-except ImportError:
+
+def _install_fallback():
+    global syntax_highlight, pygments_html_formatter
     from mako.filters import html_escape
     pygments_html_formatter = None
     def syntax_highlight(filename='', language=None):
         return html_escape
+
+def _install_highlighting():
+    try:
+        _install_pygments()
+    except ImportError:
+        _install_fallback()
+_install_highlighting()
 
 def html_error_template():
     """Provides a template that renders a stack trace in an HTML format,
@@ -248,10 +258,11 @@ def html_error_template():
     filenames, line numbers and code for that of the originating source
     template, as applicable.
 
-    The template's default ``encoding_errors`` value is ``'htmlentityreplace'``. The
-    template has two options. With the ``full`` option disabled, only a section of
-    an HTML document is returned. With the ``css`` option disabled, the default
-    stylesheet won't be included.
+    The template's default ``encoding_errors`` value is
+    ``'htmlentityreplace'``. The template has two options. With the
+    ``full`` option disabled, only a section of an HTML document is
+    returned. With the ``css`` option disabled, the default stylesheet
+    won't be included.
 
     """
     import mako.template

@@ -1,0 +1,45 @@
+#!/bin/sh
+#
+# PROVIDE: htpc-manager
+# REQUIRE: LOGIN
+# KEYWORD: shutdown
+#
+# Add the following lines to /etc/rc.conf.local or /etc/rc.conf
+# to enable this service:
+#
+# htpc_enable (bool):   Set to NO by default.
+#                       Set it to YES to enable it.
+# htpc_manager_user:    The user account htpc-manager daemon runs as what
+#                       you want it to be. It uses 'media' user by
+#                       default. Do not sets it as empty or it will run
+#                       as root.
+# htpc_manager_data_dir:        Directory where htpc-manager configuration
+#                               data is stored.
+#                               Default: /var/db/htpc-manager
+
+. /etc/rc.subr
+name="htpc"
+rcvar="${name}_enable"
+load_rc_config ${name}
+
+: ${htpc_manager_enable:="NO"}
+: ${htpc_manager_user:="media"}
+: ${htpc_manager_group:="media"}
+: ${htpc_manager_data_dir:="/var/db/htpc-manager"}
+
+pidfile="/var/run/htpc-manager/htpc-manager.pid"
+command="/usr/local/bin/python2.7"
+command_args="/usr/local/share/HTPC-Manager/Htpc.py --datadir ${htpc_manager_data_dir} --daemon --pid ${pidfile}"
+
+start_precmd="htpc-manager_prestart"
+htpc-manager_prestart() {
+        if [ ! -d ${pidfile%/*} ]; then
+                install -d -o ${htpc_manager_user} -g ${htpc_manager_group} ${pidfile%/*}
+        fi
+
+        if [ ! -d ${htpc_manager_data_dir} ]; then
+                install -d -o ${htpc_manager_user} -g ${htpc_manager_group} ${htpc_manager_data_dir}
+        fi
+}
+
+run_rc_command "$1"

@@ -49,14 +49,3 @@ if supports('decimalColumn'):
             d._SO_validatorState) == Decimal("10.01")
         assert DecimalTable.sqlmeta.columns['col3'].from_python(Decimal('10.01'),
             d._SO_validatorState) == "10.0100"
-
-    # See http://mail.python.org/pipermail/python-dev/2008-March/078189.html
-    if isinstance(Decimal(u'123').to_eng_string(), unicode): # a bug in Python 2.5.2
-        def test_3_unicode():
-            setupClass(DecimalTable)
-            d = DecimalTable(name='test', col1=Decimal(u"21.12"),
-                col2='10.01', col3='10.01')
-            assert d.col1 == Decimal("21.12")
-            d = DecimalTable(name=unicode('тест', 'koi8-r'), col1=Decimal(u"21.12"),
-                col2='10.01', col3='10.01')
-            assert d.col1 == Decimal("21.12")

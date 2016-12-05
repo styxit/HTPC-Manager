@@ -83,7 +83,7 @@ class SybaseConnection(DBAPI):
 
         q = self._insertSQL(table, names, values)
         if self.debug:
-            print 'QueryIns: %s' % q
+            self.printDebug(conn, q, 'QueryIns')
         c.execute(q)
         if has_identity and identity_insert_on:
             c.execute('SET IDENTITY_INSERT %s OFF' % table)

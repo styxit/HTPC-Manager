@@ -1,27 +1,27 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
+<div class="container-fluid">
     <div class="content maincontent sickbeard_show">
         <h1 class="page-header page-title" data-showid="${tvdbid}">
             <span class="sickbeard_showname">Show details</span>
             <div class="btn-group show-options-menu pull-right">
-                <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
-                    <i class="icon-wrench"></i>&nbsp;<span class="caret"></span>
+                <a class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" href="#">
+                    <i class="fa fa-cogs fa-lg"></i>
+                    <i class="fa fa-chevron-down fa-fw"></i>
                 </a>
                 <ul class="dropdown-menu">
-                    <li>
-                        <a href="#" class="full-update">Force full update</a>
-                    </li>
-                    <li>
-                        <a href="#" class="rescan-files">Rescan files</a>
-                    </li>
+                    <li><a href="#" class="full-update"><i class="fa fa-refresh fa-fw"></i> Force full update</a></li>
+                    <li><a href="#" class="rescan-files"><i class="fa fa-search fa-fw"></i> Rescan files</a></li>
+                    <li class="divider"></li>
+                    <!--- <li><a href="#" class="edit-show"><i class="fa fa-pencil"></i> Edit show</a></li> --->
+                    <li><a href="#" class="remove-show"><i class="fa fa-trash-o"></i> Delete show</a></li>
                 </ul>
             </div>
         </h1>
 
         <ul class="breadcrumb">
             <li><a href="${self.attr.webdir}">Home</a> <span class="divider">/</span></li>
-            <li><a href="${self.attr.webdir}sickbeard">${settings.get('sickbeard_name', 'Sickbeard')}</a> <span class="divider">/</span></li>
+            <li><a href="${self.attr.webdir}sickbeard">${settings.get('sickbeard_name', 'Sick Beard')}</a> <span class="divider">/</span></li>
             <li class="active sickbeard_showname">Show details</li>
         </ul>
 
@@ -57,18 +57,21 @@
 
         <ul class="nav nav-pills" id="season-list"></ul>
 
-        <table class="table table-striped table-condensed table-sortable">
-            <thead>
-                <tr>
-                    <th>Episode</th>
-                    <th>Name</th>
-                    <th>Airdate</th>
-                    <th>status</th>
-                    <th>Quality</th>
-                    <th class="span1">Search</th>
-                </tr>
-            </thead>
-            <tbody id="season-content"></tbody>
-        </table>
+        <div class="mofa">
+            <table class="table table-striped table-condensed table-sortable">
+                <thead>
+                    <tr>
+                        <th>Episode</th>
+                        <th>Name</th>
+                        <th>Air Date</th>
+                        <th>status</th>
+                        <th>Quality</th>
+                        <th class="span1">Search</th>
+                    </tr>
+                </thead>
+                <tbody id="season-content"></tbody>
+            </table>
+        </div>
+
     </div>
 </div>

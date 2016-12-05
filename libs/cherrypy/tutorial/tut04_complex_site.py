@@ -9,11 +9,12 @@ import cherrypy
 
 
 class HomePage:
+
     def index(self):
         return '''
             <p>Hi, this is the home page! Check out the other
             fun stuff on this site:</p>
-            
+
             <ul>
                 <li><a href="/joke/">A silly joke</a></li>
                 <li><a href="/links/">Useful links</a></li>
@@ -22,6 +23,7 @@ class HomePage:
 
 
 class JokePage:
+
     def index(self):
         return '''
             <p>"In Python, how do you create a string of random
@@ -31,12 +33,13 @@ class JokePage:
 
 
 class LinksPage:
+
     def __init__(self):
         # Request handler objects can create their own nested request
         # handler objects. Simply create them inside their __init__
         # methods!
         self.extra = ExtraLinksPage()
-    
+
     def index(self):
         # Note the way we link to the extra links page (and back).
         # As you can see, this object doesn't really care about its
@@ -44,31 +47,36 @@ class LinksPage:
         # links exclusively.
         return '''
             <p>Here are some useful links:</p>
-            
+
             <ul>
-                <li><a href="http://www.cherrypy.org">The CherryPy Homepage</a></li>
-                <li><a href="http://www.python.org">The Python Homepage</a></li>
+                <li>
+                    <a href="http://www.cherrypy.org">The CherryPy Homepage</a>
+                </li>
+                <li>
+                    <a href="http://www.python.org">The Python Homepage</a>
+                </li>
             </ul>
-            
+
             <p>You can check out some extra useful
             links <a href="./extra/">here</a>.</p>
-            
+
             <p>[<a href="../">Return</a>]</p>
         '''
     index.exposed = True
 
 
 class ExtraLinksPage:
+
     def index(self):
         # Note the relative link back to the Links page!
         return '''
             <p>Here are some extra useful links:</p>
-            
+
             <ul>
                 <li><a href="http://del.icio.us">del.icio.us</a></li>
-                <li><a href="http://www.mornography.de">Hendrik's weblog</a></li>
+                <li><a href="http://www.cherrypy.org">CherryPy</a></li>
             </ul>
-            
+
             <p>[<a href="../">Return to links page</a>]</p>'''
     index.exposed = True
 
@@ -95,4 +103,3 @@ if __name__ == '__main__':
 else:
     # This branch is for the test suite; you can ignore it.
     cherrypy.tree.mount(root, config=tutconf)
-

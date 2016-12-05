@@ -1,0 +1,9 @@
+# Hptc Manager will run fine fine without this ones. However if will miss some features
+# "Needed" for image resize etc
+Pillow
+# "Needed" for stat module
+psutil>=3.0.0
+# "Needed for genereratin ssl cert key"
+pyopenssl
+# "Needed" for the vnstat module
+paramiko

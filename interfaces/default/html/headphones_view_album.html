@@ -1,0 +1,75 @@
+<%inherit file="base.html"/>
+<div class="container-fluid">
+    <div class="content maincontent headphones_album">
+        <h1 class="page-header page-title" data-artistid="${artist_id}" data-albumid="${album_id}" data-albumimg="${album['ArtworkURL']}">
+            <span class="headphones_albumname">${album['AlbumTitle']}</span>
+            <div class="btn-group show-options-menu pull-right">
+                <a class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown" href="#">
+                    <i class="fa fa-cogs fa-lg"></i>
+                    <i class="fa fa-chevron-down fa-fw"></i>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="${self.attr.webdir}headphones/QueueAlbum/${album_id}&new=True" class="ajax-link"><i class="fa fa-search fa-fw"></i> Force Check </a></li>
+                    <li class="divider"></li>
+                    <li><a href="${self.attr.webdir}headphones/QueueAlbum/${album_id}" class="ajax-link"><i class="fa fa-heart fa-fw"></i> Wanted Album </a></li>
+                    <li><a href="${self.attr.webdir}headphones/UnqueueAlbum/${album_id}" class="ajax-link"><i class="fa fa-step-forward fa-fw"></i> Skip Album </a></li>
+                </ul>
+            </div>
+        </h1>
+
+        <ul class="breadcrumb">
+            <li><a href="${self.attr.webdir}">Home</a> <span class="divider">/</span></li>
+            <li><a href="${self.attr.webdir}headphones">${module_name}</a> <span class="divider">/</span></li>
+            <li class="headphones_artistname"><a href="${self.attr.webdir}headphones/viewArtist/${artist_id}">${album['ArtistName']}</a> <span class="divider">/</span></li>
+            <li class="headphones_albumname">${album['AlbumTitle']}</li>
+        </ul>
+
+        <div id="banner" class="row-fluid banner">
+            <div class="span8" style="min-height: 0px;"><img class="img-polaroid img-rounded album_img"></div>
+            <div class="album_details span4 pull-right">
+                <div id="album_details_top" class="span4"></div>
+                <strong>Album details</strong>
+                <table class="table table-condensed">
+                    <tr>
+                        <td>Status</td>
+                        <td class="headphones_album_status">${album['Status']}</td>
+                    </tr>
+                    <tr>
+                        <td>Tracks</td>
+                        <td class="headphones_album_tracks">${len(tracks)}</td>
+                    </tr>
+                    <tr>
+                        <td>Release Date</td>
+                        <td class="headphones_release_date">${album['ReleaseDate']}</td>
+                    </tr>
+                    <tr>
+                        <td>Type</td>
+                        <td class="headphones_album_type">${album['Type']}</td>
+                    </tr>
+                </table>
+                <div id="album_details_bottom" class="span4"></div>
+            </div>
+        </div>
+
+        <div id="tracks">
+            <table class="table table-striped table-condensed table-sortable tracks-table">
+                <thead>
+                <tr>
+                    <th>Track</th>
+                    <th>Title</th>
+                    <th>Length</th>
+                </tr>
+                </thead>
+                <tbody>
+                % for track in tracks:
+                <tr>
+                    <td>${track['TrackNumber']}</td>
+                    <td>${track['TrackTitle']}</td>
+                    <td>${track['DurationText']}</td>
+                </tr>
+                % endfor
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -6,9 +6,13 @@ from sqlobject.converters import registerConverter
 from sqlobject.dberrors import *
 
 class ErrorMessage(str):
-    def __new__(cls, e):
-        obj = str.__new__(cls, e[0])
-        obj.code = None
+    def __new__(cls, e, append_msg=''):
+        obj = str.__new__(cls, e[0] + append_msg)
+        if e.__module__ == 'psycopg2':
+            obj.code = getattr(e, 'pgcode', None)
+            obj.error = getattr(e, 'pgerror', None)
+        else:
+            obj.code = obj.error = None
         obj.module = e.__module__
         obj.exception = e.__class__.__name__
         return obj
@@ -139,7 +143,7 @@ class PostgresConnection(DBAPI):
             else:
                 conn = self.module.connect(**self.dsn_dict)
         except self.module.OperationalError, e:
-            raise OperationalError("%s; used connection string %r" % (e, self.dsn))
+            raise OperationalError(ErrorMessage(e, "used connection string %r" % self.dsn))
 
         # For printDebug in _executeRetry
         self._connectionNumbers[id(conn)] = self._connectionCount
@@ -189,15 +193,20 @@ class PostgresConnection(DBAPI):
         sequenceName = soInstance.sqlmeta.idSequence or \
                                '%s_%s_seq' % (table, idName)
         c = conn.cursor()
+        if id is not None:
+            names = [idName] + names
+            values = [id] + values
+        if names and values:
+            q = self._insertSQL(table, names, values)
+        else:
+            q = "INSERT INTO %s DEFAULT VALUES" % table
         if id is None:
-            self._executeRetry(conn, c, "SELECT NEXTVAL('%s')" % sequenceName)
-            id = c.fetchone()[0]
-        names = [idName] + names
-        values = [id] + values
-        q = self._insertSQL(table, names, values)
+            q += " RETURNING " + idName
         if self.debug:
             self.printDebug(conn, q, 'QueryIns')
         self._executeRetry(conn, c, q)
+        if id is None:
+            id = c.fetchone()[0]
         if self.debugOutput:
             self.printDebug(conn, id, 'QueryIns', 'result')
         return id
@@ -271,6 +280,17 @@ class PostgresConnection(DBAPI):
             AND pg_index.indisprimary
         """
 
+        otherKeyQuery = """
+        SELECT pg_index.indisprimary,
+            pg_catalog.pg_get_indexdef(pg_index.indexrelid)
+        FROM pg_catalog.pg_class c, pg_catalog.pg_class c2,
+            pg_catalog.pg_index AS pg_index
+        WHERE c.relname = %s
+            AND c.oid = pg_index.indrelid
+            AND pg_index.indexrelid = c2.oid
+            AND NOT pg_index.indisprimary
+        """
+
         keyData = self.queryAll(keyQuery % self.sqlrepr(tableName))
         keyRE = re.compile(r"\((.+)\) REFERENCES (.+)\(")
         keymap = {}
@@ -296,6 +316,18 @@ class PostgresConnection(DBAPI):
         if primaryKey.startswith('"'):
             assert primaryKey.endswith('"')
             primaryKey = primaryKey[1:-1]
+
+        otherData = self.queryAll(otherKeyQuery % self.sqlrepr(tableName))
+        otherRE = primaryRE
+        otherKeys = []
+        for isPrimary, indexDef in otherData:
+            match = otherRE.search(indexDef)
+            assert match, "Unparseable constraint definition: %r" % indexDef
+            otherKey = match.group(1)
+            if otherKey.startswith('"'):
+                assert otherKey.endswith('"')
+                otherKey = otherKey[1:-1]
+            otherKeys.append(otherKey)
 
         colData = self.queryAll(colQuery % self.sqlrepr(tableName))
         results = []
@@ -323,6 +355,8 @@ class PostgresConnection(DBAPI):
                 kw['default'] = self.defaultFromSchema(colClass, defaultstr)
             elif not notnull:
                 kw['default'] = None
+            if field in otherKeys:
+                kw['alternateID'] = True
             results.append(colClass(**kw))
         return results
 
@@ -391,6 +425,17 @@ class PostgresConnection(DBAPI):
         self._executeRetry(conn, cur, '%s DATABASE %s' % (op, self.db))
         cur.close()
         conn.close()
+
+    def listTables(self):
+        return [v[0] for v in self.queryAll(
+            """SELECT c.relname FROM pg_catalog.pg_class c
+            LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relkind IN ('r','') AND
+            n.nspname NOT IN ('pg_catalog', 'pg_toast') AND
+            pg_catalog.pg_table_is_visible(c.oid)""")]
+
+    def listDatabases(self):
+        return [v[0] for v in self.queryAll("SELECT datname FROM pg_database")]
 
     def createEmptyDatabase(self):
         self._createOrDropDatabase()

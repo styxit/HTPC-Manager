@@ -1,0 +1,89 @@
+table td{
+	vertical-align: middle !important;
+}
+
+.artist_img {
+  max-width: 300px;
+  height: 250px;
+  //width: 250px;
+
+}
+
+#banner {
+  margin-bottom: 15 px;
+}
+
+.headphones_artist .banner{
+  position: relative;
+  border-radius: 6px 0px 0px 6px;
+  background:  center left no-repeat ;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  margin-bottom: 15px;
+}
+
+.headphones_artist .banner .artist_details {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+    color: White;
+    overflow:hidden;
+}
+.headphones_artist .banner .artist_details #artist_details_top{
+  background: Red;
+  display: block;
+  height: 15px;
+  min-height: 10px;
+  position: absolute;
+  top: -15px;
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+  border-radius: 6px 6px 0px 0px;
+}
+
+.headphones_artist .banner .artist_details #artist_details_bottom{
+  display: block;
+  height: 15px;
+  min-height: 10px;
+  position: absolute;
+  margin-left: 0px;
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+  border-radius: 0px 0px 6px 6px;
+}
+
+.headphones_artist .banner .artist_details td{
+  padding: 2px 5px;
+}
+
+.headphones_artist .banner .artist_details table,
+.headphones_artist .banner .artist_details strong {
+  margin:10px;
+}
+
+@media all and  (max-width: 767px) {
+  /*
+   * On small screens, remove top and bottom round bars on artist-detail block
+   */
+  .headphones_artist .banner .artist_details #artist_details_bottom,
+  .headphones_artist .banner .artist_details #artist_details_top{
+    display: none;
+  }
+  .artist_img {
+    display: none;
+  }
+  /*
+   * On small screens, Add rounded corners on all sides on banner and detail-box
+   */
+  .headphones_artist .banner .artist_details,
+  .headphones_artist .banner{
+    border-radius: 6px;
+  }
+}
+
+.episodeinfo tr {
+	border-bottom: 1px solid #CCCCCC;
+}
+
+.episodeinfo  td {
+	width: auto;
+	padding-right: 20px;
+}

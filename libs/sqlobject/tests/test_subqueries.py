@@ -12,6 +12,9 @@ class TestIn1(SQLObject):
 class TestIn2(SQLObject):
     col2 = StringCol()
 
+class TestOuter(SQLObject):
+    fk = ForeignKey('TestIn1')
+
 def setup():
     setupClass(TestIn1)
     setupClass(TestIn2)
@@ -46,10 +49,19 @@ def test_3syntax_exists():
     assert str(select) == \
         "SELECT test_in1.id, test_in1.col1 FROM test_in1 WHERE NOT EXISTS (SELECT test_in2.col2 FROM test_in2 WHERE ((test_in1.col1) = (test_in2.col2)))"
 
+    setupClass(TestOuter)
+    select = TestOuter.select(NOTEXISTS(Select(TestIn1.q.col1, where=(Outer(TestOuter).q.fk == TestIn1.q.id))))
+    assert str(select) == \
+        "SELECT test_outer.id, test_outer.fk_id FROM test_outer WHERE NOT EXISTS (SELECT test_in1.col1 FROM test_in1 WHERE ((test_outer.fk_id) = (test_in1.id)))"
+
 def test_4perform_exists():
     insert()
     select = TestIn1.select(EXISTS(Select(TestIn2.q.col2, where=(Outer(TestIn1).q.col1 == TestIn2.q.col2))))
     assert len(list(select)) == 2
+
+    setupClass(TestOuter)
+    select = TestOuter.select(NOTEXISTS(Select(TestIn1.q.col1, where=(Outer(TestOuter).q.fkID == TestIn1.q.id))))
+    assert len(list(select)) == 0
 
 def test_4syntax_direct():
     setup()

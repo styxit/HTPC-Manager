@@ -1,26 +1,54 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
+<div class="container-fluid">
     <div class="content maincontent">
         <h1 class="page-header page-title">
-            <a href="webinterface" target="_blank" title="Open original Couchpotato interface">${settings.get('couchpotato_name', 'CouchPotato')}</a>
+            <a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'} title="Open original CouchPotato interface">${settings.get('couchpotato_name', 'CouchPotato')}</a>
+            <div class="btn-group pull-right">
+                 <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wrench fa-lg"></i>
+	                <i class="fa fa-chevron-down"></i></a>
+                    <ul class="dropdown-menu pull-right"> <!-- Skeleton -->
+                        <li><a href="SearchAllWanted" class="ajax-confirm" title="Search all wanted movies"><i class="fa fa-search fa-fw"></i> Search all wanted movies</a></li>
+                        <li><a id="postprocess" href="#" title="Postprocess"><i class="fa fa-hdd-o fa-fw"></i> Postprocess</a></li>
+                        <li class="divider"></li>
+                        <li><a id= "cp_update" href="#" title="Update Couchpotato"><i class="fa fa-eye fa-fw"></i> Update</a></li>
+                        <li class="divider"></li>
+                        <li><a href="Restart" class="ajax-confirm" title="Restart Couchpotato"><i class="fa fa-refresh fa-fw"></i> Restart</a></li>
+                        <li><a href="Shutdown" class="ajax-confirm" title="Shutdown Couchpotato"><i class="fa fa-power-off fa-fw"></i> Shutdown</a></li>
+                    </ul>
+            </div>
         </h1>
         <form id="searchform" class="well form-inline">
             <input type="text" id="moviename" class="span6"  placeholder="Add new movie" />
-            <button type="submit" class="btn btn-success"><i class="icon-search"></i> Search</button>
+            <button type="submit" class="btn btn-success"><i class="fa fa-search fa-fw"></i> Search</button>
         </form>
-        <ul class="nav nav-tabs">
+        <ul class="cp_nav nav nav-tabs">
 			<li><a href="#library" data-toggle="tab">Library</a></li>
             <li><a href="#wanted" data-toggle="tab">Wanted</a></li>
+            <li><a href="#suggestions" data-toggle="tab">Suggestions</a></li>
+            <li><a href="#dashboardsoon" data-toggle="tab">Available soon</a></li>
+            <!--<li><a href="#charts" data-toggle="tab">Charts</a></li>-->
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Charts
+                <i class="fa fa-chevron-down"></i></a>
+                <ul class="cp_chart_dropdown dropdown-menu">
+                </ul>
+            </li>
             <li><a href="#history" data-toggle="tab">History</a></li>
             <li class="hidden"><a href="#result" data-toggle="tab">Search</a></li>
         </ul>
-        <div class="tab-content">
+        <div id="cp_tab_content" class="tab-content">
             <div id="library" class="tab-pane">
                 <ul id="library-grid" class="thumbnails"></ul>
-            </div>		
+            </div>
             <div id="wanted" class="tab-pane">
                 <ul id="wanted-grid" class="thumbnails"></ul>
+            </div>
+            <div id="suggestions" class="tab-pane">
+                <ul id="suggestions-grid" class="thumbnails"></ul>
+            </div>
+            <div id="dashboardsoon" class="tab-pane">
+                <ul id="dashboardsoon-grid" class="thumbnails"></ul>
             </div>
             <div id="history" class="tab-pane">
                 <table class="table table-striped">

@@ -1,18 +1,19 @@
 <%inherit file="base.html"/>
 <%namespace name="form" file="form.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
+<div class="container-fluid">
     <div class="content maincontent">
         <h1 class="page-header page-title">Settings</h1>
 
         <div class="tabbable tabs-left">
 
-            <ul class="nav nav-tabs">
+            <ul class="nav nav-tabs" style="width: 160px">
                 <li class="active"><a href="#general" data-toggle="tab">General</a></li>
+                <li><a href="#theme" data-toggle="tab">Theme</a></li>
+                <li><a href="#users" data-toggle="tab">Manage users</a></li>
+                <li class="divider-tab"></li>
                 <li><a href="#dashboard" data-toggle="tab">Dashboard</a></li>
-                <li><a href="#style" data-toggle="tab">Style</a></li>
                 <li><a href="#other" data-toggle="tab">Other apps</a></li>
-                <li><a href="#users" data-toggle="tab">User management</a></li>
                 <li class="divider-tab"></li>
                 % for m in sorted(htpc.MODULES, key=lambda d: d['name']):
                   % if m.get('isThirdParty') != False:
@@ -23,17 +24,37 @@
             </ul>
 
             <div class="tab-content">
-            ${form.buildForm(id='general', classes='form-horizontal tab-pane active', description='Most of these settings require a HTPC-Manager restart after saving.', legend='General',  fields=[
+            ${form.buildForm(id='general', classes='form-horizontal tab-pane active', description='<div class="alert alert-block alert-danger"><i class="fa fa-exclamation-triangle fa-fw"></i> Most of these settings require a HTPC Manager restart after saving.</div>', legend='General',  fields=[
                 {'type':'text', 'label':'IP / Host *', 'name':'app_host', 'value':settings.get('app_host', '0.0.0.0')},
                 {'type':'text', 'label':'Port *', 'name':'app_port', 'value':settings.get('app_port', 8085)},
                 {'type':'text', 'label':'Webdir *', 'name':'app_webdir', 'value':settings.get('app_webdir', '/')},
                 {'type':'text', 'label':'Username *', 'name':'app_username', 'value':settings.get('app_username')},
                 {'type':'password', 'label':'Password *', 'name':'app_password', 'value':settings.get('app_password')},
-                {'type':'text', 'label':'SSL Cert', 'name':'app_ssl_cert', 'value':settings.get('app_ssl_cert')},
+                {'type':'bool', 'label':'Use SSL?', 'name':'app_use_ssl', 'value':settings.get('app_use_ssl'), 'desc': 'By enabling this and leaving SSL cert and key blank HTPC Manager will generate cert and key for you'},
+                {'type':'text', 'label':'SSL Cert', 'name':'app_ssl_cert', 'value':settings.get('app_ssl_cert'), 'desc':''},
                 {'type':'text', 'label':'SSL Key', 'name':'app_ssl_key', 'value':settings.get('app_ssl_key')},
-                {'type':'text', 'label':'Git Path', 'name':'git_path', 'value':settings.get('git_path', 'git')},
-                {'type':'bool', 'label':'Open Browser', 'name':'openbrowser', 'desc':'Automatically open brower on server start', 'value':settings.get('openbrowser')}
+                {'type':'select', 'label':'Log level', 'name':'app_loglevel', 'options':settings.get_loglvl(), 'desc':'Use debug if you have issues with HTPC Manager'},
+                {'type':'text', 'label':'Git Path', 'name':'git_path', 'desc':'Only needed if OS is unable to locate git', 'value':settings.get('git_path', 'git')},
+                {'type':'bool', 'label':'Git Cleanup?', 'name':'git_cleanup', 'desc':'Removes untracked files and performs a hard reset on git branch automatically to help resolve update issues', 'value':settings.get('git_cleanup')},
+                {'type':'bool', 'label':'Use  rev proxy headers', 'name':'app_use_proxy_headers', 'desc':'', 'checked':bool(settings.get('app_use_proxy_headers'))},
+                {'type':'text', 'label':'Rev proxy headers basepath', 'name':'app_use_proxy_headers_basepath', 'desc':'Advanced option, should be left blank', 'value':settings.get('app_use_proxy_headers_basepath')},
+                {'type':'bool', 'label':'Use secure headers', 'name':'app_use_secure_headers', 'desc':'', 'checked': bool(settings.get('app_use_secure_headers', True))},
+                {'type': 'select', 'label': 'Branch', 'name': 'branch', 'options':''},
+                {'type':'bool', 'label':'Open Browser', 'name':'openbrowser', 'desc':'Automatically open browser on HTPC Manager start', 'value':settings.get('openbrowser')},
+                {'type':'bool', 'label':'Use robots.txt', 'name':'robots', 'desc':'Stop bots from indexing your site', 'value':settings.get('robots')},
+                {'type':'bool', 'label':'Check for updates', 'name':'app_check_for_updates', 'desc':'HTPC checks for updates in the background', 'value':settings.get('app_check_for_updates')},
+                {'type':'bool', 'label':'Auto update', 'name':'app_auto_update', 'desc':'By enabling this HTPC Manager will update automatically', 'checked': bool(settings.get('app_auto_update', True))},
+                {'type':'bool', 'label':'Enable CDN', 'name':'app_use_cdn', 'desc':'Use CSS/JS files hosted on CDN', 'checked':bool(settings.get('app_use_cdn', False))},
+                {'type':'bool', 'label':'Disable cache after update', 'name':'app_disable_cache_on_update', 'desc':'This option will disable cache for 36 hours after a update', 'checked':bool(settings.get('app_disable_cache_on_update', True))},
+                {'type':'bool', 'label':'Highlight module name in menu', 'name':'app_disable_menu_highlight', 'desc':'', 'checked':bool(settings.get('app_disable_menu_highlight', True))},
+                {'type':'bool', 'label':'Allow iframe', 'name':'app_open_otherlink_in_iframe', 'desc':'Open other links inside HTPC Manager', 'checked': bool(settings.get('app_open_otherlink_in_iframe', False))}
+                ], buttons=[
+                        {'name':'Save', 'type':'submit', 'classes':'btn-primary'},
+                        {'name':'Clear', 'type':'reset'},
+                        {'name':'Delete cache folder', 'type':'button', 'classes':'btn-danger delete_cache'},
+                        {'name':'Force update', 'type':'button', 'classes':'force_update'}
             ])}
+
             % for m in htpc.MODULES:
                 % if m.get('test'):
                     ${form.buildForm(action=m.get('action'), id=m.get('id'), description=m.get('description'), classes='form-horizontal tab-pane', legend=m.get('name'),
@@ -46,38 +67,64 @@
                                      fields=m.get('fields'))}
                 % endif
             % endfor
-            ${form.buildForm(id='style', classes='form-horizontal tab-pane', legend='Style', fields=[
-                {'type':'select', 'label':'Template *', 'name':'app_template', 'options':settings.get_templates()},
-                {'type':'select', 'label':'Theme', 'name':'app_theme', 'options':settings.get_themes()}
+            ${form.buildForm(id='theme', classes='form-horizontal tab-pane', legend='Theme', description='<div class="alert alert-block alert-info"><i class="fa fa-lightbulb-o fa-fw"></i> &nbsp Hint: Can&#8217t decide on your favorite theme?  Feeling adventurous?  Then try out the Aurora theme!  Inspired by the Northern Lights, the menu bar is always gently changing color and cycles through different patterns depending on the time of day.</div>', fields=[
+                {'type':'select', 'label':'Theme', 'name':'app_theme_mig', 'options':settings.get_themes(), 'desc':'Changes the appearance of HTPC Manager'},
+                {'type':'bool', 'label':'Use heavier fonts', 'name':'app_use_heavy_font', 'desc':'Increases the font weight globally', 'checked':bool(settings.get('app_use_heavy_font', False))},
             ])}
             ${form.buildForm(id='dashboard', classes='form-horizontal tab-pane', legend='Dashboard', fields=[
-                {'type':'bool', 'label':'Show recent movies', 'name':'dash_rec_movies',
-                 'checked':bool(settings.get('dash_rec_movies', 0))},
-                {'type':'bool', 'label':'Show recent shows', 'name':'dash_rec_tv',
-                 'checked':bool(settings.get('dash_rec_tv', 0))},
-                {'type':'bool', 'label':'Show recent music', 'name':'dash_rec_music',
-                 'checked':bool(settings.get('dash_rec_music', 0))},
-                {'type':'bool', 'label':'Show recent movies from Plex', 'name':'dash_rec_movies_plex',
-                 'checked':bool(settings.get('dash_rec_movies_plex', 0))},
-                {'type':'bool', 'label':'Show recent shows  from Plex', 'name':'dash_rec_tv_plex',
-                 'checked':bool(settings.get('dash_rec_tv_plex', 0))},
-                {'type':'bool', 'label':'Show recent music from Plex', 'name':'dash_rec_music_plex',
-                 'checked':bool(settings.get('dash_rec_music_plex', 0))},
-                {'type':'bool', 'label':'Show Sickbeard', 'name':'dash_sickbeard',
-                 'checked':bool(settings.get('dash_sickbeard', 0))},
-                {'type':'bool', 'label':'Show CouchPotato', 'name':'dash_couchpotato',
+	            {'type':'bool', 'label':'Show CouchPotato', 'name':'dash_couchpotato',
                  'checked':bool(settings.get('dash_couchpotato', 0))},
+                {'type':'bool', 'label':'Show Disks', 'name':'dash_disks',
+                 'checked':bool(settings.get('dash_disks', 0))},
+                {'type':'bool', 'label':'Show Kodi recent movies', 'name':'dash_rec_movies',
+                 'checked':bool(settings.get('dash_rec_movies', 0))},
+                {'type':'bool', 'label':'Show Kodi recent movies (List)', 'name':'dash_rec_movies_list',
+                 'checked':bool(settings.get('dash_rec_movies_list', 0))},               
+		 {'type':'bool', 'label':'Show Kodi recent episodes', 'name':'dash_rec_tv',
+                 'checked':bool(settings.get('dash_rec_tv', 0))},
+                 {'type':'bool', 'label':'Show Kodi recent episodes (List)', 'name':'dash_rec_tv_list',
+                 'checked':bool(settings.get('dash_rec_tv_list', 0))},
+                {'type':'bool', 'label':'Show Kodi recent music (Old)', 'name':'dash_rec_music_old',
+                 'checked':bool(settings.get('dash_rec_music_old', 0))},
+				        {'type':'bool', 'label':'Show Kodi recent music', 'name':'dash_rec_music',
+                 'checked':bool(settings.get('dash_rec_music', 0))},
+                {'type':'bool', 'label':'Show NZBGet', 'name':'dash_nzbget',
+                 'checked':bool(settings.get('dash_nzbget', 0))},
+                {'type':'bool', 'label':'Show Plex recent movies', 'name':'dash_rec_movies_plex',
+                 'checked':bool(settings.get('dash_rec_movies_plex', 0))},
+                {'type':'bool', 'label':'Show Plex recent shows', 'name':'dash_rec_tv_plex',
+                 'checked':bool(settings.get('dash_rec_tv_plex', 0))},
+                {'type':'bool', 'label':'Show Plex recent music', 'name':'dash_rec_music_plex',
+                 'checked':bool(settings.get('dash_rec_music_plex', 0))},
+                {'type':'bool', 'label':'Show qBittorrent', 'name':'dash_qbit',
+                  'checked':bool(settings.get('dash_qbit', 0))},
                 {'type':'bool', 'label':'Show SABnzbd', 'name':'dash_sabnzbd',
                  'checked':bool(settings.get('dash_sabnzbd', 0))},
-                {'type':'bool', 'label':'Show NZBGet', 'name':'dash_nzbget',
-                 'checked':bool(settings.get('dash_nzbget', 0))}
+                {'type':'bool', 'label':'Show Sick Beard', 'name':'dash_sickbeard',
+                 'checked':bool(settings.get('dash_sickbeard', 0))},
+                {'type':'bool', 'label':'Show SickRage', 'name':'dash_sickrage',
+                 'checked':bool(settings.get('dash_sickrage', 0))},
+                {'type':'bool', 'label':'Show S.M.A.R.T. Info', 'name':'dash_smart',
+                  'checked':bool(settings.get('dash_smart', 0))},
+                {'type':'bool', 'label':'Show Sonarr', 'name':'dash_sonarr',
+                 'checked':bool(settings.get('dash_nzbdrone', 0))},
+                {'type':'bool', 'label':'Show System Info', 'name':'dash_sysinfo',
+                  'checked':bool(settings.get('dash_sysinfo', 0))},
+                {'type':'bool', 'label':'Show Wanted Albums (Carousel)', 'name':'dash_wanted_albums',
+                  'checked':bool(settings.get('dash_wanted_albums', 0))},
+                {'type':'bool', 'label':'Show Wanted Albums (List)', 'name':'dash_wanted_albums_list',
+                  'checked':bool(settings.get('dash_wanted_albums_list', 0))},
+                {'type':'bool', 'label':'Show Sonar calendar', 'name':'dash_sonarr_calendar',
+                    'checked':bool(settings.get('dash_sonarr_calendar', 0))},
+                {'type':'bool', 'label':'Show Upcoming Albums (List)', 'name':'dash_upcoming_albums_list',
+                  'checked':bool(settings.get('dash_upcoming_albums_list', 0))}
             ])}
 
             <form class="form-horizontal tab-pane" id="other" method="POST">
 
                 <fieldset>
                     <legend>Other apps</legend>
-                    <blockquote>Are you using software that is not supported by Htpc Manager or want to have you selfmade dashboard url in the menu bar? Add custom urls to the menubar.</blockquote>
+                    <div class="alert alert-block alert-info"><i class="fa fa-info-circle fa-fw"></i> &nbsp Add customs URLs to the menu bar.  Useful if you are using software that is not supported by HTPC Manager or want to have a custom link in the menubar.  <BR /><i class="fa fa-lightbulb-o fa-fw"></i> &nbsp Hint: You can drag and drop items to re-order them.</div>
                     <button class="btn btn-small btn-primary add">New link</button>
 
                     <table class="table table-striped table-condensed">
@@ -85,15 +132,14 @@
                         <tr>
                             <th class="span3">Name</th>
                             <th>Full url <small class="muted">including http://etc...</small</th>
-                            <th class="span1">Actions</th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody id="reorder">
                         % for link in self.attr.settings.getUrls():
                         <tr>
-                          <td><input type="text" value="${link['name']}"name="name"></td>
-                          <td><input type="text" value="${link['url']}"name="url"></td>
-                          <td><button class="btn btn-mini delete">Delete</button></td>
+                          <td><input type="text" value="${link['name']|h, entity}"name="name"></td>
+                          <td><input type="text" value="${link['url']|h, entity}"name="url"></td>
+                          <td><button class="btn btn-mini btn-danger pull-left delete"><i class="fa fa-trash-o fa-lg"></i></button></td>
                         </tr>
                         % endfor
                       </tbody>
@@ -101,7 +147,7 @@
 
                     <div class="form-actions">
                         <button class="btn btn-primary save" type="submit">Save</button>
-                        <button class="btn " type="reset">Clear</button>
+                        <button class="btn" type="reset">Clear</button>
                     </div>
                 </fieldset>
             </form>

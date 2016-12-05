@@ -4,17 +4,35 @@
 .alignright {
     text-align: right !important;
 }
+.aligncenter {
+    text-align: center !important;
+}
 .carousel-item {
     height: 200px;
     background-position: center 20%;
     background-size: cover;
     background-repeat: no-repeat;
 }
+.carousel-control.left {
+	background: none;
+	border: none;
+	left: 0px;
+	opacity: 0.7;
+}
+.carousel-control.right {
+	background: none;
+	border: none;
+	right: 0px;
+	opacity: 0.7;
+}
 .carousel-caption h4 {
+    font-weight: normal;
+    font-size: small;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     cursor: pointer;
+    line-height: 15px;
 }
 .carousel-caption p {
     font-size: smaller;
@@ -48,4 +66,64 @@
 }
 .dashboard .span4 #nzbgetdownloads_table_body td:last-child {
     width: 14px;
+}
+.dash-module-edit{
+    min-height: 140px !important;
+    border: 1px solid !important;
+    border-color: #FFFF00 !important;
+    max-height: 140px !important;
+    height: 140px !important;
+    overflow: hidden !important;
+    cursor: move;
+
+}
+
+.dash-row-edit {
+    min-height: 150px !important;
+    border: 1px solid !important;
+    border-color: #FF0000 !important;
+    margin-bottom: 10px !important;
+    padding: 5px !important;
+}
+
+.refresh-btns{
+    float: right !important;
+}
+
+/*
+#dash_sysinfo_table_body div{
+    width:50%;
+    display:inline-block
+}
+
+#dash_sysinfo_table_body td{
+    text-align: center !important;
+}
+
+
+#dash_sysinfo_table_body tr td:first-of-type{
+    text-align: left !important;
+}
+*/
+#dash_disks_table_body .progress,
+#dash_sysinfo_table_body .progress{
+    margin-bottom:0px !important;
+}
+#editButtons{
+    display: None;
+}
+
+.stretchedbg {
+	background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+#dash_smart .table,
+#dash_sysinfo .table,
+#dash_disks .table{
+  table-layout: auto !important;
+}
+
+.ip{
+width:360px;
 }

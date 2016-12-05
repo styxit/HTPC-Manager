@@ -48,10 +48,10 @@ class MSSQLConnection(DBAPI):
             # MSDE does not allow SQL server login 
             if kw.get("sspi"):
                 conn_str += "Integrated Security=SSPI;Persist Security Info=False"
-                self.make_conn_str = lambda keys: [conn_str % (keys.host, keys.db)]
+                self.make_conn_str = lambda keys: conn_str % (keys.host, keys.db)
             else:
                 conn_str += "User Id=%s;Password=%s"
-                self.make_conn_str = lambda keys: [conn_str % (keys.host, keys.db, keys.user, keys.password)]
+                self.make_conn_str = lambda keys: conn_str % (keys.host, keys.db, keys.user, keys.password)
 
             kw.pop("sspi", None)
             kw.pop("ncli", None)
@@ -61,16 +61,26 @@ class MSSQLConnection(DBAPI):
             sqlmodule.Binary = lambda st: str(st)
             # don't know whether pymssql uses unicode
             self.usingUnicodeStrings = False
-            self.make_conn_str = lambda keys:  \
-                   ["", keys.user, keys.password, keys.host, keys.db]
+            def _make_conn_str(keys):
+                keys_dict = {}
+                for attr, value in (
+                    ('user', keys.user),
+                    ('password', keys.password),
+                    ('host', keys.host),
+                    ('port', keys.port),
+                    ('database', keys.db),
+                ):
+                    if value: keys_dict[attr] = value
+                return keys_dict
+            self.make_conn_str = _make_conn_str
 
         self.autoCommit=int(autoCommit)
+        self.user = user
+        self.password = password
         self.host = host
         self.port = port
         self.db = db
-        self.user = user
-        self.password = password
-        self.password = password
+        self._server_version = None
         self._can_use_max_types = None
         DBAPI.__init__(self, **kw)
 
@@ -91,7 +101,11 @@ class MSSQLConnection(DBAPI):
         return c.fetchone()[0]
 
     def makeConnection(self):
-        con = self.dbconnection( *self.make_conn_str(self) )
+        conn_descr = self.make_conn_str(self)
+        if isinstance(conn_descr, dict):
+            con = self.dbconnection(**conn_descr)
+        else:
+            con = self.dbconnection(conn_descr)
         cur = con.cursor()
         cur.execute('SET ANSI_NULLS ON')
         cur.execute("SELECT CAST('12345.21' AS DECIMAL(10, 2))")
@@ -100,13 +114,10 @@ class MSSQLConnection(DBAPI):
         return con
 
     HAS_IDENTITY = """
-       SELECT col.name, col.status, obj.name
-       FROM syscolumns col
-       JOIN sysobjects obj
-       ON obj.id = col.id
-       WHERE obj.name = '%s'
-       and col.autoval is not null
-
+       select 1
+       from INFORMATION_SCHEMA.COLUMNS
+       where TABLE_NAME = '%s'
+       and COLUMNPROPERTY(object_id(TABLE_NAME), COLUMN_NAME, 'IsIdentity') = 1
     """
     def _hasIdentity(self, conn, table):
         query = self.HAS_IDENTITY % table
@@ -143,7 +154,7 @@ class MSSQLConnection(DBAPI):
 
         q = self._insertSQL(table, names, values)
         if self.debug:
-            print 'QueryIns: %s' % q
+            self.printDebug(conn, q, 'QueryIns')
         c.execute(q)
         if has_identity:
             c.execute('SET IDENTITY_INSERT %s OFF' % table)
@@ -288,13 +299,15 @@ class MSSQLConnection(DBAPI):
             return col.Col, {}
 
     def server_version(self):
+        if self._server_version is not None:
+            return self._server_version
         try:
-            server_version = self.queryAll("SELECT SERVERPROPERTY('productversion')")[0][0]
+            server_version = self.queryOne("SELECT SERVERPROPERTY('productversion')")[0]
             server_version = server_version.split('.')[0]
             server_version = int(server_version)
         except:
             server_version = None # unknown
-        self.server_version = server_version # cache it forever
+        self._server_version = server_version
         return server_version
 
     def can_use_max_types(self):

@@ -1,4 +1,7 @@
 $(document).ready(function () {
+    // Open debug by default
+    $(window).trigger('hashchange')
+    $('#loglevel').val(5)
     $('#logsize, #loglevel').change(loadLog);
     $('#refreshlog, #deletelog').click(loadLog);
     loadLog();
@@ -24,7 +27,7 @@ function loadLog () {
                 });
                 $('#log-grid tbody').append(tr);
             });
-            $('#log-grid tbody').trigger('update')
+            $('#log-grid').trigger('update')
         }
     });
 }

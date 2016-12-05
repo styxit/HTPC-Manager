@@ -33,8 +33,9 @@ def testJoin():
     assert list(SBPerson.select(AND(SBPerson.q.id==SBAddress.q.personID, SBAddress.q.city=='London'))) == \
            list(SBAddress.selectBy(city='London').throughTo.person)
 
-    assert list(SBAddress.select(AND(SBPerson.q.id==SBAddress.q.personID, SBPerson.q.name=='Julia'))) == \
-           list(SBPerson.selectBy(name='Julia').throughTo.addresses)
+
+    assert list(SBAddress.select(AND(SBPerson.q.id==SBAddress.q.personID, SBPerson.q.name=='Julia')).orderBy(SBAddress.q.city)) == \
+           list(SBPerson.selectBy(name='Julia').throughTo.addresses.orderBy(SBAddress.q.city))
 
 def testRelatedJoin():
     assert list(SBPerson.selectBy(name='Julia').throughTo.sharedAddresses) == \
@@ -53,9 +54,9 @@ def testRelatedJoin2():
            list(SBPerson.select(SBPerson.q.name=='Julia').throughTo.sharedAddresses)
 
 def testJoin2():
-    assert list(SBAddress.select(AND(SBPerson.j.addresses, SBPerson.q.name=='Julia'))) == \
-            list(SBAddress.select(AND(SBPerson.q.id==SBAddress.q.personID, SBPerson.q.name=='Julia'))) == \
-            list(SBPerson.selectBy(name='Julia').throughTo.addresses)
+    assert list(SBAddress.select(AND(SBPerson.j.addresses, SBPerson.q.name=='Julia')).orderBy(SBAddress.q.city)) == \
+            list(SBAddress.select(AND(SBPerson.q.id==SBAddress.q.personID, SBPerson.q.name=='Julia')).orderBy(SBAddress.q.city)) == \
+            list(SBPerson.selectBy(name='Julia').throughTo.addresses.orderBy(SBAddress.q.city))
 
 def testFK2():
     assert list(SBAddress.select(AND(SBAddress.j.person, SBPerson.q.name=='Julia'))) == \

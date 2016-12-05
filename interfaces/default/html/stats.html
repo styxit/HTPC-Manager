@@ -1,24 +1,36 @@
 <%inherit file="base.html"/>
-<% settings = self.attr.settings %>
-<div class="container">
+<% settings = self.attr.settings
+import htpc
+webdir = htpc.WEBDIR
+%>
+
+<div class="container-fluid">
   <div class="content">
     <h1 class="page-header page-title">
       <span>${settings.get('stats_name', 'Stats')}</span>
+	% if settings.get('stats_psutil_enabled'):
       <small>
-        <i class="icon-arrow-down"></i><span id="stat-recv"></span>
-        <i class="icon-arrow-up"></i><span id="stat-sent"></span>
+        <i class="fa fa-arrow-down"></i><span id="stat-recv"></span>
+        <i class="fa fa-arrow-up"></i><span id="stat-sent"></span>
       </small>
+    % endif
     </h1>
-
-    % if not importPsutil:
+    % if not settings.get('stats_psutil_enabled') and not settings.get('stats_smart_enabled') and not settings.get('stats_ohm_enabled'):
     <div class="row-fluid">
       <div class="alert alert-error">
-        <h4>Psutil is was not found on your system</h4>
-        <p>Stats can only be accessed if you install psutil on your system. See <a href="https://github.com/giampaolo/psutil/blob/master/INSTALL.rst">Psutil website</a>.
+        <h4>All modules are disabled</h4>
+        <p>To enable a stats module go to <a href="${htpc.WEBDIR}settings/#stats">settings</a> and enable some.
       </div>
     </div>
-
-    % else:
+    % endif
+	% if settings.get('stats_psutil_enabled'):
+      % if not importPsutil:
+    <div class="row-fluid">
+      <div class="alert alert-error">
+        <h4>${importPsutilerror}</h4>
+      </div>
+    </div>
+      % else:
     <div class="row-fluid">
       <div class="span4 text-left" id="system_user"></div>
       <div class="span4 text-center" id="system_info"></div>
@@ -28,71 +40,190 @@
       <div class="span3 cpu"></div>
       <div class="span3 virmem text-center"></div>
       <div class="span3 swpmem text-center"></div>
-      <div class="span3 nw text-center"></div>
+      <div class="span3 nw text-center">
+        <table class="table nwtable">
+            <tr>
+                <td class="span4">Network</td>
+                <td class="span4">In</td>
+                <td class="span4">Out</td>
+            </tr>
+            <tr>
+                <td>Drop</td>
+                <td class="dropin"></td>
+                <td class="dropout"></td>
+            </tr>
+            <tr>
+                <td>Error</td>
+                <td class="errin"></td>
+                <td class="errout"></td>
+            </tr>
+            <tr>
+                <td>IP</td>
+                <td class="tlip"></td>
+                <td class="txip"></td>
+            </tr>
+        </table>
+      </div>
     </div>
-   
+	  % endif
+	% endif
     <ul class="nav nav-tabs">
-    <li id="diskl" class="active"><a href="#diskt" data-toggle="tab">Disk</a></li>
-    <li id="procl"><a href="#proc" data-toggle="tab">Process</a></li>
-    </ul>
-    
+	% if settings.get('stats_psutil_enabled'):
+      % if importPsutil:
+        <li id="diskl"><a href="#diskt" data-toggle="tab">Disk</a></li>
+        <li id="procl"><a href="#proc" data-toggle="tab">Process</a></li>
+      %  endif
+	% endif
+	% if settings.get('stats_ohm_enabled'):
+    <li id="ohm"><a href="#ohm_" data-toggle="tab">Hardware Info</a></li>
+  % endif
+	% if settings.get('stats_smart_enabled'):
+	 <li id="smartl"><a href="#smart" data-toggle="tab">S.M.A.R.T.</a></li>
+	% endif
+  % if settings.get('stats_scripts_enabled', 1):
+    <li id="scriptl"><a href="#scripts" data-toggle="tab">Scripts</a></li>
+  % endif
+	</ul>
+
+
     <div class="tab-content">
-        <div id="diskt" class="tab-pane active">
-            <table class="table disktable table-striped table-hover">
+	% if settings.get('stats_psutil_enabled'):
+      % if importPsutil:
+        <div id="diskt" class="tab-pane mofa">
+            <table class="table disktable table-sortable table-hover">
                 <thead>
                     <tr>
                         <th>Mount Point</th>
                         <th class="hidden-phone">Location</th>
                         <th class="hidden-phone">File System</th>
-                        <th class="">Free</th>
-                        <th class="">Used</th>
-                        <th class="">Total</th>
+                        <th class="" data-sorter="filesize">Free</th>
+                        <th class="" data-sorter="filesize">Used</th>
+                        <th class="" data-sorter="filesize">Total</th>
                         <th id="pbar" class="span3">Bar</th>
                         <th class="">%</th>
                     </tr>
                 </thead>
                 <tbody id="disklist"></tbody>
             </table>
-            <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
+            <span id="error_message"></span>
+            <div class="disktspinner"></div>
         </div>
-        <div id="proc" class="tab-pane">
-            <table class="table disktable table-striped table-hover">
+        <div id="proc" class="tab-pane mofa">
+            <table class="table disktable table-sortable table-hover">
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Pid</th>
                         <th class="hidden-phone">Status</th>
                         <th class="hidden-phone">User</th>
-                        <th>Memory %</th>
-                        <th>Memory usage</th>
+                        <th data-parser="percent">Memory %</th>
+                        <!--<th data-sorter="metric" data-metric-name-abbr="N/A|b|B|mb|MB|gb|Gb|GB|tb|Tb|TB">Memory usage</th>-->
+                        <th data-sorter="filesize">Memory usage</th>
                         <th>Time</th>
-                        <th>CPU %</th>
+                        <th data-parser="percent">CPU %</th>
                         <th>&nbsp;</th>
                     </tr>
                 </thead>
                 <tbody id="proclist"></tbody>
+                <div class="procspinner"></div>
             </table>
-            % if cmdline:
-            <div id="statscmd" class="span4">
-                <div class="input-append">
-                    <input id="cmdinput" class="span4" type="text" placeholder="mkdir, dir1"></input>
-                    <button id="sendcmd" data-cmd="popen" class="btn" type="button">Go!</button>
-                </div>
-                <div class="alert helper-block">WARNING! What is written here is passed to the shell! Dont come crying if you delete your hardrive</div>
-            </div>
-            % endif
-            <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
+            <span id="error_message"></i></span>
         </div>
-    </div>
+	  % endif
+	% endif
+
+    % if settings.get('stats_ohm_enabled'):
+        <div id="ohm_" class="tab-pane mofa">
+            <table class="table table-condensed ohm_three table-hover">
+            </table>
+            <div class="ohmspinner"></div>
+        </div>
     % endif
-   
+
+
+    % if settings.get('stats_smart_enabled'):
+		<div id="smart" class="tab-pane">
+      % if not importpySMART:
+			<div class="row-fluid">
+				<div class="alert alert-error">
+					<h4>smartmontools</h4>
+					<p>${importpySMARTerror}</p>
+				</div>
+			</div>
+		  % else:
+      <div class="mofa">
+  			<table class="table table-striped table-hover table-sortable smart_three">
+          <thead>
+            <tr>
+              <th class="">Mount Point</th>
+              <th class="">Model</th>
+              <th class="">Serial no.</th>
+              <th class="">Firmware</th>
+              <th class="">Capacity</th>
+              <th class="">Interface</th>
+              <th class="">Temperature</th>
+              <th class="">S.M.A.R.T.</th>
+            </tr>
+          </thead>
+          <tbody id="smartlist"></tbody>
+        </table>
+      </div>
+            <span id="smart_error_message"><i class="smart-spinner"></i></span>
+          % endif
+		</div>
+		% endif
+
+  % if settings.get('stats_scripts_enabled', 1):
+    <div id="scripts" class="tab-pane">
+      % if len(scripts):
+      <div class="tabbable tabs-left">
+
+          <ul class="nav nav-tabs">
+            <!-- if you know css, please fixme.. -->
+            % for script in scripts:
+              <li class="scriptli" data-name="${script['name']}" data-filename="${script['filename']}" data-ext="${script['ext']}" data-fp="${script['fp']}"><a href="">${script['name']}</a></li>
+            % endfor
+          </ul>
+            <div class="span11">
+                <div id="script-info">Pick one</div>
+                <div id="script-result"></div>
+            </div>
+
+      </div> <!-- .tabbable .tabs-left -->
+      % else:
+        <div class="alert alert-info helper-block">
+          You havn't added any scripts to the <code>userdata/scripts</code> folder
+        </div>
+      % endif
+    </div> <!-- #scripts -->
+    % endif
+    </div>
   </div>
 </div>
 
 <script type="text/javascript">
-  % if importPsutil:
-    importPsutil = true;
-  % else :
+  % if settings.get('stats_psutil_enabled'):
+    % if importPsutil:
+      importPsutil = true;
+    % else:
+      importPsutil = false;
+    % endif
+  % else:
     importPsutil = false;
   % endif
+  % if settings.get('stats_smart_enabled'):
+    % if importpySMART:
+      importpySMART = true;
+    % else:
+      importpySMART = false;
+    % endif
+  % else:
+    importpySMART = false;
+  % endif
+  % if settings.get('stats_ohm_enabled'):
+    ohm = true;
+  % else:
+    ohm = false;
+  % endif
+
 </script>

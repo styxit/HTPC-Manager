@@ -3,24 +3,66 @@ $(document).ready(function () {
     $('#nzb_pause_button').click(function () {
         var clickItem = $(this);
         clickItem.button('loading');
+        var time = $('#sab_pause_for').val();
         $.ajax({
-            url: WEBDIR + 'sabnzbd/TogglePause?mode='+queueToggleStatusAction,
+            url: WEBDIR + 'sabnzbd/TogglePause?mode='+queueToggleStatusAction + '&time=' + time,
             dataType: 'json',
             type: 'get'
         });
+        $('#sab_pause_for').val('');
     });
 
-    $('#add_nzb_form').ajaxForm({
-        url: WEBDIR + 'sabnzbd/AddNzbFromUrl',
-        type: 'post',
-        dataType: 'json',
-        success: function (result) {
-            if (result.status != undefined && result.status) {
-                $('[href=#active]').trigger('click');
-                $('#nzb_url').val('');
-                $('#nzb_category').val('');
+    $('#sabnzbd_clear_history').click(function() {
+        var modalButtons = {
+            'Remove all': function() {
+                $.ajax({
+                    'url': WEBDIR + 'sabnzbd/DeleteHistory/all',
+                    'success': function(response) {
+                        if (response.status) {
+                            notify('Info ', 'Removed all nzbs from history', 'success', 5);
+                        } else {
+                            notify('Error ', 'Failed to remove all nzbs from history ', 'error ', 5);
+                        }
+                        hideModal();
+                    }
+                });
+            },
+            'Remove failed ': function() {
+                $.ajax({
+                    'url': WEBDIR + 'sabnzbd/DeleteHistory/failed',
+                    'success ': function(response) {
+                        if (response.status) {
+                            notify('Info ', 'Removed all failed nzbs from history ', 'success ', 5);
+                        } else {
+                            notify('Error ', 'Failed to remove all nzbs from history ' , 'error ', 5);
+                        }
+                    }
+                });
             }
-        }
+        };
+        showModal('History', 'What history do you want to remove?', modalButtons);
+    });
+
+    $('#add_nzb_button').click(function (e) {
+        // nzb_url, nzb_category
+        var nzb_url = $('#nzb_url').val()
+        var nzb_category = $('#nzb_category').val()
+        if (!nzb_url && !nzb_category) return;
+        $.ajax({
+            url: WEBDIR + 'sabnzbd/AddNzbFromUrl',
+            data: {'nzb_url': nzb_url , 'nzb_category': nzb_category},
+            type: 'post',
+            dataType: 'json',
+            success: function (result) {
+                if (result.status !== undefined && result.status) {
+                    console.log(result.status)
+                    $('[href=#active]').trigger('click');
+                    $('#nzb_url').val('');
+                    $('#nzb_category').val('');
+                }
+            }
+
+        });
     });
 
     setCategories('#nzb_category', 'Default');
@@ -33,12 +75,21 @@ $(document).ready(function () {
             dataType: 'json'
         });
     });
+
     loadQueue(1);
+    // drag and drop to reorder q
+    $("#active_table_body").sortable({
+        stop: function (event, ui) {
+            swap(ui.item.attr('data-nzo-id'), ui.item.index())
+        }
+    }).disableSelection();
+
     setInterval(function() {
         loadQueue(0);
     }, 5000);
     loadHistory();
     loadWarnings();
+
 
     // reload tab content on tab click
     $('#tab-history').click(function() {
@@ -91,14 +142,14 @@ function loadHistory() {
             }
             $('#history_table_body').html('');
             $.each(data.history.slots, function (i, slot) {
-                var deleteImage = makeIcon('icon-remove', 'Delete');
+                var deleteImage = makeIcon('fa fa-trash-o fa-lg');
                 deleteImage.click(function () {
                     removeHistoryItem(slot.nzo_id);
                 });
 
                 var retryImage = null;
                 if (slot.status == 'Failed') {
-                    var retryImage = makeIcon('icon-repeat', 'Retry');
+                    var retryImage = makeIcon('fa fa-repeat', 'Retry');
                     retryImage.click(function () {
                         retryHistoryItem(slot.nzo_id);
                     });
@@ -118,17 +169,38 @@ function loadHistory() {
                 if (slot.status == 'Failed') {
                     $(name).append('&nbsp;').append(failMessage);
                 }
+                if (slot.script && slot.script_line.length) {
+                    $(name).append('&nbsp;').append(makeIcon('fa fa-list-alt', slot.script_line))
+                }
 
+                // Use to make a info string regarding speed unpack
+                var inf = ''
+
+                for (i = 0; i < slot.stage_log.length; i++) {
+                    if ($.inArray(slot.stage_log[i].name, ["Download", "Repair", "Unpack"]) !== -1) {
+                        inf = inf.concat(slot.stage_log[i].actions[0] + '<br>')
+                    }
+
+                }
+
+                var info = sabnzbdStatusLabel(slot.status).tooltip({'placement': 'right', 'title': inf, 'html': true})
+
+                row.append($('<td>').append(parseDate(slot.completed)));
                 row.append(name);
-                row.append($('<td>').append(sabnzbdStatusLabel(slot.status)));
+                row.append($('<td>').append(info));
                 row.append($('<td>').html(slot.size));
                 row.append($('<td>').append(deleteImage));
                 row.append($('<td>').append(retryImage));
 
                 $('#history_table_body').append(row);
+
             });
         }
+
+    }).done(function() {
+        $('.table-sortable').trigger('update');
     });
+
 }
 
 function removeQueueItem(id) {
@@ -148,6 +220,14 @@ function removeQueueItem(id) {
 function changeCategory(id, cat) {
     $.ajax({
         url: WEBDIR + 'sabnzbd/ChangeCategory?id=' + id + '&cat=' + cat,
+        type: 'get',
+        dataType: 'json'
+    });
+}
+
+function swap(v1, v2) {
+    $.ajax({
+        url: WEBDIR + 'sabnzbd/Swap?v1=' + v1 + '&v2=' + v2,
         type: 'get',
         dataType: 'json'
     });
@@ -173,17 +253,18 @@ function loadQueue(once) {
 
             $('#nzb_pause_button').button('reset');
             if (data.status == 'Paused') {
-                $('#nzb_pause_button').html('<i class="icon-play"></i> Resume');
+                $('#nzb_pause_button').html('<i class="fa fa-play"></i> Resume');
                 queueToggleStatusAction = 'resume';
             } else {
-                $('#nzb_pause_button').html('<i class="icon-pause"></i> Pause')
+                $('#nzb_pause_button').html('<i class="fa fa-pause"></i> Pause')
                 queueToggleStatusAction = 'pause';
             }
 
             var state = data.status.toLowerCase();
             var formattedState = state.charAt(0).toUpperCase() + state.slice(1);
+            var pausetime = (data.pause_int != '0') ? ' ' + data.pause_int: ''
 
-            $('#queue_state').html(formattedState);
+            $('#queue_state').html(formattedState + pausetime);
             $('#queue_speed').html(data.speed + 'B/Sec');
 
             $('#active_table_body').html('');
@@ -203,7 +284,7 @@ function loadQueue(once) {
                 progress.addClass('progress');
                 progress.append(progressBar);
 
-                var row = $('<tr>')
+                var row = $('<tr>').attr('data-nzo-id', job.nzo_id)
                 row.append($('<td>').html(job.filename));
 
                 var categories = $('<select>');
@@ -211,18 +292,26 @@ function loadQueue(once) {
                 categories.change(function() {
                     changeCategory(job.nzo_id, $(this).val());
                 });
-                setCategories(categories, job.cat);
+
+                $.each(data.categories, function (i, cat) {
+                    var option = $('<option>');
+                    if (job.cat == cat) {
+                        option.attr('selected', true);
+                    }
+                    option.attr('value', cat);
+                    option.html(cat);
+                    categories.append(option);
+                });
 
                 row.append($('<td>').html(categories));
-
                 row.append($('<td>').html(progress));
                 row.append($('<td>').html(job.timeleft + ' / ' + job.mbleft + 'MB').addClass('span3'));
 
                 var deleteImage = $('<a>');
-                deleteImage.html('&times;');
                 deleteImage.attr('alt', 'Remove');
                 deleteImage.addClass('close');
                 deleteImage.attr('href', '#');
+                deleteImage.append($('<i>').addClass('fa fa-times'))
                 deleteImage.click(function () {
                     removeQueueItem(job.nzo_id);
                 });
@@ -231,6 +320,8 @@ function loadQueue(once) {
 
                 $('#active_table_body').append(row);
             });
+
+            $('#active_table_body').parent().trigger('update');
 
             // Set diskspace
             freePercentDisk1 =  Math.ceil((data.diskspace1 / data.diskspacetotal1) * 100);
@@ -311,6 +402,7 @@ function setCategories(selector, select) {
     });
 }
 
+
 function sabnzbdStatusLabel(text){
   var statusOK = ['Completed'];
   var statusInfo = ['Extracting', 'Running'];
@@ -349,20 +441,24 @@ function sabnzbdStatusIcon(iconText, white){
     'Repairing'
   ];
   var icons = [
-    'icon-ok',
-    'icon-share',
-    'icon-play-circle',
-    'icon-exchange',
-    'icon-remove',
-    'icon-wrench'
+    'fa fa-check',
+    'fa fa-share',
+    'fa fa-play-circle',
+    'fa fa-exchange',
+    'fa fa-times',
+    'fa fa-wrench'
   ];
 
   if (text.indexOf(iconText) != -1) {
     var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
     if (white == true) {
-      icon.addClass('icon-white');
+      icon.addClass('fa-inverse');
     }
     return icon;
   }
   return '';
+}
+
+function historymodal() {
+
 }

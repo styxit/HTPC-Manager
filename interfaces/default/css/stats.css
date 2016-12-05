@@ -37,6 +37,11 @@ table.networktable {
 	font-weight: bold;
 }
 
+
+#disklist > tr > td.span3.stats_disk_progress > div {
+	margin-bottom: 0px;
+}
+
 #statscmd {
 	margin-top:10px;
 }
@@ -44,3 +49,11 @@ table.networktable {
 .alert.helper-block{
 	margin-bottom: 0px !important;
 }
+
+
+.treegrid-indent {width:16px; height: 16px; display: inline-block; position: relative;}
+
+.treegrid-expander {width:16px; height: 16px; display: inline-block; position: relative; cursor: pointer;}
+
+.treegrid-expander-expanded{background-image: url(../img/collapse.png); }
+.treegrid-expander-collapsed{background-image: url(../img/expand.png);}

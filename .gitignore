@@ -9,7 +9,7 @@ _site/
 
 # Ignore system files and folders aswell as some common files #
 .DS_Store*
-*.pyc
+*.py[co]
 .project
 .pydevproject
 .settings/
@@ -18,3 +18,7 @@ Icon?
 Thumbs.db
 .idea
 htpc_manager.log
+*.orig
+config.codekit
+.flux
+.python-version
