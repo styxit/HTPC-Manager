@@ -10,6 +10,7 @@ import logging
 from cherrypy.lib.auth2 import require, member_of
 from sqlobject import connectionForURI, sqlhub, SQLObject, SQLObjectNotFound
 from sqlobject.col import StringCol
+import re
 
 
 class Setting(SQLObject):
@@ -89,5 +90,19 @@ class Settings:
 
     """ Get custom defined urls from database in json format """
     def getUrls(self):
-        links = self.get('custom_urls', '{}')
-        return loads(links)
+        linkstr = self.get('custom_urls', '{}')
+        links = loads(linkstr)
+
+        request = cherrypy.request
+        regex = r'([a-zA-Z]+)://([.a-zA-Z0-9_-]*)(:[0-9]*)?'
+        match = re.match(regex, request.base)
+        kwargs = {
+            'http_scheme': match.group(1),
+            'http_host': match.group(2),
+            'http_port': (match.group(3) or ':80')[1:],
+        }
+
+        for link in links:
+            link['url'] = link['url'] % kwargs
+
+        return links

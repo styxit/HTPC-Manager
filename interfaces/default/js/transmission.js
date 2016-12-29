@@ -1,6 +1,11 @@
 // Last time we checked, was there a problem connecting to transmission?
 var transmissionConnectionError = false;
 
+htpc = {
+    transmission: {
+    }
+};
+
 $(document).ready(function(){
   $('.spinner').show();
   getTorrents();
@@ -9,6 +14,41 @@ $(document).ready(function(){
      getTorrents();
      getStatus();
   }, 4000);
+
+    // sort fields
+    $(document.body).off('click', '#torrent-table .sort-fields a');
+    $(document.body).on('click', '#torrent-table .sort-fields a', function(event) {
+	event.preventDefault();
+	var $this = $(this);
+	var sort_on = $this.attr('data-sort-field');
+
+	var $i = $this.children('i');
+	if ($i.hasClass('icon-chevron-down')) {
+	    $i.removeClass('icon-chevron-down');
+	    $i.addClass('icon-chevron-up');
+	    sort_on += ':asc';
+	} else if ($i.hasClass('icon-chevron-up')) {
+	    $i.removeClass('icon-chevron-up');
+	    $i.addClass('icon-chevron-down');
+	    sort_on += ':desc';
+	} else {
+	    $i.addClass('icon-chevron-down');
+	    sort_on += ':desc';
+	}
+
+	$('#torrent-table .sort-fields a').each(function(x, a) {
+	    var $a = $(a);
+	    if ($a.attr('data-sort-field') != $this.attr('data-sort-field')) {
+		var $i = $a.children('i');
+		$i
+		    .removeClass('icon-chevron-up')
+		    .removeClass('icon-chevron-down');
+	    }
+	});
+
+	getTorrents({sort_on: sort_on});
+    });
+
 
   // Torrent button ajax load
   $(document.body).off('click', '#torrent-queue .torrent-action a');
@@ -60,7 +100,10 @@ $(document).ready(function(){
 	});
 });
 
-function getTorrents(){
+function getTorrents(kwargs) {
+  if (kwargs == null)
+      kwargs = {};
+
   $.ajax({
     url: WEBDIR + 'transmission/queue',
     success: function(response){
@@ -72,7 +115,40 @@ function getTorrents(){
           $('#torrent-queue').html('<tr><td colspan="5">Queue is empty</td></tr>');
         }
 
-        $.each(response.arguments.torrents, function(index, torrent){
+          var torrents = response.arguments.torrents;
+
+	  var sort_on = kwargs.sort_on;
+	  if (sort_on == null && htpc.transmission.last_sort_on != null)
+	      sort_on = htpc.transmission.last_sort_on;
+
+	  if (sort_on != null)
+	      htpc.transmission.last_sort_on = sort_on;
+
+	  if (sort_on) {
+	      var split = sort_on.split(':');
+	      if (split.length == 1)
+		  split.push('desc');
+
+	      var field = split[0];
+	      var ordering = split[1];
+
+	      torrents.sort(function(first, second) {
+		  var x = first;
+		  var y = second;
+		  if (ordering == 'asc') {
+		      x = second
+		      y = first;
+		  }
+
+		  if (x[field] < y[field])
+		      return -1;
+		  if (x[field] > y[field])
+		      return 1;
+		  return 0;
+	      });
+	  }
+	  
+        $.each(torrents, function(index, torrent){
           tr = $('<tr>');
 
           var progressBar = $('<div>');
