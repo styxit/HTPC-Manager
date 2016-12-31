@@ -243,7 +243,7 @@ $(document).ready(function () {
                 if ($.isNumeric(data.versionsBehind) && data.versionsBehind == 0) {
                     notify('Update', 'Already running latest version.', 'success')
                 } else if (data.updateNeeded) {
-                    if (confirm('Your are '+data.versionsBehind+' versions behind. Update need. Update to latest version?')) {
+                    if (confirm('Your are '+data.versionsBehind+' versions behind. Update needed. Update to latest version?')) {
                         $.post(WEBDIR + 'update/', function (data) {
                             if (data == 1) {
                                 showModal('Installing update', '<div class="progress progress-striped active"><div class="bar" style="width:100%"></div></div>','')

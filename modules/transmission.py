@@ -58,7 +58,7 @@ class Transmission(object):
 
             basepath = fix_basepath(basepath)
 
-            url = 'http://%s:%s%srpc/' % (host, str(port), basepath)
+            url = 'http://%s:%s%srpc' % (host, str(port), basepath)
 
         return url
 
@@ -90,7 +90,7 @@ class Transmission(object):
 
         if not basepath:
             basepath = fix_basepath('/transmission/')
-        url = 'http://%s:%s%srpc/' % (striphttp(host), port, basepath)
+        url = 'http://%s:%s%srpc' % (striphttp(host), port, basepath)
 
         # format post data
         data = {'method': 'session-get'}
@@ -131,7 +131,7 @@ class Transmission(object):
     @cherrypy.tools.json_out()
     def set_downspeed(self, speed):
         if int(speed) == 0:
-            self.fetch('session-set', {'speed-limit-down': False})
+            return self.fetch('session-set', {'speed-limit-down-enabled': False})
         return self.fetch('session-set', {'speed-limit-down': int(speed), 'speed-limit-down-enabled': True})
 
     @cherrypy.expose()
@@ -139,9 +139,8 @@ class Transmission(object):
     @cherrypy.tools.json_out()
     def set_upspeed(self, speed):
         if int(speed) == 0:
-            self.fetch('session-set', {'speed-limit-up': 'false'})
-        else:
-            return self.fetch('session-set', {'speed-limit-up': int(speed), 'speed-limit-up-enabled': 'true'})
+            return self.fetch('session-set', {'speed-limit-up-enabled': False})
+        return self.fetch('session-set', {'speed-limit-up': int(speed), 'speed-limit-up-enabled': True})
 
     @cherrypy.expose()
     @require(member_of(htpc.role_user))
@@ -219,7 +218,7 @@ class Transmission(object):
 
         basepath = fix_basepath(basepath)
 
-        url = 'http://%s:%s%srpc/' % (host, str(port), basepath)
+        url = 'http://%s:%s%srpc' % (host, str(port), basepath)
 
         # format post data
         data = {'method': method}
