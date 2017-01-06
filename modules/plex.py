@@ -158,9 +158,9 @@ class Plex(object):
                                 if 'addedAt'in movie:
                                     jmovie['addedAt'] = movie['addedAt']
 
-                                for attrib in movie['_children']:
-                                    if attrib['_elementType'] == 'Genre':
-                                        genre.append(attrib['tag'])
+                                # for pms 1.3
+                                if 'Genre' in movie:
+                                    genre = [t.get('tag') for t in movie['Genre']]
 
                                 jmovie['genre'] = [genre]
                                 jmovie['type'] = movie['type']
@@ -241,7 +241,7 @@ class Plex(object):
             plex_url = Plex.get_server_url()
             episodes = []
 
-            for section in self.jloader('/library/sections').get('Directory', {}):
+            for section in self.jloader('%s/library/sections' % plex_url).get('Directory', {}):
                 if self.check_ignore(section['title']):
                     if section['type'] == 'show':
                         for episode in self.jloader('%s/library/sections/%s/all?type=4&sort=addedAt:desc&X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_url, section['key'], limit)).get('Metadata', {}):
@@ -272,7 +272,7 @@ class Plex(object):
                                 if 'addedAt'in episode:
                                     jepisode['addedAt'] = episode['addedAt']
 
-                                jepisode['type'] = episode['_elementType']
+                                jepisode['type'] = episode.get('type')
 
                                 episodes.append(jepisode)
                             except Exception as e:
@@ -293,7 +293,7 @@ class Plex(object):
             plex_url = Plex.get_server_url()
             albums = []
 
-            for section in self.jloadr('%s/library/sections' % plex_url).get('Directory', {}):
+            for section in self.jloader('%s/library/sections' % plex_url).get('Directory', {}):
                 if self.check_ignore(section['title']):
                     if section['type'] == 'artist':
                         for album in self.jloader('%s/library/sections/%s/recentlyAdded?X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_url, section['key'], limit)).get('Metadata', {}):
@@ -301,7 +301,7 @@ class Plex(object):
 
                             jalbum['title'] = album['title']
                             jalbum['id'] = album['ratingKey']
-                            jalbum['type'] = album['_elementType']
+                            jalbum['type'] = album['type']
 
                             if 'thumb'in album:
                                 jalbum['thumbnail'] = album['thumb']
