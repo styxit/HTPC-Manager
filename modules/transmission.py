@@ -45,12 +45,8 @@ class Transmission(object):
             url = htpc.settings.get('transmission_reverse_proxy_link')
         else:
             host = striphttp(htpc.settings.get('transmission_host', ''))
-            port = str(htpc.settings.get('transmission_port', ''))
+            port = htpc.settings.get('transmission_port', '9091')
             basepath = htpc.settings.get('transmission_rpcbasepath')
-            username = htpc.settings.get('transmission_username')
-            password = htpc.settings.get('transmission_password')
-
-            auth = None
 
             # Default basepath is transmission
             if not basepath:
@@ -58,10 +54,9 @@ class Transmission(object):
 
             basepath = fix_basepath(basepath)
 
-            url = 'http://%s:%s%srpc' % (host, str(port), basepath)
+            url = 'http://%s:%s%sweb' % (host, port, basepath)
 
         return url
-
 
     @cherrypy.expose()
     @require()
