@@ -279,7 +279,7 @@ def resize_image(img, height, width, opacity, mode, dest):
     if mode:
         im = im.convert(str(mode))
 
-    if imagetype.lower() == 'jpeg' or 'jpg':
+    if imagetype and imagetype.lower() == 'jpeg' or 'jpg':
         im.save(dest, 'JPEG', quality=95)
     else:
         im.save(dest, imagetype)
