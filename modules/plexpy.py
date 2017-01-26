@@ -64,6 +64,8 @@ class Plexpy(object):
     def _build_methods(cls):
         """Helper to build endspoints like plexpy api"""
         r = cls._fetch(**{'cmd': 'docs'})
+        if not r:
+            return
 
         def dummy(func_name='', *args, **kwargs):
             d = {'cmd': func_name}
@@ -83,6 +85,7 @@ class Plexpy(object):
 
         return r
 
+
     def _fetch(cls, *args, **kwargs):
         """Get stuff from plexpy and handles errors"""
         apikey = htpc.settings.get('plexpy_apikey')
@@ -92,14 +95,13 @@ class Plexpy(object):
 
         url = '%sapi/v2?apikey=%s&%s' % (cls._build_url(), apikey, urlencode(kwargs))
 
-        r = requests.get(url)
-        r.raise_for_status()
-        # Lets just copy the headers for now.
-        cherrypy.response.headers['Content-Type'] = r.headers.get('Content-Type', 'application/json;charset=UTF-8')
-
         try:
+            r = requests.get(url)
+            r.raise_for_status()
+            # Lets just copy the headers for now.
+            cherrypy.response.headers['Content-Type'] = r.headers.get('Content-Type', 'application/json;charset=UTF-8')
             resp = r.json()
             if resp.get('response', {}).get('result') == 'success':
                 return resp['response']['data']
         except:
-            return r.content
+            return

@@ -42,17 +42,20 @@ webdir = htpc.WEBDIR
     % else:
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/bootstrap.min.css" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/themes/${s.get('app_theme_mig','obsidian')}/bootstrap-responsive.min.css" rel="stylesheet">
+    <!--<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">-->
     % endif
     % if s.get('app_use_cdn', 0):
 	    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/css/base/minified/jquery-ui.min.css" rel="stylesheet">
 	    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/css/filter.formatter.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.css" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.13/r-2.1.1/datatables.min.css"/>
     % else:
 	    <link href="${htpc.WEBDIR}css/jquery-ui.min.css" rel="stylesheet">
 	    <link href="${htpc.WEBDIR}css/font-awesome.min.css" rel="stylesheet">
         <link href="${htpc.WEBDIR}css/filter.formatter.css" rel="stylesheet">
         <link href="${htpc.WEBDIR}css/fullcalendar.min.css" rel="stylesheet">
+        <link href="${htpc.WEBDIR}css/datatables.min.css" rel="stylesheet">
     % endif
     <link href="${htpc.WEBDIR}css/rg-icons.min.css${nocache}" rel="stylesheet">
     <link href="${htpc.WEBDIR}css/jquery.pnotify.default.css" rel="stylesheet">
@@ -64,11 +67,11 @@ webdir = htpc.WEBDIR
 <div class="navbar navbar-fixed-top navbar-inverse">
     <div class="navbar-inner">
         <div class="container-fluid">
-            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".navbar-collapse">
                 <i class="fa fa-bars fa-inverse"></i>
             </a>
             <a href="${htpc.WEBDIR}"><i class="rg rg-htpc brand"></i></a>
-            <div class="nav-collapse">
+            <div class="navbar-collapse">
                 <ul class="nav" id="nav-menu">
                     <div class="mobile-search hidden-desktop visible-phone visible-tablet">
                         %if s.get('newznab_enable'):
@@ -219,21 +222,20 @@ ${self.body()}
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
   <!-- dont remove this until squeezebox is checked -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/js/jquery.tablesorter.combined.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/js/parsers/parser-ignore-articles.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.22.3/js/parsers/parser-ignore-articles.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/holder/1.9/holder.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.2/moment.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/2.6.0/fullcalendar.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.13/r-2.1.1/datatables.min.js"></script>
 % else:
 	<script src="${htpc.WEBDIR}js/libs/jquery.min.js"></script>
 	<script src="${htpc.WEBDIR}js/libs/jquery-ui.min.js"></script>
-
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.13/r-2.1.1/datatables.min.js"></script>
     <!-- Leave this until squeezebox is checked -->
 	<script src="${htpc.WEBDIR}js/libs/jquery.cookie.min.js"></script>
-
-
 	<script src="${htpc.WEBDIR}js/libs/bootstrap.min.js"></script>
 	<script src="${htpc.WEBDIR}js/libs/holder.js"></script>
 	<script src="${htpc.WEBDIR}js/libs/moment.js"></script>
@@ -243,6 +245,8 @@ ${self.body()}
     <script src="${htpc.WEBDIR}js/libs/jquery.tablesorter.combined.min.js"></script>
     <script src="${htpc.WEBDIR}js/libs/parsers/parser-ignore-articles.js"></script>
     <!-- end tablesorter -->
+    <!-- DataTables -->
+    <script src="${htpc.WEBDIR}js/libs/datatables.min.js"></script>
 % endif
   <script src="${htpc.WEBDIR}js/libs/re-bootstrap.min.js"></script>
 % if s.get('app_theme_mig') == 'aurora':
