@@ -1,3 +1,5 @@
+# This systemd unit file works for CentOS 7
+
 [Unit]
   Description=HTPC Manager Daemon
   After=network.target
@@ -6,11 +8,8 @@
   User=<user>
   Group=<user>
   Type=forking
-  ExecStart=/usr/bin/python /path/to/HTPCManager/Htpc.py --daemon --datadir </path/to/HTPCManager>/userdata --pid </path/to/HTPCManager>/userdata/htpcmanager.pid
+  ExecStart=-/usr/bin/python /path/to/HTPCManager/Htpc.py --daemon --datadir </path/to/HTPCManager>/userdata --pid </path/to/HTPCManager>/userdata/htpcmanager.pid
   PIDFile=</path/to/HTPCManager>/userdata/htpcmanager.pid
-  KillMode=process
-  Restart=on-failure
      
 [Install]
   WantedBy=multi-user.target
-
