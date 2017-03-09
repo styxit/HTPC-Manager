@@ -1,0 +1,51 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+
+
+<div class="container-fluid">
+    <div class="content maincontent">
+        <h1 class="page-header page-title">
+            <a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'} title="Open original PlexPy interface">${settings.get('plexpy_name', 'Plexpy')}</a>
+            <span class="small-font" id="sessions"></span>
+            <div class="btn-group pull-right">
+                <! -- If necessary add major plexpy functions (Update, Restart) -- >
+            </div>
+        </h1>
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#ca" data-toggle="tab">Current Activity & Stats </a></li>
+            <li><a href="#history" data-toggle="tab">History</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="ca">
+                <div id="activity">
+
+                </div>
+                <div id="watchstats">
+
+                </div>
+            </div>
+            <div class="tab-pane" id="history">
+                <table id="history_table" class="dt-history-table" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>User</th>
+                            <th>IP Address</th>
+                            <th>Platform</th>
+                            <th>Player</th>
+                            <th>Title</th>
+                            <th>Started</th>
+                            <th>Paused</th>
+                            <th>Stopped</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
