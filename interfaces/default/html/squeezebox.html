@@ -1,6 +1,6 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
+<div class="container-fluid">
     <div class="content maincontent">
         <h1 class="page-header page-title">
             <a href="http://${settings.get('squeezebox_host', '')}:${settings.get('squeezebox_port', '')}" target="_blank">${settings.get('squeezebox_name', 'Squeezebox')}</a>
