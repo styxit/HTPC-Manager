@@ -1,0 +1,71 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+<div class="container">
+    <div class="content">
+        <h1 class="page-header page-title">
+            <span>${settings.get('vera_name', 'Vera')} - ${settings.get('vera_host', '')}</span>
+        </h1>
+    
+        <ul class="nav nav-tabs">
+        <li id="lightsl" class="active"><a href="#lights" data-toggle="tab" id="tab-lights">Lights</a></li>
+        <li id="plugsl"><a href="#plugs" data-toggle="tab" id="tab-plugs">Plugs</a></li>
+        <li id="locksl"><a href="#locks" data-toggle="tab" id="tab-locks">Locks</a></li>
+        <li id="therml"><a href="#therm" data-toggle="tab" id="tab-therm">Thermostat</a></li>
+        </ul>
+        
+        <div class="tab-content">
+            <div id="lights" class="tab-pane active">
+                <table class="table devicetable table-striped table-hover">
+                    <thead>
+                        <tr>
+                        <th>Room</th>
+                        <th class="">Device</th>
+                        <th class="">Action</th>
+                        </tr>
+                    </thead>                   
+                    <tbody id="lightslist"></tbody>
+                </table>
+                <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
+            </div>
+            <div id="plugs" class="tab-pane">
+                <table class="table devicetable table-striped table-hover">
+                    <thead>
+                        <tr>
+                        <th>Room</th>
+                        <th class="">Device</th>
+                        <th class="">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="plugslist"></tbody>
+                </table> 
+                <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
+            </div>
+            <div id="locks" class="tab-pane">
+                <table class="table devicetable table-striped table-hover">
+                    <thead>
+                        <tr>
+                        <th>Room</th>
+                        <th class="">Device</th>
+                        <th class="">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lockslist"></tbody>
+                </table>
+                <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
+            </div>
+            <div id="therm" class="tab-pane">
+                <table class="table devicetable table-striped table-hover">
+                    <thead>
+                        <tr>
+                        <th>Room</th>
+                        <th class="">Device</th>
+                        <th class="">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="thermlist"></tbody>
+                </table>
+                <span id="error_message"><i class="icon-spinner icon-spin spinner"></i></span>
+            </div>
+        </div>		 
+    </div>
+</div>

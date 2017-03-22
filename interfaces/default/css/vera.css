@@ -1,0 +1,46 @@
+h1.page-header.page-title {
+	margin: -20px -20px 5px;
+}
+.table.nwtable td{
+	padding:0px !important;
+	border-top: 0px none #ddd !important;
+	text-align: center;
+}
+
+.devicetable {
+	margin: 0.3% 0 0 0 !important;
+}
+
+.table.nwtable {
+	margin-bottom:0px !important;
+}
+
+td.tlip {
+	font-size: 13px !important;
+}
+
+td.txip {
+	font-size: 13px !important;
+}
+
+table.networktable {
+	table-layout: fixed;
+	word-wrap: break-word !important;
+}
+
+.nwtable tr td{
+	font-weight: 200;
+}
+/* First td should not have the smaller font */
+.nwtable tr td:first-child{
+	text-align: center;
+	font-weight: bold;
+}
+
+#statscmd {
+	margin-top:10px;
+}
+
+.alert.helper-block{
+	margin-bottom: 0px !important;
+}
