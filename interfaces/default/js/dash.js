@@ -9,6 +9,7 @@ $(document).ready(function () {
     loadNZBGetDownloadHistory()
     loadWantedMovies()
     loadNextAired()
+    loadNZBDroneCalendar()
 })
 
 function loadRecentMovies () {
@@ -260,4 +261,23 @@ function loadNextAired(options) {
             )
         })
     })
+}
+
+function loadNZBDroneCalendar(options) {
+    if (!$('#calendar_table_body').length) return
+    $.getJSON(WEBDIR + 'nzbdrone/Calendar', function (result) {
+        $.each(result, function (i, cal) {
+          if (i >= 5) return
+            var name = $('<a>').attr('href', 'nzbdrone/View/' + cal.seriesId + '/' + cal.series.tvdbId + '#' + cal.seasonNumber).html(cal.series.title)
+            var row = $('<tr>'); 
+            row.append(
+            $('<td>').append(name),
+            $('<td>').text(cal.title),
+            $('<td>').text(moment(cal.airDateUtc).fromNow())
+            )
+     
+            $('#calendar_table_body').append(row);
+        });
+
+    });
 }

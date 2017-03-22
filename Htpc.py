@@ -83,6 +83,8 @@ def load_modules():
     htpc.ROOT.plex = Plex()
     from modules.users import Users
     htpc.ROOT.users = Users()
+    from modules.nzbdrone import NzbDrone
+    htpc.ROOT.nzbdrone = NzbDrone()
 
 def main():
     """
