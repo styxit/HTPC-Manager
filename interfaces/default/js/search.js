@@ -67,11 +67,23 @@ function search(query, catid) {
 
                 var toSabIcon = $('<i>');
                 toSabIcon.addClass('icon-download-alt');
+                toSabIcon.attr('title', 'Send to SABnzbd')
+                toSabIcon.attr('alt', 'Send to NzbGet')
                 toSabIcon.css('cursor', 'pointer');
                 toSabIcon.click(function() {
-                    sendToSab(item.link)
+                    sendToSab(item)
                 });
                 row.append($('<td>').append(toSabIcon));
+
+                var toGetIcon = $('<i>');
+                toGetIcon.addClass('icon-download-alt');
+                toGetIcon.css('cursor', 'pointer');
+                toGetIcon.attr('title', 'Send to NzbGet')
+                toGetIcon.attr('alt', 'Send to NzbGet')
+                toGetIcon.click(function() {
+                    sendToGet(item)
+                });
+                row.append($('<td>').append(toGetIcon));
 
                 $('#results_table_body').append(row);
                 if (stop) return false;
@@ -140,8 +152,12 @@ function showDetails(data) {
     modalBody.append(modalInfo);
 
     var modalButtons = {
-        'Download' : function () {
-            sendToSab(data.link)
+        'SABnzbd' : function () {
+            sendToSab(data)
+            hideModal();
+        },
+        'NZBGget': function() {
+            sendToGet(data)
             hideModal();
         }
     }
@@ -172,14 +188,26 @@ function showDetails(data) {
     showModal(modalTitle, modalBody, modalButtons);
 }
 
-function sendToSab(url) {
+function sendToSab(item) {
     return $.ajax({
         url: WEBDIR + 'sabnzbd/AddNzbFromUrl',
         type: 'post',
         dataType: 'json',
-        data: {nzb_url: url},
+        data: {nzb_url: item.link},
         success: function (result) {
-            notify('', 'Sent to SabNZBd', 'info');
+            notify('', 'Sent ' + item.description+ ' to SabNZBd', 'info');
+        }
+    });
+}
+
+function sendToGet(item) {
+    return $.ajax({
+        url: WEBDIR + 'nzbget/AddNzbFromUrl',
+        type: 'post',
+        dataType: 'json',
+        data: {nzb_url: item.link},
+        success: function (result) {
+            notify('', 'Sent ' + item.description+ ' to NzbGet', 'info');
         }
     });
 }
