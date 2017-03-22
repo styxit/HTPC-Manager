@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import traceback
-import sys
-import os
 import cherrypy
 import htpc
 import urllib2
@@ -15,11 +12,11 @@ import cookielib
 from StringIO import StringIO
 from cherrypy.lib.auth2 import require
 
+
 class Deluge:
 
     cookieJar = cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookieJar))
-
 
     def __init__(self):
         self.logger = logging.getLogger('modules.deluge')
@@ -35,24 +32,34 @@ class Deluge:
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'deluge_ssl'},
                 {'type': 'text', 'label': 'Basepath', 'name': 'deluge_basepath'},
                 {'type': 'password', 'label': 'Password', 'name': 'deluge_password'}
-        ]})
+            ]
+        })
 
     @cherrypy.expose()
     @require()
     def index(self):
         return htpc.LOOKUP.get_template('deluge.html').render(scriptname='deluge')
-   
+
+    def webinterface(self):
+        host = htpc.settings.get('deluge_host', '')
+        port = str(htpc.settings.get('deluge_port', ''))
+        deluge_basepath = str(htpc.settings.get('deluge_basepath', ''))
+        ssl = 's' if htpc.settings.get('deluge_ssl') else ''
+
+        url = 'http%s://%s:%s%s' % (ssl, host, port, deluge_basepath)
+        return url
+
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def connected(self):
-        return self.fetch('web.connected')   
-    
+        return self.fetch('web.connected')
+
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def connect(self,hostid):
-        return self.fetch('web.connect',[hostid])
+    def connect(self, hostid):
+        return self.fetch('web.connect', [hostid])
 
     @cherrypy.expose()
     @require()
@@ -64,15 +71,17 @@ class Deluge:
     @require()
     @cherrypy.tools.json_out()
     def queue(self):
-        fields = ['progress','is_finished','ratio','name','download_payload_rate','upload_payload_rate','eta','state','hash','total_size']
-        return self.fetch('core.get_torrents_status', [[],fields])
+        fields = ['progress', 'is_finished', 'ratio', 'name', 'download_payload_rate',
+                  'upload_payload_rate', 'eta', 'state', 'hash', 'total_size']
+
+        return self.fetch('core.get_torrents_status', [[], fields])
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def stats(self):
-        fields = ["payload_download_rate","payload_upload_rate"]
-        return self.fetch('core.get_session_status',[fields])
+        fields = ["payload_download_rate", "payload_upload_rate"]
+        return self.fetch('core.get_session_status', [fields])
 
     @cherrypy.expose()
     @require()
@@ -86,60 +95,54 @@ class Deluge:
     @cherrypy.tools.json_out()
     def stop(self, torrentId):
         torrents = [torrentId]
-        return self.fetch('core.pause_torrent',[torrents])
+        return self.fetch('core.pause_torrent', [torrents])
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def remove(self, torrentId, removeData):
-        removeDataBool = bool(int(removeData));
-        return self.fetch('core.remove_torrent', [torrentId,removeDataBool])
+        removeDataBool = bool(int(removeData))
+        return self.fetch('core.remove_torrent', [torrentId, removeDataBool])
 
     # Wrapper to access the Deluge Api
     # If the first call fails, there probably is no valid Session ID so we try it again
     def fetch(self, method, arguments=[]):
         """ Do request to Deluge api """
-        self.logger.debug("Request deluge method: "+method)
+        self.logger.debug("Request deluge method: " + method)
 
         # format post data
-        data = {'id':1,'method': method,'params':arguments}
-           
-    
+        data = {'id': 1, 'method': method, 'params': arguments}
+
         response = self.read_data(data)
-        self.logger.debug ("response is %s" %response)
+        self.logger.debug("response is %s" % response)
         if response and response['error']:
             self.auth()
             response = self.read_data(data)
-            self.logger.debug ("response is %s" %response)
+            self.logger.debug("response is %s" % response)
         return response
 
     def auth(self):
-        self.read_data({"method": "auth.login","params": [htpc.settings.get('deluge_password', '')],"id": 1})
+        self.read_data({"method": "auth.login", "params": [htpc.settings.get('deluge_password', '')], "id": 1})
 
-        
-    def read_data(self,data):
+    def read_data(self, data):
         try:
             self.logger.debug("Read data from server")
-
-            host = htpc.settings.get('deluge_host', '')
-            port = str(htpc.settings.get('deluge_port', ''))
-            
             host = htpc.settings.get('deluge_host', '')
             port = str(htpc.settings.get('deluge_port', ''))
             deluge_basepath = str(htpc.settings.get('deluge_basepath', ''))
             ssl = 's' if htpc.settings.get('deluge_ssl') else ''
 
-            url = 'http' + ssl + '://' +  host + ':' + str(port) + deluge_basepath + '/json'
-            
+            url = 'http' + ssl + '://' + host + ':' + str(port) + deluge_basepath + '/json'
+
             post_data = dumps(data)
-            buf = StringIO( self.opener.open(url, post_data,1).read())
+            buf = StringIO(self.opener.open(url, post_data, 1).read())
             f = gzip.GzipFile(fileobj=buf)
             response = loads(f.read())
-            self.logger.debug ("response for %s is %s" %(data,response))
+            self.logger.debug("response for %s is %s" % (data, response))
             return response
         except urllib2.URLError:
-            self.logger.error ("can't connect with %s" %data)
-            return {'result':{},'error':"can't connect with %s" %data}
+            self.logger.error("can't connect with %s" % data)
+            return {'result': {}, 'error': "can't connect with %s" % data}
         except socket.timeout:
-            self.logger.error ("timeout when connect with %s" %data)
-            return {'result':{},'error':"can't connect with %s" %data}
+            self.logger.error("timeout when connect with %s" % data)
+            return {'result': {}, 'error': "can't connect with %s" % data}
