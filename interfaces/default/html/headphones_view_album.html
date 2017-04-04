@@ -1,0 +1,68 @@
+<%inherit file="base.html"/>
+<div class="container">
+    <div class="content maincontent headphones_album">
+        <h1 class="page-header page-title" data-artistid="${artist_id}" data-albumid="${album_id}">
+            <span class="headphones_albumname">${album['AlbumTitle']}</span>
+            <div class="btn-group show-options-menu pull-right">
+                <a class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="icon-wrench"></i>&nbsp;<span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="full-update">Force full update</a></li>
+                    <li><a href="#" class="rescan-files">Rescan files</a></li>
+                </ul>
+            </div>
+        </h1>
+
+        <ul class="breadcrumb">
+            <li><a href="/">Home</a> <span class="divider">/</span></li>
+            <li><a href="/headphones">${module_name}</a> <span class="divider">/</span></li>
+            <li class="headphones_artistname"><a href="/headphones/viewArtist/${artist_id}">${album['ArtistName']}</a> <span class="divider">/</span></li>
+            <li class="headphones_albumname">${album['AlbumTitle']}</li>
+        </ul>
+
+        <div id="banner" class="row-fluid banner">
+            <div class="album_details span4 pull-right">
+                <div id="album_details_top" class="span4"></div>
+                <strong>Album details</strong>
+                <table class="table table-condensed">
+                    <tr>
+                        <td>Status</td>
+                        <td class="headphones_album_status">${album['Status']}</td>
+                    </tr>
+                    <tr>
+                        <td>Tracks</td>
+                        <td class="headphones_album_tracks">${len(tracks)}</td>
+                    </tr>
+                    <tr>
+                        <td>Release Date</td>
+                        <td class="headphones_release_date">${album['ReleaseDate']}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div id="tracks">
+            <table class="table table-striped table-condensed table-sortable">
+                <thead>
+                <tr>
+                    <th>Track</th>
+                    <th>Title</th>
+                    <th>Length</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                % for track in tracks:
+                <tr>
+                    <td>${track['TrackNumber']}</td>
+                    <td>${track['TrackTitle']}</td>
+                    <td>${track['DurationText']}</td>
+                    <td>${track['TrackStatus']}</td>
+                </tr>
+                % endfor
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
