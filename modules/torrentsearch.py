@@ -87,7 +87,7 @@ class Torrentsearch(object):
     def btn(self, query=None):
         result = None
         try:
-            btn = jsonrpclib.Server('http://api.btnapps.net')
+            btn = jsonrpclib.Server('https://api.broadcasthe.net')
             result = btn.getTorrents(htpc.settings.get('torrents_btn_apikey', ''), query, 999)
         except Exception as e:
             self.logger.error("Failed to fetch search results from BTN %s" % e)
