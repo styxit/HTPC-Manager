@@ -30,9 +30,6 @@ class Rarbg(object):
             self.__gettoken()
 
         r = self.__fetch(self.urls['search'] % urllib.quote_plus(q))
-        regex_codec = re.compile(r'(x264|x\.264|h264|h\.264|xvid|x265|x\.265|h265|h\.265|mpeg2|divx)', re.I)
-        regex_source = re.compile(r'(HDTV|HD-TV|HD\.TV|WEB-DL|WEB_DL|WEB\.DL|WEB_RIP|WEB-RIP|WEBRip|WEB\.RIP|BRRIP|BDRIP|BluRay(.*)REMUX)|(?i)BluRay(.*)\.(AVC|VC-1)\.|BluRay', re.I)
-        regex_resolution = re.compile(r'(sd|480p|480i|720p|720i|1080p|1080i|2160p)', re.I)
         if 'torrent_results' in r:
             if r['torrent_results']:
                 for torrent in r['torrent_results']:
@@ -48,27 +45,6 @@ class Rarbg(object):
                         'Snatched': 'N/A',
                     }
 
-                    codec = re.search(regex_codec, torrent['title'])
-                    if codec:
-                        codec = codec.group()
-                    else:
-                        codec = 'N/A'
-
-                    resolution = re.search(regex_resolution, torrent['title'])
-                    if resolution:
-                        resolution = resolution.group()
-                    else:
-                        resolution = 'N/A'
-
-                    source = re.search(regex_source, torrent['title'])
-                    if source:
-                        source = source.group()
-                    else:
-                        source = 'N/A'
-
-                    d['Source'] = source
-                    d['Resolution'] = resolution
-                    d['Codec'] = codec
                     l.append(d)
 
                 self.logger.debug('Found %s torrents' % len(l))

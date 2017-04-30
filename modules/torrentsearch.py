@@ -1,16 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import htpc
+
+import logging
+import re
+
 import cherrypy
 import jsonrpclib
-import logging
+
+import htpc
 from ts import norbits
 from ts import ka
 from ts import ptp
 from ts import rarbg
 from ts import torrentproject
+from ts import jackett2
 from cherrypy.lib.auth2 import require
+
+
+regex_codec = re.compile(r'(x264|x\.264|h264|h\.264|xvid|x265|x\.265|h265|h\.265|mpeg2|divx)', re.I)
+regex_source = re.compile(r'(HDTV|HD-TV|HD\.TV|WEB-DL|WEB_DL|WEB\.DL|WEB_RIP|WEB-RIP|WEBRip|WEB\.RIP|BRRIP|BDRIP|BluRay(.*)REMUX)|(?i)BluRay(.*)\.(AVC|VC-1)\.|BluRay', re.I)
+regex_resolution = re.compile(r'(sd|480p|480i|720p|720i|1080p|1080i|2160p)', re.I)
 
 
 class Torrentsearch(object):
@@ -34,7 +44,13 @@ class Torrentsearch(object):
                 {'type': 'password', 'label': 'PTP passkey', 'name': 'torrents_ptp_passkey'},
                 {'type': 'bool', 'label': 'Rarbg', 'name': 'torrents_rarbg_enabled'},
                 {'type': 'bool', 'label': 'KAT', 'name': 'torrents_ka_enabled'},
-                {'type': 'bool', 'label': 'Torrent project', 'name': 'torrents_torrentproject_enabled', 'desc': 'DTH tracker'}
+                {'type': 'bool', 'label': 'Torrent project', 'name': 'torrents_torrentproject_enabled', 'desc': 'DTH tracker'},
+                {'type': 'bool', 'label': 'Jackett', 'name': 'torrents_jackett_enabled'},
+                {'type': 'text', 'label': 'Jackett host', 'name': 'torrents_jackett_host'},
+                {'type': 'text', 'label': 'Jackett port', 'name': 'torrents_jackett_port'},
+                {'type': 'bool', 'label': 'Jackett ssl', 'name': 'torrents_jackett_ssl'},
+                {'type': 'password', 'label': 'Jackett apikey', 'name': 'torrents_jackett_apikey'},
+
             ]
         })
 
@@ -49,6 +65,7 @@ class Torrentsearch(object):
     def search(self, query=None, provider='all'):
         self.logger.debug(query)
         self.logger.debug(provider)
+
         r = []
 
         if provider == 'all':
@@ -64,6 +81,8 @@ class Torrentsearch(object):
                 r += self.search_rarbg(query, None)
             if htpc.settings.get('torrents_torrentproject_enabled'):
                 r += self.search_torrentproject(query, None)
+            if htpc.settings.get('torrents_jackett_enabled'):
+                r += self.search_jackett(query, None)
 
         elif provider == 'btn':
             if htpc.settings.get('torrents_btn_enabled'):
@@ -80,6 +99,35 @@ class Torrentsearch(object):
         elif provider == 'norbits':
             if htpc.settings.get('torrents_norbits_enabled'):
                 r += self.search_norbits(query, 'all')
+
+        elif provider == 'jackett':
+            if htpc.settings.get('torrents_jackett_enabled'):
+                r += self.search_jackett(query, '')
+
+        for res in r:
+            if not res.get('Source') or res.get('Source') == 'N/A':
+                source = re.search(regex_source, res['ReleaseName'])
+                if source:
+                    source = source.group()
+                else:
+                    source = 'N/A'
+                res['Source'] = source
+
+            if not res.get('Codec') or res.get('Codec') == 'N/A':
+                codec = re.search(regex_codec, res['ReleaseName'])
+                if codec:
+                    codec = codec.group()
+                else:
+                    codec = 'N/A'
+                res['Codec'] = codec
+
+            if not res.get('Resolution') or res.get('Resolution') == 'N/A':
+                resolution = re.search(regex_resolution, res['ReleaseName'])
+                if resolution:
+                    resolution = resolution.group()
+                else:
+                    resolution = 'N/A'
+                res['Resolution'] = resolution
 
         self.logger.debug('Found %s torrents in total' % len(r))
         return r
@@ -132,6 +180,10 @@ class Torrentsearch(object):
 
         if htpc.settings.get('torrents_torrentproject_enabled') == 1:
             torrentproviders.append('torrentproject')
+
+        if (htpc.settings.get('torrents_jackett_enabled') == 1 and htpc.settings.get('torrents_jackett_host') and
+            htpc.settings.get('torrents_jackett_port') and htpc.settings.get('torrents_jackett_apikey')):
+            torrentproviders.append('jackett')
 
         return torrentproviders
 
@@ -213,3 +265,6 @@ class Torrentsearch(object):
 
     def search_torrentproject(self, q, cat):
         return torrentproject.Torrentproject().search(q, cat)
+
+    def search_jackett(self, q, cat='all'):
+        return jackett2.jackett(q, cat)
