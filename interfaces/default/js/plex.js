@@ -123,7 +123,7 @@ function loadMovies(options) {
                 $.each(data.movies, function (i, movie) {
                     var movieItem = $('<li>').attr('title', movie.title);
 
-                    var movieAnchor = $('<a>').attr('href', '#').click(function(e) {
+                    var movieAnchor = $('<a>').attr('href', '#').attr('name', movie.title).click(function(e) {
                         e.preventDefault();
                         loadMovie(movie);
                     });

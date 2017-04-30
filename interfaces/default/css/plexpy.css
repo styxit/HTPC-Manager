@@ -1,0 +1,92 @@
+.p-sm {
+    padding: 5px;
+}
+
+.p-l-md {
+    padding-left: 10px;
+}
+
+.p-lr-sm {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.small-font {
+    font-size: 15px;
+}
+
+.progress {
+    margin-bottom: 0 !important;
+    margin-top: -40px;
+}
+
+.top-title {
+    position: relative;
+    top: 19px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #000000;
+}
+#history_table {
+    color: #000000;
+}
+#history_table th{
+    background-color: #f2f2f2;
+}
+
+.meta-overlay {
+    position: relative;
+    padding-left: 5px;
+    padding-right: 5px;
+    top: -40px;
+    background-color: rgba(10, 10, 10, 0.6);
+    color: #f2f2f2;
+    font-size: small;
+    font-weight: bold;
+    visibility: hidden;
+}
+
+.stat-holder{
+    height: 145px;
+}
+
+.stat-poster {
+    width: 80px;
+    height: 120px;
+    border: 2px solid #f6f6f6;
+}
+
+.stat-highlights {
+    margin-left: 100px;
+    color: #ffffff;
+}
+
+.stat-highlights h2, h3 {
+    color: #ffffff;
+}
+
+.stat-highlights h3 {
+    display: inline;
+}
+
+.fa-white {
+    color: #ffffff;
+}
+.dt-history-table{
+    font-size: small;
+}
+td.no-wrap, th.no-wrap {
+    white-space: nowrap;
+}
+.stat-cover {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #f6f6f6;
+    margin-top: 20px;
+}
+#watchstats{
+    padding-top: 10px;
+    border-top: 2px solid #c4c4c4;
+}
+#activity{
+    margin-top: -20px;
+}

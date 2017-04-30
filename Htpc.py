@@ -107,6 +107,8 @@ def load_modules():
     htpc.ROOT.mylar = Mylar()
     from modules.rtorrent import RTorrent
     htpc.ROOT.rtorrent = RTorrent()
+    from modules.plexpy import Plexpy
+    htpc.ROOT.plexpy = Plexpy()
 
 def init_sched():
     from apscheduler.schedulers.background import BackgroundScheduler

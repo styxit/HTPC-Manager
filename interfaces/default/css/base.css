@@ -259,3 +259,9 @@ table th.tablesorter-header {
   border-color: #5cb85c;
   background-color: #5cb85c;
 }
+
+/* This is a hack, but im to lazy to fix it properly */
+.bootstrap-switch-container {
+    width: 110px !important;
+}
+
