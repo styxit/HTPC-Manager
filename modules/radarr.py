@@ -24,12 +24,16 @@ class Radarr(object):
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'radarr_enable'},
                 {'type': 'text', 'label': 'Menu name', 'name': 'radarr_name'},
-                {'type': 'text', 'label': 'IP / Host', 'placeholder': 'localhost', 'name': 'radarr_host'},
-                {'type': 'text', 'label': 'Port', 'placeholder': '7878', 'name': 'radarr_port'},
-                {'type': 'text', 'label': 'Basepath', 'placeholder': '/radarr', 'name': 'radarr_basepath'},
+                {'type': 'text', 'label': 'IP / Host',
+                    'placeholder': 'localhost', 'name': 'radarr_host'},
+                {'type': 'text', 'label': 'Port',
+                    'placeholder': '7878', 'name': 'radarr_port'},
+                {'type': 'text', 'label': 'Basepath',
+                    'placeholder': '/radarr', 'name': 'radarr_basepath'},
                 {'type': 'text', 'label': 'API KEY', 'name': 'radarr_apikey'},
                 {'type': 'bool', 'label': 'Use SSL', 'name': 'radarr_ssl'},
-                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '', 'desc': 'Reverse proxy link, e.g. https://radarr.domain.com', 'name': 'radarr_reverse_proxy_link'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '',
+                    'desc': 'Reverse proxy link, e.g. https://radarr.domain.com', 'name': 'radarr_reverse_proxy_link'},
 
             ]
         })
@@ -67,7 +71,8 @@ class Radarr(object):
 
             headers = {'X-Api-Key': htpc.settings.get('radarr_apikey', '')}
 
-            url = 'http%s://%s:%s%sapi/%s' % (ssl, host, port, radarr_basepath, path)
+            url = 'http%s://%s:%s%sapi/%s' % (ssl,
+                                              host, port, radarr_basepath, path)
 
             if banner:
                 #  the path includes the basepath automaticly (if fetched from api command 'Series')
@@ -75,15 +80,18 @@ class Radarr(object):
                 return get_image(url, headers=headers)
 
             if type == 'post':
-                r = requests.post(url, data=dumps(data), headers=headers, verify=False)
+                r = requests.post(url, data=dumps(
+                    data), headers=headers, verify=False)
                 return r.content
 
             elif type == 'put':
-                r = requests.put(url, data=dumps(data), headers=headers, verify=False)
+                r = requests.put(url, data=dumps(
+                    data), headers=headers, verify=False)
                 return r.content
 
             elif type == 'delete':
-                r = requests.delete(url, data=dumps(data), headers=headers, verify=False)
+                r = requests.delete(url, data=dumps(
+                    data), headers=headers, verify=False)
                 return r.content
 
             else:
@@ -91,7 +99,8 @@ class Radarr(object):
                 return loads(r.text)
 
         except Exception as e:
-            self.logger.error('Failed to fetch url=%s path=%s error %s' % (url, path, e))
+            self.logger.error(
+                'Failed to fetch url=%s path=%s error %s' % (url, path, e))
             return []
 
     @cherrypy.expose()
@@ -105,7 +114,8 @@ class Radarr(object):
 
             headers = {'X-Api-Key': str(radarr_apikey)}
 
-            url = 'http%s://%s:%s%sapi/system/status' % (ssl, striphttp(radarr_host), radarr_port, radarr_basepath)
+            url = 'http%s://%s:%s%sapi/system/status' % (
+                ssl, striphttp(radarr_host), radarr_port, radarr_basepath)
 
             result = requests.get(url, headers=headers, verify=False)
             return result.json()
@@ -122,22 +132,22 @@ class Radarr(object):
     @require()
     @cherrypy.tools.json_out()
     def Movies(self):
-        ''' Return info about all your shows '''
+        ''' Return info about all your movies '''
         return self.fetch('Movie')
 
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def Show(self, id, tvdbid=None):
-        ''' Details about one show '''
-        return self.fetch('Series/%s' % id)
+    def Movie(self, id, tmdbId=None):
+        ''' Details about one movie '''
+        return self.fetch('Movie/%s' % id)
 
     @cherrypy.expose()
     @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
-    def Delete_Show(self, id, title, delete_date=None):
-        self.logger.debug('Deleted tvshow %s' % title)
-        return self.fetch('Series/%s' % id, type='delete')
+    def Delete_Movie(self, id, title, delete_date=None):
+        self.logger.debug('Deleted movie %s' % title)
+        return self.fetch('Movie/%s' % id, type='delete')
 
     @cherrypy.expose()
     @require()
@@ -157,15 +167,21 @@ class Radarr(object):
     def Calendar(self, param=None, *args, **kwargs):
         kwargs.pop('_')
         p = urllib.urlencode(kwargs)
-        episodes = self.fetch('Calendar?%s' % p)
+        movies = self.fetch('Calendar?%s' % p)
         cal = []
-        if episodes:
-            for episode in episodes:
+        if movies:
+            for movie in movies:
                 d = {
-                    'title': episode['title'],
-                    'status': episode['status'],
-                    'inCinemas': episode['inCinemas'],
-                    'physicalRelease': episode['physicalRelease'],
+                    'tmdbId': movie['tmdbId'],
+                    'title': movie['title'],
+                    'status': movie['status'],
+                    'inCinemas': movie['inCinemas'],
+                    'start': movie['inCinemas'],
+                    'overview': movie.get('overview', ''),
+                    'all': movie,
+                    'physicalRelease': movie['physicalRelease'],
+                    'allDay': False,
+                    'id': movie['id'],
                 }
 
                 cal.append(d)
@@ -174,19 +190,12 @@ class Radarr(object):
 
     @cherrypy.expose()
     @require()
-    def View(self, tvdbid, id):
-        if not (tvdbid.isdigit()):
-            raise cherrypy.HTTPError('500 Error', 'Invalid show ID.')
-            self.logger.error('Invalid show ID was supplied: ' + str(id))
+    def View(self, tmdbId, id):
+        if not (tmdbId.isdigit()):
+            raise cherrypy.HTTPError('500 Error', 'Invalid movie ID.')
+            self.logger.error('Invalid movie ID was supplied: ' + str(id))
             return False
-        # tvdbid is acctually id, and id is tvdbid....
-        return htpc.LOOKUP.get_template('radarr_view.html').render(scriptname='radarr_view', tvdbid=tvdbid, id=id)
-
-    @cherrypy.expose()
-    @require()
-    @cherrypy.tools.json_out()
-    def Episodes(self, id):
-        return self.fetch('episode?seriesId=%s' % id)
+        return htpc.LOOKUP.get_template('radarr_view.html').render(scriptname='radarr_view', tmdbId=tmdbId, id=id)
 
     @cherrypy.expose()
     @require()
@@ -194,26 +203,6 @@ class Radarr(object):
         self.logger.debug('Fetching Banner')
         cherrypy.response.headers['Content-Type'] = 'image/jpeg'
         return self.fetch(url, banner=True)
-
-    @cherrypy.expose()
-    @require()
-    @cherrypy.tools.json_out()
-    def Episode(self, id):
-        self.logger.debug('Fetching Episode info')
-        return self.fetch('episode/%s' % id)
-
-    @cherrypy.expose()
-    @require()
-    @cherrypy.tools.json_out()
-    def Episodesqly(self, id):
-        self.logger.debug('Fetching fileinfo for all episodes in a show')
-        return self.fetch('episodefile?seriesId=%s' % id)
-
-    @cherrypy.expose()
-    @require()
-    @cherrypy.tools.json_out()
-    def Episodeqly(self, id):
-        return self.fetch('episodefile/%s' % id)
 
     @cherrypy.expose()
     @require()
@@ -241,80 +230,38 @@ class Radarr(object):
     @require()
     @cherrypy.tools.json_out()
     def Lookup(self, q):
-        return self.fetch('Series/lookup?term=%s' % urllib.quote(q))
+        return self.fetch('Movies/lookup?term=%s' % urllib.quote(q))
 
     @cherrypy.expose()
     @require()
-    def AddShow(self, tvdbid, quality, monitor='all', seriestype='standard',
-                rootfolder='', seasonfolder='on', specials=False): # fix me
+    def AddMovie(self, tmdbId, qualityProfileId, rootfolder='', monitored=True):
         d = {}
         try:
-            tvshow = self.fetch('Series/lookup?term=tvdbid:%s' % tvdbid)
-            seasoncount = 1
-            season = []
-            for i in tvshow:
+            movie = self.fetch('Movies/lookup/tmdb?tmdbId=%s' % tmdbId)
 
-                self.logger.debug('monitor=%s' % monitor)
+            self.logger.debug('monitor=%s' % monitored)
 
-                d['title'] = i['title']
-                d['tvdbId'] = int(i['tvdbId'])
-                d['qualityProfileId'] = int(quality)
-                d['profileId'] = int(quality)
-                d['titleSlug'] = i['titleSlug']
-                d['RootFolderPath'] = rootfolder
-                d['monitored'] = True
-                season_monitoring = False
-                d['seriesType'] = seriestype
+            d['title'] = movie['title']
+            d['tmdbId'] = int(movie['tmdbId'])
+            d['qualityProfileId'] = int(qualityProfileId)
+            d['profileId'] = int(qualityProfileId)
+            d['titleSlug'] = movie['titleSlug']
+            d['rootFolderPath'] = rootfolder
+            d['monitored'] = monitored
+            d['images'] = [] # not sure if this is actually required, radarr docs says it is so it's passed TODO voodoo
+            movie.update(d)
 
-                if seasonfolder == 'on':
-                    d['seasonFolder'] = True
-                if specials == 'on':
-                    start_on_season = 0
-                else:
-                    start_on_season = 1
-
-                seasoncount += i['seasonCount']
-
-                options = {'ignoreEpisodesWithFiles': False,
-                           'ignoreEpisodesWithoutFiles': False,
-                           'searchForMissingEpisodes': True}
-
-                if monitor == 'all':
-                    season_monitoring = True
-
-                for x in xrange(start_on_season, int(seasoncount)):
-                    s = {'seasonNumber': x, 'monitored': season_monitoring}
-                    season.append(s)
-
-                if monitor == 'future':
-                    options['ignoreEpisodesWithFiles'] = True
-                    options['ignoreEpisodesWithoutFiles'] = True
-                elif monitor == 'latest':
-                    season[i['seasonCount']]['monitored'] = True
-                elif monitor == 'first':
-                    season[1]['monitored'] = True
-                elif monitor == 'missing':
-                    options['ignoreEpisodesWithFiles'] = True
-                elif monitor == 'existing':
-                    options['ignoreEpisodesWithoutFiles'] = True
-                elif monitor == 'none':
-                    season_monitoring = False
-
-                d['seasons'] = season
-                d['addOptions'] = options
-
-                i.update(d)
-
-                # Manually add correct headers since @cherrypy.tools.json_out() renders it wrong
-                cherrypy.response.headers['Content-Type'] = 'application/json'
-                return self.fetch('Series', data=i, type='post')
+            # Manually add correct headers since @cherrypy.tools.json_out()
+            # renders it wrong
+            cherrypy.response.headers['Content-Type'] = 'application/json'
+            return self.fetch('Movie', data=movie, type='post')
 
         except Exception, e:
-            self.logger.error('Failed to add tvshow %s %s' % (tvdbid, e))
+            self.logger.error('Failed to add movie %s %s' % (tmdbId, e))
 
     @cherrypy.expose()
     @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def test(self):
-        tvshow = self.fetch('Series/lookup?term=tvdbid:70327')
-        return tvshow
+        movie = self.fetch('Movies/lookup?term=tmdbId:70327')
+        return movie

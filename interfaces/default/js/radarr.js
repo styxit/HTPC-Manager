@@ -3,38 +3,35 @@ $(document).ready(function() {
   $(window).trigger('hashchange');
   var qlty = profile();
   var folders = rootfolder();
-  loadShows();
+  loadMovies();
   history();
   cal();
   $('a[data-toggle="tab"]').click(function(e) {}).on('shown', cal)
 
-  var addShowAction = function() {
+  var AddMovieAction = function() {
     var query = $('#add_show_name').val();
     if (query) {
       $('#add_show_button').attr('disabled', true);
-      searchTvDb(query);
+      searchTMDb(query);
     }
   };
   $('#add_show_name').keyup(function(event) {
     if (event.keyCode == 13) {
-      addShowAction();
+      AddMovieAction();
     }
   });
-  $('#add_show_button').click(addShowAction);
+  $('#add_show_button').click(AddMovieAction);
 
   $('#add_tvdbid_button').click(function() {
-    addShow($('#add_show_select').val(),
+    addMovie($('#add_show_select').val(),
       $('#add_show_quality').val(),
-      $('#add_show_monitor').val(),
-      $('#add_show_type').val(),
       $('#add_show_folder').val(),
-      $('#add_show_seasonfolder').val(),
-      $('#add_show_specials').val()
+      $('#add_show_monitor').val() == 'true'
     );
   });
 
   $('#cancel_show_button').click(function() {
-    cancelAddShow();
+    cancelAddMovie();
   });
 
   $('#scanfolder').click(function(e) {
@@ -45,7 +42,7 @@ $(document).ready(function() {
 
 });
 
-function loadShows() {
+function loadMovies() {
   $('.spinner').show();
   $.ajax({
     url: WEBDIR + 'radarr/Movies',
@@ -58,55 +55,21 @@ function loadShows() {
         row.append($('<td>').attr('colspan', '5').html('No shows found'));
         $('#tvshows_table_body').append(row);
       }
-      $.each(result, function(showname, tvshow) { // tvshow.tvdbId
-        var name = $('<a>').attr('href', WEBDIR + 'radarr/View/' + tvshow.id + '/' + tvshow.tvdbId).text(tvshow.title);
+      $.each(result, function(showname, movie) { // tvshow.tvdbId
+        var name = $('<a>').attr('href', WEBDIR + 'radarr/View/' + movie.id + '/' + movie.tmdbId).text(movie.title);
         var row = $('<tr>');
         // Check the global var as radarr dont have quality name only a id.
         $.each(qlty, function(i, q) {
-          if (tvshow.qualityProfileId == q.id) {
+          if (movie.qualityProfileId == q.id) {
             qname = q.name;
           }
         });
-        if (tvshow.nextAiring) {
-          nextair = moment(tvshow.nextAiring).calendar();
-        } else {
-          nextair = '';
-        }
-
-        if (typeof(tvshow.episodeFileCount) == "undefined") {
-          tvshow.episodeFileCount = 0
-        }
-
-
-        if (typeof(tvshow.episodeCount) == "undefined") {
-          tvshow.episodeCount = 0
-        }
-
-        // Start progressbar
-        var calc = (tvshow.episodeFileCount * 100 / tvshow.episodeCount)
-        if (calc == 0) {
-          calc = 100
-        }
-        var progress = $('<div>').addClass("progress")
-        var progressbar = $('<div>').addClass("bar bar-success").css("width", calc + '%')
-        if (tvshow.episodeCount > tvshow.episodeFileCount) {
-          progressbar.removeClass("bar-success").addClass("bar-warning")
-        }
-        // For if no eps are aired
-        if (tvshow.episodeCount === 0) {
-          progressbar.removeClass("bar-success").addClass("bar-danger").css("width", 100 + '%')
-        }
-        var progresstext = $('<span>').text(tvshow.episodeFileCount + '/' + tvshow.episodeCount)
-        progress.append(progressbar, progresstext);
-        // end progressbar
 
         row.append(
           $('<td>').html(name),
-          $('<td>').html(radarrStatusLabel(tvshow.status)),
-          $('<td>').html(nextair),
-          $('<td>').html(progress),
-
-          $('<td>').html(tvshow.network),
+          $('<td>').html(radarrStatusLabel(movie.status)),
+          $('<td>').html(moment(movie.inCinemas).calendar()),
+          $('<td>').html(movie.studio),
           $('<td>').html(radarrStatusLabel(qname)));
         $('#tvshows_table_body').append(row);
       });
@@ -221,7 +184,7 @@ function calendar() {
       var row = $('<tr>');
       var name = $('<a>').attr('href', '#').html(cal.series.title).click(function(e) {
         e.preventDefault();
-        loadShow(cal.seriesId);
+        loadMovie(cal.seriesId);
       });
       var img = makeIcon('fa fa-info-circle', cal.overview);
       row.append(
@@ -236,7 +199,7 @@ function calendar() {
   });
 }
 
-function searchTvDb(query) {
+function searchTMDb(query) {
   $.ajax({
     url: WEBDIR + 'radarr/Lookup/' + encodeURIComponent(query),
     type: 'get',
@@ -254,13 +217,13 @@ function searchTvDb(query) {
       $('#add_show_quality').html('');
       $('#add_show_folder').html('');
       $.each(result, function(i, item) {
-        var tvdbid = item.tvdbId;
-        var showname = item.title;
+        var tmdbId = item.tmdbId;
+        var movie = item.title;
         var year = item.year;
         var option = $('<option>');
         option.attr('data-info', $.makeArray(item));
-        option.attr('value', tvdbid);
-        option.html(showname + ' (' + year + ')');
+        option.attr('value', tmdbId);
+        option.html(movie + ' (' + year + ')');
         $('#add_show_select').append(option);
       });
       $.each(qlty, function(i, quality) {
@@ -289,33 +252,30 @@ function searchTvDb(query) {
   });
 }
 
-function addShow(tvdbid, quality, monitor, seriestype, rootfolder, seasonfolder, specials) {
+function addMovie(tmdbid, quality, rootfolder, monitored) {
   var data = {
     rootfolder: rootfolder,
-    seasonfolder: seasonfolder,
-    monitor: monitor,
-    seriestype: seriestype,
-    specials: specials
+    monitored: monitored
   };
 
   $.ajax({
-    url: WEBDIR + 'radarr/AddShow/' + tvdbid + '/' + quality,
+    url: WEBDIR + 'radarr/AddMovie/' + tmdbid + '/' + quality,
     data: data,
     type: 'get',
     dataType: 'json',
     success: function(data) {
       if (data.title) {
-        notify('Add TV show ' + data.title + '', '', 'success');
-        loadShows();
+        notify('Adding movie ' + data.title + '', '', 'successful');
+        loadMovies();
       } else {
-        notify('Failed to add show ', data[0].errorMessage, 'error');
-        cancelAddShow();
+        notify('Failed to add movie ', data[0].errorMessage, 'error');
+        cancelAddMovie();
       }
     }
   });
 }
 
-function cancelAddShow() {
+function cancelAddMovie() {
   $('#add_show_name').val('');
   $('#add_show_quality').val('');
   $('#add_show_folder').val('');
@@ -332,8 +292,8 @@ function cancelAddShow() {
 }
 
 
-function loadShow(seriesID) {
-  $.getJSON(WEBDIR + 'radarr/Show/id=' + seriesID, function(tvshow) {
+function loadMovie(movieID) {
+  $.getJSON(WEBDIR + 'radarr/Movie/id=' + movieID, function(tvshow) {
     var bannerurl;
     var table = $('<table>');
     table.addClass('table table-bordered table-striped table-condensed');
@@ -443,7 +403,7 @@ function cal() {
         if (event.all.hasFile) {
           //calendarmodal TODO
         } else {
-          loadShow(event.all.series.id)
+          loadMovie(event.all.id)
         }
       });
 
