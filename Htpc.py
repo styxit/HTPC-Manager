@@ -95,6 +95,8 @@ def load_modules():
     htpc.ROOT.users = Users()
     from modules.sonarr import Sonarr
     htpc.ROOT.sonarr = Sonarr()
+    from modules.radarr import Radarr
+    htpc.ROOT.radarr = Radarr()
     from modules.sickrage import Sickrage
     htpc.ROOT.sickrage = Sickrage()
     from modules.samsungtv import Samsungtv
