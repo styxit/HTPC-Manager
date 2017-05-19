@@ -79,7 +79,7 @@
                 {'type':'bool', 'label':'Show Kodi recent movies', 'name':'dash_rec_movies',
                  'checked':bool(settings.get('dash_rec_movies', 0))},
                 {'type':'bool', 'label':'Show Kodi recent movies (List)', 'name':'dash_rec_movies_list',
-                 'checked':bool(settings.get('dash_rec_movies_list', 0))},               
+                 'checked':bool(settings.get('dash_rec_movies_list', 0))},
 		 {'type':'bool', 'label':'Show Kodi recent episodes', 'name':'dash_rec_tv',
                  'checked':bool(settings.get('dash_rec_tv', 0))},
                  {'type':'bool', 'label':'Show Kodi recent episodes (List)', 'name':'dash_rec_tv_list',
@@ -108,6 +108,8 @@
                   'checked':bool(settings.get('dash_smart', 0))},
                 {'type':'bool', 'label':'Show Sonarr', 'name':'dash_sonarr',
                  'checked':bool(settings.get('dash_nzbdrone', 0))},
+                 {'type':'bool', 'label':'Show Radarr', 'name':'dash_radarr',
+                  'checked':bool(settings.get('dash_radarr', 0))},
                 {'type':'bool', 'label':'Show System Info', 'name':'dash_sysinfo',
                   'checked':bool(settings.get('dash_sysinfo', 0))},
                 {'type':'bool', 'label':'Show Wanted Albums (Carousel)', 'name':'dash_wanted_albums',
@@ -116,6 +118,8 @@
                   'checked':bool(settings.get('dash_wanted_albums_list', 0))},
                 {'type':'bool', 'label':'Show Sonar calendar', 'name':'dash_sonarr_calendar',
                     'checked':bool(settings.get('dash_sonarr_calendar', 0))},
+                    {'type':'bool', 'label':'Show Radarr calendar', 'name':'dash_radarr_calendar',
+                        'checked':bool(settings.get('dash_radarr_calendar', 0))},
                 {'type':'bool', 'label':'Show Upcoming Albums (List)', 'name':'dash_upcoming_albums_list',
                   'checked':bool(settings.get('dash_upcoming_albums_list', 0))}
             ])}

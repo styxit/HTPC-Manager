@@ -176,6 +176,20 @@
                 </table>
             </div>
             %endif
+            %if settings.get('dash_radarr', 0):
+            <div class="span4 dash-module" id="dash_radarr">
+                <h3><a href="radarr/#calendar">Movies Coming Soon</a></h3>
+                <table class="table table-striped table-main">
+                    <thead>
+                        <tr>
+                            <th>Movie</th>
+                            <th>Release Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="radarr_calendar_table_body"></tbody>
+                </table>
+            </div>
+            %endif
             %if settings.get('dash_sickrage', 0):
             <div class="span4 dash-module" id="dash_sickrage">
                 <h3><a href="sickrage/#nextaired">Next Aired</a></h3>
@@ -239,6 +253,14 @@
                 </table>
             </div>
             %endif
+            %if settings.get('dash_radarr_calendar', 0):
+            <div class="span4 dash-module" id="dash_radarr_calendar">
+              <h3><a href="radarr/#calendar_tab">radarr calendar</a></h3>
+              <div id="dash_radarr_cal"></div>
+
+            </div>
+            %endif
+
             %if settings.get('dash_sonarr_calendar', 0):
             <div class="span4 dash-module" id="dash_sonarr_calendar">
               <h3><a href="sonarr/#calendar_tab">sonarr calendar</a></h3>
@@ -325,6 +347,9 @@
     if (${int(settings.get('dash_sonarr', 0))}){
         modules['dash_sonarr'] = "loadsonarrCalendar";
     }
+    if (${int(settings.get('dash_radarr', 0))}){
+        modules['dash_radarr'] = "loadRadarrCalendar";
+    }
     if (${int(settings.get('dash_rec_movies_plex', 0))}){
         modules['dash_rec_movies_plex'] = "loadRecentMoviesPlex";
     }
@@ -345,6 +370,9 @@
     }
     if (${int(settings.get('dash_sonarr_calendar', 0))}){
         modules['dash_sonarr_calendar'] = "dash_sonarr_calendar";
+    }
+    if (${int(settings.get('dash_radarr_calendar', 0))}){
+        modules['dash_radarr_calendar'] = "dash_radarr_calendar";
     }
     if (${int(settings.get('dash_upcoming_albums_list', 0))}){
         modules['dash_upcoming_albums_list'] = "loadUpcomingAlbumsList";

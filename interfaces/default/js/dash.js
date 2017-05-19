@@ -1,5 +1,45 @@
 var row_n = 0
 
+function dash_radarr_calendar() {
+
+  if (!$('#dash_radarr_calendar').length) return
+  $('#dash_radarr_cal').fullCalendar({
+    editable: false,
+    handleWindowResize: true,
+    weekends: true,
+    allDayDefault: false,
+    defaultView: 'basicDay',
+    header: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'month, basicWeek, basicDay'
+    },
+    firstDay: '1',
+    columnFormat: 'ddd D/M',
+    displayEventTime: true,
+    timeFormat: 'hh:mm',
+    timezone: 'local',
+    height: 'auto',
+
+    events: {
+      url: WEBDIR + 'radarr/Calendar',
+      type: 'GET',
+    },
+    eventRender: function(event, element) {
+      var title = event.title;
+      element.text(title);
+      if (event.all.hasFile) {
+        element.addClass('calendar_has_file');
+      } else {
+        element.addClass('calendar_missing_file');
+      }
+      // add modal here?
+    }
+
+  });
+  $('#dash_radarr_cal').fullCalendar('render')
+}
+
 function dash_sonarr_calendar() {
 
   if (!$('#dash_sonarr_calendar').length) return
@@ -469,6 +509,27 @@ function loadNextAired(options) {
     })
   })
 }
+
+function loadRadarrCalendar(options) {
+  if (!$('#radarr_calendar_table_body').length) return
+  $.getJSON(WEBDIR + 'radarr/oldCalendar', function(result) {
+    $.each(result, function(i, cal) {
+      if (i >= 5) return
+      var name = $('<a>').attr('href', 'radarr/View/' + cal.id + '/' + cal.tmdbId).html(cal.title + ' (' + cal.year + ') ');
+      var number;
+      var row = $('<tr>')
+      var img = makeIcon('fa fa-info-circle', cal.overview);
+      row.append(
+        $('<td>').append(name).append(img),
+        $('<td>').append($('<div class="pull-right">').text(moment(cal.inCinemas).fromNow()))
+      )
+      $('#radarr_calendar_table_body').append(row);
+    });
+
+  });
+}
+
+
 
 function loadsonarrCalendar(options) {
   if (!$('#calendar_table_body').length) return

@@ -159,7 +159,7 @@ class Radarr(object):
     @require()
     @cherrypy.tools.json_out()
     def oldCalendar(self, param=None):
-        return self.fetch('Calendar?end=%s' % (DT.date.today() + DT.timedelta(days=7)))
+        return self.fetch('Calendar?end=%s' % (DT.date.today() + DT.timedelta(days=30)))
 
     @cherrypy.expose()
     @require()
@@ -179,10 +179,12 @@ class Radarr(object):
                     'start': movie['inCinemas'],
                     'overview': movie.get('overview', ''),
                     'all': movie,
-                    'physicalRelease': movie['physicalRelease'],
+                    'inCinemas': movie['inCinemas'],
                     'allDay': False,
                     'id': movie['id'],
                 }
+
+
 
                 cal.append(d)
 
