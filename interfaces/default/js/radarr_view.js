@@ -1,10 +1,10 @@
 $(document).ready(function () {
     moment().format();
-    var qlty = profile();
-    var showid = $('h1.page-title').attr('data-showid');
+   // var qlty = profile();
+    var movieid = $('h1.page-title').attr('data-movieid');
     var idz = $('h1.page-title').attr('data-id');
-    var qqq = find_d_q(showid)
-    loadShowData(showid, idz);
+    var qqq = find_d_q(movieid)
+    loadmovieData(movieid, idz);
 });
 
 /*
@@ -13,99 +13,100 @@ its just confusing. I dont think tvdbid is used from anything
 
 */
 
-function loadShowData(movieId, tmdbId) {
+function loadmovieData(movieId, tmdbId) {
     $.ajax({
         url: WEBDIR + 'radarr/Movie/' + movieId + '/' + tmdbId,
         type: 'get',
         dataType: 'json',
-        success: function (tvshow) {
-            if (!tvshow) {
+        success: function (movie) {
+            if (!movie) {
                 notify('Error', 'Movie not found.', 'error');
                 return;
             }
             // Convert id to a Quality name
-            $.each(qlty, function (i, q) {
-                if (tvshow.qualityProfileId == q.id) {
-                    qname = q.name;
-                }
-            });
-
-            var showid = $('h1.page-title').attr('data-tvdbid');
+            // $.each(qlty, function (i, q) {
+            //     if (movie.qualityProfileId == q.id) {
+            //         qname = q.name;
+            //     }
+            // });
+            console.log(movie);
+            var qname = movie.qualityProfileId;
+            var movieid = $('h1.page-title').attr('data-tvdbid');
             // If there is a airdate format it, else leave set N/A
-            if (tvshow.nextAiring) {
-                nextair = moment(tvshow.nextAiring).calendar();
+            if (movie.nextAiring) {
+                nextair = moment(movie.nextAiring).calendar();
             } else {
                 nextair = 'N/A';
             }
-            var at = (typeof (tvshow.airTime) == "undefined") ? 'TBA' : tvshow.airTime;
-            if (tvshow.images.length > 0) {
-                $.each(tvshow.images, function (i, cover) {
+            var at = (typeof (movie.airTime) == "undefined") ? 'TBA' : movie.airTime;
+            if (movie.images.length > 0) {
+                $.each(movie.images, function (i, cover) {
                     if (cover.coverType === "banner") {
                         // set the url to the banner so the modal can access it
                         $('h1.page-title').attr('data-bannerurl', cover.url);
                         // Fetch the banner
-                        $('#banner').css('background-image', 'url(' + WEBDIR + 'radarr/GetBanner?url=MediaCover/' + tvshow.id + '/banner.jpg)');
+                        $('#banner').css('background-image', 'url(' + cover.url + ')');
                     }
                 });
             }
 
             $('.radarr_want_quality').append(radarrStatusLabel(qname));
-            $('.radarr_showname').text(tvshow.title);
-            $('.radarr_status').append(radarrStatusLabel(tvshow.status));
-            $('.radarr_network').text(tvshow.network);
-            $('.radarr_location').text(tvshow.path);
+            $('.radarr_moviename').text(movie.title);
+            $('.radarr_status').append(radarrStatusLabel(movie.status));
+            $('.radarr_studio').text(movie.studio);
+            $('.radarr_location').text(movie.path);
             $('.radarr_airs').text(at);
             $('.radarr_next_air').text(nextair);
 
-            var menu = $('.show-options-menu');
+            var menu = $('.movie-options-menu');
             $('.rescan-files')
                 .attr('data-desc', 'Refresh Series')
                 .attr('data-method', 'RefreshSeries')
                 .attr('data-param', 'seriesId')
-                .attr('data-id', tvshow.id)
-                .attr('data-name', tvshow.title)
+                .attr('data-id', movie.id)
+                .attr('data-name', movie.title);
 
             $('.full-update')
                 .attr('data-desc', 'Rescan Series')
                 .attr('data-method', 'RescanSeries')
                 .attr('data-param', 'seriesId')
-                .attr('data-id', tvshow.id)
-                .attr('data-name', tvshow.title);
+                .attr('data-id', movie.id)
+                .attr('data-name', movie.title);
 
-            $('.search_all_ep_in_show')
+            $('.search_all_ep_in_movie')
                 .attr('data-desc', 'Search for all episodes')
                 .attr('data-method', 'SeriesSearch')
                 .attr('data-param', 'seriesId')
-                .attr('data-id', tvshow.id)
-                .attr('data-name', tvshow.title);
+                .attr('data-id', movie.id)
+                .attr('data-name', movie.title);
 
             /* // todo?
-                $('.edit_show').click(function (evt) {
+                $('.edit_movie').click(function (evt) {
                     evt.preventDefault();
-                    loadShow2(tvshow);
+                    loadmovie2(movie);
                 });
                 */
 
-            $('.delete_show').click(function (e) {
+            $('.delete_movie').click(function (e) {
                 e.preventDefault();
-                delete_show(tvshow);
+                delete_movie(movie);
             });
 
-            renderSeasonTabs(tvdbId, tvshow.id, tvshow);
+            //renderSeasonTabs(tvdbId, movie.id, movie);
 
         },
         error: function () {
-            notify('Error', 'Error while loading show.', 'error');
+            notify('Error', 'Error while loading movie.', 'error');
         }
     });
 }
 
-// showid= tvdbid, id=radarrid
-function renderSeasonTabs(showid, id, tvshow) {
+// movieid= tvdbid, id=radarrid
+function renderSeasonTabs(movieid, id, movie) {
     list = $('#season-list');
     list.html('');
 
-    $.each(tvshow.seasons, function (index, seasonNr) {
+    $.each(movie.seasons, function (index, seasonNr) {
         var label = seasonNr.seasonNumber;
         // Specials are marked as season 0
         if (label === 0) {
@@ -117,7 +118,7 @@ function renderSeasonTabs(showid, id, tvshow) {
             .attr('href', '#' + seasonNr.seasonNumber)
             .attr('data-season', seasonNr.seasonNumber)
             .attr('data-tvdbid', id)
-            .attr('data-showid', showid));
+            .attr('data-movieid', movieid));
 
 
         list.append(pill);
@@ -129,12 +130,12 @@ function renderSeasonTabs(showid, id, tvshow) {
         rendseason(sid, id, sn);
     });
 
-    if (tvshow.status == 'continuing') {
+    if (movie.status == 'continuing') {
         // Activate latest season
         list.find('li:last-child a').trigger('click').parent().addClass('active');
 
     } else {
-        if (tvshow.seasons[0].seasonNumber !== 0) {
+        if (movie.seasons[0].seasonNumber !== 0) {
             // if the are not specials trigger season 1
             list.find('li:first-child a').trigger('click').parent().addClass('active');
         } else {
@@ -144,10 +145,10 @@ function renderSeasonTabs(showid, id, tvshow) {
     }
 }
 
-function showEpisodeInfo(episodeid, value) {
+function movieEpisodeInfo(episodeid, value) {
     var ep = value;
     $.getJSON(WEBDIR + "radarr/Episodeqly/" + episodeid + "/", function (pResult) {
-        var sid = $('h1.page-title').attr('data-showid');
+        var sid = $('h1.page-title').attr('data-movieid');
         var strHTML = $("<table>").attr("class", "episodeinfo")
             .append($("<tr>")
             .append($("<td>").html("<b>Name</b>"))
@@ -171,12 +172,12 @@ function showEpisodeInfo(episodeid, value) {
                 .append($("<td>").text(pResult.path)));
         }
 
-        showModal($('<img>').attr('src', WEBDIR + 'radarr/GetBanner?url=MediaCover/' + sid + '/banner.jpg').addClass('img-rounded'),
+        movieModal($('<img>').attr('src', WEBDIR + 'radarr/GetBanner?url=MediaCover/' + sid + '/banner.jpg').addClass('img-rounded'),
         strHTML, []);
     });
 }
 
-//Graps info about all the files in the show.
+//Graps info about all the files in the movie.
 function find_d_q(id) {
     $.getJSON(WEBDIR + 'radarr/Episodesqly/' + id, function (result) {
         qqq = result;
@@ -211,7 +212,7 @@ function rendseason(sID, id, seasonnumber) {
                 $('<td>').text(value.episodeNumber),
                 $('<td>').append($("<a>").text(value.title).click(function (pEvent) {
                     pEvent.preventDefault();
-                    showEpisodeInfo(value.episodeFileId, value);
+                    movieEpisodeInfo(value.episodeFileId, value);
                 })),
                 $('<td>').text(value.airDate),
                 $('<td>').html(radarrStatusLabel(hasfile)),
@@ -337,13 +338,13 @@ $(document).on('click', '.dostuff', function () {
     });
 });
 
-function delete_show(v) {
+function delete_movie(v) {
     data = {
         "id": v.id,
         "title": v.title
     };
     if (confirm('Are you sure you want to delete ' + v.title + ' ?')) {
-        $.getJSON(WEBDIR + 'radarr/Delete_Show/', data, function (response) {
+        $.getJSON(WEBDIR + 'radarr/Delete_movie/', data, function (response) {
             if (response == '{}') {
                 status = 'success';
 

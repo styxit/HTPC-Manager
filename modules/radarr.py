@@ -140,7 +140,7 @@ class Radarr(object):
     @cherrypy.tools.json_out()
     def Movie(self, id, tmdbId=None):
         ''' Details about one movie '''
-        return self.fetch('Movie/%s' % id)
+        return self.fetch('Movies/lookup/tmdb?tmdbId=%s' % id)
 
     @cherrypy.expose()
     @require(member_of(htpc.role_user))
@@ -265,5 +265,5 @@ class Radarr(object):
     @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def test(self):
-        movie = self.fetch('Movies/lookup?term=tmdbId:70327')
+        movie = self.fetch('Movies/lookup/tmdb?tmdbId=%s' % 32434)
         return movie
