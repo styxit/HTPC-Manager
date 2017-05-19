@@ -192,12 +192,12 @@ class Radarr(object):
 
     @cherrypy.expose()
     @require()
-    def View(self, tmdbId, id):
-        if not (tmdbId.isdigit()):
+    def View(self, id, tmdbid):
+        if not (tmdbid.isdigit()):
             raise cherrypy.HTTPError('500 Error', 'Invalid movie ID.')
             self.logger.error('Invalid movie ID was supplied: ' + str(id))
             return False
-        return htpc.LOOKUP.get_template('radarr_view.html').render(scriptname='radarr_view', tmdbId=tmdbId, id=id)
+        return htpc.LOOKUP.get_template('radarr_view.html').render(scriptname='radarr_view', tmdbid=tmdbid, id=id)
 
     @cherrypy.expose()
     @require()

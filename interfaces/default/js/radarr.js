@@ -184,7 +184,7 @@ function calendar() {
       var row = $('<tr>');
       var name = $('<a>').attr('href', '#').html(cal.series.title).click(function(e) {
         e.preventDefault();
-        loadMovie(cal.seriesId);
+        loadMovie(cal.id, cal.tmdbId);
       });
       var img = makeIcon('fa fa-info-circle', cal.overview);
       row.append(
@@ -292,36 +292,36 @@ function cancelAddMovie() {
 }
 
 
-function loadMovie(movieID) {
-  $.getJSON(WEBDIR + 'radarr/Movie/id=' + movieID, function(tvshow) {
+function loadMovie(movieID, tmdbId) {
+  $.getJSON(WEBDIR + 'radarr/Movie/tmdbId=' + tmdbId + '&id=' + movieID, function(movie) {
     var bannerurl;
     var table = $('<table>');
     table.addClass('table table-bordered table-striped table-condensed');
 
     row = $('<tr>');
-    row.append('<th>Status</th><td>' + tvshow.status + '</td>');
+    row.append('<th>Status</th><td>' + movie.status + '</td>');
     table.append(row);
 
-    if (tvshow.nextAiring) {
-      nextair = moment(tvshow.nextAiring).calendar();
+    if (movie.inCinemas) {
+      ReleaseDate = moment(movie.inCinemas).calendar();
     } else {
-      nextair = 'N/A';
+      releaseDate = 'N/A';
     }
 
     row = $('<tr>');
-    row.append('<th>Airs</th><td>' + nextair + '</td>');
+    row.append('<th>In Cinemas</th><td>' + releaseDate + '</td>');
     table.append(row);
 
     row = $('<tr>');
-    row.append('<th>Monitored</th><td>' + tvshow.monitored + '</td>');
+    row.append('<th>Monitored</th><td>' + movie.monitored + '</td>');
     table.append(row);
 
     row = $('<tr>');
-    row.append('<th>Location</th><td>' + tvshow.path + '</td>');
+    row.append('<th>Location</th><td>' + movie.path + '</td>');
     table.append(row);
 
     $.each(qlty, function(i, q) {
-      if (tvshow.qualityProfileId == q.id) {
+      if (movie.qualityProfileId == q.id) {
         qname = q.name;
         row = $('<tr>');
         row.append('<th>Quality</th><td>' + q.name + '</td>');
@@ -330,15 +330,15 @@ function loadMovie(movieID) {
     });
 
     row = $('<tr>');
-    row.append('<th>Network</th><td>' + tvshow.network + '</td>');
+    row.append('<th>Studio</th><td>' + movie.studio + '</td>');
     table.append(row);
 
     row = $('<tr>');
-    row.append('<th>Summary</th><td>' + tvshow.overview + '</td>');
+    row.append('<th>Summary</th><td>' + movie.overview + '</td>');
     table.append(row);
 
-    if (tvshow.images.length > 0) {
-      $.each(tvshow.images, function(i, cover) {
+    if (movie.images.length > 0) {
+      $.each(movie.images, function(i, cover) {
         if (cover.coverType === "banner") {
           bannerurl = cover.url;
         }
@@ -348,7 +348,7 @@ function loadMovie(movieID) {
     modalContent = $('<div>');
     modalContent.append(
 
-      $('<img>').attr('src', WEBDIR + 'radarr/GetBanner/?url=MediaCover/' + tvshow.id + '/banner.jpg').addClass('img-rounded'),
+      $('<img>').attr('src', WEBDIR + 'radarr/GetBanner/?url=MediaCover/' + movie.id + '/banner.jpg').addClass('img-rounded'),
       $('<hr>'),
       table);
 
@@ -357,14 +357,14 @@ function loadMovie(movieID) {
     var modalButtons = {
       'Show': function() {
         data = {
-          'id': tvshow.seriesID
+          'id': movie.id
         }
-        window.location = WEBDIR + 'radarr/View/' + tvshow.id + '/' + tvshow.tvdbId;
+        window.location = WEBDIR + 'radarr/View/' + movie.id + '/' + movie.tmdbId;
       }
     };
 
 
-    showModal(tvshow.title, modalContent, modalButtons);
+    showModal(movie.title, modalContent, modalButtons);
   });
 
 }
@@ -403,7 +403,7 @@ function cal() {
         if (event.all.hasFile) {
           //calendarmodal TODO
         } else {
-          loadMovie(event.all.id)
+          loadMovie(event.all.id, event.all.tmdbId)
         }
       });
 

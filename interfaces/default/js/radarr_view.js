@@ -44,18 +44,18 @@ function loadShowData(movieId, tmdbId) {
                         // set the url to the banner so the modal can access it
                         $('h1.page-title').attr('data-bannerurl', cover.url);
                         // Fetch the banner
-                        $('#banner').css('background-image', 'url(' + WEBDIR + 'sonarr/GetBanner?url=MediaCover/' + tvshow.id + '/banner.jpg)');
+                        $('#banner').css('background-image', 'url(' + WEBDIR + 'radarr/GetBanner?url=MediaCover/' + tvshow.id + '/banner.jpg)');
                     }
                 });
             }
 
-            $('.sonarr_want_quality').append(sonarrStatusLabel(qname));
-            $('.sonarr_showname').text(tvshow.title);
-            $('.sonarr_status').append(sonarrStatusLabel(tvshow.status));
-            $('.sonarr_network').text(tvshow.network);
-            $('.sonarr_location').text(tvshow.path);
-            $('.sonarr_airs').text(at);
-            $('.sonarr_next_air').text(nextair);
+            $('.radarr_want_quality').append(radarrStatusLabel(qname));
+            $('.radarr_showname').text(tvshow.title);
+            $('.radarr_status').append(radarrStatusLabel(tvshow.status));
+            $('.radarr_network').text(tvshow.network);
+            $('.radarr_location').text(tvshow.path);
+            $('.radarr_airs').text(at);
+            $('.radarr_next_air').text(nextair);
 
             var menu = $('.show-options-menu');
             $('.rescan-files')
@@ -100,7 +100,7 @@ function loadShowData(movieId, tmdbId) {
     });
 }
 
-// showid= tvdbid, id=sonarrid
+// showid= tvdbid, id=radarrid
 function renderSeasonTabs(showid, id, tvshow) {
     list = $('#season-list');
     list.html('');
@@ -146,7 +146,7 @@ function renderSeasonTabs(showid, id, tvshow) {
 
 function showEpisodeInfo(episodeid, value) {
     var ep = value;
-    $.getJSON(WEBDIR + "sonarr/Episodeqly/" + episodeid + "/", function (pResult) {
+    $.getJSON(WEBDIR + "radarr/Episodeqly/" + episodeid + "/", function (pResult) {
         var sid = $('h1.page-title').attr('data-showid');
         var strHTML = $("<table>").attr("class", "episodeinfo")
             .append($("<tr>")
@@ -162,7 +162,7 @@ function showEpisodeInfo(episodeid, value) {
                 .append($("<td>").text(moment(ep.airDateUtc).calendar())))
                 .append($("<tr>")
                 .append($("<td>").html("<b>Quality</b>"))
-                .append($("<td>").html(sonarrStatusLabel(qname))))
+                .append($("<td>").html(radarrStatusLabel(qname))))
                 .append($("<tr>")
                 .append($("<td>").html("<b>File size</b>"))
                 .append($("<td>").text(bytesToSize(pResult.size, 2))))
@@ -171,20 +171,20 @@ function showEpisodeInfo(episodeid, value) {
                 .append($("<td>").text(pResult.path)));
         }
 
-        showModal($('<img>').attr('src', WEBDIR + 'sonarr/GetBanner?url=MediaCover/' + sid + '/banner.jpg').addClass('img-rounded'),
+        showModal($('<img>').attr('src', WEBDIR + 'radarr/GetBanner?url=MediaCover/' + sid + '/banner.jpg').addClass('img-rounded'),
         strHTML, []);
     });
 }
 
 //Graps info about all the files in the show.
 function find_d_q(id) {
-    $.getJSON(WEBDIR + 'sonarr/Episodesqly/' + id, function (result) {
+    $.getJSON(WEBDIR + 'radarr/Episodesqly/' + id, function (result) {
         qqq = result;
     });
 }
 
 function rendseason(sID, id, seasonnumber) {
-    $.getJSON(WEBDIR + 'sonarr/Episodes/' + id, function (result) {
+    $.getJSON(WEBDIR + 'radarr/Episodes/' + id, function (result) {
         var seasonContent = $('#season-content');
         // Clear table contents before inserting new row
         seasonContent.html('');
@@ -214,8 +214,8 @@ function rendseason(sID, id, seasonnumber) {
                     showEpisodeInfo(value.episodeFileId, value);
                 })),
                 $('<td>').text(value.airDate),
-                $('<td>').html(sonarrStatusLabel(hasfile)),
-                $('<td>').html(sonarrStatusLabel(qname)),
+                $('<td>').html(radarrStatusLabel(hasfile)),
+                $('<td>').html(radarrStatusLabel(qname)),
                 $('<td>').append(search_link));
                 seasonContent.append(row);
 
@@ -239,7 +239,7 @@ function rendseason(sID, id, seasonnumber) {
     });
 }
 
-function sonarrStatusIcon(iconText, white) {
+function radarrStatusIcon(iconText, white) {
     var text = [
         'Downloaded',
         'Missing',
@@ -269,7 +269,7 @@ function sonarrStatusIcon(iconText, white) {
     return '';
 }
 
-function sonarrStatusLabel(text) {
+function radarrStatusLabel(text) {
     var statusOK = ['continuing', 'Downloaded', 'Any'];
     var statusInfo = ['Snatched', 'HD', 'HD - All', 'HD-720p', 'HD-1080p', 'HDTV-720p', 'HDTV-1080p', 'WEBDL-720p', 'WEBDL-1080p'];
     var statusError = ['ended', 'Missing'];
@@ -289,7 +289,7 @@ function sonarrStatusLabel(text) {
         label;
     }
 
-    var icon = sonarrStatusIcon(text, true);
+    var icon = radarrStatusIcon(text, true);
     if (icon !== '') {
         label.prepend(' ').prepend(icon);
     }
@@ -298,7 +298,7 @@ function sonarrStatusLabel(text) {
 
 // Grabs the quality profile
 function profile(qualityProfileId) {
-    $.get(WEBDIR + 'sonarr/Profile', function (result) {
+    $.get(WEBDIR + 'radarr/Profile', function (result) {
         qlty = result;
     });
 
@@ -309,13 +309,13 @@ function getbanner(bannerurl) {
     data = {
         url: bannerurl
     };
-    $.get(WEBDIR + 'sonarr/GetBanner', data, function (result) {
+    $.get(WEBDIR + 'radarr/GetBanner', data, function (result) {
         $('#banner').css('background-image', 'url(' + result + ')');
     });
 }
 
 function SeriesSearch(seriesid) {
-    $.getJSON(WEBDIR + 'sonarr/?name=SeriesSearch&seriesId=' + seriesid);
+    $.getJSON(WEBDIR + 'radarr/?name=SeriesSearch&seriesId=' + seriesid);
 }
 
 $(document).on('click', '.dostuff', function () {
@@ -327,7 +327,7 @@ $(document).on('click', '.dostuff', function () {
         id: $(this).attr('data-id'),
         name: $(this).attr('data-name')
     };
-    $.getJSON(WEBDIR + "sonarr/Command", params, function (result) {
+    $.getJSON(WEBDIR + "radarr/Command", params, function (result) {
         if (result.state) {
             notify(method, name, 'success');
         } else {
@@ -343,14 +343,14 @@ function delete_show(v) {
         "title": v.title
     };
     if (confirm('Are you sure you want to delete ' + v.title + ' ?')) {
-        $.getJSON(WEBDIR + 'sonarr/Delete_Show/', data, function (response) {
+        $.getJSON(WEBDIR + 'radarr/Delete_Show/', data, function (response) {
             if (response == '{}') {
                 status = 'success';
 
             } else {
                 status = 'error';
             }
-            notify('Deleted', v.title + 'from sonarr', status);
+            notify('Deleted', v.title + 'from radarr', status);
         });
     }
 }
