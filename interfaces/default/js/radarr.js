@@ -70,7 +70,7 @@ function loadMovies() {
           $('<td>').html(radarrStatusLabel(movie.status)),
           $('<td>').html(moment(movie.inCinemas).calendar()),
           $('<td>').html(movie.studio),
-            $('<td>').html(movie.downloaded ? 'Yes' : 'No'),
+            $('<td>').append(movie.downloaded ? radarrStatusLabel(movie.movieFile.quality.quality.name) : radarrStatusLabel('Missing')),
           $('<td>').html(radarrStatusLabel(qname)));
         $('#tvshows_table_body').append(row);
       });
@@ -120,7 +120,7 @@ function radarrStatusIcon(iconText, white) {
 function radarrStatusLabel(text) {
   var statusOK = ['released', 'Downloaded', 'Any'];
   var statusInfo = ['Snatched', 'HD', 'HD - All', 'HD-720p', 'HD-1080p', 'HDTV-720p', 'HDTV-1080p', 'WEBDL-720p', 'WEBDL-1080p', ];
-  var statusError = ['ended'];
+  var statusError = ['ended', 'Missing'];
   var statusWarning = ['Skipped', 'SD', 'SD - All', 'SDTV', 'DVD'];
   var statusNormal = ['Bluray', 'Bluray-720p', 'Bluray-1080p']
 
@@ -420,7 +420,7 @@ function calendarmodal(s) {
 
 function Scanfolder() {
   data = {
-    "method": "DownloadedEpisodesScan"
+    "method": "DownloadedMoviesScan"
   };
   p = prompt('Write path to processfolder or leave blank for default path');
   if (p || p.length >= 0) {

@@ -63,9 +63,11 @@ function loadmovieData(movieId) {
             $('.radarr_status').append(radarrStatusLabel(movie.status));
             $('.radarr_studio').text(movie.studio);
             $('.radarr_location').text(movie.path);
-            $('.radarr_downloaded').text(movie.downloaded ? 'Yes' : 'No');
+            $('.radarr_downloaded').append(movie.downloaded ? radarrStatusLabel(movie.movieFile.quality.quality.name) : radarrStatusLabel('Missing'));
             $('.radarr_overview').text(movie.overview);
             $('.radarr_imdb').text(movie.ratings.value);
+            $('.radarr_runtime').text(movie.runtime + ' minutes');
+            $('.radarr_genres').text(movie.genres.join(' '));
 
             $('#radarr_trailer').attr('src', "https://www.youtube.com/embed/" + movie.youTubeTrailerId);
 
