@@ -2,7 +2,7 @@
 <% settings = self.attr.settings %>
   <div class="container-fluid">
     <div class="content maincontent">
-      <h1 class="page-header page-title data-quality=${quality}">
+      <h1 class="page-header page-title">
         <a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'} title="Open original radarr interface">${settings.get('radarr_name', 'radarr')}</a>
         <div class="btn-group pull-right">
           <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wrench fa-lg"></i>

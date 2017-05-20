@@ -1,15 +1,8 @@
 $(document).ready(function () {
     moment().format();
-    var qlty = [];
-    var qltyPromise = new Promise(function (resolve, reject) {
-        var qlty = profile();
-        setTimeout(function () {
-            resolve();
-        }, 100);
-
-    });
-
-    qltyPromise.then(function () {
+    qlty = [];
+    $.when(profile()).done(function(qltyresult) {
+        qlty = qltyresult;
         var movieid = $('h1.page-title').attr('data-movieid');
         var idz = $('h1.page-title').attr('data-id');
         loadmovieData(idz);
@@ -68,6 +61,8 @@ function loadmovieData(movieId) {
             $('.radarr_imdb').text(movie.ratings.value);
             $('.radarr_runtime').text(movie.runtime + ' minutes');
             $('.radarr_genres').text(movie.genres.join(' '));
+            $('.radarr_aka').text(movie.alternativeTitles.join(', ').replace(/,\s*$/, ""));
+
 
             $('#radarr_trailer').attr('src', "https://www.youtube.com/embed/" + movie.youTubeTrailerId);
 
@@ -175,10 +170,12 @@ function radarrStatusLabel(text) {
 
 // Grabs the quality profile
 function profile(qualityProfileId) {
+    var done = jQuery.Deferred();
     $.get(WEBDIR + 'radarr/Profile', function (result) {
         qlty = result;
-        return qlty
+        done.resolve(qlty);
     });
+    return done;
 }
 
 // Not in use atm

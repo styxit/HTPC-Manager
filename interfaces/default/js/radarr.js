@@ -1,44 +1,47 @@
 $(document).ready(function() {
   moment().format();
   $(window).trigger('hashchange');
-  var qlty = profile();
-  var folders = rootfolder();
-  loadMovies();
-  history();
-  cal();
-  $('a[data-toggle="tab"]').click(function(e) {}).on('shown', cal)
+  qlty = [];
+  $.when(profile()).done(function(qltyresult) {
+    qlty = qltyresult;
+    var folders = rootfolder();
+    loadMovies();
+    history();
+    cal();
+    $('a[data-toggle="tab"]').click(function (e) {
+    }).on('shown', cal);
 
-  var AddMovieAction = function() {
-    var query = $('#add_show_name').val();
-    if (query) {
-      $('#add_show_button').attr('disabled', true);
-      searchTMDb(query);
-    }
-  };
-  $('#add_show_name').keyup(function(event) {
-    if (event.keyCode == 13) {
-      AddMovieAction();
-    }
-  });
-  $('#add_show_button').click(AddMovieAction);
+    var AddMovieAction = function () {
+        var query = $('#add_show_name').val();
+        if (query) {
+            $('#add_show_button').attr('disabled', true);
+            searchTMDb(query);
+        }
+    };
+    $('#add_show_name').keyup(function (event) {
+        if (event.keyCode == 13) {
+            AddMovieAction();
+        }
+    });
+    $('#add_show_button').click(AddMovieAction);
 
-  $('#add_tvdbid_button').click(function() {
-    addMovie($('#add_show_select').val(),
-      $('#add_show_quality').val(),
-      $('#add_show_folder').val(),
-      $('#add_show_monitor').val() == 'true'
-    );
-  });
+    $('#add_tvdbid_button').click(function () {
+        addMovie($('#add_show_select').val(),
+            $('#add_show_quality').val(),
+            $('#add_show_folder').val(),
+            $('#add_show_monitor').val() == 'true'
+        );
+    });
 
-  $('#cancel_show_button').click(function() {
-    cancelAddMovie();
-  });
+    $('#cancel_show_button').click(function () {
+        cancelAddMovie();
+    });
 
-  $('#scanfolder').click(function(e) {
-    e.preventDefault();
-    Scanfolder()
-  });
-
+    $('#scanfolder').click(function (e) {
+        e.preventDefault();
+        Scanfolder()
+    });
+});
 
 });
 
@@ -122,7 +125,7 @@ function radarrStatusLabel(text) {
   var statusInfo = ['Snatched', 'HD', 'HD - All', 'HD-720p', 'HD-1080p', 'HDTV-720p', 'HDTV-1080p', 'WEBDL-720p', 'WEBDL-1080p', ];
   var statusError = ['ended', 'Missing'];
   var statusWarning = ['Skipped', 'SD', 'SD - All', 'SDTV', 'DVD'];
-  var statusNormal = ['Bluray', 'Bluray-720p', 'Bluray-1080p']
+  var statusNormal = ['Bluray', 'Bluray-720p', 'Bluray-1080p'];
 
   var label = $('<span>').addClass('label').text(text);
 
@@ -146,10 +149,12 @@ function radarrStatusLabel(text) {
 }
 
 function profile(qualityProfileId) {
-  $.get(WEBDIR + 'radarr/Profile', function(result) {
-    qlty = result
-    return qlty
-  });
+    var done = jQuery.Deferred();
+    $.get(WEBDIR + 'radarr/Profile', function (result) {
+        qlty = result;
+        done.resolve(qlty);
+    });
+    return done;
 }
 
 function rootfolder() {
@@ -359,7 +364,7 @@ function loadMovie(movieID) {
       'Show': function() {
         data = {
           'id': movie.id
-        }
+        };
         window.location = WEBDIR + 'radarr/View/' + movie.id + '/' + movie.tmdbId;
       }
     };

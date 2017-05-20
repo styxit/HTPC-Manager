@@ -28,7 +28,7 @@
 
         <ul class="breadcrumb">
             <li><a href="${self.attr.webdir}">Home</a> <span class="divider">/</span></li>
-            <li><a href="${self.attr.webdir}radarr">${settings.get('radarr_name', 'radarr')}</a> <span
+            <li><a href="${self.attr.webdir}radarr">${settings.get('radarr_name', 'Radarr')}</a> <span
                     class="divider">/</span></li>
             <li class="active sickbeard_moviename">Movie details</li>
         </ul>
@@ -36,7 +36,7 @@
         <div id="banner" class="row-fluid banner">
             <div class="span8" style="min-height: 0px;"></div>
             <div class="movie_details span4 pull-right">
-                <strong>movie details</strong>
+                <strong>Movie details</strong>
                 <table class="table table-condensed">
                     <tr>
                         <td>Quality</td>
@@ -77,6 +77,10 @@
                     <tr>
                         <td>Genres</td>
                         <td class="radarr_genres"/>
+                    </tr>
+                    <tr>
+                        <td>Also known as</td>
+                        <td class="radarr_aka"/>
                     </tr>
                 </table>
             </div>
