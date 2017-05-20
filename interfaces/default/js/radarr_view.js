@@ -1,21 +1,30 @@
 $(document).ready(function () {
     moment().format();
-   // var qlty = profile();
-    var movieid = $('h1.page-title').attr('data-movieid');
-    var idz = $('h1.page-title').attr('data-id');
-    var qqq = find_d_q(movieid)
-    loadmovieData(movieid, idz);
+    var qlty = [];
+    var qltyPromise = new Promise(function (resolve, reject) {
+        var qlty = profile();
+        setTimeout(function () {
+            resolve();
+        }, 100);
+
+    });
+
+    qltyPromise.then(function () {
+        var movieid = $('h1.page-title').attr('data-movieid');
+        var idz = $('h1.page-title').attr('data-id');
+        loadmovieData(idz);
+    });
 });
 
 /*
-All the ids need to get fixed some time
-its just confusing. I dont think tvdbid is used from anything
+ All the ids need to get fixed some time
+ its just confusing. I dont think tvdbid is used from anything
 
-*/
+ */
 
-function loadmovieData(movieId, tmdbId) {
+function loadmovieData(movieId) {
     $.ajax({
-        url: WEBDIR + 'radarr/Movie/' + movieId + '/' + tmdbId,
+        url: WEBDIR + 'radarr/Movie/' + movieId,
         type: 'get',
         dataType: 'json',
         success: function (movie) {
@@ -23,29 +32,28 @@ function loadmovieData(movieId, tmdbId) {
                 notify('Error', 'Movie not found.', 'error');
                 return;
             }
-            // Convert id to a Quality name
-            // $.each(qlty, function (i, q) {
-            //     if (movie.qualityProfileId == q.id) {
-            //         qname = q.name;
-            //     }
-            // });
-            console.log(movie);
-            var qname = movie.qualityProfileId;
-            var movieid = $('h1.page-title').attr('data-tvdbid');
+            var qname = "Unknown";
+            //Convert id to a Quality name
+            $.each(qlty, function (i, q) {
+                if (movie.qualityProfileId === q.id) {
+                    qname = q.name;
+                }
+            });
+
+            var inCinemas;
             // If there is a airdate format it, else leave set N/A
-            if (movie.nextAiring) {
-                nextair = moment(movie.nextAiring).calendar();
+            if (movie.inCinemas) {
+                inCinemas = moment(movie.inCinemas).calendar();
             } else {
-                nextair = 'N/A';
+                inCinemas = 'N/A';
             }
-            var at = (typeof (movie.airTime) == "undefined") ? 'TBA' : movie.airTime;
             if (movie.images.length > 0) {
                 $.each(movie.images, function (i, cover) {
                     if (cover.coverType === "banner") {
                         // set the url to the banner so the modal can access it
                         $('h1.page-title').attr('data-bannerurl', cover.url);
                         // Fetch the banner
-                        $('#banner').css('background-image', 'url(' + cover.url + ')');
+                        $('#banner').css('background-image', 'url(' + WEBDIR + 'radarr/GetBanner?url=MediaCover/' + movie.id + '/banner.jpg)');
                     }
                 });
             }
@@ -55,37 +63,42 @@ function loadmovieData(movieId, tmdbId) {
             $('.radarr_status').append(radarrStatusLabel(movie.status));
             $('.radarr_studio').text(movie.studio);
             $('.radarr_location').text(movie.path);
-            $('.radarr_airs').text(at);
-            $('.radarr_next_air').text(nextair);
+            $('.radarr_downloaded').text(movie.downloaded ? 'Yes' : 'No');
+            $('.radarr_overview').text(movie.overview);
+            $('.radarr_imdb').text(movie.ratings.value);
+
+            $('#radarr_trailer').attr('src', "https://www.youtube.com/embed/" + movie.youTubeTrailerId);
+
+            $('.radarr_incinemas').text(inCinemas);
 
             var menu = $('.movie-options-menu');
             $('.rescan-files')
-                .attr('data-desc', 'Refresh Series')
-                .attr('data-method', 'RefreshSeries')
-                .attr('data-param', 'seriesId')
+                .attr('data-desc', 'Refresh Movie')
+                .attr('data-method', 'RefreshMovie')
+                .attr('data-param', 'movieId')
                 .attr('data-id', movie.id)
                 .attr('data-name', movie.title);
 
             $('.full-update')
-                .attr('data-desc', 'Rescan Series')
-                .attr('data-method', 'RescanSeries')
-                .attr('data-param', 'seriesId')
+                .attr('data-desc', 'Rescan Movie')
+                .attr('data-method', 'RescanMovie')
+                .attr('data-param', 'movieId')
                 .attr('data-id', movie.id)
                 .attr('data-name', movie.title);
 
             $('.search_all_ep_in_movie')
-                .attr('data-desc', 'Search for all episodes')
-                .attr('data-method', 'SeriesSearch')
-                .attr('data-param', 'seriesId')
+                .attr('data-desc', 'Search for movie')
+                .attr('data-method', 'MoviesSearch')
+                .attr('data-param', 'movieIds')
                 .attr('data-id', movie.id)
                 .attr('data-name', movie.title);
 
             /* // todo?
-                $('.edit_movie').click(function (evt) {
-                    evt.preventDefault();
-                    loadmovie2(movie);
-                });
-                */
+             $('.edit_movie').click(function (evt) {
+             evt.preventDefault();
+             loadmovie2(movie);
+             });
+             */
 
             $('.delete_movie').click(function (e) {
                 e.preventDefault();
@@ -98,145 +111,6 @@ function loadmovieData(movieId, tmdbId) {
         error: function () {
             notify('Error', 'Error while loading movie.', 'error');
         }
-    });
-}
-
-// movieid= tvdbid, id=radarrid
-function renderSeasonTabs(movieid, id, movie) {
-    list = $('#season-list');
-    list.html('');
-
-    $.each(movie.seasons, function (index, seasonNr) {
-        var label = seasonNr.seasonNumber;
-        // Specials are marked as season 0
-        if (label === 0) {
-            label = 'Specials';
-        }
-        var pill = $('<li>').append(
-        $('<a>')
-            .text(label)
-            .attr('href', '#' + seasonNr.seasonNumber)
-            .attr('data-season', seasonNr.seasonNumber)
-            .attr('data-tvdbid', id)
-            .attr('data-movieid', movieid));
-
-
-        list.append(pill);
-    });
-
-    list.find('a').on('click', function () {
-        var sn = $(this).attr('data-season');
-        var sid = $(this).attr('data-id');
-        rendseason(sid, id, sn);
-    });
-
-    if (movie.status == 'continuing') {
-        // Activate latest season
-        list.find('li:last-child a').trigger('click').parent().addClass('active');
-
-    } else {
-        if (movie.seasons[0].seasonNumber !== 0) {
-            // if the are not specials trigger season 1
-            list.find('li:first-child a').trigger('click').parent().addClass('active');
-        } else {
-            // Specials exist, pick season 1
-            list.find('li:nth-of-type(2) a').trigger('click').parent().addClass('active');
-        }
-    }
-}
-
-function movieEpisodeInfo(episodeid, value) {
-    var ep = value;
-    $.getJSON(WEBDIR + "radarr/Episodeqly/" + episodeid + "/", function (pResult) {
-        var sid = $('h1.page-title').attr('data-movieid');
-        var strHTML = $("<table>").attr("class", "episodeinfo")
-            .append($("<tr>")
-            .append($("<td>").html("<b>Name</b>"))
-            .append($("<td>").text(ep.title)))
-            .append($("<tr>")
-            .append($("<td>").html("<b>Summary</b>"))
-            .append($("<td>").text(ep.overview)));
-
-        if (ep.hasFile) {
-            strHTML.append($("<tr>")
-                .append($("<td>").html("<b>Air date</b>"))
-                .append($("<td>").text(moment(ep.airDateUtc).calendar())))
-                .append($("<tr>")
-                .append($("<td>").html("<b>Quality</b>"))
-                .append($("<td>").html(radarrStatusLabel(qname))))
-                .append($("<tr>")
-                .append($("<td>").html("<b>File size</b>"))
-                .append($("<td>").text(bytesToSize(pResult.size, 2))))
-                .append($("<tr>")
-                .append($("<td>").html("<b>Location</b>"))
-                .append($("<td>").text(pResult.path)));
-        }
-
-        movieModal($('<img>').attr('src', WEBDIR + 'radarr/GetBanner?url=MediaCover/' + sid + '/banner.jpg').addClass('img-rounded'),
-        strHTML, []);
-    });
-}
-
-//Graps info about all the files in the movie.
-function find_d_q(id) {
-    $.getJSON(WEBDIR + 'radarr/Episodesqly/' + id, function (result) {
-        qqq = result;
-    });
-}
-
-function rendseason(sID, id, seasonnumber) {
-    $.getJSON(WEBDIR + 'radarr/Episodes/' + id, function (result) {
-        var seasonContent = $('#season-content');
-        // Clear table contents before inserting new row
-        seasonContent.html('');
-
-        // Loop through data
-        $.each(result, function (index, value) {
-            if (value.seasonNumber == seasonnumber) {
-                if (value.hasFile) {
-                    hasfile = 'Downloaded';
-                } else {
-                    hasfile = 'Missing';
-                }
-
-                var img = makeIcon('fa fa-search', 'Search for ' + value.title);
-                var row = $('<tr>');
-                var search_link = $('<a>').addClass('btn btn-mini dostuff')
-                    .attr('data-method', 'episodeSearch')
-                    .attr('data-param', 'episodeIds')
-                    .attr('data-id', value.id)
-                    .attr('data-name', value.title)
-                    .append(img);
-
-                row.append(
-                $('<td>').text(value.episodeNumber),
-                $('<td>').append($("<a>").text(value.title).click(function (pEvent) {
-                    pEvent.preventDefault();
-                    movieEpisodeInfo(value.episodeFileId, value);
-                })),
-                $('<td>').text(value.airDate),
-                $('<td>').html(radarrStatusLabel(hasfile)),
-                $('<td>').html(radarrStatusLabel(qname)),
-                $('<td>').append(search_link));
-                seasonContent.append(row);
-
-                $.each(qqq, function (i, q) {
-                    if (value.hasFile && value.episodeFileId === q.id) {
-                        $('.quality').text(q.quality.quality.name);
-                    }
-                });
-
-            }
-
-        }); // end loop
-
-        // Trigger tableSort update
-        seasonContent.parent().trigger("update");
-        seasonContent.parent().trigger("sorton", [
-            [
-                [0, 1]
-            ]
-        ]);
     });
 }
 
@@ -301,8 +175,8 @@ function radarrStatusLabel(text) {
 function profile(qualityProfileId) {
     $.get(WEBDIR + 'radarr/Profile', function (result) {
         qlty = result;
+        return qlty
     });
-
 }
 
 // Not in use atm
@@ -315,9 +189,6 @@ function getbanner(bannerurl) {
     });
 }
 
-function SeriesSearch(seriesid) {
-    $.getJSON(WEBDIR + 'radarr/?name=SeriesSearch&seriesId=' + seriesid);
-}
 
 $(document).on('click', '.dostuff', function () {
     var method = $(this).attr('data-method');

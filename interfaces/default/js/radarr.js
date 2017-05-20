@@ -70,6 +70,7 @@ function loadMovies() {
           $('<td>').html(radarrStatusLabel(movie.status)),
           $('<td>').html(moment(movie.inCinemas).calendar()),
           $('<td>').html(movie.studio),
+            $('<td>').html(movie.downloaded ? 'Yes' : 'No'),
           $('<td>').html(radarrStatusLabel(qname)));
         $('#tvshows_table_body').append(row);
       });
@@ -184,7 +185,7 @@ function calendar() {
       var row = $('<tr>');
       var name = $('<a>').attr('href', '#').html(cal.series.title).click(function(e) {
         e.preventDefault();
-        loadMovie(cal.id, cal.tmdbId);
+        loadMovie(cal.id);
       });
       var img = makeIcon('fa fa-info-circle', cal.overview);
       row.append(
@@ -292,8 +293,8 @@ function cancelAddMovie() {
 }
 
 
-function loadMovie(movieID, tmdbId) {
-  $.getJSON(WEBDIR + 'radarr/Movie/tmdbId=' + tmdbId + '&id=' + movieID, function(movie) {
+function loadMovie(movieID) {
+  $.getJSON(WEBDIR + 'radarr/Movie/%d' + movieID, function(movie) {
     var bannerurl;
     var table = $('<table>');
     table.addClass('table table-bordered table-striped table-condensed');
@@ -403,7 +404,7 @@ function cal() {
         if (event.all.hasFile) {
           //calendarmodal TODO
         } else {
-          loadMovie(event.all.id, event.all.tmdbId)
+          loadMovie(event.all.id);
         }
       });
 

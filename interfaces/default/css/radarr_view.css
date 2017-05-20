@@ -1,0 +1,69 @@
+.radarr_movie .banner{
+  position: relative;
+  border-radius: 6px 0px 0px 6px;
+  background:  center left no-repeat ;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.radarr_movie .banner .movie_details {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+    color: White;
+    overflow:hidden;
+}
+.radarr_movie .banner .movie_details #movie_details_top{
+  background: Red;
+  display: block;
+  height: 15px;
+  min-height: 10px;
+  position: absolute;
+  top: -15px;
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+  border-radius: 6px 6px 0px 0px;
+}
+
+.radarr_movie .banner .movie_details #movie_details_bottom{
+  display: block;
+  height: 15px;
+  min-height: 10px;
+  position: absolute;
+  margin-left: 0px;
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.5);
+  border-radius: 0px 0px 6px 6px;
+}
+
+.radarr_movie .banner .movie_details td{
+  padding: 2px 5px;
+}
+
+.radarr_movie .banner .movie_details table,
+.radarr_movie .banner .movie_details strong {
+  margin:10px;
+}
+strong {
+	line-height: 10px !important;
+	vertical-align: bottom !important;
+}
+@media all and  (max-width: 767px) {
+  /*
+   * On small screens, remove top and bottom round bars on movie-detail block
+   */
+  .radarr_movie .banner .movie_details #movie_details_bottom,
+  .radarr_movie .banner .movie_details #movie_details_top{
+    display: none;
+  }
+  /*
+   * On small screens, Add rounded corners on all sides on banner and detail-box
+   */
+  .radarr_movie .banner .movie_details,
+  .radarr_movie .banner{
+    border-radius: 6px;
+  }
+}
+
+.radarr_trailer {
+    margin: 10px auto;
+    width: 50%;
+}

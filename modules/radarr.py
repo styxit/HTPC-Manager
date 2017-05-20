@@ -138,16 +138,16 @@ class Radarr(object):
     @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
-    def Movie(self, id, tmdbId=None):
+    def Movie(self, id):
         ''' Details about one movie '''
-        return self.fetch('Movies/lookup/tmdb?tmdbId=%s' % id)
+        return self.fetch('Movie/%s' % id)
 
     @cherrypy.expose()
     @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
-    def Delete_Movie(self, id, title, delete_date=None):
+    def Delete_movie(self, id, title, delete_date=None):
         self.logger.debug('Deleted movie %s' % title)
-        return self.fetch('Movie/%s' % id, type='delete')
+        return self.fetch('Movie/%d' % int(id), type='delete')
 
     @cherrypy.expose()
     @require()
@@ -220,7 +220,7 @@ class Radarr(object):
         try:
             data = {}
             data['name'] = k['method']
-            if k['par'] == 'episodeIds':
+            if k['par'] == 'movieIds':
                 k['id'] = [int(k['id'])]
             data[k['par']] = k['id']
         except KeyError:
