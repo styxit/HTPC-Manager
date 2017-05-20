@@ -1,10 +1,12 @@
 $(document).ready(function () {
     moment().format();
-    var qlty = profile();
-    var showid = $('h1.page-title').attr('data-showid');
-    var idz = $('h1.page-title').attr('data-id');
-    var qqq = find_d_q(showid)
-    loadShowData(showid, idz);
+    var qlty = [];
+    $.when(profile()).done(function(qltyresult) {
+        var showid = $('h1.page-title').attr('data-showid');
+        var idz = $('h1.page-title').attr('data-id');
+        var qqq = find_d_q(showid)
+        loadShowData(showid, idz);
+    });
 });
 
 /*
@@ -298,10 +300,12 @@ function sonarrStatusLabel(text) {
 
 // Grabs the quality profile
 function profile(qualityProfileId) {
-    $.get(WEBDIR + 'sonarr/Profile', function (result) {
+    var done = jQuery.Deferred();
+    $.get(WEBDIR + 'radarr/Profile', function (result) {
         qlty = result;
+        done.resolve(qlty);
     });
-
+    return done;
 }
 
 // Not in use atm

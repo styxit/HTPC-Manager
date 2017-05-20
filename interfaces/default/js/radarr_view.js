@@ -1,6 +1,6 @@
 $(document).ready(function () {
     moment().format();
-    qlty = [];
+    var qlty = [];
     $.when(profile()).done(function(qltyresult) {
         qlty = qltyresult;
         var movieid = $('h1.page-title').attr('data-movieid');
