@@ -179,7 +179,6 @@ class Radarr(object):
                     'start': movie['inCinemas'],
                     'overview': movie.get('overview', ''),
                     'all': movie,
-                    'inCinemas': movie['inCinemas'],
                     'allDay': False,
                     'id': movie['id'],
                 }
