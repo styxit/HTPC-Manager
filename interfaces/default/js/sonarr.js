@@ -1,48 +1,49 @@
 $(document).ready(function() {
   moment().format();
   $(window).trigger('hashchange');
-  var qlty = profile();
-  var folders = rootfolder();
-  loadShows();
-  history();
-  cal();
-  $('a[data-toggle="tab"]').click(function(e) {}).on('shown', cal)
+  var qlty = [];
+   $.when(profile()).done(function(qltyresult) {
+       var folders = rootfolder();
+       loadShows();
+       history();
+       cal();
+       $('a[data-toggle="tab"]').click(function (e) {
+       }).on('shown', cal)
 
-  var addShowAction = function() {
-    var query = $('#add_show_name').val();
-    if (query) {
-      $('#add_show_button').attr('disabled', true);
-      searchTvDb(query);
-    }
-  };
-  $('#add_show_name').keyup(function(event) {
-    if (event.keyCode == 13) {
-      addShowAction();
-    }
-  });
-  $('#add_show_button').click(addShowAction);
+       var addShowAction = function () {
+           var query = $('#add_show_name').val();
+           if (query) {
+               $('#add_show_button').attr('disabled', true);
+               searchTvDb(query);
+           }
+       };
+       $('#add_show_name').keyup(function (event) {
+           if (event.keyCode == 13) {
+               addShowAction();
+           }
+       });
+       $('#add_show_button').click(addShowAction);
 
-  $('#add_tvdbid_button').click(function() {
-    addShow($('#add_show_select').val(),
-      $('#add_show_quality').val(),
-      $('#add_show_monitor').val(),
-      $('#add_show_type').val(),
-      $('#add_show_folder').val(),
-      $('#add_show_seasonfolder').val(),
-      $('#add_show_specials').val()
-    );
-  });
+       $('#add_tvdbid_button').click(function () {
+           addShow($('#add_show_select').val(),
+               $('#add_show_quality').val(),
+               $('#add_show_monitor').val(),
+               $('#add_show_type').val(),
+               $('#add_show_folder').val(),
+               $('#add_show_seasonfolder').val(),
+               $('#add_show_specials').val()
+           );
+       });
 
-  $('#cancel_show_button').click(function() {
-    cancelAddShow();
-  });
+       $('#cancel_show_button').click(function () {
+           cancelAddShow();
+       });
 
-  $('#scanfolder').click(function(e) {
-    e.preventDefault();
-    Scanfolder()
-  });
-
-
+       $('#scanfolder').click(function (e) {
+           e.preventDefault();
+           Scanfolder()
+       });
+   });
 });
 
 function loadShows() {
@@ -182,10 +183,12 @@ function sonarrStatusLabel(text) {
 }
 
 function profile(qualityProfileId) {
-  $.get(WEBDIR + 'sonarr/Profile', function(result) {
-    qlty = result
-    return qlty
-  });
+    var done = jQuery.Deferred();
+    $.get(WEBDIR + 'sonarr/Profile', function (result) {
+        qlty = result;
+        done.resolve(qlty);
+    });
+    return done;
 }
 
 function rootfolder() {

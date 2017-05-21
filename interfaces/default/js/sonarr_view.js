@@ -301,7 +301,7 @@ function sonarrStatusLabel(text) {
 // Grabs the quality profile
 function profile(qualityProfileId) {
     var done = jQuery.Deferred();
-    $.get(WEBDIR + 'radarr/Profile', function (result) {
+    $.get(WEBDIR + 'sonarr/Profile', function (result) {
         qlty = result;
         done.resolve(qlty);
     });
