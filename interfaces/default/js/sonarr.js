@@ -4,6 +4,7 @@ $(document).ready(function() {
   var qlty = [];
    $.when(profile()).done(function(qltyresult) {
        var folders = rootfolder();
+       qlty = qltyresult;
        loadShows();
        history();
        cal();
