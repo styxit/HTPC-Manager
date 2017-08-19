@@ -132,7 +132,8 @@ class Deluge:
             url = 'http' + ssl + '://' +  host + ':' + str(port) + deluge_basepath + '/json'
             
             post_data = dumps(data)
-            buf = StringIO( self.opener.open(url, post_data,1).read())
+            req = urllib2.Request(url, data=post_data, headers={'Content-Type': 'application/json'})
+            buf = StringIO(self.opener.open(req, timeout=1).read())
             f = gzip.GzipFile(fileobj=buf)
             response = loads(f.read())
             self.logger.debug ("response for %s is %s" %(data,response))
