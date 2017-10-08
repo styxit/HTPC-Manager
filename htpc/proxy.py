@@ -87,8 +87,8 @@ def download_image(url, dest, auth=None, headers=None):
 def resize_image(img, height, width, opacity, dest):
     """ Resize image, set opacity and save to disk """
     size = int(width), int(height)
-    imagetype = imghdr.what(img)
     im = Image.open(img)
+    imagetype = im.format
     im = im.resize(size, Image.ANTIALIAS)
 
     # Apply overlay if opacity is set
@@ -100,7 +100,8 @@ def resize_image(img, height, width, opacity, dest):
         # apply overlay to resized image
         im = Image.blend(overlay, im, enhance)
 
-    if imagetype == 'jpeg':
-        im.save(dest, 'JPEG', quality=95)
-    im.save(dest, imagetype)
+    if imagetype == 'JPEG':
+        im.save(dest, imagetype, quality=95)
+    else:
+        im.save(dest, imagetype)
     return dest
