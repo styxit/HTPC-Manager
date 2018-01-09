@@ -146,6 +146,13 @@
                 </table>
             </div>
             %endif
+             %if settings.get('dash_uTorrent', 0):
+            <div class="span4 dash-module mofa" id="dash_uTorrent">
+                <h3><a href="utorrent/">uTorrents</a></h3>
+                <table class="table table-striped table-main" id="dash_uTorrent_table_body">
+                </table>
+            </div>
+            %endif
             %if settings.get('dash_sickbeard', 0):
             <div class="span4 dash-module" id="dash_sickbeard">
                 <h3><a href="sickbeard/#nextaired">Next Aired</a></h3>
@@ -385,6 +392,9 @@
     }
     if (${int(settings.get('dash_qbit', 0))}){
         modules['dash_qbit'] = "loadqbit";
+    }
+    if (${int(settings.get('dash_uTorrent', 0))}){
+        modules['dash_uTorrent'] = "loaduTorrent";
     }
     dash_order = "${settings.get('dash_order', 0)}";
 </script>
