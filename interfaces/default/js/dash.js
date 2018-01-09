@@ -753,6 +753,59 @@ function loadqbit() {
   });
 }
 
+function loaduTorrent() {
+  start_refresh('uTorrent', 'loaduTorrent')
+  $.ajax({
+    'url': WEBDIR + 'utorrent/torrents',
+    'complete': function() {
+      end_refresh('uTorrent')
+    },
+    'success': function(response) {
+      if (response.result == 200) {
+        var numberofloop = 0;
+        var downloads = {};
+        var i = 0;
+        $.each(response.torrents, function(index, torrent) {
+          if (torrent.percentage_done != 1000) { // skip if 100%, see only downloading and queued torrents
+            downloads[i] = torrent;
+            i = i + 1;
+          }
+        });
+      }
+      else if (response.result == 500) {
+        $('#error_message').text("Impossible to connect to uTorrent. Maybe the remote port changed ?");
+        return false;
+      }
+      if (i > 0) {
+        var max = i;
+        if (i > 5) {
+          var max = 4;
+        }
+        $.each(downloads, function(index, torrent) {
+          tr = $('<tr>');
+          numberofloop += 1;
+          if (numberofloop <= max) {
+            tr.append(
+              $('<td>').addClass('span2').text(torrent.name),
+              $('<td>').addClass('span1').append('<div class="pull-right">' + ((torrent.percentage_done == 1000) ? "-" : "") + getReadableTime(torrent.eta) + '</div>'));
+            $('#dash_uTorrent_table_body').append(tr);
+          } else {
+
+            tr.append($('<td>').addClass('').attr("colspan", 2).append('<div class="text-center"><small><a href="utorrent/">+' + (i - max) + ' more torrents</a></small></div>'))
+            $('#dash_uTorrent_table_body').append(tr);
+            return false;
+          }
+        });
+      } else {
+        tr = $('<tr>');
+        tr.append($('<td>').attr("colspan", 2).append('<div class="text-center"><small>No active uTorrent downloads</small></div>'))
+        $('#dash_uTorrent_table_body').append(tr);
+        return false;
+      }
+    }
+  });
+}
+
 function start_refresh(module, fn) {
   if ($('#dash_' + module).children('h3:first-child').has('.refresh-btns').length == 0) {
     $('#dash_' + module).children('h3:first-child').append('<span class="refresh-btns">' +
