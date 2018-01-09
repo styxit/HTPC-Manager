@@ -719,7 +719,7 @@ function loadqbit() {
       var downloads = {};
       var i = 0;
       $.each(response, function(index, torrent) {
-        if ( (torrent.state != "uploading") && (torrent.state != "stalledUP") && (torrent.state != "pausedUP") ) {
+        if (torrent.state != "uploading") {
           downloads[i] = torrent;
           i = i + 1;
         }
@@ -766,10 +766,10 @@ function loaduTorrent() {
         var downloads = {};
         var i = 0;
         $.each(response.torrents, function(index, torrent) {
-//          if (torrent.percentage_done != 1000) {// skip if 100%, so see only active and queued torrents
+          if (torrent.percentage_done != 1000) { // skip if 100%, see only downloading and queued torrents
             downloads[i] = torrent;
             i = i + 1;
-//          }
+          }
         });
       }
       else if (response.result == 500) {
@@ -850,14 +850,6 @@ function enable_sortable() {
 
   }).disableSelection();
 }
-
-setInterval(function () {
-  loaduTorrent();
-  loadqbit();
-  loadsysinfo();
-  loaddiskinfo();
-  loadsmartinfo();
-}, 60000);
 
 $('.dash-edit').click(function() {
   $("#editButtons").show();
