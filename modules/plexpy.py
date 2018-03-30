@@ -101,7 +101,7 @@ class Plexpy(object):
         url = '%sapi/v2?apikey=%s&%s' % (cls._build_url(), apikey, urlencode(kwargs))
 
         try:
-            r = requests.get(url)
+            r = requests.get(url, verify=False)
             r.raise_for_status()
             # Lets just copy the headers for now.
             cherrypy.response.headers['Content-Type'] = r.headers.get('Content-Type', 'application/json;charset=UTF-8')
@@ -109,7 +109,7 @@ class Plexpy(object):
             if resp.get('response', {}).get('result') == 'success':
                 return resp['response']['data']
         except:
-            log.exeption('Failed to get %s' % url)
+            log.exception('Failed to get %s' % url)
             return
 
     @cherrypy.expose()
