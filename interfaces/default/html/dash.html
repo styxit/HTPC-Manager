@@ -1,5 +1,9 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
+<script>
+  var dash_refresh_interval = 0; // type-cast to a number in case of bad values in the database.
+  dash_refresh_interval = ${settings.get('dash_refresh_interval', 0)};
+</script>
 <div class="container-fluid dashboard" id="dashboard">
     <div class="content" id="dash-content">
     </div>
