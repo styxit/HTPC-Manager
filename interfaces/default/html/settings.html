@@ -123,7 +123,9 @@
                     {'type':'bool', 'label':'Show Radarr calendar', 'name':'dash_radarr_calendar',
                         'checked':bool(settings.get('dash_radarr_calendar', 0))},
                 {'type':'bool', 'label':'Show Upcoming Albums (List)', 'name':'dash_upcoming_albums_list',
-                  'checked':bool(settings.get('dash_upcoming_albums_list', 0))}
+                  'checked':bool(settings.get('dash_upcoming_albums_list', 0))},
+                {'type':'text', 'label':'Refresh dashboard widgets interval', 'name':'dash_refresh_interval',
+                  'value':settings.get('dash_refresh_interval', '0'), 'desc':'Interval in seconds. 0 to disable.\n(Bug:0 will display as False)'}
             ])}
 
             <form class="form-horizontal tab-pane" id="other" method="POST">

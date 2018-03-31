@@ -924,3 +924,14 @@ $(document).ready(function() {
     }
   }
 })
+
+if ( dash_refresh_interval > 0 ) {
+  setInterval(function () {
+    loaduTorrent();
+    loadqbit();
+    loadsysinfo();
+    loaddiskinfo();
+    loadsmartinfo();
+  }, 1000 * dash_refresh_interval ) // timer uses miliseconds
+}
+
