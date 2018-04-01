@@ -209,26 +209,80 @@ function getDashActivity() {
                 $.each(data.sessions, function (index, value) {
 
                     if (value.media_type === "movie") {
-                        var item_info = value.year;
+                        var item_info = "<i class='fa fa-fw fa-film'></i> " + value.year
                     }
                     if (value.media_type === "episode") {
-                        var item_info = "S" + value.parent_media_index + " - E" + value.media_index;
+                        var item_info = "<i class='fa fa-fw fa-tv'></i> S" + value.parent_media_index + " - E" + value.media_index;
                     }
                     var thumb = WEBDIR + 'plex/GetThumb?w=475&h=275&thumb='+encodeURIComponent(value.art);
-                    var image = "<img src=\"" + thumb + "\"/>";
+                    var image = "<img src=\"" + thumb + "\"/ class='post-image'>";
 
+                    var transcode_speed = value.transcode_speed + "x";
+                    if (value.transcode_speed == "0.0") { 
+                      transcode_speed = "Throttled"
+                    }
 
-                    if ((index % 4) == 0) items += '<div class="row-fluid">';
-                    items += "<div class='span3 p-lr-sm'><div class='top-title'>" + playState(value.state) + "<span>" + value.full_title + "</span></div>" +
-                        "<div class='poster-image'>" + image +
-                        "<div class='meta-overlay'><span>IP: " + value.ip_address + "<br/>ETC: "+moment().add(millisecondsToMinutes(value.duration - value.view_offset,1),'m').format("hh:mm A")+"</span><span class='pull-right'>" + millisecondsToMinutes(value.view_offset) + " / " + millisecondsToMinutes(value.duration) + "</span></div></div>" +
-                        "<div class='progress'>" +
+                    var transcode_decision = value.transcode_decision;
+                    if (value.transcode_decision === "transcode") { 
+                      transcode_decision = "Transcode (" + transcode_speed + ")" 
+                    } else {
+                      transcode_decision = "Direct Stream"
+                    }
+
+                    var stream_container_decision = "Direct Streamm (" + (value.container).toLocaleUpperCase() + ")";
+                    if (value.stream_container_decision === "transcode") { 
+                      stream_container_decision = "Transcode (" + (value.container).toLocaleUpperCase() + " &rarr; " + (value.transcode_container).toLocaleUpperCase() + ")" 
+                    }
+
+                    var stream_video_decision = "Direct Stream (" + (value.stream_video_codec).toLocaleUpperCase() + " " + value.stream_video_resolution + "p)";
+                    if (value.stream_video_decision === "transcode") {
+                      stream_video_decision = "Transcode (" + (value.stream_video_codec).toLocaleUpperCase() + " &rarr; " + (value.transcode_video_codec).toLocaleUpperCase() + ")"
+                    }
+
+                    var audio_channel_layout = value.audio_channel_layout
+                    if (audio_channel_layout.indexOf('\(') > 0) { audio_channel_layout = (value.audio_channel_layout).substring(0, (value.audio_channel_layout).indexOf('\(')) }
+                    var stream_audio_channel_layout = value.stream_audio_channel_layout
+                    if (stream_audio_channel_layout.indexOf('\(') > 0) { stream_audio_channel_layout = (value.stream_audio_channel_layout).substring(0, (value.stream_audio_channel_layout).indexOf('\(')) }
+                    var stream_audio_decision = "Direct Stream (" + (value.audio_codec).toLocaleUpperCase() + " " + audio_channel_layout + ")";
+                    if (value.stream_audio_decision === "transcode") {
+                      stream_audio_decision = "Transcode (" + (value.audio_codec).toLocaleUpperCase() + " " + audio_channel_layout + " &rarr; " + (value.transcode_audio_codec).toLocaleUpperCase() + " " + stream_audio_channel_layout + ")"
+                    }
+
+                    if ((index % 3) == 0) items += '<div class="row-fluid">';
+                    items += "<div class='span4 p-lr-sm'><div class='top-title'>" + playState(value.state) + "<span>" + value.full_title + "</span></div>" +
+                      "<div class='plexpy-poster'>" + image +
+                      "<div class='meta-overlay-full'>" +
+
+                      "<table width=100%>" +
+                        "<tr><td class='span4' style='text-align:right'>PRODUCT</td><td class='span1'></td><td>" + value.product + "</td></tr>" +
+
+                        "<tr><td class='span4' style='text-align:right'>PLAYER</td><td class='span1'></td><td>" + value.player + "</td></tr>" +
+
+                        "<tr><td class='span4' align='right'>QUALITY</td><td class='span1'></td><td>" + value.quality_profile + " @ " + value.bitrate + " Kbps</td></tr>" +
+
+                        "<tr><td class='span4' align='right'>STREAM</td><td class='span1'></td><td>" + transcode_decision + "</td></tr>" +
+
+                        "<tr><td class='span4' align='right'>CONTAINER</td><td class='span1'></td><td>" + stream_container_decision + "</td></tr>" +
+
+                        "<tr><td class='span4' align='right'>VIDEO</td><td class='span1'></td><td>" + stream_video_decision + "</td></tr>" +
+
+                        "<tr><td class='span4' align='right'>AUDIO</td><td class='span1'></td><td>" + stream_audio_decision + "</td></tr>" +
+
+                        "<tr><td class='span4' align='right'>LOCATION</td><td class='span1'></td><td>" + (value.location).toLocaleUpperCase() + ": " + value.ip_address + "</td></tr>" +
+                        "<tr><td class='span4' align='right'>BANDWIDTH</td><td></td><td>" + value.bandwidth + " Kbps</td></tr>" +
+                        "<tr><td colspan=3 style='font-size:smaller; text-align:right'> ETC: "+moment().add(millisecondsToMinutes(value.duration - value.view_offset,1),'m').format("h:mma") + " &nbsp; " +millisecondsToMinutes(value.view_offset) + " / " + millisecondsToMinutes(value.duration) + "</td></tr>" +
+                      "</table>" +
+
+                    "</div>" +
+                    "</div>" +
+                    "<div class='progress'>" +
                         "<div class='bar' style='width:" + value.progress_percent + "%'>" +
-                        "<span class='sr-only'>" + value.progress_percent + "%</span></div>" +
-                        "<div class='bar bar-warning' style='width:" + (100 - value.progress_percent) + "%'>" +
-                        "<span class='sr-only'></span></div>" +
-                        "</div><div><span class='pull-left'>" + item_info + "</span><span class='pull-right'>" + value.user + "</span></div></div>";
-                    if ((index % 4) == 3) items += '</div>';
+                            "<span class='sr-only'>" + value.progress_percent + "%</span></div>" +
+                            "<div class='bar bar-warning' style='width:" + (100 - value.progress_percent) + "%'>" +
+                            "<span class='sr-only'></span></div>" +
+                          "</div>" +
+                        "<div><span class='pull-left'>" + item_info + "</span><span class='pull-right'>" + value.user + "</span></div></div>";
+                    if ((index % 3) == 2) items += '</div>';
 
                     $("#activity").html(items);
 
@@ -260,13 +314,6 @@ function getDashActivity() {
                 Sessions += " )";
 
                 $('#sessions').html(Sessions);
-
-                $("div.poster-image").hover(
-                    function () {
-                        $(this).find(".meta-overlay").css('visibility', 'visible');
-                    }, function () {
-                        $(this).find(".meta-overlay").css('visibility', 'hidden');
-                    });
 
             }
         },
@@ -353,7 +400,8 @@ function getLibraryStats() {
                         '</div>' +
                         '<div class="stat-highlights">' +
                         '<h2>' + itemTitle + '</h2>' +
-                        '<p>' + value.rows[0].title + value.rows[0].friendly_name +'</p>';
+                        //'<p>' + value.rows[0].title + value.rows[0].friendly_name +'</p>';
+                        '<p>' + value.rows[0].title +'</p>';
                             if(value.stat_id == "last_watched"){
                                 items += itemCount
                             }
