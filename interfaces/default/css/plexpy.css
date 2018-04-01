@@ -40,7 +40,6 @@
     width: 100%;
     height: 250px;
     backface-visibility: hidden;
-    flex: 1;
 }
 
 .plexpy-poster:hover .poster-image {
