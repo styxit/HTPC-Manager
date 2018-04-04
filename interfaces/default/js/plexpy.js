@@ -267,6 +267,9 @@ function getDashActivity() {
                     if (value.stream_subtitle_decision !== "") {
                       stream_subtitle_decision = (value.stream_subtitle_decision).toLocaleUpperCase() + " (" + (value.subtitle_codec).toLocaleUpperCase() + " " + (value.stream_subtitle_language_code).toLocaleUpperCase() + ")"
                     }
+                    if (value.stream_subtitle_decision === "transcode") {
+                      stream_subtitle_decision = "Transcode (" + (value.subtitle_codec).toLocaleUpperCase() + " " + (value.stream_subtitle_language_code).toLocaleUpperCase() + ")"
+                    }
                     if (value.stream_subtitle_decision === "burn") {
                       stream_subtitle_decision = "Burn (" + (value.subtitle_codec).toLocaleUpperCase() + " " + (value.stream_subtitle_language_code).toLocaleUpperCase() + ")"
                     }
@@ -301,7 +304,7 @@ function getDashActivity() {
                     "<div class='progress'>" +
                         "<div class='bar' style='width:" + value.progress_percent + "%'>" +
                             "<span class='sr-only'>" + value.progress_percent + "%</span></div>" +
-                            "<div class='bar bar-warning' style='width:" + (100 - value.progress_percent) + "%'>" +
+                            "<div class='bar bar-info' style='width:" + (100 - value.progress_percent) + "%'>" +
                             "<span class='sr-only'></span></div>" +
                           "</div>" +
                         "<div><span class='pull-left'>" + item_info + "</span><span class='pull-right'>" + value.user + "</span></div></div>";
@@ -340,7 +343,7 @@ function getDashActivity() {
 
             }
         },
-        complete: setTimeout(function() {getDashActivity()}, 10000),
+        complete: setTimeout(function() {getDashActivity()}, 5000),
         timeout: 2000
     })
 }
