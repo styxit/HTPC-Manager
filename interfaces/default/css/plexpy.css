@@ -33,34 +33,38 @@
     background-color: #f2f2f2;
 }
 
+/* .poster-image {
+  min-height: 200px;
+} */
+
 .plexpy-poster {
     position: relative;
     opacity: 1;
-    display: block;
-    width: 100%;
-    height: 250px;
-    backface-visibility: hidden;
+    display: block; 
+    width: 100%; 
+/*    backface-visibility: hidden; */
 }
 
 .plexpy-poster:hover .poster-image {
-  opacity: 0.3;
+    min-height: 200px;
+    min-width: 345px;
+    opacity: 0.2;
 }
 
 .plexpy-poster:hover .meta-overlay-full {
-  opacity: 1;
+    min-width: 400px;
+    visibility: visible;
 }
 
 .meta-overlay-full {
     position: relative;
     top: -200px;
-    height: 200px;
-    display: flex;
+    height: 40px; 
     padding-left: 5px;
     padding-right: 5px;
-    background-color: rgba(10, 10, 10, 0.7);
     color: #f2f2f2;
     font-size: small;
-    opacity: 0;
+    visibility: hidden;
 }
 
 .meta-overlay {
@@ -73,6 +77,30 @@
     font-size: small;
     font-weight: bold;
     visibility: hidden;
+}
+
+ul.meta {
+    list-style:none;
+    margin:0;
+    padding:0;
+    width:100%;
+    overflow:hidden;
+}
+li.meta-right {
+    white-space: nowrap;
+}
+
+li.meta-left {
+    width: 20%;
+    padding-right: 8px;
+    float: left;
+    min-width:85px;
+}
+
+li.meta-span {
+    width:100%;
+    max-width: 325px;
+    font-size:smaller;
 }
 
 .stat-holder{

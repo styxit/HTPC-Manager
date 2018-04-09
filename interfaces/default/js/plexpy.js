@@ -46,7 +46,8 @@ function getHistoryTable() {
                         $(td).html(moment(cellData, "X").format("YYYY-MM-DD"));
                     },
                     "width": "7%",
-                    "searchable": "false"
+                    "searchable": "false",
+                    "className": "no-wrap"
 
                 },
                 {
@@ -214,8 +215,14 @@ function getDashActivity() {
                     if (value.media_type === "episode") {
                         var item_info = "<i class='fa fa-fw fa-tv'></i> S" + value.parent_media_index + " - E" + value.media_index;
                     }
-                    var thumb = WEBDIR + 'plex/GetThumb?w=475&h=275&thumb='+encodeURIComponent(value.art);
-                    var image = "<img src=\"" + thumb + "\"/ class='post-image'>";
+                    //var thumb = WEBDIR + 'plex/GetThumb?w=475&h=275&thumb='+encodeURIComponent(value.art);
+                    var thumb = WEBDIR + 'plex/GetThumb?w=730&h=420&thumb='+encodeURIComponent(value.art);
+                    var image = "<img src=\"" + thumb + "\"/ class='poster-image'>";
+
+                    var product_player = value.product + " on " + value.player
+                    if (value.player === value.product) { 
+                      product_player = value.player
+                    }
 
                     var transcode_speed = value.transcode_speed + "x";
                     if (value.transcode_speed == "0.0") { 
@@ -229,14 +236,24 @@ function getDashActivity() {
                       transcode_decision = "Direct Stream"
                     }
 
-                    var stream_container_decision = "Direct Streamm (" + (value.container).toLocaleUpperCase() + ")";
+                    var stream_container_decision = "Direct Stream (" + (value.container).toLocaleUpperCase() + ")";
                     if (value.stream_container_decision === "transcode") { 
                       stream_container_decision = "Transcode (" + (value.container).toLocaleUpperCase() + " &rarr; " + (value.transcode_container).toLocaleUpperCase() + ")" 
                     }
 
-                    var stream_video_decision = "Direct Stream (" + (value.stream_video_codec).toLocaleUpperCase() + " " + value.stream_video_resolution + "p)";
+		    if ( isNaN(value.video_resolution.charAt(0)) ) {
+		      var video_resolution = value.video_resolution.toLocaleUpperCase()
+                    } else {
+		      var video_resolution = value.video_resolution + "p"
+                    }
+		    if ( isNaN(value.stream_video_resolution.charAt(0)) ) {
+		      var stream_video_resolution = value.stream_video_resolution.toLocaleUpperCase()
+                    } else {
+		      var stream_video_resolution = value.stream_video_resolution + "p"
+                    }
+                    var stream_video_decision = "Direct Stream (" + (value.stream_video_codec).toLocaleUpperCase() + " " + video_resolution + ")";
                     if (value.stream_video_decision === "transcode") {
-                      stream_video_decision = "Transcode (" + (value.stream_video_codec).toLocaleUpperCase() + " &rarr; " + (value.transcode_video_codec).toLocaleUpperCase() + ")"
+                      stream_video_decision = "Transcode (" + (value.stream_video_codec).toLocaleUpperCase() + " " + video_resolution + " &rarr; " + (value.transcode_video_codec).toLocaleUpperCase() + " " + stream_video_resolution + ")"
                     }
 
                     var audio_channel_layout = value.audio_channel_layout
@@ -248,41 +265,53 @@ function getDashActivity() {
                       stream_audio_decision = "Transcode (" + (value.audio_codec).toLocaleUpperCase() + " " + audio_channel_layout + " &rarr; " + (value.transcode_audio_codec).toLocaleUpperCase() + " " + stream_audio_channel_layout + ")"
                     }
 
+                    var stream_subtitle_decision = "None";
+                    if (value.stream_subtitle_decision !== "") {
+                      stream_subtitle_decision = (value.stream_subtitle_decision).toLocaleUpperCase() + " (" + (value.subtitle_codec).toLocaleUpperCase() + " " + (value.stream_subtitle_language_code).toLocaleUpperCase() + ")"
+                    }
+                    if (value.stream_subtitle_decision === "transcode") {
+                      stream_subtitle_decision = "Transcode (" + (value.subtitle_codec).toLocaleUpperCase() + " " + (value.stream_subtitle_language_code).toLocaleUpperCase() + ")"
+                    }
+                    if (value.stream_subtitle_decision === "burn") {
+                      stream_subtitle_decision = "Burn (" + (value.subtitle_codec).toLocaleUpperCase() + " " + (value.stream_subtitle_language_code).toLocaleUpperCase() + ")"
+                    }
+
                     if ((index % 3) == 0) items += '<div class="row-fluid">';
-                    items += "<div class='span4 p-lr-sm'><div class='top-title'>" + playState(value.state) + "<span>" + value.full_title + "</span></div>" +
+                    items += "<div class='span4 p-lr-sm'>" +
+                      "<div class='top-title'>" + playState(value.state) + " <span> " + value.full_title + "</span></div>" +
                       "<div class='plexpy-poster'>" + image +
                       "<div class='meta-overlay-full'>" +
 
-                      "<table width=100%>" +
-                        "<tr><td class='span4' style='text-align:right'>PRODUCT</td><td class='span1'></td><td>" + value.product + "</td></tr>" +
 
-                        "<tr><td class='span4' style='text-align:right'>PLAYER</td><td class='span1'></td><td>" + value.player + "</td></tr>" +
+                      "<ul class='meta'>" +
+                        "<li class='meta-left'><div style='float:right;'>PLAYER</div></li><li class='meta-right'>" + product_player + "</li>" +
+                        "<li class='meta-left'><div style='float:right;'>QUALITY</div></li><li class='meta-right'>" +  value.quality_profile + " @ " + value.bitrate + " Kbps</li>" +
 
-                        "<tr><td class='span4' align='right'>QUALITY</td><td class='span1'></td><td>" + value.quality_profile + " @ " + value.bitrate + " Kbps</td></tr>" +
+                        "<li class='meta-left'><div style='float:right;'>STREAM</div></li><li class='meta-right'>" + transcode_decision + "</li>" +
 
-                        "<tr><td class='span4' align='right'>STREAM</td><td class='span1'></td><td>" + transcode_decision + "</td></tr>" +
+                        "<li class='meta-left'><div style='float:right;'>CONTAINER</div></li><li class='meta-right'>" + stream_container_decision + "</li>" +
 
-                        "<tr><td class='span4' align='right'>CONTAINER</td><td class='span1'></td><td>" + stream_container_decision + "</td></tr>" +
+                        "<li class='meta-left'><div style='float:right;'>VIDEO</div></li><li class='meta-right'>" + stream_video_decision + "</li>" +
 
-                        "<tr><td class='span4' align='right'>VIDEO</td><td class='span1'></td><td>" + stream_video_decision + "</td></tr>" +
+                        "<li class='meta-left'><div style='float:right;'>AUDIO</div></li><li class='meta-right'>" + stream_audio_decision + "</li>" +
 
-                        "<tr><td class='span4' align='right'>AUDIO</td><td class='span1'></td><td>" + stream_audio_decision + "</td></tr>" +
+                        "<li class='meta-left'><div style='float:right;'>LOCATION</div></li><li class='meta-right'>" + (value.location).toLocaleUpperCase() + ": " + value.ip_address + "</li>" +
+                        "<li class='meta-left'><div style='float:right;'>SUBTITLES</div></li><li class='meta-right'>" + stream_subtitle_decision + "</li>" +
+                       "<li class='meta-left'><div style='float:right;'>BANDWIDTH</div></li><li class='meta-right'>" + value.bandwidth + " Kbps</li>" +
+                        "<li class='meta-span'><div style='float:right;'>ETC: "+moment().add(millisecondsToMinutes(value.duration - value.view_offset,1),'m').format("h:mma") + " &nbsp; " +millisecondsToMinutes(value.view_offset) + " / " + millisecondsToMinutes(value.duration) + "</div></li>" +
+                    "</ul>" +
 
-                        "<tr><td class='span4' align='right'>LOCATION</td><td class='span1'></td><td>" + (value.location).toLocaleUpperCase() + ": " + value.ip_address + "</td></tr>" +
-                        "<tr><td class='span4' align='right'>BANDWIDTH</td><td></td><td>" + value.bandwidth + " Kbps</td></tr>" +
-                        "<tr><td colspan=3 style='font-size:smaller; text-align:right'> ETC: "+moment().add(millisecondsToMinutes(value.duration - value.view_offset,1),'m').format("h:mma") + " &nbsp; " +millisecondsToMinutes(value.view_offset) + " / " + millisecondsToMinutes(value.duration) + "</td></tr>" +
-                      "</table>" +
-
-                    "</div>" +
-                    "</div>" +
+                    "</div>" + // meta-overlay
+                    "</div>" + // div poster
                     "<div class='progress'>" +
                         "<div class='bar' style='width:" + value.progress_percent + "%'>" +
                             "<span class='sr-only'>" + value.progress_percent + "%</span></div>" +
-                            "<div class='bar bar-warning' style='width:" + (100 - value.progress_percent) + "%'>" +
+                            "<div class='bar bar-info' style='width:" + (100 - value.progress_percent) + "%'>" +
                             "<span class='sr-only'></span></div>" +
-                          "</div>" +
-                        "<div><span class='pull-left'>" + item_info + "</span><span class='pull-right'>" + value.user + "</span></div></div>";
-                    if ((index % 3) == 2) items += '</div>';
+                          "</div>" + // div progress
+                        "<div><span class='pull-left'>" + item_info + "</span><span class='pull-right'>" + value.user + "</span></div>" +
+                        "</div>"; // div span4 tile
+                    if ((index % 3) == 2) items += '</div>'; // div row-fluid
 
                     $("#activity").html(items);
 
