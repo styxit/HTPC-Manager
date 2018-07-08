@@ -226,7 +226,7 @@ class UTorrent(object):
         :rtype: requests.Response
         :return:
         """
-        if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove', 'add-url', 'recheck', 'setprio',
+        if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove', 'removedata', 'add-url', 'recheck', 'setprio',
                           'queuebottom', 'queuetop', 'queuedown', 'queueup', 'getfiles', 'getsettings', 'setsetting'):
             raise AttributeError
         if action == 'add-url':
