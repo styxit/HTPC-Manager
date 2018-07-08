@@ -231,14 +231,14 @@ class Radarr(object):
     @require()
     @cherrypy.tools.json_out()
     def Lookup(self, q):
-        return self.fetch('Movies/lookup?term=%s' % urllib.quote(q))
+        return self.fetch('Movie/lookup?term=%s' % urllib.quote(q))
 
     @cherrypy.expose()
     @require()
     def AddMovie(self, tmdbId, qualityProfileId, rootfolder='', monitored=True):
         d = {}
         try:
-            movie = self.fetch('Movies/lookup/tmdb?tmdbId=%s' % tmdbId)
+            movie = self.fetch('Movie/lookup/tmdb?tmdbId=%s' % tmdbId)
 
             self.logger.debug('monitor=%s' % monitored)
 
@@ -264,5 +264,5 @@ class Radarr(object):
     @require(member_of(htpc.role_user))
     @cherrypy.tools.json_out()
     def test(self):
-        movie = self.fetch('Movies/lookup/tmdb?tmdbId=%s' % 32434)
+        movie = self.fetch('Movie/lookup/tmdb?tmdbId=%s' % 32434)
         return movie

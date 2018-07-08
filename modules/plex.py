@@ -127,13 +127,17 @@ class Plex(object):
         try:
             plex_url = Plex.get_server_url()
             plex_hide_homemovies = htpc.settings.get('plex_hide_homemovies', False)
+            if htpc.settings.get('plex_hide_watched', False):
+                hidewatched = '1'
+            else:
+                hidewatched = '0'
             movies = []
 
             for section in self.jloader('%s/library/sections' % plex_url).get('Directory', {}):
                 if self.check_ignore(section['title']):
                     if section['type'] == 'movie':
                         if section['agent'] != 'com.plexapp.agents.none' or not plex_hide_homemovies:
-                            for movie in self.jloader('%s/library/sections/%s/all?type=1&sort=addedAt:desc&X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_url, section['key'], limit)).get('Metadata', {}):
+                            for movie in self.jloader('%s/library/sections/%s/all?type=1&unwatched=%s&sort=addedAt:desc&X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_url, section['key'], hidewatched, limit)).get('Metadata', {}):
                                 jmovie = {}
                                 genre = []
 
@@ -237,14 +241,19 @@ class Plex(object):
     @cherrypy.tools.json_out()
     def GetRecentShows(self, limit=5):
         ''' Get a list of recently added shows '''
+        self.logger.debug('Fetching recent shows')
         try:
             plex_url = Plex.get_server_url()
+            if htpc.settings.get('plex_hide_watched', False):
+                hidewatched = '1'
+            else:
+                hidewatched = '0'
             episodes = []
 
             for section in self.jloader('%s/library/sections' % plex_url).get('Directory', {}):
                 if self.check_ignore(section['title']):
                     if section['type'] == 'show':
-                        for episode in self.jloader('%s/library/sections/%s/all?type=4&sort=addedAt:desc&X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_url, section['key'], limit)).get('Metadata', {}):
+                        for episode in self.jloader('%s/library/sections/%s/all?type=4&unwatched=%s&sort=addedAt:desc&X-Plex-Container-Start=0&X-Plex-Container-Size=%s' % (plex_url, section['key'], hidewatched, limit)).get('Metadata', {}):
                             try:
                                 jepisode = {}
 
@@ -363,7 +372,8 @@ class Plex(object):
             else:
                 hidewatched = 'all'
 
-            f = self._filter(f)
+            f = self._filter(f, hidewatched) # tell the _filter parser about hidewatched
+            self.logger.debug('_filter response was %s' % f)
             for section in self.jloader('%s/library/sections' % plex_url).get('Directory', {}):
                 if self.check_ignore(section['title']):
                     if section['type'] == 'movie':
@@ -456,7 +466,7 @@ class Plex(object):
             else:
                 hidewatched = 'all'
 
-            f = self._filter(f)
+            f = self._filter(f, hidewatched) # tell the _filter parser about hidewatched
             self.logger.debug('_filter response was %s' % f)
 
             for section in self.jloader('%s/library/sections' % plex_url).get('Directory', {}):
@@ -1177,9 +1187,9 @@ class Plex(object):
             self.logger.error('Unable to play %s on player %s type %s offset %s' % (item, playerip, type, offset))
             return 'error'
 
-    def _filter(self, s):
-        self.logger.debug('called _filter %s' % s)
-        default = 'all'
+    def _filter(self, s, hidewatched='all'): # default to 'all' as audio tabs don't currently specify watched/unwatched.
+        self.logger.debug('called _filter with "%s" for %s' % (s, hidewatched))
+        default = hidewatched
         if s == '':
             return default
         # allow foreign
@@ -1194,7 +1204,7 @@ class Plex(object):
         if ok:
             # Check for control chars and default to title
             if '=' not in s and '<' not in s and '>' not in s and '!' not in s:
-                return 'all?title=%s' % urllib.quote_plus(s)
+                return '%s?title=%s' % (default, urllib.quote_plus(s))
             else:
                 s = urlparse.parse_qsl(s)
                 # returns empty list if it fails
@@ -1207,6 +1217,9 @@ class Plex(object):
                             return default
 
                         if k == 'genre':
+                            # TODO: make this lookup dynamic (curl http://127.0.0.1:32400/library/sections/x/genre?X-Plex-Token=xxxxxxxxx)
+                            # as classifications differ based on library type (and language I think).
+							# The below appears to be out of date or not English.
                             gen = {
                                     'action': 235,
                                     'action film': 776,
@@ -1219,7 +1232,9 @@ class Plex(object):
                                     'drama': 169,
                                     'family': 264,
                                     'fantacy': 79,
-                                    'forein': 3312,
+                                    'fantasy': 79, #allow both spellings
+                                    'foreign': 3312,
+                                    'forein': 3312, # allow both spellings
                                     'history': 170,
                                     'horror': 303,
                                     'music': 2361,
@@ -1229,18 +1244,25 @@ class Plex(object):
                                     'romance': 519,
                                     'romance film': 7555,
                                     'science fiction': 80,
+                                    'science-fiction': 80, # allow hyphenated
                                     'slapstick': 777,
                                     'thriller': 196,
                                     'war': 659,
-                                    'western': 1705,
-
-
+                                    'western': 1705
                             }
                             t = gen.get(v)
                             if t is not None:
                                 d[k] = gen[v]
                             else:
-                                return default
+                                # return filter as typed if not matched to genre above, in case someone actually knows what index to type
+                                return '%s?%s' % (default, urllib.urlencode(s))
+
+                        # TODO: If the lookup for 'genre=' can be made dynamic, then we can easily add these other filters:
+                        # if k == 'director':
+                        # if k == 'actor':
+                        # if k == 'collection':
+                        # if k == 'country':
+                        # and presumably some music-related ones too.
 
                         if k == 'type':
                             # doesnt really do anything. you dont get appropriate response unless you
@@ -1263,4 +1285,4 @@ class Plex(object):
                             else:
                                 return default
 
-                    return 'all?%s' % urllib.urlencode(d)
+                    return '%s?%s' % (default, urllib.urlencode(d))

@@ -367,9 +367,20 @@ class Stats(object):
 
     def _get_external_ip(self, dash=False):
         try:
-            self.logger.debug('Checking external ip')
-            s = requests.get('http://myexternalip.com/raw')
-            return s.content.strip()
+            # myexternalip.com/raw isn't working for me. Changed to two different sites and added error checking to ensure success.
+            self.logger.debug('Checking external ip at wtfismyip.com')
+            s = requests.get('http://wtfismyip.com/text')
+            if s.status_code == requests.codes.ok:
+                return s.content.strip()
+            else:
+                self.logger.error('Got bad response from wtfismyip.com HTTP ' + str(s.status_code))
+                self.logger.debug('Checking external ip at ident.me')
+                s = requests.get('http://ident.me/')
+                if s.status_code == requests.codes.ok:
+                    return s.content.strip()
+                else:
+                    self.logger.error('Got bad response from ident.me HTTP ' + str(s.status_code))
+                    return ''
         except Exception as e:
             self.logger.error('Pulling external ip %s' % e)
             return ''
