@@ -714,6 +714,7 @@ function bytestospeed(bytes) {
 }
 
 function loadqbit() {
+  if (!$('#dash_qbit_table_body').length) return
   start_refresh('qbit', 'loadqbit')
   $.ajax({
     'url': WEBDIR + 'qbittorrent/fetch',
@@ -761,6 +762,7 @@ function loadqbit() {
 }
 
 function loaduTorrent() {
+  if (!$('#dash_uTorrent_table_body').length) return
   start_refresh('uTorrent', 'loaduTorrent')
   $.ajax({
     'url': WEBDIR + 'utorrent/torrents',
