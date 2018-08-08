@@ -1,0 +1,9 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+<div class="container">
+	<div class="content maincontent">
+		<h1 class="page-header page-title">
+		<a href="http://${settings.get('ombi_host')}:${settings.get('ombi_port')}" target="_blank">${settings.get('ombi_name', 'Awesome')}</a>
+		</h1>
+	</div>
+</div>
