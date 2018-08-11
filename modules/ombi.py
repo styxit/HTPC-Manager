@@ -1,21 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+
 __author__ = 'jeremysherriff'
 
 
 import requests
-from cherrypy.lib.auth2 import require, member_of
-import logging
-import htpc
 import cherrypy
+from cherrypy.lib.auth2 import require, member_of
+import datetime as DT
+from json import loads, dumps
+import logging
+import urllib
+import htpc
 from HTMLParser import HTMLParser
 from htpc.helpers import striphttp
 
 logger = logging.getLogger('modules.ombi')
 
 class Ombi(object):
-    # _token = ''
+    _token = ''
     # _cookies = None
 
     def __init__(self):
@@ -24,7 +28,7 @@ class Ombi(object):
         htpc.MODULES.append({
             'name': 'Ombi',
             'id': 'ombi',
-            'test': htpc.WEBDIR + 'ombi/ping',
+            'test': 'http://127.0.0.1:8085/ombi/test',
             'fields': [
                 {'type': 'bool', 'label': 'Enable', 'name': 'ombi_enable'},
                 {'type': 'text', 'label': 'Menu name *', 'name': 'ombi_name'},
@@ -71,14 +75,14 @@ class Ombi(object):
         try:
             res = requests.get(u)
             if res.status_code == 200:
-                logger.debug('Ombi ping via ' + str(u))
-                return True
+                logger.debug('Ombi ping successful via ' + str(u))
+                return 'Ombi ping successful via %s %s' % ( str(u), res.content)
             else:
                 logger.error('Unable to contact Ombi via %s Response %s %s' % (u, str(res.status_code), str(res.reason)))
-                return False
+                return 'Unable to contact Ombi via %s Response %s %s' % (u, str(res.status_code), str(res.reason))
         except Exception, e:
             logger.error('Unable to contact Ombi via %s Response %s' % (u, str(e)))
-            return False
+            return 'Unable to contact Ombi via %s Response %s' % (u, str(e))
 
 
     @cherrypy.expose()
@@ -87,44 +91,119 @@ class Ombi(object):
     def test(self):
         # Fuller version of ping(). Includes auth test.
         # self.logger.info('Testing connectivity and credentials')
-        url = 'api/v1/Stats'
+        url = 'api/v1/Settings/about'
         
-        res = self._ombi_fetch('GET', url)
+        res = self._ombi_get(url)
         if res.status_code == 200:
+            logger.error('Unable to contact Ombi via %s Response %s %s' % (url, str(res.status_code), str(res.reason)))
             return res.content
         else:
-            # self.logger.info('Unable to contact Ombi via %s Response %s %s' % (u, str(res.response_code), str(res.reason)))
-            return False
+            logger.error('Unable to contact Ombi via %s Response %s %s' % (url, str(res.status_code), str(res.reason)))
+            return res.reason
 
-    def _ombi_fetch(self, rtype, url):
+    @cherrypy.expose()
+    @require(member_of(htpc.role_admin))
+    @cherrypy.tools.json_out()
+    def dummy(self):
+        x = self.auth()
+        if x:
+            return self._token
+        else:
+            return 'Token auth failed'
+
+    def _ombi_get(self, url):
         """
         Combined function to make all Ombi API calls.
         Builds the url, authenticates and grabs token if there isn't one.
         If the call doesn't need auth, don't use this function.
         :param args:
-        :rtype: GET, POST, PUT, DELETE
         :url: api endpoint
         :return: the requests response object.
         """
-        # self.logger.info('Doing %s request to %s' % (rtype, url) )
+        logger.debug('Doing GET request to %s' % url )
+        if self._token == '':
+            r = self.auth()
+            if r.status_code != 200:
+                logger.debug('GET request died - auth failed')
+                return r
         ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
         ip = htpc.settings.get('ombi_host')
         port = htpc.settings.get('ombi_port')
         u = 'http%s://%s:%s/%s' % (ssl, ip, port, url)
-        return False
+        h = dict()
+        h.update({ 'Authorization': self._token})
+        r = requests.get( u, headers=h )
+        if r.status_code == 401: # 401 means we need to re-authenticate
+            logger.debug('Token has expired, re-authenticating')
+            r = self.auth()
+            if self._token != '':
+                logger.debug('Repeating GET after auth')
+                self._ombi_get(url)
+            else:
+                logger.debug('GET Request died - could not re-authenticate')
+                return r
+        logger.debug('GET response: %s %s' % ( str(r.status_code), str(r.reason) ))
+        if r.status_code == 200:
+            d = r.json()
+            logger.debug('Ombi GET successful')
+        else:
+            logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
+        return r
+        
+    def _ombi_post(self, url, data):
+        """
+        Combined function to make all Ombi API calls.
+        Builds the url, authenticates and grabs token if there isn't one.
+        If the call doesn't need auth, don't use this function.
+        :param args:
+        :url: api endpoint
+        :return: the requests response object.
+        """
+        logger.debug('Doing PUT request to %s' % url )
+        if self._token == '':
+            self.auth()
+        ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
+        ip = htpc.settings.get('ombi_host')
+        port = htpc.settings.get('ombi_port')
+        u = 'http%s://%s:%s/%s' % (ssl, ip, port, url)
+        h = dict()
+        h.update({ 'Authorization': self._token})
+        r = requests.post( u, json=data )
+        logger.debug('POST response: %s %s' % ( str(r.status_code), str(r.reason) ))
+        if r.status_code == 200:
+            d = r.json()
+            self._token = 'Bearer ' + str(d['access_token'])
+            logger.debug('Ombi PUT successful')
+        else:
+            logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
+        return r
+
+    def auth(self):
+        ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
+        ip = htpc.settings.get('ombi_host')
+        port = htpc.settings.get('ombi_port')
+        usernm = htpc.settings.get('ombi_username')
+        passwd = htpc.settings.get('ombi_password')
+        url = 'api/v1/Token'
+        u = 'http%s://%s:%s/%s' % (ssl, ip, port, url)
+
+        h = dict()
+        j = dict()
+        j.update({ "username": usernm, "password": passwd })
+        r = requests.post( u, json=j )
+        if r.status_code == 200:
+            d = r.json()
+            self._token = 'Bearer ' + str(d['access_token'])
+            logger.warning('Ombi auth successful')
+        else:
+            self._token = ''
+            logger.error('Could not get auth token from Ombi: %s %s' % ( str(r.status_code), str(r.reason) ))
+        return r
 
     def _get_url(self, host=None, port=None):
         u_host = host or htpc.settings.get('utorrent_host')
         u_port = port or htpc.settings.get('utorrent_port')
         return 'http://{}:{}/gui/'.format(striphttp(u_host), u_port)
-
-    def auth(self, host, port, username, pwd):
-        logger.debug('Fetching auth token')
-        token_page = self.sess.get(self._get_url(host, port) + 'token.html', auth=(username, pwd))
-        self._token = AuthTokenParser().token(token_page.content)
-        self._cookies = token_page.cookies
-        logger.debug('Auth token is %s' % self._token)
-        return self._token
 
     def fetch(self, args, username='', password='', host='', port=''):
         """
@@ -163,6 +242,18 @@ class Ombi(object):
         except Exception as e:
             logger.error('Failed to fetch %s with args %s %s' % (url, args, e), exc_info=True)
 
+
+    @cherrypy.tools.json_out()
+    @cherrypy.expose()
+    @require()
+    def movie_requests(self):
+        u = 'api/v1/Request/movie'
+        logger.debug('Fetching all movies requests via %s' % u)
+        req = self._ombi_get(u)
+        if req:
+            return req.json()
+        else:
+            return {'result': 500}
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()

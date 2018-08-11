@@ -1,9 +1,90 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
-<div class="container">
-	<div class="content maincontent">
-		<h1 class="page-header page-title">
-		<a href="http://${settings.get('ombi_host')}:${settings.get('ombi_port')}" target="_blank">${settings.get('ombi_name', 'Awesome')}</a>
-		</h1>
-	</div>
-</div>
+  <div class="container-fluid">
+    <div class="content maincontent">
+      <h1 class="page-header page-title">
+        <a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'} title="Open native Ombi interface">${settings.get('ombi_name', 'Ombi')}</a>
+        <div class="btn-group pull-right">
+          <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wrench fa-lg"></i>
+                <i class="fa fa-chevron-down fa-fw"></i></a>
+          <ul class="dropdown-menu pull-right">
+            <!-- Skeleton -->
+            <li><a id="sync_part_plex" href="#" title="Plex resync recently added"><i class="fa fa-search fa-fw"></i> Plex resync recently added</a></li>
+            <li><a id="sync_full_plex" href="#" title="Plex resync full scan"><i class="fa fa-search fa-fw"></i> Plex resync full scan</a></li>
+            <li><a id="run_cacher_emby" href="#" title="Emby run cacher"><i class="fa fa-search fa-fw"></i> Emby manual cacher run</a></li>
+            <li class="divider"></li>
+            <li><a id="show_landing" href="#" title="Show landing page"><i class="fa fa-eye fa-fw"></i> Show landing page</a></li>
+            <li class="divider"></li>
+            <li><a href="#" class="ajax-confirm" title="Restart Ombi"><i class="fa fa-refresh fa-fw"></i> Restart Ombi</a></li>
+            <li><a href="#" class="ajax-confirm" title="Shutdown Ombi"><i class="fa fa-power-off fa-fw"></i> Shutdown Ombi</a></li>
+          </ul>
+        </div>
+      </h1>
+	  
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#mrequests_tab" data-toggle="tab">Requests</a></li>
+        <li><a href="#msuggest_tab" data-toggle="tab">Suggestions</a></li>
+        <li><a href="#displaylog_tab" data-toggle="tab">Ombi Log</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div id="mrequests_tab" class="tab-pane mofa active">
+          <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
+            <thead>
+              <tr>
+                <th data-ignore-articles="en" data-sorter="ignoreArticles">Movie Title</th>
+                <th>Release Status</th>
+                <th>Theatre Release</th>
+                <th>Request Status</th>
+                <th>Requested By</th>
+                <th>Requested Date</th>
+              </tr>
+            </thead>
+            <!-- <tbody id="mrequests_table_body"></tbody> -->
+          </table>
+        </div>
+
+        <div id="msuggest_tab" class="tab-pane">
+		  <div class="well form-inline">
+			<input class="span6" id="add_movie_name" name="add_movie_name" type="text" />
+			<select class="span3" style="display:none;" id="add_movie_select" name="add_movie_select"></select>
+			<!-- <select class="span1" style="display:none;" id="add_movie_quality" name="add_movie_quality"></select> -->
+			<!-- <select class="span2" style="display:none;" id="add_movie_folder" name="add_movie_folder"></select> -->
+			  <!-- <select class="span1" style="display:none;" id="add_movie_monitor" name="add_movie_monitor"> -->
+			  <!-- <option value="true">Yes</option> -->
+			  <!-- <option value="false">No</option> -->
+			<!-- </select> -->
+			<button class="btn btn-success" type="button" id="add_moviesearch_button"><i class="fa fa-search fa-inverse fa-fw"></i> Search Movie</button>
+			<button class="btn btn-success hide" type="button" id="add_tvdbid_button"><i class="fa fa-plus fa-inverse fa-fw"></i> Request Movie</button>
+			<button class="btn hide" type="button" id="cancel_moviesearch_button"> Cancel</button>
+		  </div>
+          <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
+            <thead>
+              <tr>
+                <th data-ignore-articles="en" data-sorter="ignoreArticles">Movie Title</th>
+                <th>Release Status</th>
+                <th>Theatre Release</th>
+                <th>Request Status</th>
+              </tr>
+            </thead>
+            <!-- <tbody id="msuggest_table_body"></tbody> -->
+          </table>
+        </div>
+
+        <div id="displaylog_tab" class="tab-pane">
+          <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
+            <thead>
+              <tr>
+                <th data-ignore-articles="en" data-sorter="ignoreArticles">Date/Time</th>
+                <th>Level</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <!-- <tbody id="mrequests_table_body"></tbody> -->
+          </table>
+        </div>
+		
+        <!-- <div class="spinner"></div> -->
+      </div>
+    </div>
+  </div>
