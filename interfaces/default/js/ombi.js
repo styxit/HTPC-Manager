@@ -1,36 +1,41 @@
 $(document).ready(function() {
-  moment().format();
+  // moment().format();
   $(window).trigger('hashchange');
-  qlty = [];
-  $.when(profile()).done(function(qltyresult) {
-    qlty = qltyresult;
-    loadMRequests();
-    loadMSuggestions('ombi_popular_movies');
-    loadLog();
-    $('a[data-toggle="tab"]').click(function (e) {
-    }).on('shown', cal);
+  
+  // $(myimg1).attr('src', 'https://www.themoviedb.org/favicon.ico').css({'width':'22px','padding-right':'5px','border-radius':'5px 5px 5px 5px'});
+  // $(myimg1).wrap('<a href="https://www.themoviedb.org/movie/" target="_blank"></a>');
 
-    var AddMovieAction = function () {
-        var query = $('#add_movie_name').val();
-        if (query) {
-            $('#add_movie_button').attr('disabled', true);
-            searchTMDb(query);
-        }
-    };
-    $('#add_movie_name').keyup(function (event) {
-        if (event.keyCode == 13) {
-            AddMovieAction();
-        }
-    });
-    $('#add_movie_button').click(AddMovieAction);
+  // $(myimg1).css({'border-width':'1px','height':'22px','width':'22px','padding-right':'5px','border-radius':'5px 5px 5px 5px'});
 
-    $('#add_tvdbid_button').click(function () {
-        addMovie($('#add_show_select').val());
-    });
+  // $(myimg2).attr('src', 'https://www.imdb.com/favicon.ico').css({'width':'22px','padding-right':'5px','border-radius':'5px'});
+  // $(myimg2).wrap('<a href="https://www.imdb.com/title/" target="_blank"></a>');
+  
+  loadMRequests();
+  loadMSuggestions('ombi_popular_movies');
+  loadLog();
+  // $('a[data-toggle="tab"]').click(function (e) {
+  // }).on('shown', displaylog_tab);
 
-    $('#cancel_show_button').click(function () {
-        cancelAddMovie();
-    });
+  var AddMovieAction = function () {
+    var query = $('#add_movie_name').val();
+    if (query) {
+      $('#add_movie_button').attr('disabled', true);
+      searchTMDb(query);
+    }
+  };
+  $('#add_movie_name').keyup(function (event) {
+    if (event.keyCode == 13) {
+      AddMovieAction();
+    }
+  });
+  $('#add_movie_button').click(AddMovieAction);
+
+  $('#add_tvdbid_button').click(function () {
+    addMovie($('#add_show_select').val());
+  });
+
+  $('#cancel_show_button').click(function () {
+    cancelAddMovie();
   });
 });
 
@@ -47,20 +52,38 @@ function loadMRequests() {
         row.append($('<td>').attr('colspan', '6').html('No movies found'));
         $('#mrequests_table_body').append(row);
       }
-      $.each(result, function(showname, movie) { // tvshow.tvdbId
-        var name = $('<a>').attr('href', WEBDIR + 'ombi/view_movie/' + movie.id + '/' + movie.imdbId).text(movie.title);
-        var row = $('<tr>');
+      var i = 0;
+      // notify('ombi', 'Image ' + name, 'debug');
+      $.each(result, function(showname, movie) {
 
+        // var lnk_tmdb_$i = $('<a target="_blank">').attr('href','https://www.themoviedb.org/movie/'+movie.theMovieDbId).text(' TMDb ');
+        // $(lnk_tmdb_$i).css({'background-color':'black', 'color':'mediumseagreen', 'font-family':'fantasy', 'font-weight':'normal'});
+        // var lnk_imdb_$i = $('<a target="_blank">').attr('href','https://www.imdb.com/title/'+movie.imdbId).text(' IMDb ');
+        // $(lnk_imdb_$i).css({'color':'black', 'background-color':'gold', 'font-family':'fantasy', 'font-weight':'normal'});
+        var name = $('<a>').attr('href', 'https://www.themoviedb.org/movie/'+movie.theMovieDbId).text(movie.title).attr('target','_blank');
+        var row = $('<tr>');
         row.append(
-          $('<td>').html(name),
-          // $('<td>').html(radarrStatusLabel(movie.status)),
-          $('<td>').html(movie.status),
-          // $('<td>').html(moment(movie.releaseDate).calendar()),
-          $('<td>').html(movie.releaseDate),
-          $('<td>').append(movie.approved ? 'Approved' : 'Pending Approval'),
+          // $('<td nowrap>').html(movie.title+'&nbsp;').append($(lnk_imdb_$i)),
+          $('<td nowrap>').html(name),
+          $('<td>').html( movie.digitalRelease ? 'Digital' : movie.status),
+          $('<td>').html( (movie.digitalRelease ? movie.digitalReleaseDate : movie.releaseDate).substr(0,10) ) );
+        // if (movie.available) { row.append( $('<td>').append($('<i>').addClass('fas fa-cloud-download-alt')).append(' Available') )}
+          // else if (movie.approved) { row.append($('<td>').append($('<i>').addClass('fa fa-check')).append(' Approved'))}
+            // else { row.append($('<td>').append($('<i>').addClass('fa fa-question')).append(' Pending ').append($('<i>').addClass('fa fa-check-circle')).append($('<i>').addClass('fa fa-minus-circle')))}
+        if (movie.available) { row.append( $('<td>').append('Available') ); }
+          else if (movie.approved) { row.append($('<td>').append('Approved')); }
+            else { row.append($('<td>').append('Pending')
+              .append('&nbsp;').append( ( $('<i>').addClass('fa fa-plus-square').css({'font-size':'20px', 'color':'green'}) )
+                .attr('title','Appprove request').click( function(){ombi_approve("movie",movie.id)} ) )
+              .append('&nbsp;').append( $('<i>').addClass('fa fa-ban').css({'font-size':'20px','color':'salmon'})
+                .attr('title','Deny request').click( function(){ombi_deny("movie",movie.id)} ) )
+              .append('&nbsp;').append( $('<i>').addClass('fa fa-trash').css({'font-size':'20px','color':'red'}) 
+                .attr('title','Delete request').click( function(){ombi_delete("movie",movie.id)} ) ) ); }
+        row.append(
           $('<td>').html(movie.requestedUser.alias),
-          $('<td>').html(movie.requestedDate);
+          $('<td>').html( movie.requestedDate.substr(0,16).replace('T',' ') ));
         $('#mrequests_table_body').append(row);
+        i+=1;
       });
       $('#mrequests_table_body').parent().trigger('update');
       $('#mrequests_table_body').parent().trigger("sorton", [
@@ -149,27 +172,12 @@ function rootfolder() {
   });
 }
 
-function LoadLog() {
-  // $.getJSON(WEBDIR + 'radarr/History', function(result) {
-    // $.each(result.records, function(i, log) {
-      // var row = $('<tr>');
-      // row.append(
-        // $('<td>').text(moment(log.date).calendar()),
-        // $('<td>').text(log.eventType),
-        // $('<td>').text(log.sourceTitle),
-        // $('<td>').text(log.series.title), // Clean title
-        // $('<td>').text(log.title),
-        // $('<td>').html(radarrStatusLabel(log.status)),
-        // $('<td>').html(radarrStatusLabel(log.quality.quality.name)));
+function loadMSuggestions(suggestion_base) {
+	$('#msuggest_table_body').empty();
+	var row = $('<tr>');
+	row.append($('<td>').attr('colspan', '4').html('Suggestions for ' + suggestion_base + ' go here'));
+	$('#msuggest_table_body').append(row);
 
-      // $('#history_table_body').append(row);
-    // });
-
-    // $('#history_table_body').parent().trigger("update");
-  // });
-}
-
-function loadMSuggestions() {
   // $.getJSON(WEBDIR + 'radarr/Calendar', function(result) {
     // $.each(result, function(i, cal) {
       // var row = $('<tr>');
@@ -187,6 +195,31 @@ function loadMSuggestions() {
     // });
 
     // $('#calendar_table_body').parent().trigger("update");
+  // });
+}
+
+function loadLog() {
+	$('#mlog_table_body').empty();
+	var row = $('<tr>');
+	row.append($('<td>').attr('colspan', '3').html('Log content goes here'));
+	$('#mlog_table_body').append(row);
+
+	// $.getJSON(WEBDIR + 'radarr/History', function(result) {
+    // $.each(result.records, function(i, log) {
+      // var row = $('<tr>');
+      // row.append(
+        // $('<td>').text(moment(log.date).calendar()),
+        // $('<td>').text(log.eventType),
+        // $('<td>').text(log.sourceTitle),
+        // $('<td>').text(log.series.title), // Clean title
+        // $('<td>').text(log.title),
+        // $('<td>').html(radarrStatusLabel(log.status)),
+        // $('<td>').html(radarrStatusLabel(log.quality.quality.name)));
+
+      // $('#mlog_table_body').append(row);
+    // });
+
+    // $('#mlog_table_body').parent().trigger("update");
   // });
 }
 
@@ -241,6 +274,21 @@ function searchTMDb(query) {
       $('.radarr_checkboxs').show();
     }
   });
+}
+
+function ombi_approve(ctype, id) {
+  notify('ombi', 'Approve ' + ctype + ' request id ' + id, 'success');
+  return true;
+}
+
+function ombi_deny(ctype, id) {
+  notify('ombi', 'Deny ' + ctype + ' request id ' + id, 'warning');
+  return true;
+}
+
+function ombi_delete(ctype, id) {
+  notify('ombi', 'Delete ' + ctype + ' request id ' + id, 'error');
+  return true;
 }
 
 function addMovie(tmdbid, quality, rootfolder, monitored) {
