@@ -9,24 +9,18 @@
                 <i class="fa fa-chevron-down fa-fw"></i></a>
           <ul class="dropdown-menu pull-right">
             <!-- Skeleton -->
-            <li><a id="sync_part_plex" href="#" title="Plex resync recently added"><i class="fa fa-search fa-fw"></i> Plex resync recently added</a></li>
-            <li><a id="sync_full_plex" href="#" title="Plex resync full scan"><i class="fa fa-search fa-fw"></i> Plex resync full scan</a></li>
-            <li><a id="run_cacher_emby" href="#" title="Emby run cacher"><i class="fa fa-search fa-fw"></i> Emby manual cacher run</a></li>
-            <li class="divider"></li>
-            <li><a id="show_landing" href="#" title="Show landing page"><i class="fa fa-eye fa-fw"></i> Show landing page</a></li>
-            <li class="divider"></li>
-            <li><a href="#" class="ajax-confirm" title="Restart Ombi"><i class="fa fa-refresh fa-fw"></i> Restart Ombi</a></li>
-            <li><a href="#" class="ajax-confirm" title="Shutdown Ombi"><i class="fa fa-power-off fa-fw"></i> Shutdown Ombi</a></li>
+			<li class="fmenu_plex"><a id="sync_plex_part" href="#" title="Plex sync recently added"><i class="fa fa-search fa-fw"></i> Plex sync recently added</a></li>
+			<li class="fmenu_plex"><a id="sync_plex_full" href="#" title="Plex sync full scan"><i class="fa fa-search fa-fw"></i> Plex sync full scan</a></li>
+			<li class="fmenu_emby"><a id="sync_emby_full" href="#" title="Emby manual cacher run"><i class="fa fa-search fa-fw"></i> Emby manual cacher run</a></li>
           </ul>
         </div>
       </h1>
 	  
       <ul class="nav nav-tabs">
         <li class="active"><a href="#mrequests_tab" data-toggle="tab">Movie Requests</a></li>
-        <li><a href="#msuggest_tab" data-toggle="tab">Movie Suggestions</a></li>
-        <li><a href="#msuggest_tab" data-toggle="tab">TV Requests</a></li>
-        <li><a href="#msuggest_tab" data-toggle="tab">TV Suggestions</a></li>
-        <li><a href="#displaylog_tab" data-toggle="tab">Ombi Log</a></li>
+        <li><a href="#msearch_tab" data-toggle="tab">Movie Search</a></li>
+        <!-- <li><a href="#tvrequest_tab" data-toggle="tab">TV Requests</a></li> -->
+        <!-- <li><a href="#tvsearch_tab" data-toggle="tab">TV Search</a></li> -->
       </ul>
 
       <div class="tab-content">
@@ -46,46 +40,33 @@
           </table>
         </div>
 
-        <div id="msuggest_tab" class="tab-pane">
+        <div id="msearch_tab" class="tab-pane">
 		  <div class="well form-inline">
-			<input class="span6" id="add_movie_name" name="add_movie_name" type="text" />
-			<select class="span3" style="display:none;" id="add_movie_select" name="add_movie_select"></select>
-			<!-- <select class="span1" style="display:none;" id="add_movie_quality" name="add_movie_quality"></select> -->
-			<!-- <select class="span2" style="display:none;" id="add_movie_folder" name="add_movie_folder"></select> -->
-			  <!-- <select class="span1" style="display:none;" id="add_movie_monitor" name="add_movie_monitor"> -->
-			  <!-- <option value="true">Yes</option> -->
-			  <!-- <option value="false">No</option> -->
-			<!-- </select> -->
-			<button class="btn btn-success" type="button" id="add_moviesearch_button"><i class="fa fa-search fa-inverse fa-fw"></i> Search Movie</button>
-			<button class="btn btn-success hide" type="button" id="add_tvdbid_button"><i class="fa fa-plus fa-inverse fa-fw"></i> Request Movie</button>
-			<button class="btn hide" type="button" id="cancel_moviesearch_button"> Cancel</button>
+			<div style="display: inline;" class="span6">
+				<input id="search_movie_name" class="span4" name="search_movie_name" type="text" />
+				<button class="btn btn-success" type="button" id="search_movie_button"><i class="fa fa-search fa-inverse fa-fw"></i> Search</button>
+			</div>
+			&nbsp;&nbsp;&nbsp;
+			<div style="display: inline-block;">
+				<button class="btn btn-info" type="button" id="search_popular_button"><i class="fa fa-search fa-inverse fa-fw"></i> Popular</button>
+				<button class="btn btn-info" type="button" id="search_upcoming_button"><i class="fa fa-search fa-inverse fa-fw"></i> Upcoming</button>
+				<button class="btn btn-info" type="button" id="search_toprated_button"><i class="fa fa-search fa-inverse fa-fw"></i> Top Rated</button>
+				<button class="btn btn-info" type="button" id="search_nowplaying_button"><i class="fa fa-search fa-inverse fa-fw"></i> Now Playing</button>
+			</div>
 		  </div>
           <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
             <thead>
               <tr>
-                <th data-ignore-articles="en" data-sorter="ignoreArticles">Movie Title</th>
-                <th>Release Status</th>
-                <th>Theatre Release</th>
-                <th>Request Status</th>
+                <th class="span5" data-ignore-articles="en" data-sorter="ignoreArticles">Movie Title</th>
+                <th class="span2">Release Info</th>
+                <th class="span2">Request Status</th>
+                <th class="span1">&nbsp;</th> <!-- Search for similar -->
               </tr>
             </thead>
-            <tbody id="msuggest_table_body"></tbody>
+            <tbody id="msearch_table_body"></tbody>
           </table>
         </div>
 
-        <div id="displaylog_tab" class="tab-pane">
-          <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
-            <thead>
-              <tr>
-                <th data-ignore-articles="en" data-sorter="ignoreArticles">Date/Time</th>
-                <th>Level</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody id="mlog_table_body"></tbody>
-          </table>
-        </div>
-		
         <div class="spinner"></div>
       </div>
     </div>

@@ -1,41 +1,62 @@
-$(document).ready(function() {
+$(document).ready(function () {
   // moment().format();
+  // alert('break');
   $(window).trigger('hashchange');
-  
+
   // $(myimg1).attr('src', 'https://www.themoviedb.org/favicon.ico').css({'width':'22px','padding-right':'5px','border-radius':'5px 5px 5px 5px'});
   // $(myimg1).wrap('<a href="https://www.themoviedb.org/movie/" target="_blank"></a>');
-
   // $(myimg1).css({'border-width':'1px','height':'22px','width':'22px','padding-right':'5px','border-radius':'5px 5px 5px 5px'});
-
   // $(myimg2).attr('src', 'https://www.imdb.com/favicon.ico').css({'width':'22px','padding-right':'5px','border-radius':'5px'});
   // $(myimg2).wrap('<a href="https://www.imdb.com/title/" target="_blank"></a>');
-  
+
+  loadFunctionMenu();
   loadMRequests();
-  loadMSuggestions('ombi_popular_movies');
-  loadLog();
+  loadMSearch('popular', 'suggest');
+  // notify('ombi', 'menu.ready', 'debug');
+
   // $('a[data-toggle="tab"]').click(function (e) {
   // }).on('shown', displaylog_tab);
 
-  var AddMovieAction = function () {
-    var query = $('#add_movie_name').val();
+  var SearchMovieAction = function () {
+    var query = $('#search_movie_name').val();
     if (query) {
-      $('#add_movie_button').attr('disabled', true);
-      searchTMDb(query);
+      // $('#search_movie_button').attr('disabled', true);
+      loadMSearch(query, 'search');
     }
   };
-  $('#add_movie_name').keyup(function (event) {
+  $('#search_movie_name').keyup(function (event) {
     if (event.keyCode == 13) {
-      AddMovieAction();
+      SearchMovieAction();
     }
   });
-  $('#add_movie_button').click(AddMovieAction);
+  $('#search_movie_button').click(SearchMovieAction);
 
-  $('#add_tvdbid_button').click(function () {
-    addMovie($('#add_show_select').val());
+  $('#search_popular_button').click(function () {
+    loadMSearch('popular', 'suggest');
   });
 
-  $('#cancel_show_button').click(function () {
-    cancelAddMovie();
+  $('#search_upcoming_button').click(function () {
+    loadMSearch('upcoming', 'suggest');
+  });
+
+  $('#search_toprated_button').click(function () {
+    loadMSearch('toprated', 'suggest');
+  });
+
+  $('#search_nowplaying_button').click(function () {
+    loadMSearch('nowplaying', 'suggest');
+  });
+
+  $('#sync_plex_part').click(function () {
+    syncContent('plex', 'part');
+  });
+
+  $('#sync_plex_full').click(function () {
+    syncContent('plex', 'full');
+  });
+
+  $('#sync_emby_full').click(function () {
+    syncContent('emby', 'full');
   });
 });
 
@@ -45,16 +66,16 @@ function loadMRequests() {
     url: WEBDIR + 'ombi/movie_requests',
     type: 'get',
     dataType: 'json',
-    success: function(result) {
+    success: function (result) {
       $('#mrequests_table_body').empty();
-      if (result.length === 0) {
+      if (result == 'False') {
         var row = $('<tr>');
         row.append($('<td>').attr('colspan', '6').html('No movies found'));
         $('#mrequests_table_body').append(row);
       }
       var i = 0;
       // notify('ombi', 'Image ' + name, 'debug');
-      $.each(result, function(showname, movie) {
+      $.each(result, function (showname, movie) {
 
         // var lnk_tmdb_$i = $('<a target="_blank">').attr('href','https://www.themoviedb.org/movie/'+movie.theMovieDbId).text(' TMDb ');
         // $(lnk_tmdb_$i).css({'background-color':'black', 'color':'mediumseagreen', 'font-family':'fantasy', 'font-weight':'normal'});
@@ -73,15 +94,19 @@ function loadMRequests() {
         if (movie.available) { row.append( $('<td>').append('Available') ); }
           else if (movie.approved) { row.append($('<td>').append('Approved')); }
             else { row.append($('<td>').append('Pending')
-              .append('&nbsp;').append( ( $('<i>').addClass('fa fa-plus-square').css({'font-size':'20px', 'color':'green'}) )
-                .attr('title','Appprove request').click( function(){ombi_approve("movie",movie.id)} ) )
-              .append('&nbsp;').append( $('<i>').addClass('fa fa-ban').css({'font-size':'20px','color':'salmon'})
-                .attr('title','Deny request').click( function(){ombi_deny("movie",movie.id)} ) )
-              .append('&nbsp;').append( $('<i>').addClass('fa fa-trash').css({'font-size':'20px','color':'red'}) 
-                .attr('title','Delete request').click( function(){ombi_delete("movie",movie.id)} ) ) ); }
+              .append('&nbsp;').append( ( $('<i>').addClass('fa fa-plus-square fa-slightlybigger').css({'color':'green'}) )
+                .attr('title','Appprove request').click( function(){ombi_approve("movie",movie.id);} ) )
+              .append('&nbsp;').append( $('<i>').addClass('fa fa-ban fa-slightlybigger').css({'color':'salmon'})
+                .attr('title','Deny request').click( function(){ombi_deny("movie",movie.id);} ) )
+              .append('&nbsp;').append( $('<i>').addClass('fa fa-trash fa-slightlybigger').css({'color':'red'})
+                .attr('title','Remove request').click( function(){ombi_delete("movie",movie.id);} ) )
+              );
+            }
+        // Todo: Add button for marking Available/Unavailable
         row.append(
           $('<td>').html(movie.requestedUser.alias),
-          $('<td>').html( movie.requestedDate.substr(0,16).replace('T',' ') ));
+          $('<td>').html( movie.requestedDate.substr(0,16).replace('T',' ') )
+        );
         $('#mrequests_table_body').append(row);
         i+=1;
       });
@@ -92,186 +117,105 @@ function loadMRequests() {
         ]
       ]);
       $('.spinner').hide();
-    }
-  });
-}
-
-function radarrStatusIcon(iconText, white) {
-  var text = [
-    'Downloaded',
-    'Missing',
-    'continuing',
-    'Snatched',
-    'Unaired',
-    'Archived',
-    'Skipped',
-    'ended'
-  ];
-  var icons = [
-    'fa fa-download &nbsp',
-    'fa fa-exclamation-triangle &nbsp',
-    'fa fa-play &nbsp',
-    'fa fa-cloud-download &nbsp',
-    'fa fa-clock-o &nbsp',
-    'fa fa-archive &nbsp',
-    'fa fa-fast-forward &nbsp',
-    'fa fa-stop &nbsp'
-  ];
-
-  if (text.indexOf(iconText) != -1) {
-    var icon = $('<i>').addClass(icons[text.indexOf(iconText)]);
-    if (white === true) {
-      icon.addClass('fa-inverse');
-    }
-    return icon;
-  }
-  return '';
-}
-
-function radarrStatusLabel(text) {
-  var statusOK = ['released', 'Downloaded', 'Any'];
-  var statusInfo = ['Snatched', 'HD', 'HD - All', 'HD-720p', 'HD-1080p', 'HDTV-720p', 'HDTV-1080p', 'WEBDL-720p', 'WEBDL-1080p', ];
-  var statusError = ['ended', 'Missing'];
-  var statusWarning = ['Skipped', 'SD', 'SD - All', 'SDTV', 'DVD'];
-  var statusNormal = ['Bluray', 'Bluray-720p', 'Bluray-1080p'];
-
-  var label = $('<span>').addClass('label').text(text);
-
-  if (statusOK.indexOf(text) != -1) {
-    label.addClass('label-success');
-  } else if (statusInfo.indexOf(text) != -1) {
-    label.addClass('label-info');
-  } else if (statusError.indexOf(text) != -1) {
-    label.addClass('label-important');
-  } else if (statusWarning.indexOf(text) != -1) {
-    label.addClass('label-warning');
-  } else if (statusNormal.indexOf(text) != -1) {
-    label;
-  }
-
-  var icon = radarrStatusIcon(text, true);
-  if (icon !== '') {
-    label.prepend(' ').prepend(icon);
-  }
-  return label;
-}
-
-function profile(qualityProfileId) {
-    var done = jQuery.Deferred();
-    $.get(WEBDIR + 'radarr/Profile', function (result) {
-        qlty = result;
-        done.resolve(qlty);
-    });
-    return done;
-}
-
-function rootfolder() {
-  $.get(WEBDIR + 'radarr/Rootfolder', function(result) {
-    folders = result;
-    return folders
-  });
-}
-
-function loadMSuggestions(suggestion_base) {
-	$('#msuggest_table_body').empty();
-	var row = $('<tr>');
-	row.append($('<td>').attr('colspan', '4').html('Suggestions for ' + suggestion_base + ' go here'));
-	$('#msuggest_table_body').append(row);
-
-  // $.getJSON(WEBDIR + 'radarr/Calendar', function(result) {
-    // $.each(result, function(i, cal) {
-      // var row = $('<tr>');
-      // var name = $('<a>').attr('href', '#').html(cal.series.title).click(function(e) {
-        // e.preventDefault();
-        // loadMovie(cal.id);
-      // });
-      // var img = makeIcon('fa fa-info-circle', cal.overview);
-      // row.append(
-        // $('<td>').append(name),
-        // $('<td>').text('S' + pad(cal.seasonNumber, 2) + 'E' + pad(cal.episodeNumber, 2)),
-        // $('<td>').html(cal.title + '&nbsp').append(img),
-        // $('<td>').text(moment(cal.airDateUtc).calendar()));
-      // $('#calendar_table_body').append(row);
-    // });
-
-    // $('#calendar_table_body').parent().trigger("update");
-  // });
-}
-
-function loadLog() {
-	$('#mlog_table_body').empty();
-	var row = $('<tr>');
-	row.append($('<td>').attr('colspan', '3').html('Log content goes here'));
-	$('#mlog_table_body').append(row);
-
-	// $.getJSON(WEBDIR + 'radarr/History', function(result) {
-    // $.each(result.records, function(i, log) {
-      // var row = $('<tr>');
-      // row.append(
-        // $('<td>').text(moment(log.date).calendar()),
-        // $('<td>').text(log.eventType),
-        // $('<td>').text(log.sourceTitle),
-        // $('<td>').text(log.series.title), // Clean title
-        // $('<td>').text(log.title),
-        // $('<td>').html(radarrStatusLabel(log.status)),
-        // $('<td>').html(radarrStatusLabel(log.quality.quality.name)));
-
-      // $('#mlog_table_body').append(row);
-    // });
-
-    // $('#mlog_table_body').parent().trigger("update");
-  // });
-}
-
-function searchTMDb(query) {
-  $.ajax({
-    url: WEBDIR + 'radarr/Lookup/' + encodeURIComponent(query),
-    type: 'get',
-    error: function() {
-      $('#add_show_button').attr('disabled', false);
     },
-    success: function(result) {
-      if (result.length === 0) {
-        $('#add_show_button').attr('disabled', false);
-        $('#add_show_quality').attr('disabled', false);
-        $('#add_show_folder').attr('disabled', false);
-        return;
+    error: function (result) {
+      notify('Ombi', 'Could not connect to Ombi, check your settings' + result, 'error');
+    }
+  });
+}
+
+function loadMSearch(hint='popular', lookup='suggest') {
+  var url = WEBDIR + 'ombi/get_searchresult?t=movie&q='+hint+'&l='+lookup
+  // alert(url)
+  $('.spinner').show();
+  $.ajax({
+    url: url,
+    type: 'get',
+    dataType: 'json',
+    success: function (result) {
+      $('#msearch_table_body').empty();
+      if (result == 'False' || result.length == 0) {
+        var row = $('<tr>');
+        row.append($('<td>').attr('colspan', '4').html('No movies found'));
+        $('#msearch_table_body').append(row);
       }
-      $('#add_show_select').html('');
-      $('#add_show_quality').html('');
-      $('#add_show_folder').html('');
-      $.each(result, function(i, item) {
-        var tmdbId = item.tmdbId;
-        var movie = item.title;
-        var year = item.year;
-        var option = $('<option>');
-        option.attr('data-info', $.makeArray(item));
-        option.attr('value', tmdbId);
-        option.html(movie + ' (' + year + ')');
-        $('#add_show_select').append(option);
+      var i = 0;
+      $.each(result, function (showname, movie) {
+        // $.getJSON(WEBDIR + 'ombi/get_extrainfo?t=movie&q='+movie.theMovieDbId+'&k=digitalReleaseDate', function(digitalReleaseDate) {
+        var row = $('<tr>');
+        if (movie.releaseDate == null) {
+          var name = $('<a>').attr('href', 'https://www.themoviedb.org/movie/'+movie.theMovieDbId)
+            .text(movie.title).attr('target','_blank');
+          row.append($('<td>').html(name));
+          row.append($('<td nowrap>'));
+        } else {
+          var name = $('<a>').attr('href', 'https://www.themoviedb.org/movie/'+movie.theMovieDbId)
+            .text(movie.title+' ('+movie.releaseDate.substr(0,4)+')').attr('target','_blank');
+          row.append($('<td>').html(name));
+          row.append($('<td nowrap>').append( ( $('<i>').addClass('fa fa-film fa-slightlybigger')))
+            .append('&nbsp;').append( movie.releaseDate.substr(0,10)).attr('title','Theatre release'));
+        }
+        if (movie.available && movie.quality) {
+          row.append( $('<td>').append('Available ').append( $('<span>')
+            .html(movie.quality).addClass('label label-success label-ombi-quality')));
+        }
+        else if (movie.available) { row.append( $('<td>').append('Available') ); }
+        else if (movie.approved) { row.append($('<td>').append('Processing')); }
+        else if (movie.requested && !(movie.approved)) { row.append($('<td>').append('Pending Approval')); }
+        else { 
+          row.append($('<td>').append( ( $('<button class="btn btn-ombi btn-request" type="button">)')
+            .append('Request ').append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger'))
+              .click( function(){ombi_mrequest(movie.theMovieDbId, hint, lookup);} ) ) ) );
+        }
+        row.append($('<td>').append( ( $('<button class="btn btn-ombi btn-similar" type="button">)')
+          .append('Similar ').append($('<i>').addClass('fa fa-eye fa-fw fa-slightlybigger'))
+            .click( function(){loadMSearch(movie.theMovieDbId);} ) ) ) );
+        $('#msearch_table_body').append(row);
+        i+=1;
       });
-      $.each(qlty, function(i, quality) {
-        var option2 = $('<option>');
-        option2.attr('value', quality.id);
-        option2.html(quality.name);
-        $('#add_show_quality').append(option2);
-      });
-      $.each(folders, function(i, folder) {
-        var option2 = $('<option>');
-        option2.attr('value', folder);
-        option2.html(folder);
-        $('#add_show_folder').append(option2);
-      });
-      $('#add_show_name').hide();
-      $('#cancel_show_button').show();
-      $('#add_show_select').fadeIn();
-      $('#add_show_button').attr('disabled', false).hide();
-      $('#add_tvdbid_button').show();
-      $('#add_show_monitor').fadeIn().show();
-      $('#add_show_type').fadeIn().show();
-      $('#add_show_quality').fadeIn().show();
-      $('#add_show_folder').fadeIn().show();
-      $('.radarr_checkboxs').show();
+      $('#msearch_table_body').parent().trigger('update');
+      $('#msearch_table_body').parent().trigger("sorton", [
+        [
+          [1, 1]
+        ]
+      ]);
+      $('.spinner').hide();
+    },
+    error: function (result) {
+      $('.spinner').hide();
+      notify('Ombi', 'Could not connect to Ombi, check your settings' + result, 'error');
+    }
+  });
+}
+
+function get_extrainfo_key(ctype,cid,key) {
+  $.getJSON(WEBDIR + 'ombi/get_extrainfo?t='+ctype+'&q='+cid+'&k='+key, function(result) {
+    // alert(key + ' is ' + result);
+    return result;
+  });
+}
+
+function loadFunctionMenu() {
+  $('.fmenu_plex').hide();
+  $('.fmenu_emby').hide();
+  $.ajax({
+    url: WEBDIR + 'ombi/get_plex_enabled',
+    type: 'get',
+    dataType: 'text',
+    success: function(result) {
+      if (result == 'True') {
+        $('.fmenu_plex').show();
+      }
+    }
+  });
+  $.ajax({
+    url: WEBDIR + 'ombi/get_emby_enabled',
+    type: 'get',
+    dataType: 'text',
+    success: function(result) {
+      if (result == 'True') {
+        $('.fmenu_emby').show();
+      }
     }
   });
 }
@@ -291,187 +235,42 @@ function ombi_delete(ctype, id) {
   return true;
 }
 
-function addMovie(tmdbid, quality, rootfolder, monitored) {
-  var data = {
-    rootfolder: rootfolder,
-    monitored: monitored
-  };
-
+function ombi_mrequest(id, h, l) {
+  var url = WEBDIR + 'ombi/ombi_request_movie?id='+id;
+  alert(url);
   $.ajax({
-    url: WEBDIR + 'radarr/AddMovie/' + tmdbid + '/' + quality,
-    data: data,
+    url: url,
+    data: id,
     type: 'get',
     dataType: 'json',
-    success: function(data) {
-      if (data.title) {
-        notify('Adding movie ' + data.title + '', '', 'successful');
-        loadMovies();
+    success: function(result) {
+      if (result != 'False') {
+        notify('Request success ', result.message, 'success');
+        loadMRequests(h,l);
       } else {
-        notify('Failed to add movie ', data[0].errorMessage, 'error');
-        cancelAddMovie();
+        notify('Failed to request movie ', 'Check logs for details', 'error');
       }
+      return true;
+    },
+    error: function(data){
+      notify('Failed to request movie ', 'Bad web engine call: ' + data.status + ' ' + data.statusText, 'error');
+      return false;
     }
   });
 }
 
-function cancelAddMovie() {
-  $('#add_show_name').val('');
-  $('#add_show_quality').val('');
-  $('#add_show_folder').val('');
-  $('#add_show_select').hide();
-  $('#cancel_show_button').hide();
-  $('#add_show_name').fadeIn();
-  $('#add_tvdbid_button').hide();
-  $('#add_show_button').show();
-  $('#add_show_quality').hide();
-  $('#add_show_monitor').hide();
-  $('#add_show_type').hide();
-  $('#add_show_folder').hide();
-  $('.radarr_checkboxs').hide();
-}
-
-
-function loadMovie(movieID) {
-  $.getJSON(WEBDIR + 'radarr/Movie/%d' + movieID, function(movie) {
-    var bannerurl;
-    var table = $('<table>');
-    table.addClass('table table-bordered table-striped table-condensed');
-
-    row = $('<tr>');
-    row.append('<th>Status</th><td>' + movie.status + '</td>');
-    table.append(row);
-
-    if (movie.inCinemas) {
-      ReleaseDate = moment(movie.inCinemas).calendar();
-    } else {
-      releaseDate = 'N/A';
-    }
-
-    row = $('<tr>');
-    row.append('<th>In Cinemas</th><td>' + releaseDate + '</td>');
-    table.append(row);
-
-    row = $('<tr>');
-    row.append('<th>Monitored</th><td>' + movie.monitored + '</td>');
-    table.append(row);
-
-    row = $('<tr>');
-    row.append('<th>Location</th><td>' + movie.path + '</td>');
-    table.append(row);
-
-    $.each(qlty, function(i, q) {
-      if (movie.qualityProfileId == q.id) {
-        qname = q.name;
-        row = $('<tr>');
-        row.append('<th>Quality</th><td>' + q.name + '</td>');
-        table.append(row);
-      }
-    });
-
-    row = $('<tr>');
-    row.append('<th>Studio</th><td>' + movie.studio + '</td>');
-    table.append(row);
-
-    row = $('<tr>');
-    row.append('<th>Summary</th><td>' + movie.overview + '</td>');
-    table.append(row);
-
-    if (movie.images.length > 0) {
-      $.each(movie.images, function(i, cover) {
-        if (cover.coverType === "banner") {
-          bannerurl = cover.url;
-        }
-      });
-    }
-
-    modalContent = $('<div>');
-    modalContent.append(
-
-      $('<img>').attr('src', WEBDIR + 'radarr/GetBanner/?url=MediaCover/' + movie.id + '/banner.jpg').addClass('img-rounded'),
-      $('<hr>'),
-      table);
-
-    // Disabled for now
-
-    var modalButtons = {
-      'Show': function() {
-        data = {
-          'id': movie.id
-        };
-        window.location = WEBDIR + 'radarr/View/' + movie.id + '/' + movie.tmdbId;
-      }
-    };
-
-
-    showModal(movie.title, modalContent, modalButtons);
-  });
-
-}
-
-function cal() {
-  $('#cal').fullCalendar({
-    editable: false,
-    handleWindowResize: true,
-    weekends: true,
-    allDayDefault: false,
-    defaultView: 'basicWeek',
-    header: {
-      left: 'prev,next today',
-      center: 'title',
-      right: 'month,agendaWeek,agendaDay'
-    },
-    firstDay: '1',
-    columnFormat: 'ddd D/M',
-    displayEventTime: true,
-    timeFormat: 'hh:mm',
-    timezone: 'local',
-    height: 'auto',
-
-    events: {
-      url: 'Calendar',
-      type: 'GET',
-    },
-    eventRender: function(event, element, view) {
-      if (event.all.hasFile) {
-        element.addClass('calendar_has_file');
+function syncContent(source, mode) {
+  $.ajax({
+    url: WEBDIR + 'ombi/content_sync?source=' + source + '&mode=' + mode,
+    type: 'post',
+    dataType: 'text',
+    success: function(result) {
+      if (result != 'True') {
+        notify('Ombi', 'Sync for ' + source + ' returned ' + result, 'error');
       } else {
-        element.addClass('calendar_missing_file');
+        notify('Ombi', 'Sync for ' + source + ' initiated', 'success');
       }
-
-      element.click(function(e) {
-        if (event.all.hasFile) {
-          //calendarmodal TODO
-        } else {
-          loadMovie(event.all.id);
-        }
-      });
-
     }
-
   });
-  $('#cal').fullCalendar('render')
 }
 
-function calendarmodal(s) {
-  // TODO
-}
-
-function Scanfolder() {
-  data = {
-    "method": "DownloadedMoviesScan"
-  };
-  p = prompt('Write path to processfolder or leave blank for default path');
-  if (p || p.length >= 0) {
-    data.par = "path";
-    data.id = p;
-
-    $.getJSON(WEBDIR + 'radarr/Command', data, function(r) {
-      state = (r.state) ? 'success' : 'error';
-      // Stop the notify from firing on cancel
-      if (p !== null) {
-        path = (p.length === 0) ? 'Default folder' : p;
-        notify('radarr', 'Postprocess ' + path, state);
-      }
-    });
-  }
-}

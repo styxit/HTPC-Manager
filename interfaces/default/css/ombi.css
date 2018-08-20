@@ -1,0 +1,32 @@
+.btn-similar {
+	background-color:	hsl(194, 87%, 44%);
+}
+
+.btn-similar:hover {
+	background-color:	hsl(194, 77%, 39%);
+}
+
+.btn-request {
+	background-color:	hsl(24, 86%, 54%)
+}
+
+.btn-request:hover {
+	background-color:	hsl(24, 76%, 44%)
+}
+
+.btn-ombi {
+	border-radius:	5px!important;
+	padding-top:	4px;
+	padding-bottom:	3px;
+	padding-left:	6px;
+	padding-right:	6px;
+}
+
+.fa-slightlybigger {
+	font-size:	125%;
+}
+
+.label-ombi-quality {
+	font-weight:	bolder;
+	border-radius:	3px!important;
+}
