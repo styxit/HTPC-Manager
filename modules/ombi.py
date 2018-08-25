@@ -93,10 +93,12 @@ class Ombi(object):
     @require()
     # @cherrypy.tools.json_out()
     def dummy(self):
-        x = self.auth()
-        if x == 'True':
-            return 'Auth success\n%s' % self._token
-        return 'Auth failed:\n%s' % x
+        # x = self.auth()
+        x = 'api/v1/Settings/ombi'
+        d = self._ombi_get(x)
+        if d != 'False':
+            return 'Response: %s' % d
+        return 'Failed: %s' % str(d)
 
     @cherrypy.expose()
     @require(member_of(htpc.role_admin))

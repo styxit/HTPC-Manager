@@ -24,16 +24,21 @@
       </ul>
 
       <div class="tab-content">
-        <div id="mrequests_tab" class="tab-pane mofa active">
+        <!-- <div id="mrequests_tab" class="tab-pane mofa active"> -->
+        <div id="mrequests_tab" class="tab-pane active">
+<!-- 		  <div class="well form-inline">
+			<button class="btn btn-info" type="button" id="filter_approved_button"><i class="fa fa-search fa-inverse fa-fw"></i> Approved Only</button>
+			<button class="btn btn-info" type="button" id="filter_pending_button"><i class="fa fa-search fa-inverse fa-fw"></i> Pending Only</button>
+			<button class="btn btn-info" type="button" id="filter_available_button"><i class="fa fa-search fa-inverse fa-fw"></i> Available Only</button>
+		  </div>
+ -->
           <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
             <thead>
               <tr>
-                <th data-ignore-articles="en" data-sorter="ignoreArticles">Movie Title</th>
-                <th>Release Status</th>
-                <th>Theatre Release</th>
-                <th>Request Status</th>
-                <th>Requested By</th>
-                <th>Requested Date</th>
+                <th class="span3" data-ignore-articles="en" data-sorter="ignoreArticles">Movie Title</th>
+                <th class="span2">Release Status</th>
+                <th class="span2">Request Status</th>
+                <th class="span1">Requester</th>
               </tr>
             </thead>
             <tbody id="mrequests_table_body"></tbody>
@@ -42,12 +47,11 @@
 
         <div id="msearch_tab" class="tab-pane">
 		  <div class="well form-inline">
-			<div style="display: inline;" class="span6">
-				<input id="search_movie_name" class="span4" name="search_movie_name" type="text" />
-				<button class="btn btn-success" type="button" id="search_movie_button"><i class="fa fa-search fa-inverse fa-fw"></i> Search</button>
-			</div>
-			&nbsp;&nbsp;&nbsp;
-			<div style="display: inline-block;">
+			<div style="display: inline-block; margin-top: 2px; margin-bottom: 2px;" class="span5">
+				<input id="search_movie_name" name="search_movie_name" type="text" style="width: 250px;" />
+				<button class="btn btn-success" type="button" id="search_movie_button"><i class="fa fa-search fa-inverse fa-fw"></i></button>
+ 			</div>
+			<div style="display: inline-block; margin-top: 2px; margin-bottom: 2px;">
 				<button class="btn btn-info" type="button" id="search_popular_button"><i class="fa fa-search fa-inverse fa-fw"></i> Popular</button>
 				<button class="btn btn-info" type="button" id="search_upcoming_button"><i class="fa fa-search fa-inverse fa-fw"></i> Upcoming</button>
 				<button class="btn btn-info" type="button" id="search_toprated_button"><i class="fa fa-search fa-inverse fa-fw"></i> Top Rated</button>
@@ -57,9 +61,9 @@
           <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
             <thead>
               <tr>
-                <th class="span5" data-ignore-articles="en" data-sorter="ignoreArticles">Movie Title</th>
-                <th class="span2">Release Info</th>
-                <th class="span2">Request Status</th>
+                <th class="span3" data-ignore-articles="en" data-sorter="ignoreArticles">Movie Title</th>
+                <th class="span2">Release Date</th>
+                <th class="span2">Status</th>
                 <th class="span1">&nbsp;</th> <!-- Search for similar -->
               </tr>
             </thead>

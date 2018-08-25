@@ -1,25 +1,28 @@
-.btn-similar {
-	background-color:	hsl(194, 87%, 44%);
+.btn-ombiblue {
+	background-color:	hsl(194, 87%, 44%)!important;
+}
+.btn-ombiblue:hover {
+	background-color:	hsl(194, 77%, 39%)!important;
 }
 
-.btn-similar:hover {
-	background-color:	hsl(194, 77%, 39%);
-}
-
-.btn-request {
-	background-color:	hsl(24, 86%, 54%)
-}
-
-.btn-request:hover {
-	background-color:	hsl(24, 76%, 44%)
+.ombi_actions {
+	display: inline-block;
+	position: absolute;
+	border-radius: 5px!important;
+	background-color: hsla(24, 5%, 5%, 0.85);
+	padding: 5px;
+	display: none;
 }
 
 .btn-ombi {
 	border-radius:	5px!important;
-	padding-top:	4px;
+	padding-top:	5px;
 	padding-bottom:	3px;
 	padding-left:	6px;
 	padding-right:	6px;
+	margin-right:	3px;
+	margin-top:		2px;
+	margin-bottom:	2px;
 }
 
 .fa-slightlybigger {
@@ -30,3 +33,12 @@
 	font-weight:	bolder;
 	border-radius:	3px!important;
 }
+
+/* .ombi-tip:hover {
+	background-color: salmon!important;
+	display: inline-block;
+	position: relative;
+	width: 50%;
+	display: none;
+}
+ */
