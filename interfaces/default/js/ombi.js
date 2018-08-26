@@ -100,10 +100,10 @@ function loadMRequests() {
             .append( ( $('<button class="btn btn-ombi btn-blue btn-ombiblue" type="button">)').attr('title','Mark Unavailable')
             .append($('<i>').addClass('fa fa-minus fa-fw fa-slightlybigger')).append(' Mark Unavailable &nbsp;')
             .click( function(){ombi_mark_unavailable("movie",movie.id);} ) ) );
-          row.append( $('<td>').append($('<button class="btn btn-ombi btn-warning" type="button">)')
-            .append( $('<i>').addClass('fa fa-list-ul fa-slightlybigger').attr('title','Request actions menu') )
-              .click( function(){toggle_menu(div_$i);}) )
-            .append(' Available').append( div_$i.attr('hidden',true) )
+          row.append( $('<td>').append($('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Request actions menu')
+            // .append( $('<i>').addClass('fa fa-check fa-slightlybigger') )
+              .click( function(){toggle_menu(div_$i);})
+            .append(' Available ').append($('<i>').addClass('fa fa-chevron-down'))).append( div_$i.attr('hidden',true) )
           );
         }
         else if (movie.approved) {
@@ -114,10 +114,10 @@ function loadMRequests() {
             .append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Mark Available')
             .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Mark Available &nbsp;')
             .click( function(){ombi_mark_available("movie",movie.id);} ) ) );
-          row.append( $('<td>').append($('<button class="btn btn-ombi btn-warning" type="button">)')
-            .append( $('<i>').addClass('fa fa-list-ul fa-slightlybigger').attr('title','Request actions menu') )
-              .click(function(){toggle_menu(div_$i);}) )
-            .append(' Approved').append( div_$i.attr('hidden',true) )
+          row.append( $('<td nowrap>').append($('<button class="btn btn-ombi btn-ombiblue" type="button">)').attr('title','Request actions menu')
+            // .append( $('<i>').addClass('fa fa-check fa-slightlybigger') )
+              .click(function(){toggle_menu(div_$i);})
+            .append(' Processing ').append($('<i>').addClass('fa fa-chevron-down'))).append( div_$i.attr('hidden',true) )
           );
         }
         else {
@@ -136,15 +136,15 @@ function loadMRequests() {
             .append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Mark Available')
             .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Mark Available &nbsp;')
             .click( function(){ombi_mark_available("movie",movie.id);} ) ) );
-          row.append( $('<td>').append($('<button class="btn btn-ombi btn-warning" type="button">)')
-            .append( $('<i>').addClass('fa fa-list-ul fa-slightlybigger').attr('title','Request actions menu'))
-              .click(function(){toggle_menu(div_$i);}) )
-            .append(' Pending').append('<br />').append( div_$i.attr('hidden',true) )
+          row.append( $('<td>').append($('<button class="btn btn-ombi btn-warning" type="button">)').attr('title','Request actions menu')
+            // .append( $('<i>').addClass('fa fa-check fa-slightlybigger') )
+              .click(function(){toggle_menu(div_$i);})
+            .append(' Pending ').append($('<i>').addClass('fa fa-chevron-down'))).append( div_$i.attr('hidden',true) )
           );
         }
         row.append(
           $('<td>').html(movie.requestedUser.alias).append('<br />')
-          .append( movie.requestedDate.substr(0,16).replace('T',' ') )
+          .append( '<nobr>'+movie.requestedDate.substr(0,10).replace('T',' ')+'</nobr>' )
         );
         $('#mrequests_table_body').append(row);
         i+=1;

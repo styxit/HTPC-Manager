@@ -12,6 +12,8 @@
 	background-color: hsla(24, 5%, 5%, 0.85);
 	padding: 5px;
 	display: none;
+	margin-top: -2px;
+	margin-left: 0px;
 }
 
 .btn-ombi {
