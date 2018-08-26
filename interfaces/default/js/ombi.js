@@ -1,35 +1,28 @@
 $(document).ready(function () {
   // moment().format();
-  // alert('break');
   $(window).trigger('hashchange');
 
-  // $(myimg1).attr('src', 'https://www.themoviedb.org/favicon.ico').css({'width':'22px','padding-right':'5px','border-radius':'5px 5px 5px 5px'});
-  // $(myimg1).wrap('<a href="https://www.themoviedb.org/movie/" target="_blank"></a>');
-  // $(myimg1).css({'border-width':'1px','height':'22px','width':'22px','padding-right':'5px','border-radius':'5px 5px 5px 5px'});
-  // $(myimg2).attr('src', 'https://www.imdb.com/favicon.ico').css({'width':'22px','padding-right':'5px','border-radius':'5px'});
-  // $(myimg2).wrap('<a href="https://www.imdb.com/title/" target="_blank"></a>');
-
+  // Todo: convert to use deferred() so that we only request an auth token once.
   loadFunctionMenu();
   loadMRequests();
   loadMSearch('popular', 'suggest');
-  // notify('ombi', 'menu.ready', 'debug');
 
+  // Todo: Use below example to delay load of tabs
   // $('a[data-toggle="tab"]').click(function (e) {
   // }).on('shown', displaylog_tab);
 
-  var SearchMovieAction = function () {
+  var searchMovieAction = function () {
     var query = $('#search_movie_name').val();
     if (query) {
-      // $('#search_movie_button').attr('disabled', true);
       loadMSearch(query, 'search');
     }
   };
+  $('#search_movie_button').click(searchMovieAction);
   $('#search_movie_name').keyup(function (event) {
     if (event.keyCode == 13) {
-      SearchMovieAction();
+      searchMovieAction();
     }
   });
-  $('#search_movie_button').click(SearchMovieAction);
 
   $('#search_popular_button').click(function () {
     loadMSearch('popular', 'suggest');
@@ -60,7 +53,7 @@ $(document).ready(function () {
   });
 });
 
-function loadMRequests() {
+function loadMRequests(mreq_col=3, mreq_ord=1) {
   $('.spinner').show();
   $.ajax({
     url: WEBDIR + 'ombi/movie_requests',
@@ -74,32 +67,24 @@ function loadMRequests() {
         $('#mrequests_table_body').append(row);
       }
       var i = 0;
-      // notify('ombi', 'Image ' + name, 'debug');
       $.each(result, function (showname, movie) {
-
         var row = $('<tr>');
-        var summary = $('<i ombi-tip>').addClass('fa fa-info-circle').attr('title',movie.overview);
-        if (movie.releaseDate == null) {
-          var name = $('<a>').attr('href', 'https://www.themoviedb.org/movie/'+movie.theMovieDbId)
-            .text(movie.title).attr('target','_blank');
-          row.append($('<td>').html(name));
-          row.append($('<td>'));
-        } else {
+        var summaryicon = makeIcon('fa fa-info-circle fa-fw', movie.overview);
           var name = $('<a>').attr('href', 'https://www.themoviedb.org/movie/'+movie.theMovieDbId)
             .text(movie.title+' ('+movie.releaseDate.substr(0,4)+')').attr('target','_blank');
-          row.append($('<td>').append(summary).append('&nbsp;').append(name));
-          row.append($('<td>').append( movie.digitalRelease ? 'Digital' : movie.status).append('<br />')
-            .append( (movie.digitalRelease ? movie.digitalReleaseDate : movie.releaseDate).substr(0,10)));
-        }
-        var div_$i = ($('<div id="#mreq_menu_'+movie.theMovieDbId+'" class="span2 ombi_actions">'));
+          row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
+          row.append($('<td nowrap>').append( (movie.digitalRelease ? movie.digitalReleaseDate : movie.releaseDate).substr(0,10))
+            .append('<br />').append( movie.digitalRelease ? 'Digital' : movie.status.replace('Post Production','Post-productn'))
+            );
+        var div_$i = ($('<div id="#mreq_menu_'+movie.theMovieDbId+'" class="span2 ombi-actions">'));
         if (movie.available) {
           div_$i.append( ( $('<button class="btn btn-ombi btn-danger" type="button">)').attr('title','Remove request')
             .append($('<i>').addClass('fa fa-minus fa-fw fa-slightlybigger')).append(' Remove &nbsp;')
-            .click( function(){ombi_remove("movie",movie.id);} ) ) )
+            .click( function(){ombi_remove("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
             .append('<br />')
             .append( ( $('<button class="btn btn-ombi btn-blue btn-ombiblue" type="button">)').attr('title','Mark Unavailable')
             .append($('<i>').addClass('fa fa-minus fa-fw fa-slightlybigger')).append(' Mark Unavailable &nbsp;')
-            .click( function(){ombi_mark_unavailable("movie",movie.id);} ) ) );
+            .click( function(){ombi_mark_unavailable("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) );
           row.append( $('<td>').append($('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Request actions menu')
             // .append( $('<i>').addClass('fa fa-check fa-slightlybigger') )
               .click( function(){toggle_menu(div_$i);})
@@ -109,11 +94,11 @@ function loadMRequests() {
         else if (movie.approved) {
           div_$i.append( ( $('<button class="btn btn-ombi btn-danger" type="button">)').attr('title','Remove request')
             .append($('<i>').addClass('fa fa-minus fa-fw fa-slightlybigger')).append(' Remove &nbsp;')
-            .click( function(){ombi_remove("movie",movie.id);} ) ) )
+            .click( function(){ombi_remove("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
             .append('<br />')
             .append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Mark Available')
             .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Mark Available &nbsp;')
-            .click( function(){ombi_mark_available("movie",movie.id);} ) ) );
+            .click( function(){ombi_mark_available("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) );
           row.append( $('<td nowrap>').append($('<button class="btn btn-ombi btn-ombiblue" type="button">)').attr('title','Request actions menu')
             // .append( $('<i>').addClass('fa fa-check fa-slightlybigger') )
               .click(function(){toggle_menu(div_$i);})
@@ -123,19 +108,19 @@ function loadMRequests() {
         else {
           div_$i.append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Appprove request')
             .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Approve &nbsp;')
-            .click( function(){ombi_approve("movie",movie.id);} ) ) )
+            .click( function(){ombi_approve("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
             .append('<br />')
             .append( ( $('<button class="btn btn-ombi btn-danger" type="button">)').attr('title','Deny request')
             .append($('<i>').addClass('fa fa-times fa-fw fa-slightlybigger')).append(' Deny &nbsp;')
-            .click( function(){ombi_deny("movie",movie.id);} ) ) )
+            .click( function(){ombi_deny("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
             .append('<br />')
             .append( ( $('<button class="btn btn-ombi btn-danger" type="button">)').attr('title','Remove request')
             .append($('<i>').addClass('fa fa-minus fa-fw fa-slightlybigger')).append(' Remove &nbsp;')
-            .click( function(){ombi_remove("movie",movie.id);} ) ) )
+            .click( function(){ombi_remove("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
             .append('<br />')
             .append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Mark Available')
             .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Mark Available &nbsp;')
-            .click( function(){ombi_mark_available("movie",movie.id);} ) ) );
+            .click( function(){ombi_mark_available("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) );
           row.append( $('<td>').append($('<button class="btn btn-ombi btn-warning" type="button">)').attr('title','Request actions menu')
             // .append( $('<i>').addClass('fa fa-check fa-slightlybigger') )
               .click(function(){toggle_menu(div_$i);})
@@ -143,16 +128,22 @@ function loadMRequests() {
           );
         }
         row.append(
-          $('<td>').html(movie.requestedUser.alias).append('<br />')
-          .append( '<nobr>'+movie.requestedDate.substr(0,10).replace('T',' ')+'</nobr>' )
+          $('<td>').append( '<nobr>'+movie.requestedDate.substr(0,10)+'</nobr>' )
+          .append('<br />').append(movie.requestedUser.alias)
         );
         $('#mrequests_table_body').append(row);
         i+=1;
       });
       $('#mrequests_table_body').parent().trigger('update');
+      $('#mrequests_table_body').parent().on('sortEnd', function(event) {
+          var s = '' + event.target.config.sortList + ''; // Had trouble typecasting this!
+          var sp = s.split(",");
+          mreq_col = sp[0];
+          mreq_ord = sp[1];
+      });
       $('#mrequests_table_body').parent().trigger("sorton", [
         [
-          [5, 1]
+          [mreq_col, mreq_ord]
         ]
       ]);
       $('.spinner').hide();
@@ -182,34 +173,33 @@ function loadMSearch(hint='popular', lookup='suggest') {
       $.each(result, function (showname, movie) {
         // $.getJSON(WEBDIR + 'ombi/get_extrainfo?t=movie&q='+movie.theMovieDbId+'&k=digitalReleaseDate', function(digitalReleaseDate) {
         var row = $('<tr>');
-        var summary = $('<i ombi-tip>').addClass('fa fa-info-circle').attr('title',movie.overview);
+        var summaryicon = makeIcon('fa fa-info-circle fa-fw', movie.overview);
         if (movie.releaseDate == null) {
           var name = $('<a>').attr('href', 'https://www.themoviedb.org/movie/'+movie.theMovieDbId)
             .text(movie.title).attr('target','_blank');
-          row.append($('<td>').html(name));
+          row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
           row.append($('<td>'));
         } else {
           var name = $('<a>').attr('href', 'https://www.themoviedb.org/movie/'+movie.theMovieDbId)
             .text(movie.title+' ('+movie.releaseDate.substr(0,4)+')').attr('target','_blank');
-          row.append($('<td>').append(summary).append('&nbsp;').append(name));
-          row.append($('<td>').append( ( $('<i>').addClass('fa fa-film fa-slightlybigger')))
-            .append('&nbsp;').append('<nobr>'+movie.releaseDate.substr(0,10)+'<nobr>').attr('title','Theatre release'));
+          row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
+          row.append($('<td nowrap>').append(movie.releaseDate.substr(0,10)));
         }
         if (movie.available && movie.quality) {
-          row.append( $('<td>').append('Available ').append( $('<span>')
+          row.append( $('<td nowrap>').append('Available ').append( $('<span>')
             .html(movie.quality).addClass('label label-success label-ombi-quality')));
         }
-        else if (movie.available) { row.append( $('<td>').append('Available') ); }
-        else if (movie.approved) { row.append($('<td>').append('Processing')); }
+        else if (movie.available) { row.append( $('<td nowrap>').append('Available') ); }
+        else if (movie.approved) { row.append($('<td>').append('Processing Request')); }
         else if (movie.requested && !(movie.approved)) { row.append($('<td>').append('Pending Approval')); }
         else { 
-          row.append($('<td>').append( ( $('<button class="btn btn-ombi btn-warning" type="button">)')
+          row.append($('<td nowrap>').append( ( $('<button class="btn btn-ombi btn-warning" type="button">)')
             .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger"')).append(' Request &nbsp;')
-            .click( function(){ombi_mrequest(movie.theMovieDbId, hint, lookup);} ) ) ) );
+            .attr('title','Request '+movie.title).click( function(){ombi_mrequest(movie.theMovieDbId, hint, lookup);} ) ) ) );
         }
-        row.append($('<td>').append( ( $('<button class="btn btn-ombi btn-blue btn-ombiblue" type="button">)')
-          .append($('<i>').addClass('fa fa-eye fa-fw fa-slightlybigger')).append(' Similar &nbsp;')
-          .click( function(){loadMSearch(movie.theMovieDbId);} ) ) ) );
+        row.append($('<td nowrap>').append( ( $('<button class="btn btn-ombi btn-blue btn-ombiblue" type="button">)')
+          .append($('<i>').addClass('fa fa-eye fa-slightlybigger')).append(' Similar')
+          .attr('title','Look for movies similar to '+movie.title).click( function(){loadMSearch(movie.theMovieDbId);} ) ) ) );
         $('#msearch_table_body').append(row);
         i+=1;
       });
@@ -261,49 +251,76 @@ function loadFunctionMenu() {
 }
 
 function toggle_menu(div_id) {
+  // Collapses any open menus when opening another
   if (div_id.is(":hidden")) {
-    $('.ombi_actions').hide();
+    $('.ombi-actions').hide();
     div_id.slideToggle("fast");
   } else {
     div_id.slideToggle("fast");
   }
 }
 
-function ombi_approve(ctype, id) {
-  notify('ombi', 'Approve ' + ctype + ' request id ' + id, 'success');
-  return true;
+function ombi_approve(ctype, id, fn, col, ord) {
+  // Actions the menu action, and then reloads the tab while
+  // retaining existing table sort order.
+  if (ctype == 'movie') {
+    ombi_maction(id, 'approve').done(function(res) {
+      notify('Ombi', 'Approved', 'success'); // Approve action doesn't return a message.
+      fn(col,ord);
+      return;
+    });
+  }
 }
 
-function ombi_deny(ctype, id) {
-  notify('ombi', 'Deny ' + ctype + ' request id ' + id, 'info');
-  return true;
+function ombi_mark_available(ctype, id, fn, col, ord) {
+  if (ctype == 'movie') {
+    ombi_maction(id, 'available').done(function(res) {
+      notify('Ombi', res, 'success');
+      fn(col,ord);
+      return;
+    });
+  }
 }
 
-function ombi_remove(ctype, id) {
-  notify('ombi', 'Delete ' + ctype + ' request id ' + id, 'info');
-  return true;
+function ombi_mark_unavailable(ctype, id, fn, col, ord) {
+  if (ctype == 'movie') {
+    ombi_maction(id, 'unavailable').done(function(res) {
+      notify('Ombi', res, 'success');
+      fn(col,ord);
+      return;
+    });
+  }
 }
 
-function ombi_mark_available(ctype, id) {
-  notify('ombi', 'Mark available ' + ctype + ' request id ' + id, 'success');
-  return true;
+function ombi_remove(ctype, id, fn, col, ord) {
+  if (ctype == 'movie') {
+    ombi_mdelete(id, 'remove').done(function(res) {
+      notify('Ombi', res, 'info');
+      fn(col,ord);
+      return;
+    });
+  }
 }
 
-function ombi_mark_unavailable(ctype, id) {
-  notify('ombi', 'Mark unavailable ' + ctype + ' request id ' + id, 'info');
-  return true;
+function ombi_deny(ctype, id, fn, col, ord) {
+  if (ctype == 'movie') {
+    ombi_mdeny(id, 'deny').done(function(res) {
+      notify('Ombi', res, 'info');
+      fn(col,ord);
+      return;
+    });
+  }
 }
 
 function ombi_mrequest(id, h, l) {
-  var url = WEBDIR + 'ombi/request_movie?id='+id;
-  alert(url);
+  var u = WEBDIR + 'ombi/request_movie?id='+id;
   $.ajax({
-    url: url,
+    url: u,
     data: id,
     type: 'get',
     dataType: 'json',
     success: function(result) {
-      if (result != 'False') {
+      if (!result.isError) {
         notify('Request success ', result.message, 'success');
         loadMRequests(h,l);
       } else {
@@ -331,5 +348,47 @@ function syncContent(source, mode) {
       }
     }
   });
+}
+
+function ombi_maction(id, action) {
+  var u = WEBDIR + 'ombi/do_maction?id=' + id + '&action=' + action;
+  // alert(u)
+  var dfrd = $.Deferred();
+  $.ajax({
+    url: u,
+    type: 'post',
+    dataType: 'json',
+    success: function(result) {
+      if (result.isError) {
+        dfrd.reject(false);
+        notify('Ombi', 'API call failed for "' + id + ':' + action + '" returned: ' + result.errorMessage, 'error');
+      } else {
+        dfrd.resolve(result.message);
+      }
+    },
+    error: function(data){
+      notify('Failed to do action ', 'Bad web engine call: ' + data.status + ' ' + data.statusText, 'error');
+      dfrd.reject(false);
+    }
+  });
+  return dfrd.promise();
+}
+
+function ombi_mdelete(id, action) {
+  var u = WEBDIR + 'ombi/do_maction?id=' + id + '&action=' + action;
+  var dfrd = $.Deferred();
+  $.ajax({
+    url: u,
+    type: 'post',
+    dataType: 'text',
+    success: function(result) {
+      dfrd.resolve('Deleted successfully');
+    },
+    error: function(result){
+      notify('Failed to do action ', 'Bad web engine call: ' + result.status + ' ' + result.statusText, 'error');
+      dfrd.reject('An error occured, check the logs');
+    }
+  });
+  return dfrd.promise();
 }
 

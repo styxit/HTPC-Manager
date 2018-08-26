@@ -83,10 +83,10 @@ class Ombi(object):
             logger.debug('ping ok, now trying credentials')
             url = 'api/v1/Settings/about'
             res = self._ombi_get(url)
-            if res.status_code == 200:
+            if res != 'False':
                 logger.debug('Successful Ombi test')
                 return 'True'
-            logger.error('Unable to contact Ombi via %s Response %s %s' % (url, str(res.status_code), str(res.reason)))
+            logger.error('Ombi test failed: %s' % res)
         return
 
     @cherrypy.expose()
@@ -142,7 +142,7 @@ class Ombi(object):
         Combined function to make all swagger API GET calls.
         Builds the url, authenticates and grabs token if there isn't one.
         :url: api endpoint
-        :return: the json respoonse content or 'False'
+        :return: the json response content or 'False'
         """
         logger.debug('Doing GET request to %s' % url )
         if self.auth() == 'False':
@@ -161,7 +161,7 @@ class Ombi(object):
             return d
         logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
         return 'False'
-        
+
     def _ombi_post(self, url, data=''):
         """
         Combined function to make all swagger API POSTs.
@@ -170,7 +170,7 @@ class Ombi(object):
         :param data: post data in json format
         :return: the response data in json format or 'False'
         """
-        logger.debug('Doing POST request to %s %s' % (url, data) )
+        logger.debug('Doing POST request to %s:\n%s' % (url, data) )
         if self.auth() == 'False':
             logger.debug('POST request died - auth failed')
             return 'False'
@@ -182,9 +182,33 @@ class Ombi(object):
         h.update({ 'Authorization': self._token})
         r = requests.post( u, headers=h, json=data )
         if r.status_code == 200:
-            d = r.json()
-            logger.debug('Ombi POST successful\n%s' % d)
-            return d
+            logger.debug('Ombi POST successful:\n%s' % r.json())
+            return r
+        logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
+        return 'False'
+
+    def _ombi_delete(self, url):
+        """
+        Combined function to make all swagger API DELETE calls.
+        Builds the url, authenticates and grabs token if there isn't one.
+        :url: api endpoint
+        :return: the json response content or 'False'
+        """
+        logger.debug('Doing DELETE request to %s' % url )
+        if self.auth() == 'False':
+            logger.debug('DELETE request died - auth failed')
+            return 'False'
+        ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
+        ip = htpc.settings.get('ombi_host')
+        port = htpc.settings.get('ombi_port')
+        u = 'http%s://%s:%s/%s' % (ssl, ip, port, url)
+        h = dict()
+        h.update({ 'Authorization': self._token})
+        r = requests.delete( u, headers=h )
+        if r.status_code == 200:
+            # d = r.json()
+            logger.debug('Ombi DELETE successful\n%s' % r)
+            return r
         logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
         return 'False'
 
@@ -227,15 +251,10 @@ class Ombi(object):
                 self._token = ''
                 return self.auth(authtry)
             elif r.status_code == 200:
-                logger.debug('Existing token is OK')
+                # logger.debug('Existing token is OK')
                 return 'True'
         logger.error('Unable to authenticate on try %s: Response %s %s' % (authtry, str(res.status_code), str(res.reason)))
         return 'False'
-
-    def _get_url(self, host=None, port=None):
-        u_host = host or htpc.settings.get('utorrent_host')
-        u_port = port or htpc.settings.get('utorrent_port')
-        return 'http://{}:{}/gui/'.format(striphttp(u_host), u_port)
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
@@ -300,40 +319,35 @@ class Ombi(object):
         d.update({ 'theMovieDbId':id })
         r = self._ombi_post(u, d)
         if r != 'False':
-            return r
+            return r.json()
         logger.debug('Bad request')
         return 'False'
 
     @cherrypy.expose()
     @require(member_of(htpc.role_user))
-    @cherrypy.tools.json_out()
-    def remove(self, torrent_id):
-        return self.do_action('remove', hash=torrent_id).json()
-
-    @cherrypy.expose()
-    @require(member_of(htpc.role_user))
-    @cherrypy.tools.json_out()
-    def deny(self, torrent_id):
-        return self.do_action('removedata', hash=torrent_id).json()
-
-    def do_action(self, action, hash=None, s=None, **kwargs):
+    # @cherrypy.tools.json_out() # response is json payload so don't need this
+    def do_maction(self, id, action, **kwargs):
         """
-        :param action:
-        :param hash:
+        :param ctype: content type for api url
+        :param id: id from the GET /api/v1/Request/movie response
+        :param action: must be in below list
         :param kwargs:
-        :rtype: requests.Response
-        :return:
+        :return: result message in json format
         """
-        if action not in ('start', 'stop', 'pause', 'forcestart', 'unpause', 'remove', 'removedata', 'add-url', 'recheck', 'setprio',
-                          'queuebottom', 'queuetop', 'queuedown', 'queueup', 'getfiles', 'getsettings', 'setsetting'):
-            raise AttributeError
-        if action == 'add-url':
-            return self.fetch('&action=%s&s=%s' % (action, s))
+        logger.debug('Performing %s on movie %s' % (action,id) )
+        if action not in ('approve', 'available', 'unavailable', 'remove'):
+            raise cherrypy.HTTPError('500 Error', 'Invalid action')
+            return '{"500": "Invalid action"}'
+        u = 'api/v1/Request/movie/%s' % action
+        d = dict()
+        d.update({ 'id': id })
+        if action == 'remove':
+            u = 'api/v1/Request/movie/%s' % id
+            r = self._ombi_delete(u)
+        else:
+            r = self._ombi_post(u, d)
+        if r != 'False':
+            return r
+        logger.error('Bad request to api')
+        return 'False'
 
-        params_str = ''.join(["&%s=%s" % (k, v) for k, v in kwargs.items()])
-
-        if hash is None:
-            # getsettings
-            return self.fetch('&action=%s%s' % (action, params_str))
-
-        return self.fetch('&action=%s%s&hash=%s' % (action, params_str, hash))
