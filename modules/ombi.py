@@ -187,6 +187,31 @@ class Ombi(object):
         logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
         return 'False'
 
+    def _ombi_put(self, url, data=''):
+        """
+        Combined function to make all swagger API PUTs.
+        Builds the url, authenticates and grabs token if there isn't one.
+        :url: api endpoint
+        :param data: PUT data in json format
+        :return: the response data in json format or 'False'
+        """
+        logger.debug('Doing PUT request to %s:\n%s' % (url, data) )
+        if self.auth() == 'False':
+            logger.debug('PUT request died - auth failed')
+            return 'False'
+        ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
+        ip = htpc.settings.get('ombi_host')
+        port = htpc.settings.get('ombi_port')
+        u = 'http%s://%s:%s/%s' % (ssl, ip, port, url)
+        h = dict()
+        h.update({ 'Authorization': self._token})
+        r = requests.put( u, headers=h, json=data )
+        if r.status_code == 200:
+            logger.debug('Ombi PUT successful:\n%s' % r.json())
+            return r
+        logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
+        return 'False'
+
     def _ombi_delete(self, url):
         """
         Combined function to make all swagger API DELETE calls.
@@ -335,7 +360,7 @@ class Ombi(object):
         :return: result message in json format
         """
         logger.debug('Performing %s on movie %s' % (action,id) )
-        if action not in ('approve', 'available', 'unavailable', 'remove'):
+        if action not in ('approve', 'available', 'unavailable', 'deny', 'remove'):
             raise cherrypy.HTTPError('500 Error', 'Invalid action')
             return '{"500": "Invalid action"}'
         u = 'api/v1/Request/movie/%s' % action
@@ -344,6 +369,8 @@ class Ombi(object):
         if action == 'remove':
             u = 'api/v1/Request/movie/%s' % id
             r = self._ombi_delete(u)
+        elif action == 'deny':
+            r = self._ombi_put(u, d)
         else:
             r = self._ombi_post(u, d)
         if r != 'False':

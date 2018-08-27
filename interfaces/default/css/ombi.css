@@ -16,6 +16,13 @@
 	margin-left: 0px;
 }
 
+.ombi-menu-disabled {
+	color: gray!important;
+}
+h1.page-header.page-title a.ombi-menu-disabled {
+	color: gray!important;
+}
+
 .btn-ombi {
 	border-radius:	5px!important;
 	padding-top:	5px;

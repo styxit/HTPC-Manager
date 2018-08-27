@@ -39,18 +39,6 @@ $(document).ready(function () {
   $('#search_nowplaying_button').click(function () {
     loadMSearch('nowplaying', 'suggest');
   });
-
-  $('#sync_plex_part').click(function () {
-    syncContent('plex', 'part');
-  });
-
-  $('#sync_plex_full').click(function () {
-    syncContent('plex', 'full');
-  });
-
-  $('#sync_emby_full').click(function () {
-    syncContent('emby', 'full');
-  });
 });
 
 function loadMRequests(mreq_col=3, mreq_ord=1) {
@@ -74,7 +62,7 @@ function loadMRequests(mreq_col=3, mreq_ord=1) {
             .text(movie.title+' ('+movie.releaseDate.substr(0,4)+')').attr('target','_blank');
           row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
           row.append($('<td nowrap>').append( (movie.digitalRelease ? movie.digitalReleaseDate : movie.releaseDate).substr(0,10))
-            .append('<br />').append( movie.digitalRelease ? 'Digital' : movie.status.replace('Post Production','Post-productn'))
+            .append('<br />').append( movie.digitalRelease ? 'Digital' : movie.status.replace('Post Production','Post Prod'))
             );
         var div_$i = ($('<div id="#mreq_menu_'+movie.theMovieDbId+'" class="span2 ombi-actions">'));
         if (movie.available) {
@@ -86,7 +74,6 @@ function loadMRequests(mreq_col=3, mreq_ord=1) {
             .append($('<i>').addClass('fa fa-minus fa-fw fa-slightlybigger')).append(' Mark Unavailable &nbsp;')
             .click( function(){ombi_mark_unavailable("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) );
           row.append( $('<td>').append($('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Request actions menu')
-            // .append( $('<i>').addClass('fa fa-check fa-slightlybigger') )
               .click( function(){toggle_menu(div_$i);})
             .append(' Available ').append($('<i>').addClass('fa fa-chevron-down'))).append( div_$i.attr('hidden',true) )
           );
@@ -100,12 +87,28 @@ function loadMRequests(mreq_col=3, mreq_ord=1) {
             .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Mark Available &nbsp;')
             .click( function(){ombi_mark_available("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) );
           row.append( $('<td nowrap>').append($('<button class="btn btn-ombi btn-ombiblue" type="button">)').attr('title','Request actions menu')
-            // .append( $('<i>').addClass('fa fa-check fa-slightlybigger') )
               .click(function(){toggle_menu(div_$i);})
             .append(' Processing ').append($('<i>').addClass('fa fa-chevron-down'))).append( div_$i.attr('hidden',true) )
           );
         }
-        else {
+        else if (movie.denied) {
+          div_$i.append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Appprove request')
+            .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Approve &nbsp;')
+            .click( function(){ombi_approve("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
+            .append('<br />')
+            .append( ( $('<button class="btn btn-ombi btn-danger" type="button">)').attr('title','Remove request')
+            .append($('<i>').addClass('fa fa-minus fa-fw fa-slightlybigger')).append(' Remove &nbsp;')
+            .click( function(){ombi_remove("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
+            .append('<br />')
+            .append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Mark Available')
+            .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Mark Available &nbsp;')
+            .click( function(){ombi_mark_available("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) );
+          row.append( $('<td>').append($('<button class="btn btn-ombi btn-danger" type="button">)').attr('title','Request actions menu')
+              .click(function(){toggle_menu(div_$i);})
+            .append(' Denied ').append($('<i>').addClass('fa fa-chevron-down'))).append( div_$i.attr('hidden',true) )
+          );
+        }
+        else { // "Requested"
           div_$i.append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Appprove request')
             .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Approve &nbsp;')
             .click( function(){ombi_approve("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
@@ -122,7 +125,6 @@ function loadMRequests(mreq_col=3, mreq_ord=1) {
             .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Mark Available &nbsp;')
             .click( function(){ombi_mark_available("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) );
           row.append( $('<td>').append($('<button class="btn btn-ombi btn-warning" type="button">)').attr('title','Request actions menu')
-            // .append( $('<i>').addClass('fa fa-check fa-slightlybigger') )
               .click(function(){toggle_menu(div_$i);})
             .append(' Pending ').append($('<i>').addClass('fa fa-chevron-down'))).append( div_$i.attr('hidden',true) )
           );
@@ -186,7 +188,7 @@ function loadMSearch(hint='popular', lookup='suggest') {
           row.append($('<td nowrap>').append(movie.releaseDate.substr(0,10)));
         }
         if (movie.available && movie.quality) {
-          row.append( $('<td nowrap>').append('Available ').append( $('<span>')
+          row.append( $('<td>').append('Available ').append( $('<span>')
             .html(movie.quality).addClass('label label-success label-ombi-quality')));
         }
         else if (movie.available) { row.append( $('<td nowrap>').append('Available') ); }
@@ -226,15 +228,23 @@ function get_extrainfo_key(ctype,cid,key) {
 }
 
 function loadFunctionMenu() {
-  $('.fmenu_plex').hide();
-  $('.fmenu_emby').hide();
+  // $('.fmenu_plex').hide();
+  // $('.fmenu_emby').hide();
   $.ajax({
     url: WEBDIR + 'ombi/get_plex_enabled',
     type: 'get',
     dataType: 'text',
     success: function(result) {
       if (result == 'True') {
-        $('.fmenu_plex').show();
+        // $('.fmenu_plex').show();
+        $('#sync_plex_part').click(function () {
+          syncContent('plex', 'part');
+        });
+        $('#sync_plex_full').click(function () {
+          syncContent('plex', 'full');
+        });
+      } else {
+        $('.fmenu_plex').addClass('ombi-menu-disabled');
       }
     }
   });
@@ -244,7 +254,12 @@ function loadFunctionMenu() {
     dataType: 'text',
     success: function(result) {
       if (result == 'True') {
-        $('.fmenu_emby').show();
+        // $('.fmenu_emby').show();
+        $('#sync_emby_full').click(function () {
+          syncContent('emby', 'full');
+        });
+      } else {
+        $('.fmenu_emby').addClass('ombi-menu-disabled');
       }
     }
   });
@@ -292,9 +307,9 @@ function ombi_mark_unavailable(ctype, id, fn, col, ord) {
   }
 }
 
-function ombi_remove(ctype, id, fn, col, ord) {
+function ombi_deny(ctype, id, fn, col, ord) {
   if (ctype == 'movie') {
-    ombi_mdelete(id, 'remove').done(function(res) {
+    ombi_maction(id, 'deny').done(function(res) {
       notify('Ombi', res, 'info');
       fn(col,ord);
       return;
@@ -302,9 +317,9 @@ function ombi_remove(ctype, id, fn, col, ord) {
   }
 }
 
-function ombi_deny(ctype, id, fn, col, ord) {
+function ombi_remove(ctype, id, fn, col, ord) {
   if (ctype == 'movie') {
-    ombi_mdeny(id, 'deny').done(function(res) {
+    ombi_mdelete(id, 'remove').done(function(res) {
       notify('Ombi', res, 'info');
       fn(col,ord);
       return;
@@ -367,7 +382,7 @@ function ombi_maction(id, action) {
       }
     },
     error: function(data){
-      notify('Failed to do action ', 'Bad web engine call: ' + data.status + ' ' + data.statusText, 'error');
+      notify('Failed to do ' + action , 'Bad web engine call: ' + data.status + ' ' + data.statusText, 'error');
       dfrd.reject(false);
     }
   });
@@ -375,6 +390,8 @@ function ombi_maction(id, action) {
 }
 
 function ombi_mdelete(id, action) {
+  // Delete is handled differently by the Ombi API, as there's no response message
+  // and it seems to be text not json due to DELETE verb. Not 100% sure on that last point :) .
   var u = WEBDIR + 'ombi/do_maction?id=' + id + '&action=' + action;
   var dfrd = $.Deferred();
   $.ajax({
@@ -385,7 +402,7 @@ function ombi_mdelete(id, action) {
       dfrd.resolve('Deleted successfully');
     },
     error: function(result){
-      notify('Failed to do action ', 'Bad web engine call: ' + result.status + ' ' + result.statusText, 'error');
+      notify('Failed to do delete ', 'Bad web engine call: ' + result.status + ' ' + result.statusText, 'error');
       dfrd.reject('An error occured, check the logs');
     }
   });
