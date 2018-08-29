@@ -271,14 +271,14 @@ class Ombi(object):
             h.update({ 'Authorization': self._token})
             r = requests.get( u, headers=h )
             if r.status_code == 401: # means we need to re-authenticate
-                logger.debug('Re-auth needed %s %s' % (str(res.status_code), str(res.reason)))
+                logger.debug('Re-auth needed %s %s' % (str(r.status_code), str(r.reason)))
                 authtry += 1
                 self._token = ''
                 return self.auth(authtry)
             elif r.status_code == 200:
                 # logger.debug('Existing token is OK')
                 return 'True'
-        logger.error('Unable to authenticate on try %s: Response %s %s' % (authtry, str(res.status_code), str(res.reason)))
+        logger.error('Unable to authenticate on try %s: Response %s %s' % (authtry, str(r.status_code), str(r.reason)))
         return 'False'
 
     @cherrypy.tools.json_out()
