@@ -24,4 +24,7 @@ config.codekit
 .python-version
 
 # Ignore themes from other projects
-interfaces/default/css/themes/openflixr/ # http://www.openflixr.com
+
+# http://www.openflixr.com
+interfaces/default/css/themes/openflixr/
+
