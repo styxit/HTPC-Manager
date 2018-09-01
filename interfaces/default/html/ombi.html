@@ -19,19 +19,13 @@
       <ul class="nav nav-tabs">
         <li class="active"><a href="#mrequests_tab" data-toggle="tab">Movie Requests</a></li>
         <li><a href="#msearch_tab" data-toggle="tab">Movie Search</a></li>
-        <!-- <li><a href="#tvrequest_tab" data-toggle="tab">TV Requests</a></li> -->
-        <!-- <li><a href="#tvsearch_tab" data-toggle="tab">TV Search</a></li> -->
+        <li><a href="#tvrequests_tab" data-toggle="tab">TV Requests</a></li>
+        <li><a href="#tvsearch_tab" data-toggle="tab">TV Search</a></li>
       </ul>
 
       <div class="tab-content">
-        <!-- <div id="mrequests_tab" class="tab-pane mofa active"> -->
         <div id="mrequests_tab" class="tab-pane active">
-<!-- 		  <div class="well form-inline">
-			<button class="btn btn-info" type="button" id="filter_approved_button"><i class="fa fa-search fa-inverse fa-fw"></i> Approved Only</button>
-			<button class="btn btn-info" type="button" id="filter_pending_button"><i class="fa fa-search fa-inverse fa-fw"></i> Pending Only</button>
-			<button class="btn btn-info" type="button" id="filter_available_button"><i class="fa fa-search fa-inverse fa-fw"></i> Available Only</button>
-		  </div>
- -->
+
           <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
             <thead>
               <tr>
@@ -68,6 +62,46 @@
               </tr>
             </thead>
             <tbody id="msearch_table_body"></tbody>
+          </table>
+        </div>
+
+        <div id="tvrequests_tab" class="tab-pane">
+          <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
+            <thead>
+              <tr>
+                <th class="span3" data-ignore-articles="en" data-sorter="ignoreArticles">TV Show Title</th>
+                <th class="span1">Show Status</th>
+                <th class="span1">Release Date</th>
+                <th class="span1">&nbsp;</th> <!-- View button -->
+              </tr>
+            </thead>
+            <tbody id="tvrequests_table_body"></tbody>
+          </table>
+        </div>
+
+        <div id="tvsearch_tab" class="tab-pane">
+		  <div class="well form-inline">
+			<div style="display: inline-block; margin-top: 2px; margin-bottom: 2px;" class="span5">
+				<input id="search_tvshow_name" name="search_tvshow_name" type="text" style="width: 250px;" />
+				<button class="btn btn-success" type="button" id="search_tvshow_button"><i class="fa fa-search fa-inverse fa-fw"></i></button>
+ 			</div>
+			<div style="display: inline-block; margin-top: 2px; margin-bottom: 2px;">
+				<button class="btn btn-info" type="button" id="search_tvpopular_button"><i class="fa fa-search fa-inverse fa-fw"></i> Popular</button>
+				<button class="btn btn-info" type="button" id="search_trending_button"><i class="fa fa-search fa-inverse fa-fw"></i> Trending</button>
+				<button class="btn btn-info" type="button" id="search_mostwatched_button"><i class="fa fa-search fa-inverse fa-fw"></i> Most Watched</button>
+				<button class="btn btn-info" type="button" id="search_anticipated_button"><i class="fa fa-search fa-inverse fa-fw"></i> Most Anticipated</button>
+			</div>
+		  </div>
+          <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
+            <thead>
+              <tr>
+                <th class="span3" data-ignore-articles="en" data-sorter="ignoreArticles">Show Title</th>
+                <th class="span1">Status</th>
+                <th class="span1">First Aired</th>
+                <th class="span1">Status</th>
+              </tr>
+            </thead>
+            <tbody id="tvsearch_table_body"></tbody>
           </table>
         </div>
 

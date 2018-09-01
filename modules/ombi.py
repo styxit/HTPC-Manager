@@ -94,7 +94,7 @@ class Ombi(object):
     # @cherrypy.tools.json_out()
     def dummy(self):
         # x = self.auth()
-        x = 'api/v1/Settings/ombi'
+        x = 'api/v1/Request/tv'
         d = self._ombi_get(x)
         if d != 'False':
             return 'Response: %s' % d
@@ -291,7 +291,20 @@ class Ombi(object):
         if d != 'False':
             return d
         else:
-            logger.debug('Unable to get movies requests')
+            logger.error('Unable to get movies requests')
+            return 'False'
+
+    @cherrypy.tools.json_out()
+    @cherrypy.expose()
+    @require()
+    def tv_requests(self):
+        u = 'api/v1/Request/tvlite'
+        logger.debug('Fetching all tv requests via %s' % u)
+        d = self._ombi_get(u)
+        if d != 'False':
+            return d
+        else:
+            logger.error('Unable to get tv requests')
             return 'False'
 
     @cherrypy.tools.json_out()
