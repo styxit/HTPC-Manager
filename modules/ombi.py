@@ -144,9 +144,8 @@ class Ombi(object):
         :url: api endpoint
         :return: the json response content or 'False'
         """
-        logger.debug('Doing GET request to %s' % url )
         if self.auth() == 'False':
-            logger.debug('GET request died - auth failed')
+            logger.error('GET request died - auth failed')
             return 'False'
         ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
         ip = htpc.settings.get('ombi_host')
@@ -157,7 +156,6 @@ class Ombi(object):
         r = requests.get( u, headers=h )
         if r.status_code == 200:
             d = r.json()
-            # logger.debug('Ombi GET successful\n%s' % d)
             return d
         logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
         return 'False'
@@ -221,7 +219,7 @@ class Ombi(object):
         """
         logger.debug('Doing DELETE request to %s' % url )
         if self.auth() == 'False':
-            logger.debug('DELETE request died - auth failed')
+            logger.error('DELETE request died - auth failed')
             return 'False'
         ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
         ip = htpc.settings.get('ombi_host')
@@ -231,8 +229,6 @@ class Ombi(object):
         h.update({ 'Authorization': self._token})
         r = requests.delete( u, headers=h )
         if r.status_code == 200:
-            # d = r.json()
-            logger.debug('Ombi DELETE successful\n%s' % r)
             return r
         logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
         return 'False'

@@ -16,6 +16,37 @@
 	margin-left: 0px;
 }
 
+.ombi-tvrequest-overlay {
+	/* display: inline; */
+	position: fixed;
+	border-radius: 5px!important;
+	background-color: hsla(24, 5%, 5%, 0.85);
+	padding: 5px;
+	display: none;
+	/* margin-top: -2px; */
+	/* margin-left: 0px; */
+}
+
+.ombi-tvrequest-detail {
+	/* display: inline; */
+	position: absolute;
+	border-radius: 5px!important;
+	background-color: hsla(24, 5%, 5%, 0.85);
+	/* color:	white; */
+	padding: 6px;
+	display: none;
+	/* margin-top: -2px; */
+	width: 78%;
+	left: 5px;
+	/* right: 50px; */
+	overflow: auto;
+}
+
+.btn-ombi-suggestion {
+	 margin-top: 2px;
+	 margin-bottom: 2px;
+}
+
 .ombi-menu-disabled {
 	color: gray!important;
 }

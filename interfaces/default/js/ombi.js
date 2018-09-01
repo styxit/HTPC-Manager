@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 $(document).ready(function () {
   // moment().format();
   $(window).trigger('hashchange');
@@ -95,7 +97,7 @@ $(document).ready(function () {
   });
 });
 
-function loadMRequests(mreq_col=1, mreq_ord=1) {
+function loadMRequests(mreq_col=1, mreq_ord=1 ) {
   $('.spinner').show();
   $.ajax({
     url: WEBDIR + 'ombi/movie_requests',
@@ -229,98 +231,78 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
       }
       $.each(result, function (showname, show) {
         // alert('Looping for TV id ' + show.id);
-        
-        // !wip - TV content request details in a hidden row?
-        // No - tablesorter breaks everything and puts the rows out of order/ wrong colours etc.
-        var row_id = show.tvDbId
-        var row_$row_id = $('<tr id="#tr_'+show.tvDbId+'">').attr('hidden',true);
-        row_$row_id.append($('<td>').attr('colspan', '4').html('Request detail goes here'));
-        
         var row = $('<tr>');
+        var tvDbId = show.tvDbId;
         var summaryicon = makeIcon('fa fa-info-circle fa-fw', show.overview);
-          var name = $('<a>').attr('href', 'https://www.imdb.com/title/'+show.imdbId)
-            .text(show.title+' ('+show.releaseDate.substr(0,4)+')').attr('target','_blank');
-          row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
-          row.append($('<td nowrap>').append(show.status));
-          row.append($('<td nowrap>').append(show.releaseDate.substr(0,10)));
-          row.append( $('<td>').append($('<button id="#view_req'+show.tvDbId+'" class="btn btn-ombi btn-success" type="button">)')
-            .attr('title','View Show request')
-            .click( function(){toggle_menu(row_$row_id); })
-            .append(' View ').append($('<i>').addClass('fa fa-caret-down fa-slightlybigger'))
-          ));
-/*         var div_$show.tvDbId = ($('<div id="#mreq_menu_'+show.tvDbId+'" class="span2 ombi-actions">'));
-        if (movie.available) {
-          div_$i.append( ( $('<button class="btn btn-ombi btn-danger" type="button">)').attr('title','Remove request')
-            .append($('<i>').addClass('fa fa-minus fa-fw fa-slightlybigger')).append(' Remove &nbsp;')
-            .click( function(){ombi_remove("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
-            .append('<br />')
-            .append( ( $('<button class="btn btn-ombi btn-blue btn-ombiblue" type="button">)').attr('title','Mark Unavailable')
-            .append($('<i>').addClass('fa fa-minus fa-fw fa-slightlybigger')).append(' Mark Unavailable &nbsp;')
-            .click( function(){ombi_mark_unavailable("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) );
-          row.append( $('<td>').append($('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Request actions menu')
-              .click( function(){toggle_menu(div_$i);})
-            .append(' Available ').append($('<i>').addClass('fa fa-chevron-down'))).append( div_$i.attr('hidden',true) )
-          );
-        }
-        else if (movie.approved) {
-          div_$i.append( ( $('<button class="btn btn-ombi btn-danger" type="button">)').attr('title','Remove request')
-            .append($('<i>').addClass('fa fa-minus fa-fw fa-slightlybigger')).append(' Remove &nbsp;')
-            .click( function(){ombi_remove("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
-            .append('<br />')
-            .append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Mark Available')
-            .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Mark Available &nbsp;')
-            .click( function(){ombi_mark_available("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) );
-          row.append( $('<td nowrap>').append($('<button class="btn btn-ombi btn-ombiblue" type="button">)').attr('title','Request actions menu')
-              .click(function(){toggle_menu(div_$i);})
-            .append(' Processing ').append($('<i>').addClass('fa fa-chevron-down'))).append( div_$i.attr('hidden',true) )
-          );
-        }
-        else if (movie.denied) {
-          div_$i.append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Appprove request')
-            .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Approve &nbsp;')
-            .click( function(){ombi_approve("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
-            .append('<br />')
-            .append( ( $('<button class="btn btn-ombi btn-danger" type="button">)').attr('title','Remove request')
-            .append($('<i>').addClass('fa fa-minus fa-fw fa-slightlybigger')).append(' Remove &nbsp;')
-            .click( function(){ombi_remove("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
-            .append('<br />')
-            .append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Mark Available')
-            .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Mark Available &nbsp;')
-            .click( function(){ombi_mark_available("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) );
-          row.append( $('<td>').append($('<button class="btn btn-ombi btn-danger" type="button">)').attr('title','Request actions menu')
-              .click(function(){toggle_menu(div_$i);})
-            .append(' Denied ').append($('<i>').addClass('fa fa-chevron-down'))).append( div_$i.attr('hidden',true) )
-          );
-        }
-        else { // "Requested"
-          div_$i.append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Appprove request')
-            .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Approve &nbsp;')
-            .click( function(){ombi_approve("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
-            .append('<br />')
-            .append( ( $('<button class="btn btn-ombi btn-danger" type="button">)').attr('title','Deny request')
-            .append($('<i>').addClass('fa fa-times fa-fw fa-slightlybigger')).append(' Deny &nbsp;')
-            .click( function(){ombi_deny("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
-            .append('<br />')
-            .append( ( $('<button class="btn btn-ombi btn-danger" type="button">)').attr('title','Remove request')
-            .append($('<i>').addClass('fa fa-minus fa-fw fa-slightlybigger')).append(' Remove &nbsp;')
-            .click( function(){ombi_remove("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) )
-            .append('<br />')
-            .append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Mark Available')
-            .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Mark Available &nbsp;')
-            .click( function(){ombi_mark_available("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) );
-          row.append( $('<td>').append($('<button class="btn btn-ombi btn-warning" type="button">)').attr('title','Request actions menu')
-              .click(function(){toggle_menu(div_$i);})
-            .append(' Pending ').append($('<i>').addClass('fa fa-chevron-down'))).append( div_$i.attr('hidden',true) )
-          );
-        }
-        row.append(
-          $('<td>').append( '<nobr>'+movie.requestedDate.substr(0,10)+'</nobr>' )
-          .append('<br />').append(movie.requestedUser.alias)
+        var name = $('<a>').attr('href', 'https://www.imdb.com/title/'+show.imdbId)
+          .text(show.title+' ('+show.releaseDate.substr(0,4)+')').attr('target','_blank');
+        row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
+        row.append($('<td nowrap>').append(show.status));
+        row.append($('<td nowrap>').append(show.releaseDate.substr(0,10)));
+        row.append( $('<td>').append(
+          $('<button id="#view_req'+tvDbId+'" class="btn btn-ombi btn-success" type="button">)')
+          .attr('title','View Show request')
+          .click( function(){toggle_menu(tvreq_detail_$tvDbId); })
+          .append(' View ').append($('<i>').addClass('fa fa-caret-down fa-slightlybigger'))
+        ) );
+          
+        // !wip - TV content request details in a hidden row?
+        // var tvreq_$tvDbId = ($('<div id="#tvreq_'+tvDbId+'" class="span4 ombi-tvrequest-overlay">'));
+        var tvreq_detail_$tvDbId = ($('<div id="#tvreq_detail_'+tvDbId+'" class="span3 ombi-tvrequest-detail">'));
+        // $(tvreq_$tvDbId).append(
+          $(tvreq_detail_$tvDbId)
+            .append( $('<table class="table table-striped">')
+            .append( $('<tr>').append( $('<td colspan=4>').append(show.title) ) )
+            .append( $('<tr>').append( $('<td colspan=4>').append('First Aired date, Status etc here?') ) )
+            .append( $('<tr>').append( $('<td colspan=4>').append('Season quicklinks: <a href="#'+show.tvDbId+'_s1">[1]</a> <a href="#'+show.tvDbId+'_s2">[2]</a> [3] [4] ...') ) )
+            .append( $('<tr id="'+show.tvDbId+'_s1">').append( $('<td colspan=3>').append('Season 1<br />Requested by: Alias<br /><a href="#tvrequests_tab">Back to top</a>') ).append( $('<td class="span1">').append('[Approve] [Deny]<br />[Mark Available]<br />[Remove]') ) )
+            .append( $('<tr>').append( $('<td class="span1">').append('1') ).append( $('<td class="span1">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('2') ).append( $('<td class="span2">').append('Episode Title can be quite long sometimes') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('3') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('<nobr>aired date</nobr>') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('4') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('5') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('6') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('7') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('8') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('9') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr id="'+show.tvDbId+'_s2">').append( $('<td colspan=3>').append('Season 2<br />Requested by: Alias<br /><a href="#tvrequests_tab">Back to top</a>') ).append( $('<td class="span1">').append('[Approve] [Deny]<br />[Mark Available]<br />[Remove]') ) )
+            .append( $('<tr>').append( $('<td>').append('1') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('2') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('3') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('4') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('5') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('6') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('7') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('8') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            .append( $('<tr>').append( $('<td>').append('9') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
+            // 'Season and episode info for ' + show.title + ' goes here<br />' +
+            // '<b>Season 1</b><br />' +
+            // 'Episode 1<br />' +
+            // 'Episode 2<br />' +
+            // 'Episode 3<br />' +
+            // 'Episode 4<br />' +
+            // 'Episode 5<br />' +
+            // 'Episode 1<br />' +
+            // 'Episode 2<br />' +
+            // 'Episode 3<br />' +
+            // 'Episode 4<br />' +
+            // 'Episode 5<br />' +
+            // '<b>Season 1</b><br />' +
+            // 'Episode 1<br />' +
+            // 'Episode 2<br />' +
+            // 'Episode 3<br />' +
+            // 'Episode 4<br />' +
+            // 'Episode 5<br />' +
+            // 'Episode 1<br />' +
+            // 'Episode 2<br />' +
+            // 'Episode 3<br />' +
+            // 'Episode 4<br />' +
+            // 'Episode 5<br />'
+          // )
         );
- */
         
         $('#tvrequests_table_body').append(row);
-        $('#tvrequests_table_body').append(row_$row_id);
+        $('#tvrequests_table_body').append(tvreq_detail_$tvDbId);
         });
       $('#tvrequests_table_body').parent().trigger('update');
       $('#tvrequests_table_body').parent().on('sortEnd', function(event) {
@@ -343,7 +325,7 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
 }
 
 function loadMSearch(hint='popular', lookup='suggest') {
-  var url = WEBDIR + 'ombi/get_searchresult?t=movie&q='+hint+'&l='+lookup
+  var url = WEBDIR + 'ombi/get_searchresult?t=movie&q='+hint+'&l='+lookup;
   // alert(url)
   $('.spinner').show();
   $.ajax({
@@ -409,7 +391,7 @@ function loadMSearch(hint='popular', lookup='suggest') {
 }
 
 function loadTVSearch(hint='popular', lookup='suggest') {
-  var url = WEBDIR + 'ombi/get_searchresult?t=tv&q='+hint+'&l='+lookup
+  var url = WEBDIR + 'ombi/get_searchresult?t=tv&q='+hint+'&l='+lookup;
   // alert(url)
   $('.spinner').show();
   $.ajax({
