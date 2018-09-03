@@ -38,6 +38,12 @@ $(document).ready(function () {
   $('a[href="#tvrequests_tab"]').on('show.bs.tab', function (e) { loadTVRequests(); });
   $('a[href="#tvsearch_tab"]').on('show.bs.tab', function (e) { loadTVSearch('popular', 'suggest'); });
 
+  $( document ).on( 'keydown', function ( e ) {
+      if ( e.keyCode === 27 ) { // ESC
+          close_menu();
+      }
+  });
+
   var searchMovieAction = function () {
     var query = $('#search_movie_name').val();
     if (query) {
@@ -229,99 +235,98 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
         $('.spinner').hide();
         return false;
       }
-      $.each(result, function (showname, show) {
-        // alert('Looping for TV id ' + show.id);
+      $.each(result, function (showix, show) {
         var row = $('<tr>');
         var tvDbId = show.tvDbId;
-        var summaryicon = makeIcon('fa fa-info-circle fa-fw', show.overview);
+        var title = show.title+' ('+show.releaseDate.substr(0,4)+')';
         var name = $('<a>').attr('href', 'https://www.imdb.com/title/'+show.imdbId)
-          .text(show.title+' ('+show.releaseDate.substr(0,4)+')').attr('target','_blank');
+          .text(title).attr('target','_blank');
+        var tvreq_detail_$tvDbId = $('<div id="#tvreq_detail_'+tvDbId+'" class="span3 ombi-tvrequest-detail">');
+        tvreq_detail_$tvDbId.append( $('<button class="btn btn-danger btn-small btn-ombi-close" name="close">')
+          .click( function(){ toggle_req_div(tvreq_detail_$tvDbId); }).append( $('<li class="fa fa-times fa-fw">') ) );
+        var detail_tbody = $('<tr>');
+        detail_tbody.append( $('<tr>').append( $('<td colspan=4>').append( $('<h3>').html('<b>'+title+'</b>') )
+          .append('Status: '+show.status).append(' &nbsp; Release Date: '+show.releaseDate.substr(0,10))
+          ) );
+        var summaryicon = makeIcon('fa fa-info-circle fa-fw', show.overview);
         row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
         row.append($('<td nowrap>').append(show.status));
         row.append($('<td nowrap>').append(show.releaseDate.substr(0,10)));
-        row.append( $('<td>').append(
-          $('<button id="#view_req'+tvDbId+'" class="btn btn-ombi btn-success" type="button">)')
-          .attr('title','View Show request')
-          .click( function(){toggle_menu(tvreq_detail_$tvDbId); })
-          .append(' View ').append($('<i>').addClass('fa fa-caret-down fa-slightlybigger'))
-        ) );
           
-        // !wip - TV content request details in a hidden row?
-        // var tvreq_$tvDbId = ($('<div id="#tvreq_'+tvDbId+'" class="span4 ombi-tvrequest-overlay">'));
-        var tvreq_detail_$tvDbId = ($('<div id="#tvreq_detail_'+tvDbId+'" class="span3 ombi-tvrequest-detail">'));
-        // $(tvreq_$tvDbId).append(
-          $(tvreq_detail_$tvDbId)
-            .append( $('<table class="table table-striped">')
-            .append( $('<tr>').append( $('<td colspan=4>').append(show.title) ) )
-            .append( $('<tr>').append( $('<td colspan=4>').append('First Aired date, Status etc here?') ) )
-            .append( $('<tr>').append( $('<td colspan=4>').append('Season quicklinks: <a href="#'+show.tvDbId+'_s1">[1]</a> <a href="#'+show.tvDbId+'_s2">[2]</a> [3] [4] ...') ) )
-            .append( $('<tr id="'+show.tvDbId+'_s1">').append( $('<td colspan=3>').append('Season 1<br />Requested by: Alias<br /><a href="#tvrequests_tab">Back to top</a>') ).append( $('<td class="span1">').append('[Approve] [Deny]<br />[Mark Available]<br />[Remove]') ) )
-            .append( $('<tr>').append( $('<td class="span1">').append('1') ).append( $('<td class="span1">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('2') ).append( $('<td class="span2">').append('Episode Title can be quite long sometimes') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('3') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('<nobr>aired date</nobr>') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('4') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('5') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('6') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('7') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('8') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('9') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr id="'+show.tvDbId+'_s2">').append( $('<td colspan=3>').append('Season 2<br />Requested by: Alias<br /><a href="#tvrequests_tab">Back to top</a>') ).append( $('<td class="span1">').append('[Approve] [Deny]<br />[Mark Available]<br />[Remove]') ) )
-            .append( $('<tr>').append( $('<td>').append('1') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('2') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('3') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('4') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('5') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('6') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('7') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('8') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            .append( $('<tr>').append( $('<td>').append('9') ).append( $('<td class="span2">').append('Episode Title') ).append( $('<td class="span1">').append('aired date') ).append( $('<td class="span1">').append('pending/ approved/ avail') ) )
-            // 'Season and episode info for ' + show.title + ' goes here<br />' +
-            // '<b>Season 1</b><br />' +
-            // 'Episode 1<br />' +
-            // 'Episode 2<br />' +
-            // 'Episode 3<br />' +
-            // 'Episode 4<br />' +
-            // 'Episode 5<br />' +
-            // 'Episode 1<br />' +
-            // 'Episode 2<br />' +
-            // 'Episode 3<br />' +
-            // 'Episode 4<br />' +
-            // 'Episode 5<br />' +
-            // '<b>Season 1</b><br />' +
-            // 'Episode 1<br />' +
-            // 'Episode 2<br />' +
-            // 'Episode 3<br />' +
-            // 'Episode 4<br />' +
-            // 'Episode 5<br />' +
-            // 'Episode 1<br />' +
-            // 'Episode 2<br />' +
-            // 'Episode 3<br />' +
-            // 'Episode 4<br />' +
-            // 'Episode 5<br />'
-          // )
-        );
+        // !wip - TV content request details in a hidden div.
+        $.ajax({
+          url: WEBDIR + 'ombi/tv_request_details/'+show.id,
+          type: 'get',
+          dataType: 'json',
+          success: function (detail) {
+            $.each(detail.childRequests, function (childix, childreq) {
+              var linkrow = 'Seasons in Request: ';
+
+              detail_tbody.append( $('<tr>').append( $('<td colspan=2>')
+                .append('Requested By:<h2> &nbsp; '+childreq.requestedUser.alias+'</h>') )
+                .append( $('<td colspan=2>')
+                .append('[ + Approve ] [ + Mark Available ]<br />[ X Deny ] [ X Remove ]') ) );
+
+              var sid_row = '';
+              var season_rows = '';
+              $.each(childreq.seasonRequests, function(seasonix, seasonreq) {
+                var seasonNum = 's'+seasonreq.seasonNumber;
+                var seasonId = 'c'+childreq.id+seasonNum;
+                linkrow += ' <a href="#'+seasonId+'">'+seasonNum+'</a> ';
+                season_rows += '<tr id="'+seasonId+'">';
+                season_rows += '<td colspan=3>Season: <b>'+seasonreq.seasonNumber+'</b></td>';
+                season_rows += '<td><a href="#tvrequests_tab">Back to Top</a></td></tr>';
+                var ep_rows = '<tr>';
+                $.each(seasonreq.episodes, function(episodeix, episode) {
+                  var episodeStatus = 'PendingApproval';
+                  if (episode.approved) { episodeStatus = 'Approved'; }
+                  if (episode.available) { episodeStatus = 'Available'; }
+                  ep_rows += '<td>'+episode.episodeNumber+'</td>';
+                  ep_rows += '<td class="span3">'+episode.title+'</td>';
+                  ep_rows += '<td class="span1"><nobr>'+episode.airDate.substr(0,10)+'</nobr></td>';
+                  ep_rows += '<td class="span1">'+episodeStatus+'</td>';
+                  ep_rows += '</tr>';
+                }); // each episode
+                // season_rows += sid_row;
+                season_rows += ep_rows;
+              }); // each seasonreq
+              detail_tbody.append( $('<tr>').append( $('<td colspan=4>').append(linkrow) ) );
+              detail_tbody.append(season_rows);
+            }); // each childreq
+            row.append( $('<td>').append(
+              $('<button id="#view_req'+tvDbId+'" class="btn btn-ombi btn-success" type="button">)')
+              .attr('title','View Show request')
+              .click( function(){ toggle_req_div(tvreq_detail_$tvDbId); })
+              .append(' View ').append($('<i>').addClass('fa fa-caret-down fa-slightlybigger'))
+            ) );
         
-        $('#tvrequests_table_body').append(row);
-        $('#tvrequests_table_body').append(tvreq_detail_$tvDbId);
-        });
+            // }); // each detail in tv_request_details
+            tvreq_detail_$tvDbId.append( $('<table class="table table-striped" width="100%">')
+              .append(detail_tbody) );
+            $('#tvrequests_table_body').append(tvreq_detail_$tvDbId);
+            $('#tvrequests_table_body').append(row);
+          } // ajax success of tv_request_details
+        }); // ajax call for tv_request_details
+
+      }); // each show in tv_requests
       $('#tvrequests_table_body').parent().trigger('update');
       $('#tvrequests_table_body').parent().on('sortEnd', function(event) {
           var s = '' + event.target.config.sortList + ''; // Had trouble typecasting this!
           var sp = s.split(",");
           treq_col = sp[0];
           treq_ord = sp[1];
-      });
+      }); // sortEnd
       $('#tvrequests_table_body').parent().trigger("sorton", [
         [
           [treq_col, treq_ord]
         ]
       ]);
       $('.spinner').hide();
-    },
+    }, // ajax success of tv_requests
     error: function (result) {
       notify('Ombi', 'Could not connect to Ombi, check your settings' + result, 'error');
     }
-  });
+  }); // ajax call for tv_requests
 }
 
 function loadMSearch(hint='popular', lookup='suggest') {
@@ -505,10 +510,31 @@ function toggle_menu(div_id) {
   // Collapses any open menus when opening another
   if (div_id.is(":hidden")) {
     $('.ombi-actions').hide();
-    div_id.slideToggle("fast");
+    $('.ombi-tvrequest-detail').css('visibility','hidden');
+    // $('.ombi-tvrequest-detail').hide();
+    div_id.slideDown("fast");
   } else {
-    div_id.slideToggle("fast");
+    div_id.slideUp("fast");
   }
+}
+
+function toggle_req_div(div_id) { // still needed?
+  // alert('Function toggle_req_div is supposed to be unneeded');
+  // Hides any open menus when opening another
+  // Using visibility instead of display to prevent
+  // reflow of page when adding scroll bar after opening div.
+  if (div_id.css('visibility') == 'hidden') {
+    div_id.css('visibility','visible');
+  } else {
+    div_id.css('visibility','hidden');
+  }
+}
+
+function close_menu() {
+  // Collapses any open menus
+  $('.ombi-actions').hide();
+  $('.ombi-tvrequest-detail').css('visibility','hidden');
+  // $('.ombi-tvrequest-detail').hide();
 }
 
 function ombi_approve(ctype, id, fn, col, ord) {

@@ -306,6 +306,19 @@ class Ombi(object):
     @cherrypy.tools.json_out()
     @cherrypy.expose()
     @require()
+    def tv_request_details(self,id):
+        u = 'api/v1/Request/tv/%s' % id
+        logger.debug('Fetching request details via %s' % u)
+        d = self._ombi_get(u)
+        if d != 'False':
+            return d
+        else:
+            logger.error('Unable to get request details')
+            return 'False'
+
+    @cherrypy.tools.json_out()
+    @cherrypy.expose()
+    @require()
     def get_searchresult(self, t, q, l):
         logger.debug('Doing %s for %s based on %s' % (l,t,q))
         u = ''
