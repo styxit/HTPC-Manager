@@ -35,11 +35,11 @@
 	position: absolute;
 	border-radius: 5px!important;
 	/* background-color: hsla(24, 5%, 5%, 0.85); */
-	background-color: hsla(24, 79%, 49%, 0.9);
-	padding: 6px;
+	background-color: hsla(24, 79%, 49%, 1);
+	padding: 4px;
 	visibility: hidden;
 	/* display: none; */
-	width: 94%;
+	/* width: 94%; */
     /* top: 155px; */
     left: -5px;
 	overflow: auto;
@@ -48,8 +48,8 @@
 @media (max-width: 767px) {
 	.ombi-tvrequest-detail {
 		/* background-color: hsla(24, 5%, 5%, 1); */
-		background-color: hsla(24, 79%, 49%, 1);
-		padding: 3px;
+		/* background-color: hsla(24, 79%, 49%, 1); */
+		padding: 2px;
 		border-radius: 0px!important;
 		width: 100%;
 		left: 0px;

@@ -241,13 +241,14 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
         var title = show.title+' ('+show.releaseDate.substr(0,4)+')';
         var name = $('<a>').attr('href', 'https://www.imdb.com/title/'+show.imdbId)
           .text(title).attr('target','_blank');
-        var tvreq_detail_$tvDbId = $('<div id="#tvreq_detail_'+tvDbId+'" class="span3 ombi-tvrequest-detail">');
+        var tvreq_detail_$tvDbId = $('<div id="#tvreq_detail_'+tvDbId+'" class="span7 ombi-tvrequest-detail">');
         tvreq_detail_$tvDbId.append( $('<button class="btn btn-danger btn-small btn-ombi-close" name="close">')
           .click( function(){ toggle_req_div(tvreq_detail_$tvDbId); }).append( $('<li class="fa fa-times fa-fw">') ) );
-        var detail_tbody = $('<tr>');
-        detail_tbody.append( $('<tr>').append( $('<td colspan=4>').append( $('<h3>').html('<b>'+title+'</b>') )
-          .append('Status: '+show.status).append(' &nbsp; Release Date: '+show.releaseDate.substr(0,10))
-          ) );
+        var detail_tbody = $('<tbody>');
+        var detail_row = $('<tr>');
+        detail_row.append( $('<td colspan=4>').append( $('<h3>').html('<b>'+title+'</b>') )
+          .append('Status: '+show.status).append(' &nbsp; Release Date: '+show.releaseDate.substr(0,10)) );
+        detail_tbody.append(detail_row);
         var summaryicon = makeIcon('fa fa-info-circle fa-fw', show.overview);
         row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
         row.append($('<td nowrap>').append(show.status));
@@ -260,38 +261,51 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
           dataType: 'json',
           success: function (detail) {
             $.each(detail.childRequests, function (childix, childreq) {
-              var linkrow = 'Seasons in Request: ';
+              var linktxt = 'Seasons in Request:';
 
-              detail_tbody.append( $('<tr>').append( $('<td colspan=2>')
+              detail_row = $('<tr>');
+              detail_row.append( $('<td colspan=2>')
                 .append('Requested By:<h2> &nbsp; '+childreq.requestedUser.alias+'</h>') )
-                .append( $('<td colspan=2>')
-                .append('[ + Approve ] [ + Mark Available ]<br />[ X Deny ] [ X Remove ]') ) );
-
-              var sid_row = '';
-              var season_rows = '';
+                .append( $('<td>').append('[ + Approve ]<br />[ X Deny ]') )
+                .append( $('<td>').append('[ + Mark Available ]<br />[ X Remove ]') );
+              detail_tbody.append(detail_row);
+              var linkId = 'linktxt_'+childreq.id
+              var linkTd = $('<td colspan=4>')
+              linkTd.attr('id',linkId)
+              detail_row = $('<tr>')
+              detail_row.append( linkTd );
+              detail_tbody.append(detail_row);
+              linkTd.html(linktxt);
+              // var sid_row = ''; // ?
+              // var season_row = $('<tr>');
               $.each(childreq.seasonRequests, function(seasonix, seasonreq) {
-                var seasonNum = 's'+seasonreq.seasonNumber;
+                var seasonNum = 'S'+(('0'+seasonreq.seasonNumber).slice(-2));
+                // var seasonNum = 's'+seasonreq.seasonNumber;
                 var seasonId = 'c'+childreq.id+seasonNum;
-                linkrow += ' <a href="#'+seasonId+'">'+seasonNum+'</a> ';
-                season_rows += '<tr id="'+seasonId+'">';
-                season_rows += '<td colspan=3>Season: <b>'+seasonreq.seasonNumber+'</b></td>';
-                season_rows += '<td><a href="#tvrequests_tab">Back to Top</a></td></tr>';
-                var ep_rows = '<tr>';
+                linktxt += ' <a href="#'+seasonId+'">'+seasonNum+'</a>';
+                // $('#linktxt_'+childId).append(' <a href="#'+seasonId+'">'+seasonNum+'</a>');
+                var season_row = $('<tr>').attr('id',seasonId);
+                season_row.append( $('<td colspan=3>').append('<b>Season: '+seasonreq.seasonNumber+'</b>') )
+                  .append( $('<td>').append('<a href="#tvrequests_tab">Back to Top</a> [ ^ ]').css('text-align','right') ); 
+                detail_tbody.append(season_row);
                 $.each(seasonreq.episodes, function(episodeix, episode) {
+                  var ep_row = $('<tr>');
                   var episodeStatus = 'PendingApproval';
                   if (episode.approved) { episodeStatus = 'Approved'; }
                   if (episode.available) { episodeStatus = 'Available'; }
-                  ep_rows += '<td>'+episode.episodeNumber+'</td>';
-                  ep_rows += '<td class="span3">'+episode.title+'</td>';
-                  ep_rows += '<td class="span1"><nobr>'+episode.airDate.substr(0,10)+'</nobr></td>';
-                  ep_rows += '<td class="span1">'+episodeStatus+'</td>';
-                  ep_rows += '</tr>';
+                  ep_row.append( 
+                    $('<td class="span1">').css('text-align','right').append(episode.episodeNumber+' '),
+                    $('<td class="span3">').append(episode.title),
+                    $('<td class="span1">').append('<nobr>'+episode.airDate.substr(0,10)+'</nobr>'),
+                    $('<td class="span1">').append(episodeStatus)
+                  );
+                  detail_tbody.append(ep_row);
                 }); // each episode
-                // season_rows += sid_row;
-                season_rows += ep_rows;
               }); // each seasonreq
-              detail_tbody.append( $('<tr>').append( $('<td colspan=4>').append(linkrow) ) );
-              detail_tbody.append(season_rows);
+              // detail_row = $('<tr>')
+              // alert('#linktxt_'+childId+' content is '+ linktxt);
+              linkTd.html(linktxt);
+              // detail_tbody.append(detail_row);
             }); // each childreq
             row.append( $('<td>').append(
               $('<button id="#view_req'+tvDbId+'" class="btn btn-ombi btn-success" type="button">)')
@@ -299,15 +313,15 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
               .click( function(){ toggle_req_div(tvreq_detail_$tvDbId); })
               .append(' View ').append($('<i>').addClass('fa fa-caret-down fa-slightlybigger'))
             ) );
-        
-            // }); // each detail in tv_request_details
-            tvreq_detail_$tvDbId.append( $('<table class="table table-striped" width="100%">')
-              .append(detail_tbody) );
+            tvreq_detail_$tvDbId.append( $('<table>')
+              .addClass('table','table-striped')
+              .attr('border',1)
+              .append(detail_tbody)
+            );
             $('#tvrequests_table_body').append(tvreq_detail_$tvDbId);
             $('#tvrequests_table_body').append(row);
           } // ajax success of tv_request_details
         }); // ajax call for tv_request_details
-
       }); // each show in tv_requests
       $('#tvrequests_table_body').parent().trigger('update');
       $('#tvrequests_table_body').parent().on('sortEnd', function(event) {
