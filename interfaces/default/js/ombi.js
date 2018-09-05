@@ -137,7 +137,7 @@ function loadMRequests(mreq_col=1, mreq_ord=1 ) {
             .append( ( $('<button class="btn btn-ombi btn-blue btn-ombiblue" type="button">)').attr('title','Mark Unavailable')
             .append($('<i>').addClass('fa fa-minus fa-fw fa-slightlybigger')).append(' Mark Unavailable &nbsp;')
             .click( function(){ombi_mark_unavailable("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) );
-          row.append( $('<td>').append($('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Request actions menu')
+          row.append( $('<td nowrap>').append($('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Request actions menu')
               .click( function(){toggle_menu(div_$i);})
             .append(' Available ').append($('<i>').addClass('fa fa-chevron-down'))).append( div_$i.attr('hidden',true) )
           );
@@ -188,7 +188,7 @@ function loadMRequests(mreq_col=1, mreq_ord=1 ) {
             .append( ( $('<button class="btn btn-ombi btn-success" type="button">)').attr('title','Mark Available')
             .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger')).append(' Mark Available &nbsp;')
             .click( function(){ombi_mark_available("movie",movie.id,loadMRequests,mreq_col,mreq_ord);} ) ) );
-          row.append( $('<td>').append($('<button class="btn btn-ombi btn-warning" type="button">)').attr('title','Request actions menu')
+          row.append( $('<td nowrap>').append($('<button class="btn btn-ombi btn-warning" type="button">)').attr('title','Request actions menu')
               .click(function(){toggle_menu(div_$i);})
             .append(' Pending ').append($('<i>').addClass('fa fa-chevron-down'))).append( div_$i.attr('hidden',true) )
           );
@@ -265,31 +265,46 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
 
               detail_row = $('<tr>');
               detail_row.append( $('<td colspan=2>')
-                .append('Requested By:<h2> &nbsp; '+childreq.requestedUser.alias+'</h>') )
-                .append( $('<td>').append('[ + Approve ]<br />[ X Deny ]') )
-                .append( $('<td>').append('[ + Mark Available ]<br />[ X Remove ]') );
+                .append('Requested By:<h2> &nbsp; '+childreq.requestedUser.alias+'</h>') );
+              detail_row.append( $('<td class="span1">').css('white-space','nowrap').css('text-align','right')
+                .append( $('<button class="btn btn-success btn-small btn-ombi">')
+                .click( function(){ alert('Approve button'); })
+                .append( $('<li class="fa fa-plus">') ).append(' Approve') )
+                .append('<br />')
+                .append( $('<button class="btn btn-danger btn-small btn-ombi">')
+                .click( function(){ alert('Deny button'); })
+                .append( $('<li class="fa fa-times">') ).append(' Deny') ) );
+              detail_row.append( $('<td class="span1">').css('white-space','nowrap')
+                .append( $('<button class="btn btn-success btn-small btn-ombi">')
+                .click( function(){ alert('Available button'); })
+                .append( $('<li class="fa fa-check">') ).append(' Mark Available') )
+                .append('<br />')
+                .append( $('<button class="btn btn-danger btn-small btn-ombi">')
+                .click( function(){ alert('Remove button'); })
+                .append( $('<li class="fa fa-times">') ).append(' Remove') ) );
               detail_tbody.append(detail_row);
+              var cReqIx = 'c_'+childreq.id
               var linkId = 'linktxt_'+childreq.id
-              var linkTd = $('<td colspan=4>')
+              var linkTd = $('<td colspan=3>')
               linkTd.attr('id',linkId)
               detail_row = $('<tr>')
               detail_row.append( linkTd );
               detail_tbody.append(detail_row);
-              linkTd.html(linktxt);
-              // var sid_row = ''; // ?
-              // var season_row = $('<tr>');
+              detail_row.append( $('<td class="span1">').css('text-align','right')
+                .append( $('<button class="btn btn-warning btn-small btn-ombi">')
+                .click( function(){ $('.'+cReqIx).toggle(); })
+                .append( $('<li class="fa fa-chevron-down">') ).append(' Details') ) );
+              var i = 0;
               $.each(childreq.seasonRequests, function(seasonix, seasonreq) {
                 var seasonNum = 'S'+(('0'+seasonreq.seasonNumber).slice(-2));
-                // var seasonNum = 's'+seasonreq.seasonNumber;
                 var seasonId = 'c'+childreq.id+seasonNum;
                 linktxt += ' <a href="#'+seasonId+'">'+seasonNum+'</a>';
-                // $('#linktxt_'+childId).append(' <a href="#'+seasonId+'">'+seasonNum+'</a>');
-                var season_row = $('<tr>').attr('id',seasonId);
+                var season_row = $('<tr>').attr('id',seasonId).addClass(cReqIx).css('display','none');
                 season_row.append( $('<td colspan=3>').append('<b>Season: '+seasonreq.seasonNumber+'</b>') )
-                  .append( $('<td>').append('<a href="#tvrequests_tab">Back to Top</a> [ ^ ]').css('text-align','right') ); 
+                  .append( $('<td class="span1">').append('<a href="#tvrequests_tab">Back to Top</a> [ ^ ]').css('text-align','right') ); 
                 detail_tbody.append(season_row);
                 $.each(seasonreq.episodes, function(episodeix, episode) {
-                  var ep_row = $('<tr>');
+                  var ep_row = $('<tr>').addClass(cReqIx).css('display','none');
                   var episodeStatus = 'PendingApproval';
                   if (episode.approved) { episodeStatus = 'Approved'; }
                   if (episode.available) { episodeStatus = 'Available'; }
@@ -301,13 +316,11 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
                   );
                   detail_tbody.append(ep_row);
                 }); // each episode
+                i += 1;
               }); // each seasonreq
-              // detail_row = $('<tr>')
-              // alert('#linktxt_'+childId+' content is '+ linktxt);
               linkTd.html(linktxt);
-              // detail_tbody.append(detail_row);
             }); // each childreq
-            row.append( $('<td>').append(
+            row.append( $('<td>').css('white-space','nowrap').append(
               $('<button id="#view_req'+tvDbId+'" class="btn btn-ombi btn-success" type="button">)')
               .attr('title','View Show request')
               .click( function(){ toggle_req_div(tvreq_detail_$tvDbId); })
@@ -315,7 +328,7 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
             ) );
             tvreq_detail_$tvDbId.append( $('<table>')
               .addClass('table','table-striped')
-              .attr('border',1)
+              // .attr('border',1)
               .append(detail_tbody)
             );
             $('#tvrequests_table_body').append(tvreq_detail_$tvDbId);
@@ -531,6 +544,19 @@ function toggle_menu(div_id) {
     div_id.slideUp("fast");
   }
 }
+
+// function toggle_season(div_id) {
+  // Collapses any open menus when opening another
+  // if (div_id.is(":hidden")) {
+    // $('.ombi-tvrequest-detail').css('visibility','hidden');
+    // $('.ombi-tvrequest-detail').hide();
+    // $('.'+cReqIx).show();
+    // div_id.slideDown("fast");
+  // } else {
+    // $('.'+div_id).toggle();
+    // div_id.slideUp("fast");
+  // }
+// }
 
 function toggle_req_div(div_id) { // still needed?
   // alert('Function toggle_req_div is supposed to be unneeded');
