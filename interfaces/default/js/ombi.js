@@ -241,7 +241,7 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
         var title = show.title+' ('+show.releaseDate.substr(0,4)+')';
         var name = $('<a>').attr('href', 'https://www.imdb.com/title/'+show.imdbId)
           .text(title).attr('target','_blank');
-        var tvreq_detail_$tvDbId = $('<div id="#tvreq_detail_'+tvDbId+'" class="span7 ombi-tvrequest-detail">');
+        var tvreq_detail_$tvDbId = $('<div id="#tvreq_detail_'+tvDbId+'" class="span6 ombi-tvrequest-detail">');
         tvreq_detail_$tvDbId.append( $('<button class="btn btn-danger btn-small btn-ombi-close" name="close">')
           .click( function(){ toggle_req_div(tvreq_detail_$tvDbId); }).append( $('<li class="fa fa-times fa-fw">') ) );
         var detail_tbody = $('<tbody>');
@@ -264,24 +264,43 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
               var linktxt = 'Seasons in Request:';
 
               detail_row = $('<tr>');
-              detail_row.append( $('<td colspan=2>')
+              detail_row.append( $('<td class="span3" colspan=2>')
                 .append('Requested By:<h2> &nbsp; '+childreq.requestedUser.alias+'</h>') );
-              detail_row.append( $('<td class="span1">').css('white-space','nowrap').css('text-align','right')
+              // detail_row.append( $('<td class="span1">').css('white-space','nowrap').css('text-align','right')
+                // .append( $('<button class="btn btn-success btn-small btn-ombi">')
+                // .click( function(){ alert('Approve button'); })
+                // .append( $('<li class="fa fa-plus">') ).append(' Approve') )
+                // .append('<br />')
+                // .append( $('<button class="btn btn-danger btn-small btn-ombi">')
+                // .click( function(){ alert('Deny button'); })
+                // .append( $('<li class="fa fa-times">') ).append(' Deny') ) );
+              // detail_row.append( $('<td class="span1">').css('white-space','nowrap')
+                // .append( $('<button class="btn btn-success btn-small btn-ombi">')
+                // .click( function(){ alert('Available button'); })
+                // .append( $('<li class="fa fa-check">') ).append(' Mark Available') )
+                // .append('<br />')
+                // .append( $('<button class="btn btn-danger btn-small btn-ombi">')
+                // .click( function(){ alert('Remove button'); })
+                // .append( $('<li class="fa fa-times">') ).append(' Remove') ) );
+              // detail_row.append( $('<td colspan=4 class="span5">')
+                // .append('Requested By: &nbsp; ')
+              detail_row.append( $('<td colspan=2 class="span2">').css('white-space','nowrap')
+                .append( $('<div style="display: inline-block; float: right;">')
                 .append( $('<button class="btn btn-success btn-small btn-ombi">')
                 .click( function(){ alert('Approve button'); })
                 .append( $('<li class="fa fa-plus">') ).append(' Approve') )
-                .append('<br />')
-                .append( $('<button class="btn btn-danger btn-small btn-ombi">')
-                .click( function(){ alert('Deny button'); })
-                .append( $('<li class="fa fa-times">') ).append(' Deny') ) );
-              detail_row.append( $('<td class="span1">').css('white-space','nowrap')
                 .append( $('<button class="btn btn-success btn-small btn-ombi">')
                 .click( function(){ alert('Available button'); })
-                .append( $('<li class="fa fa-check">') ).append(' Mark Available') )
-                .append('<br />')
+                .append( $('<li class="fa fa-check">') ).append(' Mark Available') ) )
+                .append( $('<div style="display: inline-block; float: right;">')
+                .append( $('<button class="btn btn-danger btn-small btn-ombi">')
+                .click( function(){ alert('Deny button'); })
+                .append( $('<li class="fa fa-times">') ).append(' Deny') )
                 .append( $('<button class="btn btn-danger btn-small btn-ombi">')
                 .click( function(){ alert('Remove button'); })
-                .append( $('<li class="fa fa-times">') ).append(' Remove') ) );
+                .append( $('<li class="fa fa-times">') ).append(' Remove') ) ) 
+                // .append('<br /><h2> &nbsp; '+childreq.requestedUser.alias+'</h>')
+              );
               detail_tbody.append(detail_row);
               var cReqIx = 'c_'+childreq.id
               var linkId = 'linktxt_'+childreq.id
@@ -290,7 +309,7 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
               detail_row = $('<tr>')
               detail_row.append( linkTd );
               detail_tbody.append(detail_row);
-              detail_row.append( $('<td class="span1">').css('text-align','right')
+              detail_row.append( $('<td class="span1">').css('white-space','nowrap').css('text-align','right')
                 .append( $('<button class="btn btn-warning btn-small btn-ombi">')
                 .click( function(){ $('.'+cReqIx).toggle(); })
                 .append( $('<li class="fa fa-chevron-down">') ).append(' Details') ) );
@@ -301,7 +320,7 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
                 linktxt += ' <a href="#'+seasonId+'">'+seasonNum+'</a>';
                 var season_row = $('<tr>').attr('id',seasonId).addClass(cReqIx).css('display','none');
                 season_row.append( $('<td colspan=3>').append('<b>Season: '+seasonreq.seasonNumber+'</b>') )
-                  .append( $('<td class="span1">').append('<a href="#tvrequests_tab">Back to Top</a> [ ^ ]').css('text-align','right') ); 
+                  .append( $('<td class="span1">').append('<a href="#tvrequests_tab">Back to Top <li class="fa fa-chevron-up"></li></a>').css('text-align','right') ); 
                 detail_tbody.append(season_row);
                 $.each(seasonreq.episodes, function(episodeix, episode) {
                   var ep_row = $('<tr>').addClass(cReqIx).css('display','none');
@@ -310,7 +329,7 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
                   if (episode.available) { episodeStatus = 'Available'; }
                   ep_row.append( 
                     $('<td class="span1">').css('text-align','right').append(episode.episodeNumber+' '),
-                    $('<td class="span3">').append(episode.title),
+                    $('<td class="span2">').append(episode.title),
                     $('<td class="span1">').append('<nobr>'+episode.airDate.substr(0,10)+'</nobr>'),
                     $('<td class="span1">').append(episodeStatus)
                   );
