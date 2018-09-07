@@ -14,7 +14,8 @@
 	display: inline-block;
 	position: absolute;
 	border-radius: 5px!important;
-	background-color: hsla(24, 5%, 5%, 0.85);
+	/* background-color: hsla(24, 5%, 5%, 0.85); */
+	background-color: hsla(24, 0%, 25%, 1);
 	padding: 5px;
 	display: none;
 	margin-top: -2px;
@@ -34,7 +35,7 @@
 .ombi-tvrequest-detail {
 	position: absolute;
 	border-radius: 5px!important;
-	background-color: hsla(24, 5%, 35%, 1);
+	background-color: hsla(24, 0%, 25%, 1);
 	/* background-color: hsla(24, 79%, 49%, 1); */
 	padding: 4px;
 	visibility: hidden;

@@ -220,7 +220,7 @@ function loadMRequests(mreq_col=1, mreq_ord=1 ) {
   });
 }
 
-function loadTVRequests(treq_col=1, treq_ord=1) {
+function loadTVRequests(viewReq="0", viewChild="0") {
   $('.spinner').show();
   $.ajax({
     url: WEBDIR + 'ombi/tv_requests',
@@ -238,95 +238,103 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
       $.each(result, function (showix, show) {
         var row = $('<tr>');
         var tvDbId = show.tvDbId;
+        var viewScroll;
         var title = show.title+' ('+show.releaseDate.substr(0,4)+')';
         var name = $('<a>').attr('href', 'https://www.imdb.com/title/'+show.imdbId)
           .text(title).attr('target','_blank');
         var tvreq_detail_$tvDbId = $('<div id="#tvreq_detail_'+tvDbId+'" class="span6 ombi-tvrequest-detail">');
-        tvreq_detail_$tvDbId.append( $('<button class="btn btn-danger btn-small btn-ombi-close" name="close">')
-          .click( function(){ toggle_req_div(tvreq_detail_$tvDbId); }).append( $('<li class="fa fa-times fa-fw">') ) );
+        var closebtn_$tvDbId = $('<button class="btn btn-danger btn-small btn-ombi-close" name="close">');
+        closebtn_$tvDbId.attr('title','Esc to close').append( $('<li class="fa fa-times fa-fw">') );
+        tvreq_detail_$tvDbId.append( closebtn_$tvDbId );
         var detail_tbody = $('<tbody>');
         var detail_row = $('<tr>');
-        detail_row.append( $('<td colspan=4>').append( $('<h3>').html('<b>'+title+'</b>') )
-          .append('Status: '+show.status).append(' &nbsp; Release Date: '+show.releaseDate.substr(0,10)) );
+        detail_row.append( $('<td colspan=4 width="100%">').append( $('<h3>').html('<b>'+title+'</b>') )
+          .append('<b>Status</b>: '+show.status).append(' &nbsp; <b>Release Date</b>: '+show.releaseDate.substr(0,10)) );
         detail_tbody.append(detail_row);
         var summaryicon = makeIcon('fa fa-info-circle fa-fw', show.overview);
         row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
         row.append($('<td nowrap>').append(show.status));
         row.append($('<td nowrap>').append(show.releaseDate.substr(0,10)));
-          
-        // !wip - TV content request details in a hidden div.
         $.ajax({
           url: WEBDIR + 'ombi/tv_request_details/'+show.id,
           type: 'get',
           dataType: 'json',
           success: function (detail) {
             $.each(detail.childRequests, function (childix, childreq) {
-              var linktxt = 'Seasons in Request:';
-
-              detail_row = $('<tr>');
-              detail_row.append( $('<td class="span3" colspan=2>')
-                .append('Requested By:<h2> &nbsp; '+childreq.requestedUser.alias+'</h>') );
-              // detail_row.append( $('<td class="span1">').css('white-space','nowrap').css('text-align','right')
-                // .append( $('<button class="btn btn-success btn-small btn-ombi">')
-                // .click( function(){ alert('Approve button'); })
-                // .append( $('<li class="fa fa-plus">') ).append(' Approve') )
-                // .append('<br />')
-                // .append( $('<button class="btn btn-danger btn-small btn-ombi">')
-                // .click( function(){ alert('Deny button'); })
-                // .append( $('<li class="fa fa-times">') ).append(' Deny') ) );
-              // detail_row.append( $('<td class="span1">').css('white-space','nowrap')
-                // .append( $('<button class="btn btn-success btn-small btn-ombi">')
-                // .click( function(){ alert('Available button'); })
-                // .append( $('<li class="fa fa-check">') ).append(' Mark Available') )
-                // .append('<br />')
-                // .append( $('<button class="btn btn-danger btn-small btn-ombi">')
-                // .click( function(){ alert('Remove button'); })
-                // .append( $('<li class="fa fa-times">') ).append(' Remove') ) );
-              // detail_row.append( $('<td colspan=4 class="span5">')
-                // .append('Requested By: &nbsp; ')
-              detail_row.append( $('<td colspan=2 class="span2">').css('white-space','nowrap')
+              var linktxt = $('<span>').append('<b>Seasons in Request</b>:');
+              var cReqIx = 'c_'+childreq.id;
+              var linkId = 'linktxt_'+childreq.id;
+              var linkTd = $('<td colspan=3>');
+              closebtn_$tvDbId.click( function(){ $('.'+cReqIx).hide(); toggle_req_div(tvreq_detail_$tvDbId); })
+              linkTd.attr('id',linkId);
+              if (viewChild == cReqIx) { viewScroll = '#'+cReqIx; }
+              var avBtnLabel = 'Available';
+              var avBtnIcon = 'check';
+              var avBtnType = 'success';
+              if (childreq.available) {
+                avBtnLabel = 'Unavailable';
+                avBtnIcon = 'minus';
+                avBtnType = 'ombiblue';
+              }
+              detail_row = $('<tr id="'+cReqIx+'">');
+              detail_row.append(
+                $('<td class="span2" width="100%" colspan=2>').css('border-top','solid 1px')
+                  .append('Requested By:<h2> &nbsp; '+childreq.requestedUser.alias+'</h>') )
+              detail_row.append(
+                $('<td class="span2" width="100%" colspan=2>').css('white-space','nowrap')
+                  .css('border-top','solid 1px')//.css('float','right')
                 .append( $('<div style="display: inline-block; float: right;">')
-                .append( $('<button class="btn btn-success btn-small btn-ombi">')
-                .click( function(){ alert('Approve button'); })
-                .append( $('<li class="fa fa-plus">') ).append(' Approve') )
-                .append( $('<button class="btn btn-success btn-small btn-ombi">')
-                .click( function(){ alert('Available button'); })
-                .append( $('<li class="fa fa-check">') ).append(' Mark Available') ) )
+                  .append( $('<button class="btn btn-success btn-small btn-ombi">')
+                    .addClass(function(){if(childreq.approved){return 'disabled';}})
+                    .click( function(){ if(!childreq.approved){ombi_approve('tv', childreq.id, loadTVRequests, tvDbId, cReqIx);}})
+                    .append( $('<li class="fa fa-plus">') ).append(' Approve')
+                  )
+                  .append( $('<button class="btn btn-'+avBtnType+' btn-small btn-ombi">')
+                    .click( function(){ if (childreq.available) { ombi_mark_unavailable('tv', childreq.id, loadTVRequests, tvDbId, cReqIx); }
+                      else { ombi_mark_available('tv', childreq.id, loadTVRequests, tvDbId, cReqIx); }})
+                    .append( $('<li class="fa fa-'+avBtnIcon+'">') ).append(' Mark '+avBtnLabel)
+                  )
+                ).append('<br /><br />')
                 .append( $('<div style="display: inline-block; float: right;">')
-                .append( $('<button class="btn btn-danger btn-small btn-ombi">')
-                .click( function(){ alert('Deny button'); })
-                .append( $('<li class="fa fa-times">') ).append(' Deny') )
-                .append( $('<button class="btn btn-danger btn-small btn-ombi">')
-                .click( function(){ alert('Remove button'); })
-                .append( $('<li class="fa fa-times">') ).append(' Remove') ) ) 
-                // .append('<br /><h2> &nbsp; '+childreq.requestedUser.alias+'</h>')
+                  .append( $('<button class="btn btn-danger btn-small btn-ombi">')
+                    .addClass(function(){if(childreq.denied){return 'disabled';}})
+                    .click( function(){if(!childreq.denied){ombi_deny('tv', childreq.id, loadTVRequests, tvDbId, cReqIx);}})
+                    .append( $('<li class="fa fa-times">') ).append(' Deny')
+                  )
+                  .append( $('<button class="btn btn-danger btn-small btn-ombi">')
+                    .click( function(){ ombi_remove('tv', childreq.id, loadTVRequests, tvDbId, "0"); })
+                    .append( $('<li class="fa fa-times">') ).append(' Remove')
+                  )
+                )
               );
+              // detail_row.append(req_cell).append(btn_cell);
               detail_tbody.append(detail_row);
-              var cReqIx = 'c_'+childreq.id
-              var linkId = 'linktxt_'+childreq.id
-              var linkTd = $('<td colspan=3>')
-              linkTd.attr('id',linkId)
-              detail_row = $('<tr>')
+              detail_row = $('<tr>');
               detail_row.append( linkTd );
               detail_tbody.append(detail_row);
               detail_row.append( $('<td class="span1">').css('white-space','nowrap').css('text-align','right')
-                .append( $('<button class="btn btn-warning btn-small btn-ombi">')
+                .append( $('<a>').css('cursor','pointer')
                 .click( function(){ $('.'+cReqIx).toggle(); })
                 .append( $('<li class="fa fa-chevron-down">') ).append(' Details') ) );
-              var i = 0;
               $.each(childreq.seasonRequests, function(seasonix, seasonreq) {
                 var seasonNum = 'S'+(('0'+seasonreq.seasonNumber).slice(-2));
                 var seasonId = 'c'+childreq.id+seasonNum;
-                linktxt += ' <a href="#'+seasonId+'">'+seasonNum+'</a>';
-                var season_row = $('<tr>').attr('id',seasonId).addClass(cReqIx).css('display','none');
+                linktxt.append('&nbsp;').append( $('<a style="cursor:pointer;">').append(seasonNum)
+                  .click( function() { doShowScroll(cReqIx,seasonId);} ) );
+                var season_row = $('<tr>').attr('id',seasonId).addClass(cReqIx).addClass('tvChildReqRows').css('display','none');
                 season_row.append( $('<td colspan=3>').append('<b>Season: '+seasonreq.seasonNumber+'</b>') )
-                  .append( $('<td class="span1">').append('<a href="#tvrequests_tab">Back to Top <li class="fa fa-chevron-up"></li></a>').css('text-align','right') ); 
+                  .append( $('<td class="span1">')
+                  .css('text-align','right')
+                  .append( $('<a>').append('Back to Top ').append( $('<li class="fa fa-arrow-up"></li>') ) )
+                  .css('cursor','pointer').click( function() { $('#'+cReqIx).get(0).scrollIntoView(); } )
+                );
                 detail_tbody.append(season_row);
                 $.each(seasonreq.episodes, function(episodeix, episode) {
-                  var ep_row = $('<tr>').addClass(cReqIx).css('display','none');
+                  var ep_row = $('<tr>').addClass(cReqIx).addClass('tvChildReqRows').css('display','none');
                   var episodeStatus = 'PendingApproval';
-                  if (episode.approved) { episodeStatus = 'Approved'; }
+                  if (episode.approved) { episodeStatus = 'Processing'; }
                   if (episode.available) { episodeStatus = 'Available'; }
+                  if (childreq.denied) { episodeStatus = 'Denied'; }
                   ep_row.append( 
                     $('<td class="span1">').css('text-align','right').append(episode.episodeNumber+' '),
                     $('<td class="span2">').append(episode.title),
@@ -335,44 +343,41 @@ function loadTVRequests(treq_col=1, treq_ord=1) {
                   );
                   detail_tbody.append(ep_row);
                 }); // each episode
-                i += 1;
+                // i += 1;
               }); // each seasonreq
-              linkTd.html(linktxt);
+              linkTd.append(linktxt);
             }); // each childreq
             row.append( $('<td>').css('white-space','nowrap').append(
               $('<button id="#view_req'+tvDbId+'" class="btn btn-ombi btn-success" type="button">)')
               .attr('title','View Show request')
               .click( function(){ toggle_req_div(tvreq_detail_$tvDbId); })
-              .append(' View ').append($('<i>').addClass('fa fa-caret-down fa-slightlybigger'))
+              .append($('<i>').addClass('fa fa-chevron-down fa-slightlybigger')).append(' View ')
             ) );
-            tvreq_detail_$tvDbId.append( $('<table>')
+            tvreq_detail_$tvDbId.append( $('<table width="100%">')
               .addClass('table','table-striped')
-              // .attr('border',1)
               .append(detail_tbody)
             );
             $('#tvrequests_table_body').append(tvreq_detail_$tvDbId);
             $('#tvrequests_table_body').append(row);
+            // alert('viewReq = '+viewReq+'\ntvDbId = '+tvDbId);
+            if (viewReq == tvDbId) {
+              toggle_req_div(tvreq_detail_$tvDbId);
+              if (viewScroll) { $(viewScroll).get(0).scrollIntoView(); }
+            }
           } // ajax success of tv_request_details
         }); // ajax call for tv_request_details
       }); // each show in tv_requests
-      $('#tvrequests_table_body').parent().trigger('update');
-      $('#tvrequests_table_body').parent().on('sortEnd', function(event) {
-          var s = '' + event.target.config.sortList + ''; // Had trouble typecasting this!
-          var sp = s.split(",");
-          treq_col = sp[0];
-          treq_ord = sp[1];
-      }); // sortEnd
-      $('#tvrequests_table_body').parent().trigger("sorton", [
-        [
-          [treq_col, treq_ord]
-        ]
-      ]);
       $('.spinner').hide();
     }, // ajax success of tv_requests
     error: function (result) {
       notify('Ombi', 'Could not connect to Ombi, check your settings' + result, 'error');
     }
   }); // ajax call for tv_requests
+}
+
+function doShowScroll(childReq, id) {
+  $('.'+childReq).show();
+  $('#'+id).get(0).scrollIntoView();
 }
 
 function loadMSearch(hint='popular', lookup='suggest') {
@@ -564,87 +569,111 @@ function toggle_menu(div_id) {
   }
 }
 
-// function toggle_season(div_id) {
-  // Collapses any open menus when opening another
-  // if (div_id.is(":hidden")) {
-    // $('.ombi-tvrequest-detail').css('visibility','hidden');
-    // $('.ombi-tvrequest-detail').hide();
-    // $('.'+cReqIx).show();
-    // div_id.slideDown("fast");
-  // } else {
-    // $('.'+div_id).toggle();
-    // div_id.slideUp("fast");
-  // }
-// }
-
-function toggle_req_div(div_id) { // still needed?
-  // alert('Function toggle_req_div is supposed to be unneeded');
-  // Hides any open menus when opening another
-  // Using visibility instead of display to prevent
+function toggle_req_div(div_id) {
+  // Using :visibility instead of :display to minimise
   // reflow of page when adding scroll bar after opening div.
   if (div_id.css('visibility') == 'hidden') {
+    close_menu();
     div_id.css('visibility','visible');
   } else {
-    div_id.css('visibility','hidden');
+    // ('.ombi-tvrequest-detail').css('visibility','hidden');
+    close_menu();
   }
 }
 
 function close_menu() {
   // Collapses any open menus
+  $('.tvChildReqRows').hide();
   $('.ombi-actions').hide();
   $('.ombi-tvrequest-detail').css('visibility','hidden');
-  // $('.ombi-tvrequest-detail').hide();
 }
 
-function ombi_approve(ctype, id, fn, col, ord) {
+function ombi_approve(ctype, id, fn, col=0, ord=0) {
   // Actions the menu action, and then reloads the tab while
-  // retaining existing table sort order.
+  // retaining existing table sort order (movies) or
+  // opening and scrolling to the right div (tv shows).
   if (ctype == 'movie') {
     ombi_maction(id, 'approve').done(function(res) {
       notify('Ombi', 'Approved', 'success'); // Approve action doesn't return a message.
       fn(col,ord);
       return;
     });
+  } else if (ctype == 'tv') {
+    ombi_tvaction(id, 'approve').done(function(res) {
+      // Using params col & ord to return to the correct
+      // div & season span on TV requests.
+      notify('Ombi', 'Approved', 'success');
+      fn(col,ord);
+      return;
+    });
+  } else {
+    notify('Ombi', 'Content type "'+ctype+'" not handled', 'error');
   }
 }
 
-function ombi_mark_available(ctype, id, fn, col, ord) {
+function ombi_mark_available(ctype, id, fn, col=0, ord=0) {
   if (ctype == 'movie') {
     ombi_maction(id, 'available').done(function(res) {
       notify('Ombi', res, 'success');
       fn(col,ord);
       return;
     });
+  } else if (ctype == 'tv') {
+    ombi_tvaction(id, 'available').done(function(res) {
+      notify('Ombi', res, 'success');
+      fn(col,ord);
+      return;
+    });
+  } else {
+    notify('Ombi', 'Content type "'+ctype+'" not handled', 'error');
   }
 }
 
-function ombi_mark_unavailable(ctype, id, fn, col, ord) {
+function ombi_mark_unavailable(ctype, id, fn, col=0, ord=0) {
   if (ctype == 'movie') {
     ombi_maction(id, 'unavailable').done(function(res) {
       notify('Ombi', res, 'success');
       fn(col,ord);
       return;
     });
+  } else if (ctype == 'tv') {
+    ombi_tvaction(id, 'unavailable').done(function(res) {
+      notify('Ombi', res, 'success');
+      fn(col,ord);
+      return;
+    });
+  } else {
+    notify('Ombi', 'Content type "'+ctype+'" not handled', 'error');
   }
 }
 
-function ombi_deny(ctype, id, fn, col, ord) {
+function ombi_deny(ctype, id, fn, col=0, ord=0) {
   if (ctype == 'movie') {
     ombi_maction(id, 'deny').done(function(res) {
       notify('Ombi', res, 'info');
       fn(col,ord);
       return;
     });
+  } else if (ctype == 'tv') {
+    ombi_tvaction(id, 'deny').done(function(res) {
+      notify('Ombi', 'Request has been marked as denied', 'info');
+      fn(col,ord);
+      return;
+    });
+  } else {
+    notify('Ombi', 'Content type "'+ctype+'" not handled', 'error');
   }
 }
 
-function ombi_remove(ctype, id, fn, col, ord) {
-  if (ctype == 'movie') {
-    ombi_mdelete(id, 'remove').done(function(res) {
+function ombi_remove(ctype, id, fn, col=0, ord=0) {
+  if (ctype == 'movie' || ctype == 'tv') {
+    ombi_delete(ctype, id, 'remove').done(function(res) {
       notify('Ombi', res, 'info');
       fn(col,ord);
       return;
     });
+  } else {
+    notify('Ombi', 'Content type "'+ctype+'" not handled', 'error');
   }
 }
 
@@ -710,20 +739,45 @@ function ombi_maction(id, action) {
   return dfrd.promise();
 }
 
-function ombi_mdelete(id, action) {
+function ombi_tvaction(id, action) {
+  var u = WEBDIR + 'ombi/do_tvaction?id=' + id + '&action=' + action;
+  // alert(u)
+  var dfrd = $.Deferred();
+  $.ajax({
+    url: u,
+    type: 'post',
+    dataType: 'json',
+    success: function(result) {
+      if (result.isError) {
+        dfrd.reject(false);
+        notify('Ombi', 'API call failed for "' + id + ':' + action + '" returned: ' + result.errorMessage, 'error');
+      } else {
+        dfrd.resolve(result.message);
+      }
+    },
+    error: function(data){
+      notify('Failed to do "'+action+'"' , 'Bad web engine call: ' + data.status + ' ' + data.statusText, 'error');
+      dfrd.reject(false);
+    }
+  });
+  return dfrd.promise();
+}
+
+function ombi_delete(ctype, id, action) {
   // Delete is handled differently by the Ombi API, as there's no response message
   // and it seems to be text not json due to DELETE verb. Not 100% sure on that last point :) .
-  var u = WEBDIR + 'ombi/do_maction?id=' + id + '&action=' + action;
+  if (ctype == 'movie') { var u = WEBDIR + 'ombi/do_maction?id=' + id + '&action=' + action; }
+  if (ctype == 'tv') { var u = WEBDIR + 'ombi/do_tvaction?id=' + id + '&action=' + action; }
   var dfrd = $.Deferred();
   $.ajax({
     url: u,
     type: 'post',
     dataType: 'text',
     success: function(result) {
-      dfrd.resolve('Deleted successfully');
+      dfrd.resolve('Removed request successfully');
     },
     error: function(result){
-      notify('Failed to do delete ', 'Bad web engine call: ' + result.status + ' ' + result.statusText, 'error');
+      notify('Failed to remove request ', 'Bad web engine call: ' + result.status + ' ' + result.statusText, 'error');
       dfrd.reject('An error occured, check the logs');
     }
   });

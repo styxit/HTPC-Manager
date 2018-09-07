@@ -400,3 +400,33 @@ class Ombi(object):
         logger.error('Bad request to api')
         return 'False'
 
+    @cherrypy.expose()
+    @require(member_of(htpc.role_user))
+    # @cherrypy.tools.json_out() # response is json payload so don't need this
+    def do_tvaction(self, id, action, **kwargs):
+        """
+        :param ctype: content type for api url
+        :param id: id from the GET /api/v1/Request/tvlite response
+        :param action: must be in below list
+        :param kwargs:
+        :return: result message in json format
+        """
+        logger.debug('Performing %s on tvshow %s' % (action,id) )
+        if action not in ('approve', 'available', 'unavailable', 'deny', 'remove'):
+            raise cherrypy.HTTPError('500 Error', 'Invalid action')
+            return '{"500": "Invalid action"}'
+        u = 'api/v1/Request/tv/%s' % action
+        d = dict()
+        d.update({ 'id': id })
+        if action == 'remove':
+            u = 'api/v1/Request/tv/child/%s' % id
+            r = self._ombi_delete(u)
+        elif action == 'deny':
+            r = self._ombi_put(u, d)
+        else:
+            r = self._ombi_post(u, d)
+        if r != 'False':
+            return r
+        logger.error('Bad request to api')
+        return 'False'
+
