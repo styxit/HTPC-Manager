@@ -3,7 +3,7 @@
 $(document).ready(function () {
   // moment().format();
   $(window).trigger('hashchange');
-
+  
   // Todo: convert to use deferred() so that we only request an auth token once.
   loadFunctionMenu();
 
@@ -102,6 +102,28 @@ $(document).ready(function () {
     loadTVSearch('anticipated', 'suggest');
   });
 });
+
+// These functions allow quick access to the theme colors seeing as
+// I can't figure out how to build many of my components with boostrap
+// and have to build the color schemes myself.
+// Functions with alert() in them aren't used yet.
+function get_themePrimary() { alert('get_themePrimary'); return $(".navbar-inner").css("color"); }
+function get_themePrimaryBG() { return $(".navbar-inner").css("background-color"); }
+function get_themeActiveBG() { return shadeRGBColor(get_themePrimaryBG(),-0.5); }
+function get_themeLinkColor() { alert('get_themeLinkColor'); return $(".dropdown-menu>li>a").css("color"); }
+function get_themeBgColor() { return $("body").css("background-color"); }
+function get_themeTextColor() { alert('get_themeTextColor'); return $("body").css("color"); }
+
+function shadeRGBColor(color, percent) {
+  // Props to: https://stackoverflow.com/questions/5560248
+    var f=color.split(","),t=percent<0?0:255,p=percent<0?percent*-1:percent,R=parseInt(f[0].slice(4)),G=parseInt(f[1]),B=parseInt(f[2]);
+    return "rgb("+(Math.round((t-R)*p)+R)+","+(Math.round((t-G)*p)+G)+","+(Math.round((t-B)*p)+B)+")";
+}
+
+function doShowScroll(childReq, id) {
+  $('.'+childReq).show();
+  $('#'+id).get(0).scrollIntoView();
+}
 
 function loadMRequests(mreq_col=1, mreq_ord=1 ) {
   $('.spinner').show();
@@ -215,6 +237,71 @@ function loadMRequests(mreq_col=1, mreq_ord=1 ) {
       $('.spinner').hide();
     },
     error: function (result) {
+      notify('Ombi', 'Could not connect to Ombi, check your settings' + result, 'error');
+    }
+  });
+}
+
+function loadMSearch(hint='popular', lookup='suggest') {
+  var url = WEBDIR + 'ombi/get_searchresult?t=movie&q='+hint+'&l='+lookup;
+  $('.spinner').show();
+  $.ajax({
+    url: url,
+    type: 'get',
+    dataType: 'json',
+    success: function (result) {
+      $('#msearch_table_body').empty();
+      if (result == 'False' || result.length == 0) {
+        var row = $('<tr>');
+        row.append($('<td>').attr('colspan', '4').html('No movies found'));
+        $('#msearch_table_body').append(row);
+        $('.spinner').hide();
+        return false;
+      }
+      var i = 0;
+      $.each(result, function (showname, movie) {
+        // $.getJSON(WEBDIR + 'ombi/get_extrainfo?t=movie&q='+movie.theMovieDbId+'&k=digitalReleaseDate', function(digitalReleaseDate) {
+        var row = $('<tr>');
+        var summaryicon = makeIcon('fa fa-info-circle fa-fw', movie.overview);
+        if (movie.releaseDate == null) {
+          var name = $('<a>').attr('href', 'https://www.themoviedb.org/movie/'+movie.theMovieDbId)
+            .text(movie.title).attr('target','_blank');
+          row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
+          row.append($('<td>'));
+        } else {
+          var name = $('<a>').attr('href', 'https://www.themoviedb.org/movie/'+movie.theMovieDbId)
+            .text(movie.title+' ('+movie.releaseDate.substr(0,4)+')').attr('target','_blank');
+          row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
+          row.append($('<td nowrap>').append(movie.releaseDate.substr(0,10)));
+        }
+        if (movie.available && movie.quality) {
+          row.append( $('<td>').append('Available ').append( $('<span>')
+            .html(movie.quality).addClass('label label-success label-ombi-quality')));
+        }
+        else if (movie.available) { row.append( $('<td nowrap>').append('Available') ); }
+        else if (movie.approved) { row.append($('<td>').append('Processing Request')); }
+        else if (movie.requested && !(movie.approved)) { row.append($('<td>').append('Pending Approval')); }
+        else { 
+          row.append($('<td nowrap>').append( ( $('<button class="btn btn-ombi btn-warning" type="button">)')
+            .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger"')).append(' Request &nbsp;')
+            .attr('title','Request '+movie.title).click( function(){ombi_mrequest(movie.theMovieDbId, hint, lookup);} ) ) ) );
+        }
+        row.append($('<td nowrap>').append( ( $('<button class="btn btn-ombi btn-blue btn-ombiblue" type="button">)')
+          .append($('<i>').addClass('fa fa-eye fa-slightlybigger')).append(' Similar')
+          .attr('title','Look for movies similar to '+movie.title).click( function(){loadMSearch(movie.theMovieDbId);} ) ) ) );
+        $('#msearch_table_body').append(row);
+        i+=1;
+      });
+      $('#msearch_table_body').parent().trigger('update');
+      $('#msearch_table_body').parent().trigger("sorton", [
+        [
+          [1, 1]
+        ]
+      ]);
+      $('.spinner').hide();
+    },
+    error: function (result) {
+      $('.spinner').hide();
       notify('Ombi', 'Could not connect to Ombi, check your settings' + result, 'error');
     }
   });
@@ -375,81 +462,9 @@ function loadTVRequests(viewReq="0", viewChild="0") {
   }); // ajax call for tv_requests
 }
 
-function doShowScroll(childReq, id) {
-  $('.'+childReq).show();
-  $('#'+id).get(0).scrollIntoView();
-}
-
-function loadMSearch(hint='popular', lookup='suggest') {
-  var url = WEBDIR + 'ombi/get_searchresult?t=movie&q='+hint+'&l='+lookup;
-  // alert(url)
-  $('.spinner').show();
-  $.ajax({
-    url: url,
-    type: 'get',
-    dataType: 'json',
-    success: function (result) {
-      $('#msearch_table_body').empty();
-      if (result == 'False' || result.length == 0) {
-        var row = $('<tr>');
-        row.append($('<td>').attr('colspan', '4').html('No movies found'));
-        $('#msearch_table_body').append(row);
-        $('.spinner').hide();
-        return false;
-      }
-      var i = 0;
-      $.each(result, function (showname, movie) {
-        // $.getJSON(WEBDIR + 'ombi/get_extrainfo?t=movie&q='+movie.theMovieDbId+'&k=digitalReleaseDate', function(digitalReleaseDate) {
-        var row = $('<tr>');
-        var summaryicon = makeIcon('fa fa-info-circle fa-fw', movie.overview);
-        if (movie.releaseDate == null) {
-          var name = $('<a>').attr('href', 'https://www.themoviedb.org/movie/'+movie.theMovieDbId)
-            .text(movie.title).attr('target','_blank');
-          row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
-          row.append($('<td>'));
-        } else {
-          var name = $('<a>').attr('href', 'https://www.themoviedb.org/movie/'+movie.theMovieDbId)
-            .text(movie.title+' ('+movie.releaseDate.substr(0,4)+')').attr('target','_blank');
-          row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
-          row.append($('<td nowrap>').append(movie.releaseDate.substr(0,10)));
-        }
-        if (movie.available && movie.quality) {
-          row.append( $('<td>').append('Available ').append( $('<span>')
-            .html(movie.quality).addClass('label label-success label-ombi-quality')));
-        }
-        else if (movie.available) { row.append( $('<td nowrap>').append('Available') ); }
-        else if (movie.approved) { row.append($('<td>').append('Processing Request')); }
-        else if (movie.requested && !(movie.approved)) { row.append($('<td>').append('Pending Approval')); }
-        else { 
-          row.append($('<td nowrap>').append( ( $('<button class="btn btn-ombi btn-warning" type="button">)')
-            .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger"')).append(' Request &nbsp;')
-            .attr('title','Request '+movie.title).click( function(){ombi_mrequest(movie.theMovieDbId, hint, lookup);} ) ) ) );
-        }
-        row.append($('<td nowrap>').append( ( $('<button class="btn btn-ombi btn-blue btn-ombiblue" type="button">)')
-          .append($('<i>').addClass('fa fa-eye fa-slightlybigger')).append(' Similar')
-          .attr('title','Look for movies similar to '+movie.title).click( function(){loadMSearch(movie.theMovieDbId);} ) ) ) );
-        $('#msearch_table_body').append(row);
-        i+=1;
-      });
-      $('#msearch_table_body').parent().trigger('update');
-      $('#msearch_table_body').parent().trigger("sorton", [
-        [
-          [1, 1]
-        ]
-      ]);
-      $('.spinner').hide();
-    },
-    error: function (result) {
-      $('.spinner').hide();
-      notify('Ombi', 'Could not connect to Ombi, check your settings' + result, 'error');
-    }
-  });
-}
-
 function loadTVSearch(hint='popular', lookup='suggest') {
-  var url = WEBDIR + 'ombi/get_searchresult?t=tv&q='+hint+'&l='+lookup;
-  // alert(url)
   $('.spinner').show();
+  var url = WEBDIR + 'ombi/get_searchresult?t=tv&q='+hint+'&l='+lookup;
   $.ajax({
     url: url,
     type: 'get',
@@ -463,47 +478,125 @@ function loadTVSearch(hint='popular', lookup='suggest') {
         $('.spinner').hide();
         return false;
       }
-      var i = 0;
-      $.each(result, function (showname, show) {
-        var row = $('<tr>');
+      $('#req_overlay').empty();
+      $('#req_overlay').css('background-color',get_themeBgColor()).css('border-color',get_themeActiveBG())
+        .append( $('<button class="btn btn-danger btn-small btn-ombi-close" name="close">')
+          .attr('title','Esc to close').append( $('<li class="fa fa-times fa-fw">') )
+          .click( function(){ $('.ombi-tvshow-request').hide(); toggle_req_div($('#req_overlay')); })
+        );
+      // var i = 0;
+      $.each(result, function (showix, show) {
+        var showId = show.id;
         var summaryicon = makeIcon('fa fa-info-circle fa-fw', show.overview);
         if (show.firstAired == null || show.firstAired == "") {
-          var name = $('<a>').attr('href', 'https://www.imdb.com/title/'+show.imdbId)
-            .text(show.title).attr('target','_blank');
-          row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
+          var name = show.title;
         } else {
-          var name = $('<a>').attr('href', 'https://www.imdb.com/title/'+show.imdbId)
-            .text(show.title+' ('+show.firstAired.substr(0,4)+')').attr('target','_blank');
-          row.append($('<td>').append(summaryicon).append('&nbsp;').append(name));
+          var name = show.title+' ('+show.firstAired.substr(0,4)+')';
         }
-        row.append( $('<td nowrap>').append(show.status) );
-        if (show.firstAired == null || show.firstAired == "") {
-          row.append($('<td>').append('<!-- No date -->'));
-        } else {
-          row.append($('<td nowrap>').append(show.firstAired.substr(0,10)));
-        }
-        if (show.available && show.quality) {
-          row.append( $('<td>').append('Available ').append( $('<span>')
-            .html(show.quality).addClass('label label-success label-ombi-quality')));
-        }
-        else if (show.available) { row.append( $('<td nowrap>').append('Available') ); }
-        else if (show.approved) { row.append($('<td>').append('Processing Request')); }
-        else if (show.requested && !(show.approved)) { row.append($('<td>').append('Pending Approval')); }
-        else { 
-          row.append($('<td nowrap>').append( ( $('<button class="btn btn-ombi btn-warning" type="button">)')
-            .append($('<i>').addClass('fa fa-plus-square fa-fw fa-slightlybigger"')).append(' Request &nbsp;')
-            .attr('title','Request '+show.title).click( function(){alert('Sorry, TV requests not working yet!');} ) ) ) );
-        }
-        $('#tvsearch_table_body').append(row);
-        i+=1;
-      });
+
+        var req_show$showId = $('<div class="ombi-tvshow-request">')
+          .attr('id','req_show$'+showId);
+        // req_show$showId.append('<h2>'+name+'</h>');
+        req_show$showId.append('<h2>'+name+' ['+showId+']</h>');
+        req_show$showId.append( $('<table width="100%">').append( $('<tr>').append( $('<td>')
+          .append( $('<div class="btn-toolbar">').css('float','right')
+          .append( $('<div class="btn-group">')
+            .append( $('<button class="btn">').css('margin-bottom','4px').append('All Seasons')
+              .click(function(){ombi_tvrequest(showId,'requestAll');}))
+            .append( $('<button class="btn">').css('margin-bottom','4px').append('First Season')
+              .click(function(){ombi_tvrequest(showId,'firstSeason');}))
+            .append( $('<button class="btn">').css('margin-bottom','4px').append('Last Season')
+              .click(function(){ombi_tvrequest(showId,'latestSeason');}))
+          ).append( $('<button class="btn">').css('margin-bottom','4px').css('margin-left','8px')
+            .append('Request Selected')
+              .click(function(){ombi_tvrequest(showId,'NotImplementedYet');}))
+        ))));
+
+        $.ajax({
+          url: url = WEBDIR + 'ombi/get_tvdetails/?id='+show.id+'&l=search',
+          type: 'get',
+          dataType: 'json',
+          success: function (detail) {
+            var row = $('<tr>');
+            row.append($('<td>').append(summaryicon).append('&nbsp;')
+              .append($('<a>').attr('href', 'https://www.imdb.com/title/'+show.imdbId)
+                .text(name).attr('target','_blank')));
+            row.append( $('<td nowrap>').append(show.status) );
+            if (detail.firstAired == null || detail.firstAired == "") {
+              row.append($('<td>').append('<!-- No date -->'));
+            } else {
+              row.append($('<td nowrap>').append(detail.firstAired.substr(0,10)));
+            }
+            if (detail.fullyAvailable) {
+              row.append( $('<td nowrap>').append('Available') );
+            } else { 
+              row.append($('<td nowrap>').append( ( $('<button class="btn btn-ombi btn-warning" type="button">)')
+                .append($('<li>').addClass('fa fa-plus-square fa-fw fa-slightlybigger"')).append(' Request &nbsp;')
+                .attr('title','Request '+show.title).click( function(){open_tvreq_panel(req_show$showId,showId)} ) ) ) );
+            }
+            
+            var seasonTabs = $('<ul class="nav nav-tabs">');
+            var seasonContent = $('<div class="tab-content seasonTabContent" id="seasonTabContent'+showId+'">')
+              .css('max-height','250px');
+            
+            $.each(detail.seasonRequests, function (seasonix, season) {
+              var seasonNum = 'S'+(('0'+season.seasonNumber).slice(-2));
+              var seasonId = showId+'_'+seasonNum;
+
+              var seasonTable = $('<tbody>');
+              $.each(season.episodes, function (episodeix, episode) {
+                var episodeStatus = 'Not Requested';
+                if (episode.requested) { episodeStatus = 'Pending Approval'; }
+                if (episode.approved) { episodeStatus = 'Processing Request'; }
+                if (episode.available) { episodeStatus = 'Available'; }
+                seasonTable.append( $('<tr>')
+                  .append( $('<td>').append('E'+(('0'+episode.episodeNumber).slice(-2))))
+                  .append( $('<td>').append(episode.title))
+                  .append( $('<td>').append(episode.airDate.substr(0,10)))
+                  .append( $('<td>').append(episodeStatus))
+                  .append( $('<td>').append( $('<input type="checkbox">')
+                    .prop("disabled", function(){ return (episodeStatus != 'Not Requested');} )))
+                );
+              }); // each episode
+
+              if (season.seasonNumber == 1) { 
+                seasonTabs.append( $('<li class="seasonTabLi'+showId+' active">').append( $('<a data-toggle="tab">')
+                  .append(seasonNum)
+                    .click(function(){$('.seasonTab'+showId).removeClass('active');$('#'+seasonId).addClass('active');})
+                  )
+                );
+                seasonContent.append( $('<div id="'+seasonId+'" class="tab-pane seasonTab'+showId+' active">')
+                  .append( $('<table class="table table-striped" style="margin-bottom: 0px;">').append(seasonTable)));
+              } else {
+                seasonTabs.append( $('<li class="seasonTabLi'+showId+'">').append( $('<a data-toggle="tab">')
+                  .append(seasonNum)
+                  .click(function(){$('.seasonTab'+showId)
+                    .removeClass('active');$('#'+seasonId).addClass('active');})
+                  )
+                );
+                seasonContent.append( $('<div id="'+seasonId+'" class="tab-pane seasonTab'+showId+'">')
+                  .append( $('<table class="table table-striped" style="margin-bottom: 0px;">').append(seasonTable)));
+              }
+
+            }); // each season
+
+            req_show$showId.append( $('<div>').append(seasonTabs) );
+            req_show$showId.append(seasonContent);
+
+            $('#tvsearch_table_body').append(row);
+          } // ajax detail success
+        }); // ajax detail
+        $('#req_overlay').append(req_show$showId);
+        // i+=1;
+      }); // each show
+
+      $('.spinner').hide("slow");
       $('#tvsearch_table_body').parent().trigger('update');
       $('#tvsearch_table_body').parent().trigger("sorton", [
         [
           [1, 1]
         ]
       ]);
-      $('.spinner').hide();
     },
     error: function (result) {
       $('.spinner').hide();
@@ -581,11 +674,26 @@ function toggle_req_div(div_id) {
   }
 }
 
+function open_tvreq_panel(id,thisShow) {
+  $('#req_overlay').show();
+  id.toggle();
+  if (id.hasClass('ombi-tvshow-request')) {
+    $('#seasonTabContent'+thisShow)
+      .css('max-height',($('#req_overlay').height() - $('#seasonTabContent'+thisShow).position().top)+'px');
+  }
+  $('.seasonTabLi'+thisShow).removeClass("active");
+  $('.seasonTabLi'+thisShow).first().addClass("active");
+  $('.seasonTab'+thisShow).removeClass("active");
+  $('.seasonTab'+thisShow).first().addClass("active");
+}
+
 function close_menu() {
   // Collapses any open menus
   $('.tvChildReqRows').hide();
   $('.ombi-actions').hide();
   $('.ombi-tvrequest-detail').css('visibility','hidden');
+  $('.ombi-tvshow-request').hide();
+  $('#req_overlay').hide();
 }
 
 function ombi_approve(ctype, id, fn, col=0, ord=0) {
@@ -683,6 +791,37 @@ function ombi_mrequest(id, h, l) {
     url: u,
     data: id,
     type: 'get',
+    dataType: 'json',
+    success: function(result) {
+      if (!result.isError) {
+        notify('Request success ', result.message, 'success');
+        loadMRequests(h,l);
+      } else {
+        notify('Failed to request movie ', 'Check logs for details', 'error');
+      }
+      return true;
+    },
+    error: function(data){
+      notify('Failed to request movie ', 'Bad web engine call: ' + data.status + ' ' + data.statusText, 'error');
+      return false;
+    }
+  });
+}
+
+function ombi_tvrequest(id, spec='false') {
+  if ( $.inArray(spec, ["requestAll","firstSeason","latestSeason"]) > -1 ) {
+    alert('Got a keyword: '+spec);
+  } else {
+    alert('Got a bunch of checkboxes: '+spec);
+  }
+  return;
+  
+  var u = WEBDIR + 'ombi/request_tv?id='+id+'&spec='+spec;
+  alert(u);
+  $.ajax({
+    url: u,
+    data: id,
+    type: 'post',
     dataType: 'json',
     success: function(result) {
       if (!result.isError) {

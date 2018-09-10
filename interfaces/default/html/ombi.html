@@ -40,18 +40,18 @@
         </div>
 
         <div id="msearch_tab" class="tab-pane">
-		  <div class="well form-inline">
-			<div style="display: inline-block; margin-top: 2px; margin-bottom: 2px;" class="span5">
-				<input id="search_movie_name" name="search_movie_name" type="text" style="width: 220px;" />
-				<button class="btn btn-success" type="button" id="search_movie_button"><i class="fa fa-search fa-inverse fa-fw"></i></button>
- 			</div>
-			<div style="display: inline-block;">
-				<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_popular_button"><i class="fa fa-search fa-inverse fa-fw"></i> Popular</button>
-				<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_upcoming_button"><i class="fa fa-search fa-inverse fa-fw"></i> Upcoming</button>
-				<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_toprated_button"><i class="fa fa-search fa-inverse fa-fw"></i> Top Rated</button>
-				<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_nowplaying_button"><i class="fa fa-search fa-inverse fa-fw"></i> Now Playing</button>
-			</div>
-		  </div>
+					<div class="well form-inline">
+						<div style="display: inline-block; margin-top: 2px; margin-bottom: 2px;" class="span5">
+							<input id="search_movie_name" name="search_movie_name" type="text" style="width: 220px;" />
+							<button class="btn btn-success" type="button" id="search_movie_button"><i class="fa fa-search fa-inverse fa-fw"></i></button>
+						</div>
+						<div style="display: inline-block;">
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_popular_button"><i class="fa fa-search fa-inverse fa-fw"></i> Popular</button>
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_upcoming_button"><i class="fa fa-search fa-inverse fa-fw"></i> Upcoming</button>
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_toprated_button"><i class="fa fa-search fa-inverse fa-fw"></i> Top Rated</button>
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_nowplaying_button"><i class="fa fa-search fa-inverse fa-fw"></i> Now Playing</button>
+						</div>
+					</div>
           <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
             <thead>
               <tr>
@@ -80,32 +80,36 @@
         </div>
 
         <div id="tvsearch_tab" class="tab-pane">
-		  <div class="well form-inline">
-			<div style="display: inline-block; margin-top: 2px; margin-bottom: 2px;" class="span5">
-				<input id="search_tvshow_name" name="search_tvshow_name" type="text" style="width: 250px;" />
-				<button class="btn btn-success" type="button" id="search_tvshow_button"><i class="fa fa-search fa-inverse fa-fw"></i></button>
- 			</div>
-			<div style="display: inline-block;">
-				<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_tvpopular_button"><i class="fa fa-search fa-inverse fa-fw"></i> Popular</button>
-				<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_trending_button"><i class="fa fa-search fa-inverse fa-fw"></i> Trending</button>
-				<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_mostwatched_button"><i class="fa fa-search fa-inverse fa-fw"></i> Most Watched</button>
-				<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_anticipated_button"><i class="fa fa-search fa-inverse fa-fw"></i> Most Anticipated</button>
-			</div>
-		  </div>
-          <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
-            <thead>
-              <tr>
-                <th class="span3" data-ignore-articles="en" data-sorter="ignoreArticles">Show Title</th>
-                <th class="span1">Status</th>
-                <th class="span1">First Aired</th>
-                <th class="span1">Status</th>
-              </tr>
-            </thead>
-            <tbody id="tvsearch_table_body"></tbody>
-          </table>
+					<div class="well form-inline">
+						<div style="display: inline-block; margin-top: 2px; margin-bottom: 2px;" class="span5 btn-group">
+							<input id="search_tvshow_name" name="search_tvshow_name" type="text" style="width: 250px;" />
+							<button class="btn btn-success" type="button" id="search_tvshow_button"><i class="fa fa-search fa-inverse fa-fw"></i></button>
+						</div>
+						<div style="display: inline-block;">
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_tvpopular_button"><i class="fa fa-search fa-inverse fa-fw"></i> Popular</button>
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_trending_button"><i class="fa fa-search fa-inverse fa-fw"></i> Trending</button>
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_mostwatched_button"><i class="fa fa-search fa-inverse fa-fw"></i> Most Watched</button>
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_anticipated_button"><i class="fa fa-search fa-inverse fa-fw"></i> Most Anticipated</button>
+						</div>
+					</div>
+					<div id="tvsearch_tab_table">
+						<table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
+							<thead>
+								<tr>
+									<th class="span3" data-ignore-articles="en" data-sorter="ignoreArticles">Show Title</th>
+									<th class="span1">Status</th>
+									<th class="span1">First Aired</th>
+									<th class="span1">&nbsp;</th> <!-- Request -->
+								</tr>
+							</thead>
+							<tbody id="tvsearch_table_body"></tbody>
+						</table>
+					</div>
+					<div id="req_overlay" class="ombi-req-overlay"></div>
         </div>
 
         <div class="spinner"></div>
+				
       </div>
     </div>
   </div>

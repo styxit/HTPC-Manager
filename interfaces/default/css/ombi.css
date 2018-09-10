@@ -1,8 +1,18 @@
+.spinner {
+	top:	50%;
+	left:	50%;
+	transform:	translate(-50%,-50%);
+    -ms-transform:	translate(-50%,-50%);
+	display:	none;
+	position:	fixed;
+	z-index:	9999;
+}
+
 .btn-ombiblue {
-	background-color:	hsl(194, 87%, 44%)!important;
+	background-color:	hsl(194, 87%, 44%) !important;
 }
 .btn-ombiblue:hover {
-	background-color:	hsl(194, 77%, 39%)!important;
+	background-color:	hsl(194, 77%, 39%) !important;
 }
 
 .btn-ombi-close {
@@ -13,7 +23,7 @@
 .ombi-actions {
 	display: inline-block;
 	position: absolute;
-	border-radius: 5px!important;
+	border-radius: 5px !important;
 	/* background-color: hsla(24, 5%, 5%, 0.85); */
 	background-color: hsla(24, 0%, 25%, 1);
 	padding: 5px;
@@ -22,38 +32,56 @@
 	margin-left: 0px;
 }
 
-/* 
-.ombi-tvrequest-overlay {
-	position: fixed;
-	border-radius: 5px!important;
-	background-color: hsla(24, 5%, 5%, 0.85);
-	padding: 5px;
-	display: none;
-}
- */
-
 .ombi-tvrequest-detail {
 	position: absolute;
-	border-radius: 5px!important;
+	border-radius: 5px !important;
 	background-color: hsla(24, 0%, 25%, 1);
-	/* background-color: hsla(24, 79%, 49%, 1); */
 	padding: 4px;
 	visibility: hidden;
 	/* display: none; */
 	/* width: 94%; */
     /* top: 155px; */
     left: -5px;
+	z-index: 2030;
 	overflow: auto;
+}
+
+.ombi-req-overlay {
+	border: solid 2px; /* #df691a  */
+	width:	80%;
+	height:	92%;
+	top:	50%;
+	left:	50%;
+	transform:	translate(-50%,-50%);
+    -ms-transform:	translate(-50%,-50%);
+	display:	none;
+	position:	fixed;
+	padding:	5px;
+	/* overflow:	auto; */
+	z-index:	2030;
+}
+
+.seasonTabContent {
+	overflow-y: auto !important;
+	/* max-height: 450px; */
+}
+
+.ombi-tvshow-request {
+	display:	none;
+	width:	100%;
 }
 
 @media (max-width: 767px) {
 	.ombi-tvrequest-detail {
-		/* background-color: hsla(24, 5%, 5%, 1); */
-		/* background-color: hsla(24, 79%, 49%, 1); */
 		padding: 2px;
-		border-radius: 0px!important;
+		border-radius: 0px !important;
 		width: 100%;
 		left: 0px;
+	}
+
+	.ombi-req-overlay {
+		width: 	96%;
+		height:	96%;
 	}
 }
 
@@ -63,14 +91,14 @@
 }
 
 .ombi-menu-disabled {
-	color: gray!important;
+	color: gray !important;
 }
 h1.page-header.page-title a.ombi-menu-disabled {
-	color: gray!important;
+	color: gray !important;
 }
 
 .btn-ombi {
-	border-radius:	5px!important;
+	border-radius:	5px !important;
 	padding-top:	5px;
 	padding-bottom:	3px;
 	padding-left:	6px;
@@ -80,13 +108,20 @@ h1.page-header.page-title a.ombi-menu-disabled {
 	margin-bottom:	2px;
 }
 
+.btn-ombi.disabled {
+	 color: darkgrey !important;
+	 /* opacity: 0.4; */
+	 cursor: not-allowed;
+	 border: solid 2px
+}
+
 .fa-slightlybigger {
 	font-size:	125%;
 }
 
 .label-ombi-quality {
 	font-weight:	bolder;
-	border-radius:	3px!important;
+	border-radius:	3px !important;
 }
 
 /* .ombi-tip:hover {
@@ -97,3 +132,89 @@ h1.page-header.page-title a.ombi-menu-disabled {
 	display: none;
 }
  */
+ 
+ /* Boootstrap 3 Panels. Because reasons. */
+ /* ref: https://stackoverflow.com/questions/19220027/can-you-use-panels-in-bootstrap-2-3 */
+.panel {
+  padding: 15px;
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.panel-heading {
+  padding: 10px 15px;
+  /* margin: -15px -15px 15px; */
+  font-size: 17.5px;
+  font-weight: 500;      
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #dddddd;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+
+.panel-footer {
+  padding: 10px 15px;
+  margin: 15px -15px -15px;
+  background-color: #f5f5f5;
+  border-top: 1px solid #dddddd;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.panel-primary {
+  border-color: #428bca;
+}
+
+.panel-primary .panel-heading {
+  color: #ffffff;
+  background-color: #428bca;
+  border-color: #428bca;
+}
+
+.panel-success {
+  border-color: #d6e9c6;
+}
+
+.panel-success .panel-heading {
+  color: #468847;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.panel-warning {
+  border-color: #fbeed5;
+}
+
+.panel-warning .panel-heading {
+  color: #c09853;
+  background-color: #fcf8e3;
+  border-color: #fbeed5;
+}
+
+.panel-danger {
+  border-color: #eed3d7;
+}
+
+.panel-danger .panel-heading {
+  color: #b94a48;
+  background-color: #f2dede;
+  border-color: #eed3d7;
+}
+
+.panel-info {
+  border-color: #bce8f1;
+}
+
+.panel-info .panel-heading {
+  color: #3a87ad;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+
+.panel>.table, .panel>.table-responsive>.table {
+      margin-bottom: 0;
+}
