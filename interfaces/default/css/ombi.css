@@ -61,7 +61,14 @@
 	z-index:	2030;
 }
 
-.seasonTabContent {
+.pseudoheader {
+		padding-top:	0px !important;
+		padding-bottom:	4px !important;
+		padding-right:	12px !important;
+}
+
+/* .seasonTabContent { */
+.seasonTabs {
 	overflow-y: auto !important;
 	/* max-height: 450px; */
 }

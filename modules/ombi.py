@@ -370,7 +370,7 @@ class Ombi(object):
                 # logger.debug('%s %s' % (k,d[k]))
                 return d[k]
         logger.debug('Bad question')
-        return 'False'
+        return '' # return empty string on error, in case real return value is 'False' :)
 
     @cherrypy.expose()
     @require()
