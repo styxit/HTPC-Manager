@@ -484,9 +484,10 @@ function loadTVSearch(hint='popular', lookup='suggest') {
           .attr('title','Esc to close').append( $('<li class="fa fa-times fa-fw">') )
           .click( function(){ $('.ombi-tvshow-request').hide(); toggle_req_div($('#req_overlay')); })
         );
-      // var i = 0;
       $.each(result, function (showix, show) {
         var showId = show.id;
+        var sList$showId = '';
+        var reqStatusAvail = get_extrainfo_key('tv',showId,'fullyAvailable');
         var summaryicon = makeIcon('fa fa-info-circle fa-fw', show.overview);
         if (show.firstAired == null || show.firstAired == "") {
           var name = show.title;
@@ -496,20 +497,19 @@ function loadTVSearch(hint='popular', lookup='suggest') {
 
         var req_show$showId = $('<div class="ombi-tvshow-request">')
           .attr('id','req_show$'+showId);
-        // req_show$showId.append('<h2>'+name+'</h>');
-        req_show$showId.append('<h2>'+name+' ['+showId+']</h>');
+        req_show$showId.append('<h2>'+name+'</h>');
         req_show$showId.append( $('<table width="100%">').append( $('<tr>').append( $('<td>')
           .append( $('<div class="btn-toolbar">').css('float','right')
           .append( $('<div class="btn-group">')
             .append( $('<button class="btn">').css('margin-bottom','4px').append('All Seasons')
-              .click(function(){ombi_tvrequest(showId,'requestAll');}))
+              .click(function(){ombi_tvrequest(showId,sList$showId,'requestAll');}))
             .append( $('<button class="btn">').css('margin-bottom','4px').append('First Season')
-              .click(function(){ombi_tvrequest(showId,'firstSeason');}))
+              .click(function(){ombi_tvrequest(showId,sList$showId,'firstSeason');}))
             .append( $('<button class="btn">').css('margin-bottom','4px').append('Last Season')
-              .click(function(){ombi_tvrequest(showId,'latestSeason');}))
+              .click(function(){ombi_tvrequest(showId,sList$showId,'latestSeason');}))
           ).append( $('<button class="btn">').css('margin-bottom','4px').css('margin-left','8px')
             .append('Request Selected')
-              .click(function(){ombi_tvrequest(showId,get_checks('cBox'+showId));}))
+              .click(function(){ombi_tvrequest(showId,sList$showId,get_checks('cBox'+showId));}))
           )
         )));
 
@@ -523,18 +523,24 @@ function loadTVSearch(hint='popular', lookup='suggest') {
               .append($('<a>').attr('href', 'https://www.imdb.com/title/'+show.imdbId)
                 .text(name).attr('target','_blank')));
             row.append( $('<td nowrap>').append(show.status) );
-            if (detail.firstAired == null || detail.firstAired == "") {
+            if (show.firstAired == null || show.firstAired == "") {
               row.append($('<td>').append('<!-- No date -->'));
             } else {
-              row.append($('<td nowrap>').append(detail.firstAired.substr(0,10)));
+              row.append($('<td nowrap>').append(show.firstAired.substr(0,10)));
             }
-            if (detail.fullyAvailable) {
-              row.append( $('<td nowrap>').append('Available') );
-            } else { 
-              row.append($('<td nowrap>').append( ( $('<button class="btn btn-ombi btn-warning" type="button">)')
-                .append($('<li>').addClass('fa fa-plus-square fa-fw fa-slightlybigger"')).append(' Request &nbsp;')
-                .attr('title','Request '+show.title).click( function(){open_tvreq_panel(req_show$showId,showId)} ) ) ) );
-            }
+            var reqStatus = $('<td nowrap id="reqStatus'+showId+'">')
+            row.append(reqStatus);
+            reqStatusAvail.done(function(reqKey){
+              if (reqKey == 'true') {
+                reqStatus.append('Available');
+              } else { 
+                reqStatus.append( $('<button class="btn btn-ombi btn-warning" type="button">)')
+                  .append($('<li>').addClass('fa fa-plus-square fa-fw fa-slightlybigger"'))
+                  // .append(' Request &nbsp;').attr('title','Request '+show.title)
+                  .append(' Request').attr('title','Request '+show.title)
+                  .click( function(){open_tvreq_panel(req_show$showId,showId)} ) );
+              }
+            });
             
             var seasonTabs = $('<ul class="nav nav-tabs">').css('margin-bottom','5px');
             var seasonContent = $('<div class="tab-content seasonTabContent" id="seasonTabContent'+showId+'">');
@@ -542,19 +548,30 @@ function loadTVSearch(hint='popular', lookup='suggest') {
             $.each(detail.seasonRequests, function (seasonix, season) {
               var seasonNum = 'S'+(('0'+season.seasonNumber).slice(-2));
               var seasonId = showId+'_'+seasonNum;
+              if (sList$showId.length > 0) { sList$showId += ','+season.seasonNumber; }
+                else { sList$showId += season.seasonNumber; }
               
               var seasonTable = $('<tbody>');
+                  // Todo: Fix table headers for request div.
+                  // Incorporate master check toggle.
+              seasonTable.append( $('<tr width="100%">').append( $('<td colspan=4>').addClass('pseudoheader pseudoheader-toggle').append('Toggle season:') )
+                .append( $('<td>').addClass('pseudoheader')
+                .append( $('<input type="checkbox" id="m_cBox'+seasonId+'" class="m_cBox'+showId+'" value="masterCheck'+seasonId+'">')
+                .css('margin','2px 0 0 0').click(function(){toggle_checks('cBox'+seasonId);})))
+              );
               $.each(season.episodes, function (episodeix, episode) {
                 var episodeStatus = 'Not Requested';
                 if (episode.requested) { episodeStatus = 'Pending Approval'; }
                 if (episode.approved) { episodeStatus = 'Processing Request'; }
                 if (episode.available) { episodeStatus = 'Available'; }
+                if (episodeStatus != 'Not Requested') { var chkClass = 'disabled'; }
+                  else { var chkClass = 'cBox'+showId+' cBox'+seasonId; }
                 seasonTable.append( $('<tr>')
                   .append( $('<td>').append('E'+(('0'+episode.episodeNumber).slice(-2))))
                   .append( $('<td>').append(episode.title))
                   .append( $('<td>').append(episode.airDate.substr(0,10)))
                   .append( $('<td>').append(episodeStatus))
-                  .append( $('<td>').append( $('<input type="checkbox" class="cBox'+showId+' cBox'+seasonId+'" value="'+season.seasonNumber+'-'+episode.episodeNumber+'">')
+                  .append( $('<td>').append( $('<input type="checkbox" class="'+chkClass+'" value="'+season.seasonNumber+'-'+episode.episodeNumber+'">')
                     .prop("disabled", function(){ return (episodeStatus != 'Not Requested');} )))
                 );
               }); // each episode
@@ -566,11 +583,17 @@ function loadTVSearch(hint='popular', lookup='suggest') {
                 )
               );
               seasonContent.append( $('<div id="'+seasonId+'" class="tab-pane seasonTabs seasonTab'+showId+'">')
-                .append( $('<table width="100%">').append( $('<tr width="100%">').append( $('<td width="100%">').addClass('pseudoheader') //).addClass('pseudoheader')
-                  .append( $('<input type="checkbox" id="m_cBox'+seasonId+'" value="masterCheck'+seasonId+'">').css('margin','0 12px 0 0').css('float','right')
-                  .click(function(){toggle_checks('cBox'+seasonId);})
-                ))))
-                .append( $('<table class="table table-striped" style="margin-bottom: 0px;">').append(seasonTable))
+                .append( $('<table class="table table-striped" style="margin-bottom: 0px;">')
+                  // Todo: Fix table headers for request div.
+                  // Incorporate master check toggle.
+                  // .append( $('<thead>')
+                    // .append( $('<tr>').append('#') )
+                    // .append( $('<tr>').append('Title') )
+                    // .append( $('<tr>').append('Aired') )
+                    // .append( $('<tr>').append('Status') )
+                    // .append( $('<tr>').append('&nbsp;') ) )
+                .append(seasonTable)
+                )
               );
 
             }); // each season
@@ -582,7 +605,6 @@ function loadTVSearch(hint='popular', lookup='suggest') {
           } // ajax detail success
         }); // ajax detail
         $('#req_overlay').append(req_show$showId);
-        // i+=1;
       }); // each show
 
       $('.spinner').hide("slow");
@@ -601,27 +623,28 @@ function loadTVSearch(hint='popular', lookup='suggest') {
 }
 
 function get_extrainfo_key(ctype,cid,key) {
-  // Async fetcher for discrete keys to help display main tab contents
-  $.getJSON(WEBDIR + 'ombi/get_extrainfo?t='+ctype+'&q='+cid+'&k='+key, function(result) {
-    alert(key + ' is ' + result);
-    if (result.length > 0) {
-      return result;
-    } else {
-      return '';
+// Async fetcher for discrete keys to help display main tab contents
+  var dfrd = $.Deferred();
+  $.ajax({
+    url: WEBDIR + 'ombi/get_extrainfo?t='+ctype+'&q='+cid+'&k='+key,
+    type: 'get',
+    dataType: 'text',
+    success: function(result) {
+      // alert('ajax result = '+result);
+      if (result.length > 0) { dfrd.resolve(result); }
+        else { dfrd.resolve(''); }
     }
   });
+  return dfrd.promise();
 }
 
 function loadFunctionMenu() {
-  // $('.fmenu_plex').hide();
-  // $('.fmenu_emby').hide();
   $.ajax({
     url: WEBDIR + 'ombi/get_plex_enabled',
     type: 'get',
     dataType: 'text',
     success: function(result) {
       if (result == 'True') {
-        // $('.fmenu_plex').show();
         $('#sync_plex_part').click(function () {
           syncContent('plex', 'part');
         });
@@ -639,7 +662,6 @@ function loadFunctionMenu() {
     dataType: 'text',
     success: function(result) {
       if (result == 'True') {
-        // $('.fmenu_emby').show();
         $('#sync_emby_full').click(function () {
           syncContent('emby', 'full');
         });
@@ -678,15 +700,15 @@ function open_tvreq_panel(id,thisShow) {
   $('#req_overlay').show();
   id.toggle();
   if (id.hasClass('ombi-tvshow-request')) {
-    // $('#seasonTabContent'+thisShow)
     $('.seasonTab'+thisShow)
       .css('max-height',($('#req_overlay').height() - 20 - $('#seasonTabContent'+thisShow).position().top)+'px');
-    // alert(($('#req_overlay').height() - $('#'+thisShow+'_S01').position().top)+'px');
   }
   $('.seasonTabLi'+thisShow).removeClass("active");
   $('.seasonTabLi'+thisShow).first().addClass("active");
   $('.seasonTab'+thisShow).removeClass("active");
   $('.seasonTab'+thisShow).first().addClass("active");
+  $('.cBox'+thisShow).prop("checked",false);
+  $('.m_cBox'+thisShow).prop("checked",false);
 }
 
 function close_menu() {
@@ -822,43 +844,59 @@ function ombi_mrequest(id, h, l) {
   });
 }
 
-function ombi_tvrequest(id, spec='false') {
+function ombi_tvrequest(id, slist, spec='false') {
+// Wrapper to call actual function via deferred() and deal with results
   if (spec == 'false' || spec == '') { // no keyword, or no checkboxes checked lol
     notify('Ombi','Did you forget to check some boxes? Nothing to do..','error');
     return false;
   }
-  if ( $.inArray(spec, ["requestAll","firstSeason","latestSeason"]) == -1 ) { // -1 = not matched
-    var key = 'selected';
-    var data = spec; // to-do
-  } else {
-    var key = spec;
-    var data = '';
-  }
-  alert('Show '+id+'\nDo: '+key + ' ' + data);
+  do_ombi_tvrequest(id, slist, spec)
+    .done(function(res) {
+      notify('Request success ', res, 'success');
+      return true;
+    })
+    .fail(function(res) {
+      if (res) { notify('Failed to process request ', res, 'error'); }
+        else { notify('Failed to process request ', 'Check logs for details', 'error'); }
+      return false;
+    });
+}
 
-  return;
-  
-  var u = WEBDIR + 'ombi/request_tv?id='+id+'&spec='+spec;
-  alert(u);
+function do_ombi_tvrequest(id, slist, spec='false') {
+  if ( $.inArray(spec, ["requestAll","firstSeason","latestSeason"]) == -1 ) { // -1 = not matched
+    var data = '&id='+id+
+      '&slist='+slist+
+      '&spec=selected'+
+      '&sel='+spec;
+  } else {
+    var data = '&id='+id+
+      '&slist='+slist+
+      '&spec='+spec+
+      '&sel=0'; // make sure we don't process any rogue checkbox selections if
+                // one of the quick-select buttons are clicked
+  }
+  var dfrd = $.Deferred();
+  var u = WEBDIR + 'ombi/request_tv';
   $.ajax({
     url: u,
-    data: id,
+    data: data,
     type: 'post',
     dataType: 'json',
     success: function(result) {
-      if (!result.isError) {
-        notify('Request success ', result.message, 'success');
-        loadMRequests(h,l);
+      if (result.isError) {
+        dfrd.reject(result.errorMessage);
+      } else if (result == 'False') {
+        dfrd.reject('API call failed');
       } else {
-        notify('Failed to request movie ', 'Check logs for details', 'error');
+        if (result.message) { dfrd.resolve(result.message); }
+          else { dfrd.resolve(''); }
       }
-      return true;
     },
-    error: function(data){
-      notify('Failed to request movie ', 'Bad web engine call: ' + data.status + ' ' + data.statusText, 'error');
-      return false;
+    error: function(){
+      dfrd.reject(false);
     }
   });
+  return dfrd.promise();
 }
 
 function syncContent(source, mode) {

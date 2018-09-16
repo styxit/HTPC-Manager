@@ -63,8 +63,12 @@
 
 .pseudoheader {
 		padding-top:	0px !important;
-		padding-bottom:	4px !important;
-		padding-right:	12px !important;
+		padding-bottom:	2px !important;
+}
+
+.pseudoheader-toggle {
+	padding-top:	2px !important;
+	text-align:	right !important;
 }
 
 /* .seasonTabContent { */
@@ -106,13 +110,13 @@ h1.page-header.page-title a.ombi-menu-disabled {
 
 .btn-ombi {
 	border-radius:	5px !important;
-	padding-top:	5px;
+	padding-top:	3px;
 	padding-bottom:	3px;
-	padding-left:	6px;
-	padding-right:	6px;
+	padding-left:	5px;
+	padding-right:	7px;
 	margin-right:	3px;
-	margin-top:		2px;
-	margin-bottom:	2px;
+	margin-top:		0px;
+	margin-bottom:	0px;
 }
 
 .btn-ombi.disabled {

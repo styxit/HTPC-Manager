@@ -15,6 +15,7 @@ import logging
 import htpc
 # from HTMLParser import HTMLParser
 from htpc.helpers import get_image
+# from collections import defaultdict
 
 logger = logging.getLogger('modules.ombi')
 
@@ -90,17 +91,6 @@ class Ombi(object):
         return
 
     @cherrypy.expose()
-    @require()
-    # @cherrypy.tools.json_out()
-    def dummy(self):
-        # x = self.auth()
-        x = 'api/v1/Request/tv'
-        d = self._ombi_get(x)
-        if d != 'False':
-            return 'Response: %s' % d
-        return 'Failed: %s' % str(d)
-
-    @cherrypy.expose()
     @require(member_of(htpc.role_admin))
     def content_sync(self, source, mode, **kwargs):
         if source == 'plex':
@@ -170,7 +160,7 @@ class Ombi(object):
         """
         logger.debug('Doing POST request to %s:\n%s' % (url, data) )
         if self.auth() == 'False':
-            logger.debug('POST request died - auth failed')
+            logger.error('POST request died - auth failed')
             return 'False'
         ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
         ip = htpc.settings.get('ombi_host')
@@ -178,7 +168,36 @@ class Ombi(object):
         u = 'http%s://%s:%s/%s' % (ssl, ip, port, url)
         h = dict()
         h.update({ 'Authorization': self._token})
+        h.update({ 'Accept': 'application/json' })
+        h.update({ 'Content-Type': 'application/json' })
         r = requests.post( u, headers=h, json=data )
+        if r.status_code == 200:
+            logger.debug('Ombi POST successful:\n%s' % r.json())
+            return r
+        logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
+        return 'False'
+
+    def _ombi_post_plaintext(self, url, data=''):
+        """
+        Workaround function to make API POST using home-built "json".
+        Builds the url, authenticates and grabs token if there isn't one.
+        : url: api endpoint
+        : data: post data in text format with all json formatting in place.
+        : return: the response data in json format or 'False'
+        """
+        logger.debug('Doing POST request to %s:\n%s' % (url, data) )
+        if self.auth() == 'False':
+            logger.error('POST request died - auth failed')
+            return 'False'
+        ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
+        ip = htpc.settings.get('ombi_host')
+        port = htpc.settings.get('ombi_port')
+        u = 'http%s://%s:%s/%s' % (ssl, ip, port, url)
+        h = dict()
+        h.update({ 'Authorization': self._token })
+        h.update({ 'Accept': 'application/json' }) # Need to force both Accept & Content-Type
+        h.update({ 'Content-Type': 'application/json' }) # for this hack to work.
+        r = requests.post( u, headers=h, data=data )
         if r.status_code == 200:
             logger.debug('Ombi POST successful:\n%s' % r.json())
             return r
@@ -195,7 +214,7 @@ class Ombi(object):
         """
         logger.debug('Doing PUT request to %s:\n%s' % (url, data) )
         if self.auth() == 'False':
-            logger.debug('PUT request died - auth failed')
+            logger.error('PUT request died - auth failed')
             return 'False'
         ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
         ip = htpc.settings.get('ombi_host')
@@ -308,7 +327,7 @@ class Ombi(object):
     @require()
     def tv_request_details(self,id):
         u = 'api/v1/Request/tv/%s' % id
-        logger.debug('Fetching request details via %s' % u)
+        # logger.debug('Fetching request details via %s' % u)
         d = self._ombi_get(u)
         if d != 'False':
             return d
@@ -324,12 +343,12 @@ class Ombi(object):
             u = 'api/v1/Request/tv/%s' % id
         else:
             u = 'api/v1/Search/tv/info/%s' % id
-        logger.debug('Fetching %s details via %s' % (l,u))
+        # logger.debug('Fetching %s details via %s' % (l,u))
         d = self._ombi_get(u)
         if d != 'False':
             return d
         else:
-            logger.error('Unable to get tvshow details')
+            logger.error('Unable to get tvshow details for %s' % id)
             return 'False'
 
     @cherrypy.tools.json_out()
@@ -360,16 +379,14 @@ class Ombi(object):
     @cherrypy.expose()
     @require()
     def get_extrainfo(self, t, q, k=''):
-        # logger.debug('Fetching extra %s info for %s %s' % (t,q,k))
         u = 'api/v1/Search/'+t+'/info/'+q
         d = self._ombi_get(u)
         if d != 'False':
             if k == '':
                 return d
             else:
-                # logger.debug('%s %s' % (k,d[k]))
                 return d[k]
-        logger.debug('Bad question')
+        logger.debug('Bad question: %s %s' % (q,k))
         return '' # return empty string on error, in case real return value is 'False' :)
 
     @cherrypy.expose()
@@ -384,6 +401,55 @@ class Ombi(object):
         if r != 'False':
             return r.json()
         logger.debug('Bad request')
+        return 'False'
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def request_tv(self, id, slist, spec, sel):
+        logger.debug('Requesting tvshow id %s %s' % (id,spec) )
+        d = '{ "tvDbId": %s' % int(id)
+        if spec == 'requestAll':
+            d += ', "requestAll": true'
+        else:
+            d += ', "requestAll": false'
+        if spec == 'firstSeason':
+            d += ', "firstSeason": true'
+        else:
+            d += ', "firstSeason": false'
+        if spec == 'latestSeason':
+            d += ', "latestSeason": true'
+        else:
+            d += ', "latestSeason": false'
+        
+        sl = slist.split(",")
+        if sel == 0: # no checkbox spec sent with request
+            se = ''
+        else:
+            se = sel.split(",")
+        d += ', "seasons": ['
+        sLoop = False
+        for s in sl:
+            if sLoop: d+= ', '
+            d += '{ "seasonNumber": %s, ' % str(s)
+            d += '"episodes": ['
+            eLoop = False
+            for e in se:
+                k = e.split("-")
+                if k[0] == s:
+                    if eLoop: d+= ', '
+                    d += '{ "episodeNumber": %s }' % str(k[1])
+                    eLoop = True
+            d += '] }'
+            sLoop = True
+        d += '] }'
+        
+        u = 'api/v1/Request/tv'
+        # r = self._ombi_post(u, d)
+        r = self._ombi_post_plaintext(u, d) # The synthesised "json" needs to be posted as plaintext
+        if r != 'False':
+            return r.json()
+        logger.debug('Request was rejected by API web engine')
         return 'False'
 
     @cherrypy.expose()
