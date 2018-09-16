@@ -341,8 +341,11 @@ class Ombi(object):
     def get_tvdetails(self,id,l='request'):
         if l == 'request':
             u = 'api/v1/Request/tv/%s' % id
-        else:
+        elif l == 'search':
             u = 'api/v1/Search/tv/info/%s' % id
+        else:
+            logger.error('Bad request: id=%s l=%s' % (id,l))
+            return 'False'
         # logger.debug('Fetching %s details via %s' % (l,u))
         d = self._ombi_get(u)
         if d != 'False':
