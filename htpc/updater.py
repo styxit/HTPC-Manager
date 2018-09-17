@@ -31,7 +31,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 from htpc.root import do_restart
 
 # configure git repo
-gitUser = 'jeremysherriff'
+gitUser = 'Hellowlol'
 gitRepo = 'HTPC-Manager'
 
 
@@ -228,7 +228,8 @@ class GitUpdater(object):
         #self.update_remote_origin() # Disable this since it a fork for now.
 
     def update_remote_origin(self):
-        self.git_exec(self.git, 'config remote.origin.url https://github.com/' + gitUser + '/' + gitRepo + '.git')
+        self.git_exec(self.git, 'config remote.origin.url https://github.com/Hellowlol/HTPC-Manager.git')
+
     def current_branch_name(self):
         output = self.git_exec(self.git, 'rev-parse --abbrev-ref HEAD')
         if output:
@@ -278,7 +279,7 @@ class GitUpdater(object):
             # If its false, default to master branch
             d["branch"] = htpc.settings.get('branch', 'master2')
 
-        branches = self.git_exec(self.git, 'ls-remote --heads https://github.com/' + gitUser + '/' + gitRepo + '.git')
+        branches = self.git_exec(self.git, 'ls-remote --heads https://github.com/Hellowlol/HTPC-Manager.git')
         if branches:
             # find all branches except the current branch.
             d["branches"] = [b for b in re.findall('\S+\Wrefs/heads/(.*)', branches) if b != cbn]
