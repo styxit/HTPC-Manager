@@ -486,7 +486,6 @@ function loadTVSearch(hint='popular', lookup='suggest') {
         );
       $.each(result, function (showix, show) {
         var showId = show.id;
-        // var sList$showId = '?';
         var reqStatusAvail = get_extrainfo_key('tv',showId,'fullyAvailable');
         var summaryicon = makeIcon('fa fa-info-circle fa-fw', show.overview);
         if (show.firstAired == null || show.firstAired == "") {
@@ -496,7 +495,9 @@ function loadTVSearch(hint='popular', lookup='suggest') {
         }
 
         var req_show$showId = $('<div class="ombi-tvshow-request">')
-          .attr('id','req_show$'+showId);
+          .attr('id','req_show'+showId);
+
+        tv_req_form(req_show$showId, show);
           
         var row = $('<tr>');
         row.append($('<td>').append(summaryicon).append('&nbsp;')
@@ -522,8 +523,7 @@ function loadTVSearch(hint='popular', lookup='suggest') {
               .append($('<li>').addClass('fa fa-plus fa-fw fa-slightlybigger"'))
               .append(' Request').attr('title','Request '+show.title)
               .click( function(){
-                tv_req_form(req_show$showId, show);
-                open_tvreq_panel(req_show$showId,showId)
+                open_tvreq_panel(req_show$showId,show);
               } )
             );
           }
@@ -552,7 +552,9 @@ function tv_req_form(showDiv, showInfo) {
   if (showInfo.firstAired == null || showInfo.firstAired == "") { var name = showInfo.title; }
     else { var name = showInfo.title+' ('+showInfo.firstAired.substr(0,4)+')'; }
 
-  showDiv.append('<h2>'+name+'</h>');
+  showDiv.append( $('<a>').append($('<h2>').append(name))
+    .click(function(){call_refresh_tv_req_form(showInfo.id);}) );
+  
   showDiv.append( $('<table width="100%">').append( $('<tr>').append( $('<td>')
     .append( $('<div class="btn-toolbar">').css('float','right')
     .append( $('<div class="btn-group">')
@@ -564,7 +566,7 @@ function tv_req_form(showDiv, showInfo) {
         .click(function(){ombi_tvrequest(showId,sList,'latestSeason');}))
     ).append( $('<button class="btn">').css('margin-bottom','4px').css('margin-left','8px')
       .append('Request Selected')
-        .click(function(){alert(sList);ombi_tvrequest(showId,sList,get_checks('cBox'+showId));}))
+        .click(function(){ombi_tvrequest(showId,sList,get_checks('cBox'+showId));}))
     )
   )));
 
@@ -589,6 +591,8 @@ function tv_req_form(showDiv, showInfo) {
         .css('margin','2px 0 0 0').click(function(){toggle_checks('cBox'+seasonId);})))
       );
       $.each(season.episodes, function (episodeix, episode) {
+        var epNum = 'E'+(('0'+episode.episodeNumber).slice(-2));
+        var epId = seasonId+'_'+epNum;
         var episodeStatus = 'Not Requested';
         if (episode.requested) { episodeStatus = 'Pending Approval'; }
         if (episode.approved) { episodeStatus = 'Processing Request'; }
@@ -596,11 +600,11 @@ function tv_req_form(showDiv, showInfo) {
         if (episodeStatus != 'Not Requested') { var chkClass = 'disabled'; }
           else { var chkClass = 'cBox'+showId+' cBox'+seasonId; }
         seasonTable.append( $('<tr>')
-          .append( $('<td>').append('E'+(('0'+episode.episodeNumber).slice(-2))))
+          .append( $('<td>').append())
           .append( $('<td>').append(episode.title))
           .append( $('<td>').append(episode.airDate.substr(0,10)))
-          .append( $('<td>').append(episodeStatus))
-          .append( $('<td>').append( $('<input type="checkbox" class="'+chkClass+'" value="'+season.seasonNumber+'-'+episode.episodeNumber+'">')
+          .append( $('<td id="eStatus_'+epId+'">').append(episodeStatus))
+          .append( $('<td>').append( $('<input type="checkbox" class="'+chkClass+'" id="eChk_'+epId+'" value="'+season.seasonNumber+'-'+episode.episodeNumber+'">')
             .prop("disabled", function(){ return (episodeStatus != 'Not Requested');} )))
         );
       }); // each episode
@@ -633,6 +637,35 @@ function tv_req_form(showDiv, showInfo) {
   showDiv.append(seasonContent);
   
   return dfrd.promise();
+}
+
+function call_refresh_tv_req_form(id) {
+  $('.spinner').show();
+  var refreshDfrd$id = get_tv_details('search',id);
+  refreshDfrd$id
+    .done(function(detail) {refresh_tv_req_form(detail); });
+}
+
+function refresh_tv_req_form(detail) {
+  $.each(detail.seasonRequests, function (seasonix, season) {
+    var seasonNum = 'S'+(('0'+season.seasonNumber).slice(-2));
+    var seasonId = detail.id+'_'+seasonNum;
+    $.each(season.episodes, function (episodeix, episode) {
+      var epNum = 'E'+(('0'+episode.episodeNumber).slice(-2));
+      var epId = seasonId+'_'+epNum;
+      var episodeStatus = 'Not Requested';
+      if (episode.requested) { episodeStatus = 'Pending Approval'; }
+      if (episode.approved) { episodeStatus = 'Processing Request'; }
+      if (episode.available) { episodeStatus = 'Available'; }
+      if (episodeStatus != 'Not Requested') { var chkClass = 'disabled'; }
+        else { var chkClass = 'cBox'+detail.id+' cBox'+seasonId; }
+      $('#eStatus_'+epId).html(episodeStatus);
+      $('#eChk_'+epId).prop("disabled", function(){return (episodeStatus != 'Not Requested');})
+        .removeClass().addClass(chkClass);
+      if ( $('#eChk_'+epId).prop("disabled") ) { $('#eChk_'+epId).prop("checked", false); }
+    }); // each episode
+  }); // each season
+  $('.spinner').hide();
 }
 
 function get_extrainfo_key(ctype,cid,key) {
@@ -729,12 +762,14 @@ function toggle_req_div(div_id) {
   }
 }
 
-function open_tvreq_panel(id,thisShow) {
+function open_tvreq_panel(id,showInfo) {
+  var thisShow = showInfo.id;
   $('#req_overlay').show();
   id.show();
   if (id.hasClass('ombi-tvshow-request')) {
     $('.seasonTab'+thisShow)
-      .css('max-height',($('#req_overlay').height() - 20 - $('#seasonTabContent'+thisShow).position().top)+'px');
+      .css('max-height',
+        ($('#req_overlay').height() - $('#seasonTabContent'+thisShow).position().top)+'px');
   }
   $('.seasonTabLi'+thisShow).removeClass("active");
   $('.seasonTabLi'+thisShow).first().addClass("active");
@@ -883,8 +918,10 @@ function ombi_tvrequest(id, slist, spec='false') {
     notify('Ombi','Did you forget to check some boxes? Nothing to do..','error');
     return false;
   }
+  $('.spinner').show();
   do_ombi_tvrequest(id, slist, spec)
     .done(function(res) {
+      call_refresh_tv_req_form(id);
       notify('Request success ', res, 'success');
       return true;
     })
