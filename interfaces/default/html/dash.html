@@ -1,8 +1,11 @@
 <%inherit file="base.html"/>
 <% settings = self.attr.settings %>
 <script>
-  var dash_refresh_interval = 0; // type-cast to a number in case of bad values in the database.
-  dash_refresh_interval = ${settings.get('dash_refresh_interval', 0)};
+  if ( '${settings.get('dash_refresh_interval', 0)}' == 'False' ) {
+		var dash_refresh_interval = 0; // type-cast to a number in case of bad values in the database.
+	} else {
+		var dash_refresh_interval = ${settings.get('dash_refresh_interval', 0)};
+	}
 </script>
 <div class="container-fluid dashboard" id="dashboard">
     <div class="content" id="dash-content">
@@ -201,6 +204,48 @@
                 </table>
             </div>
             %endif
+            %if settings.get('dash_ombi_movies', 0):
+            <div class="span4 dash-module" id="dash_ombi_movies">
+                <h3><a href="ombi/#mrequests_tab">Ombi Movie Requests</a></h3>
+                <table class="table table-striped table-main">
+                    <thead>
+                        <tr>
+                            <th>title</th>
+                            <th>Requester</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ombi_movies_table_body"></tbody>
+                </table>
+            </div>
+            %endif
+            %if settings.get('dash_ombi_music', 0):
+            <div class="span4 dash-module" id="dash_ombi_music">
+                <h3><a href="ombi/#musicrequests_tab">Ombi Music Requests</a></h3>
+                <table class="table table-striped table-main">
+                    <thead>
+                        <tr>
+                            <th>title</th>
+                            <!-- <th>Requester</th> -->
+                        </tr>
+                    </thead>
+                    <tbody id="ombi_music_table_body"></tbody>
+                </table>
+            </div>
+            %endif
+            %if settings.get('dash_ombi_tv', 0):
+            <div class="span4 dash-module" id="dash_ombi_tv">
+                <h3><a href="ombi/#tvrequests_tab">Ombi TV Requests</a></h3>
+                <table class="table table-striped table-main">
+                    <thead>
+                        <tr>
+                            <th>title</th>
+                            <!-- <th>Requester</th> -->
+                        </tr>
+                    </thead>
+                    <tbody id="ombi_tv_table_body"></tbody>
+                </table>
+            </div>
+            %endif
             %if settings.get('dash_sickrage', 0):
             <div class="span4 dash-module" id="dash_sickrage">
                 <h3><a href="sickrage/#nextaired">Next Aired</a></h3>
@@ -334,7 +379,7 @@
     if (${int(settings.get('dash_rec_music_old', 0))}){
         modules['dash_rec_music_old'] = "loadRecentAlbumsOld";
     }
-	if (${int(settings.get('dash_rec_music', 0))}){
+    if (${int(settings.get('dash_rec_music', 0))}){
         modules['dash_rec_music'] = "loadRecentAlbums";
     }
     if (${int(settings.get('dash_rec_tv', 0))}){
@@ -387,6 +432,15 @@
     }
     if (${int(settings.get('dash_upcoming_albums_list', 0))}){
         modules['dash_upcoming_albums_list'] = "loadUpcomingAlbumsList";
+    }
+    if (${int(settings.get('dash_ombi_movies', 0))}){
+        modules['dash_ombi_movies'] = "loadOmbiMovieRequests";
+    }
+    if (${int(settings.get('dash_ombi_music', 0))}){
+        modules['dash_ombi_music'] = "loadOmbiMusicRequests";
+    }
+    if (${int(settings.get('dash_ombi_tv', 0))}){
+        modules['dash_ombi_tv'] = "loadOmbiTVRequests";
     }
     if (${int(settings.get('dash_disks', 0))}){
         modules['dash_disks'] = "loaddiskinfo";

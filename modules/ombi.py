@@ -312,6 +312,29 @@ class Ombi(object):
     @cherrypy.tools.json_out()
     @cherrypy.expose()
     @require()
+    def dashboard(self,t):
+        logger.debug('Fetching %s requests for dashboard' % t)
+        if t == 'movies':
+            u = 'api/v1/Request/movie/5/0/2/5/2'
+                # Decode:
+                    # Items = 5
+                    # Start = 0
+                    # Sort = 2: Request date, descending
+                    # Type = 5: Pending approval
+                    # Availability = 2: Not available
+        elif t == 'tvlite': # filter and sort doesn't seem to work for tv
+            u = 'api/v1/Request/tvlite/5/0/2/5/2'
+        elif t == 'music':
+            u = 'api/v1/Request/music/5/0/2/5/2'
+        else:
+            return '{ status: 500}'
+        d = self._ombi_get(u)
+        if d != 'False':
+            return d
+
+    @cherrypy.tools.json_out()
+    @cherrypy.expose()
+    @require()
     def tv_requests(self):
         u = 'api/v1/Request/tvlite'
         logger.debug('Fetching all tv requests via %s' % u)
