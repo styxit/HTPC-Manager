@@ -552,8 +552,9 @@ function tv_req_form(showDiv, showInfo) {
   if (showInfo.firstAired == null || showInfo.firstAired == "") { var name = showInfo.title; }
     else { var name = showInfo.title+' ('+showInfo.firstAired.substr(0,4)+')'; }
 
-  showDiv.append( $('<a>').append($('<h2>').append(name))
-    .click(function(){call_refresh_tv_req_form(showInfo.id);}) );
+  showDiv.append( $('<h2>').append( $('<a>').append(name)
+    .attr('href', 'https://www.imdb.com/title/'+showInfo.imdbId).attr('target','_blank')
+  ));
   
   showDiv.append( $('<table width="100%">').append( $('<tr>').append( $('<td>')
     .append( $('<div class="btn-toolbar">').css('float','right')
@@ -582,14 +583,6 @@ function tv_req_form(showDiv, showInfo) {
         else { sList = season.seasonNumber; }
       
       var seasonTable = $('<tbody>');
-          // Todo: Fix table headers for request div.
-          // Incorporate master check toggle.
-      seasonTable.append( $('<tr width="100%">').append( $('<td colspan=4>')
-        .addClass('pseudoheader pseudoheader-toggle').append('Toggle season:') )
-        .append( $('<td>').addClass('pseudoheader')
-        .append( $('<input type="checkbox" id="m_cBox'+seasonId+'" class="m_cBox'+showId+'" value="masterCheck'+seasonId+'">')
-        .css('margin','2px 0 0 0').click(function(){toggle_checks('cBox'+seasonId);})))
-      );
       $.each(season.episodes, function (episodeix, episode) {
         var epNum = 'E'+(('0'+episode.episodeNumber).slice(-2));
         var epId = seasonId+'_'+epNum;
@@ -600,7 +593,7 @@ function tv_req_form(showDiv, showInfo) {
         if (episodeStatus != 'Not Requested') { var chkClass = 'disabled'; }
           else { var chkClass = 'cBox'+showId+' cBox'+seasonId; }
         seasonTable.append( $('<tr>')
-          .append( $('<td>').append())
+          .append( $('<td>').append(epNum))
           .append( $('<td>').append(episode.title))
           .append( $('<td>').append(episode.airDate.substr(0,10)))
           .append( $('<td id="eStatus_'+epId+'">').append(episodeStatus))
@@ -617,14 +610,14 @@ function tv_req_form(showDiv, showInfo) {
       );
       seasonContent.append( $('<div id="'+seasonId+'" class="tab-pane seasonTabs seasonTab'+showId+'">')
         .append( $('<table class="table table-striped" style="margin-bottom: 0px;">')
-          // Todo: Fix table headers for request div.
-          // Incorporate master check toggle.
-          // .append( $('<thead>')
-            // .append( $('<tr>').append('#') )
-            // .append( $('<tr>').append('Title') )
-            // .append( $('<tr>').append('Aired') )
-            // .append( $('<tr>').append('Status') )
-            // .append( $('<tr>').append('&nbsp;') ) )
+          .append( $('<thead>')
+            .append( $('<th>').append('#') )
+            .append( $('<th>').append('Title') )
+            .append( $('<th>').append('Aired') )
+            .append( $('<th>').append('Status') )
+            .append( $('<th>').append( $('<input type="checkbox" id="m_cBox'+seasonId+'" class="m_cBox'+showId+'" value="masterCheck'+seasonId+'">')
+        .css('margin','2px 0 0 0').click(function(){toggle_checks('cBox'+seasonId);}))
+        ) )
         .append(seasonTable)
         )
       );
