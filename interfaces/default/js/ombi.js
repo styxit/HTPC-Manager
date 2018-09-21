@@ -636,66 +636,95 @@ function tv_req_form(showDiv, reqInfo) {
     .attr('href', 'https://www.imdb.com/title/'+reqInfo.imdbId).attr('target','_blank')
   ));
   
-  //Todo: ChildRequest header & UL/Tabs with SeasonRequests inside.
-  var seasonTabs = $('<ul class="nav nav-tabs">').css('margin-bottom','5px');
-  var seasonContent = $('<div class="tab-content seasonTabContent" id="seasonReqTabContent'+showId+'">');
-  // alert('Created #seasonReqTabContent'+showId);
-
   var detailDfrd$showId = get_tv_details('request',reqInfo.id);
   detailDfrd$showId.done(function(detail) {
+    
+  var childReqTabs = $('<ul class="nav nav-tabs childReqTabUl">').css('margin-bottom','5px');
+  var childReqContent = $('<div class="tab-content childReqTabContent" id="childReqTabContent'+showId+'">');
+  // alert('Created #seasonReqTabContent'+showId);
+
     $.each(detail.childRequests, function (childix, childReq) {
-    $.each(childReq.seasonRequests, function (seasonix, season) {
-      var seasonNum = 'S'+(('0'+season.seasonNumber).slice(-2));
-      var seasonId = showId+'_'+seasonNum;
-      // alert('seasonId '+seasonId);
-      // if (Boolean(sList)) { sList += ','+season.seasonNumber; }
-        // else { sList = season.seasonNumber; }
-      
-      var seasonTable = $('<tbody>');
-      $.each(season.episodes, function (episodeix, episode) {
-        var epNum = 'E'+(('0'+episode.episodeNumber).slice(-2));
-        var epId = seasonId+'_'+epNum;
-        var episodeStatus = 'Not Requested';
-        if (episode.requested) { episodeStatus = 'Pending Approval'; }
-        if (episode.approved) { episodeStatus = 'Processing Request'; }
-        if (episode.available) { episodeStatus = 'Available'; }
-        if (episodeStatus != 'Not Requested') { var chkClass = 'disabled'; }
-          else { var chkClass = 'cBox'+showId+' cBox'+seasonId; }
-        seasonTable.append( $('<tr>')
-          .append( $('<td>').append(epNum))
-          .append( $('<td>').append(episode.title))
-          .append( $('<td>').append(episode.airDate.substr(0,10)))
-          .append( $('<td id="eStatus_'+epId+'">').append(episodeStatus))
-          .append( $('<td>').append( $('<input type="checkbox" class="'+chkClass+'" id="eChk_'+epId+'" value="'+season.seasonNumber+'-'+episode.episodeNumber+'">')
-            .prop("disabled", function(){ return (episodeStatus != 'Not Requested');} )))
-        );
-      }); // each episode
+      var childReqId = 'C'+childReq.id;
 
-      seasonTabs.append( $('<li class="seasonTabLi'+showId+'">').append( $('<a data-toggle="tab">')
-        .append(seasonNum)
-        .click(function(){$('.seasonTab'+showId)
-          .removeClass('active');$('#'+seasonId).addClass('active');})
-        )
-      );
-      seasonContent.append( $('<div id="'+seasonId+'" class="tab-pane seasonTabs seasonTab'+showId+'">')
-        .append( $('<table class="table table-striped" style="margin-bottom: 0px;">')
-          .append( $('<thead>')
-            .append( $('<th>').append('#') )
-            .append( $('<th>').append('Title') )
-            .append( $('<th>').append('Aired') )
-            .append( $('<th>').append('Status') )
+      var seasonReqTabs = $('<ul class="nav nav-tabs seasonReqTabUl">').css('margin-bottom','5px');
+      var seasonContent = $('<div class="tab-content seasonReqTabContent" id="seasonReqTabContent'+showId+'">');
+  
+      $.each(childReq.seasonRequests, function (seasonix, season) {
+        var seasonNum = 'S'+(('0'+season.seasonNumber).slice(-2));
+        var seasonId = showId+'_'+seasonNum;
+        
+        var seasonReqTable = $('<tbody>');
+        $.each(season.episodes, function (episodeix, episode) {
+          var epNum = 'E'+(('0'+episode.episodeNumber).slice(-2));
+          var epId = seasonId+'_'+epNum;
+          var episodeStatus = 'Pending Approval';
+          if (episode.approved) { episodeStatus = 'Processing Request'; }
+          if (episode.available) { episodeStatus = 'Available'; }
+          seasonReqTable.append( $('<tr>')
+            .append( $('<td>').append(epNum))
+            .append( $('<td>').append(episode.title))
+            .append( $('<td>').append(episode.airDate.substr(0,10)))
+            .append( $('<td id="eStatus_'+epId+'">').append(episodeStatus))
+          );
+        }); // each episode
+
+        seasonReqTabs.append( $('<li class="seasonReqTabLi'+showId+' seasonReqTabLi'+childReqId+'">').append( $('<a data-toggle="tab">')
+          .append(seasonNum)
+          .click(function(){$('.seasonReqTab'+showId)
+            .removeClass('active');$('#'+seasonId).addClass('active');})
           )
-        .append(seasonTable)
+        );
+        seasonContent.append( $('<div id="'+seasonId+'" class="tab-pane seasonTabs seasonReqTab'+showId+' seasonReqTab'+childReqId+'">')
+          .append( $('<table class="table table-striped" style="margin-bottom: 0px;">')
+            .append( $('<thead>')
+              .append( $('<th>').append('#') )
+              .append( $('<th>').append('Title') )
+              .append( $('<th>').append('Aired') )
+              .append( $('<th>').append('Status') )
+            )
+          .append(seasonReqTable)
+          )
+        );
+
+      }); // each seasonreq
+
+      childReqTabs.append( $('<li class="childReqTabLi'+showId+'">')
+        .append( $('<a data-toggle="tab">')
+          .append('Request By: '+childReq.requestedUser.alias)
+          .click(function(){
+            $('.childReqTab'+showId).removeClass('active');
+            $('#'+childReqId).addClass('active');
+            $('.seasonReqTabLi'+childReqId).first().addClass("active");
+            $('.seasonReqTab'+childReqId).first().addClass("active");
+          })
         )
       );
 
-    }); // each seasonreq
+      childReqContent.append( $('<div id="'+childReqId+'" class="tab-pane childReqTabs childReqTab'+showId+'">')
+        .append( $('<div>')
+          .append( $('<div class="btn-group">')
+            .append( $('<button class="btn btn-ombi btn-success">').css('margin-bottom','4px')
+              .append( $('<li class="fa fa-check">') ).append(' Approve')
+              .click(function(){alert('Approve');}))
+            .append( $('<button class="btn btn-ombi btn-ombiblue">').css('margin-bottom','4px')
+              .append( $('<li class="fa fa-check">') ).append(' Mark')
+              .click(function(){alert('Mark');}))
+            .append( $('<button class="btn btn-ombi btn-danger">').css('margin-bottom','4px')
+              .append( $('<li class="fa fa-times">') ).append(' Deny')
+              .click(function(){alert('Deny');}))
+            .append( $('<button class="btn btn-ombi btn-danger">').css('margin-bottom','4px')
+              .append( $('<li class="fa fa-times">') ).append(' Remove')
+              .click(function(){alert('Remove');}))
+          )
+          .append(seasonReqTabs) )
+        .append(seasonContent)
+      );
     }); // each childreq
 
-  }); // detailDfrd$showId.done function(detail)
+    showDiv.append( $('<div>').append(childReqTabs) );
+    showDiv.append(childReqContent);
   
-  showDiv.append( $('<div>').append(seasonTabs) );
-  showDiv.append(seasonContent);
+  }); // detailDfrd$showId.done function(detail)
   
   return dfrd.promise();
 }
@@ -915,34 +944,36 @@ function open_tv_newreq_panel(id,showInfo) {
   var thisShow = showInfo.id;
   $('#tv_newreq_overlay').show();
   id.show();
-  if (id.hasClass('ombi-tvshow-request')) {
-    $('.seasonTab'+thisShow)
-      .css('max-height',
-        ($('#tv_newreq_overlay').height() - $('#seasonTabContent'+thisShow).position().top)+'px');
-  }
   $('.seasonTabLi'+thisShow).removeClass("active");
   $('.seasonTabLi'+thisShow).first().addClass("active");
   $('.seasonTab'+thisShow).removeClass("active");
   $('.seasonTab'+thisShow).first().addClass("active");
   $('.cBox'+thisShow).prop("checked",false);
   $('.m_cBox'+thisShow).prop("checked",false);
+  if (id.hasClass('ombi-tvshow-request')) {
+    $('.seasonTab'+thisShow)
+      .css('max-height',
+        ($('#tv_newreq_overlay').height() - $('#seasonTabContent'+thisShow).position().top)+'px');
+  }
 }
 
 function open_tv_req_panel(id,showInfo) {
   var thisShow = showInfo.tvDbId;
   $('#tv_req_overlay').show();
   id.show();
+  $('.seasonReqTabLi'+thisShow).removeClass("active");
+  $('.seasonReqTabLi'+thisShow).first().addClass("active");
+  $('.seasonReqTab'+thisShow).removeClass("active");
+  $('.seasonReqTab'+thisShow).first().addClass("active");
+  $('.childReqTabLi'+thisShow).removeClass("active");
+  $('.childReqTabLi'+thisShow).first().addClass("active");
+  $('.childReqTab'+thisShow).removeClass("active");
+  $('.childReqTab'+thisShow).first().addClass("active");
   if (id.hasClass('ombi-tvshow-request')) {
-    $('.seasonTab'+thisShow)
+    $('.seasonReqTab'+thisShow)
       .css('max-height',
         ($('#tv_req_overlay').height() - $('#seasonReqTabContent'+thisShow).position().top)+'px');
   }
-  $('.seasonTabLi'+thisShow).removeClass("active");
-  $('.seasonTabLi'+thisShow).first().addClass("active");
-  $('.seasonTab'+thisShow).removeClass("active");
-  $('.seasonTab'+thisShow).first().addClass("active");
-  // $('.cBox'+thisShow).prop("checked",false);
-  // $('.m_cBox'+thisShow).prop("checked",false);
 }
 
 function close_menu() {
