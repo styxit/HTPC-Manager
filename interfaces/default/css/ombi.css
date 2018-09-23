@@ -32,6 +32,10 @@
 	margin-left: 0px;
 }
 
+.accordion {
+	overflow:	auto;
+}
+
 .ombi-tvrequest-detail {
 	position: absolute;
 	border-radius: 5px !important;
@@ -71,10 +75,8 @@
 	text-align:	right !important;
 }
 
-/* .seasonTabContent { */
 .seasonTabs {
 	overflow-y: auto !important;
-	/* max-height: 450px; */
 }
 
 .ombi-tvshow-request {
@@ -126,9 +128,7 @@ td.ombi-btn-td {
 
 .btn-ombi.disabled {
 	 color: darkgrey !important;
-	 /* opacity: 0.4; */
 	 cursor: not-allowed;
-	 border: solid 2px
 }
 
 .fa-slightlybigger {
@@ -140,97 +140,7 @@ td.ombi-btn-td {
 	border-radius:	3px !important;
 }
 
-/* .ombi-tip:hover {
-	background-color: salmon!important;
-	display: inline-block;
-	position: relative;
-	width: 50%;
-	display: none;
-}
- */
- 
- /* Boootstrap 3 Panels. Because reasons. */
- /* ref: https://stackoverflow.com/questions/19220027/can-you-use-panels-in-bootstrap-2-3 */
-.panel {
-  padding: 15px;
-  margin-bottom: 20px;
-  background-color: #ffffff;
-  border: 1px solid #dddddd;
-  border-radius: 4px;
-  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
-}
-
-.panel-heading {
-  padding: 10px 15px;
-  /* margin: -15px -15px 15px; */
-  font-size: 17.5px;
-  font-weight: 500;      
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #dddddd;
-  border-top-right-radius: 3px;
-  border-top-left-radius: 3px;
-}
-
-.panel-footer {
-  padding: 10px 15px;
-  margin: 15px -15px -15px;
-  background-color: #f5f5f5;
-  border-top: 1px solid #dddddd;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
-}
-
-.panel-primary {
-  border-color: #428bca;
-}
-
-.panel-primary .panel-heading {
-  color: #ffffff;
-  background-color: #428bca;
-  border-color: #428bca;
-}
-
-.panel-success {
-  border-color: #d6e9c6;
-}
-
-.panel-success .panel-heading {
-  color: #468847;
-  background-color: #dff0d8;
-  border-color: #d6e9c6;
-}
-
-.panel-warning {
-  border-color: #fbeed5;
-}
-
-.panel-warning .panel-heading {
-  color: #c09853;
-  background-color: #fcf8e3;
-  border-color: #fbeed5;
-}
-
-.panel-danger {
-  border-color: #eed3d7;
-}
-
-.panel-danger .panel-heading {
-  color: #b94a48;
-  background-color: #f2dede;
-  border-color: #eed3d7;
-}
-
-.panel-info {
-  border-color: #bce8f1;
-}
-
-.panel-info .panel-heading {
-  color: #3a87ad;
-  background-color: #d9edf7;
-  border-color: #bce8f1;
-}
-
-.panel>.table, .panel>.table-responsive>.table {
-      margin-bottom: 0;
+.tooltip.in {
+	opacity: 0.95;
+	font-size: 90%;
 }
