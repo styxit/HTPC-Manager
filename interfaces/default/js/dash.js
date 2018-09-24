@@ -534,7 +534,7 @@ function loadRadarrCalendar(options) {
 function loadsonarrCalendar(options) {
   if (!$('#calendar_table_body').length) return
   $.getJSON(WEBDIR + 'sonarr/oldCalendar', function(result) {
-    i = 0;
+    j = 0;
     $.each(result, function(i, cal) {
       if (i >= 5) return
       var name = $('<a>').attr('href', 'sonarr/View/' + cal.seriesId + '/' + cal.series.tvdbId + '#' + cal.seasonNumber).html(cal.series.title)
@@ -546,10 +546,10 @@ function loadsonarrCalendar(options) {
         $('<td>').html('S' + pad(cal.seasonNumber, 2) + 'E' + pad(cal.episodeNumber, 2) + '&nbsp').append(img),
         $('<td>').append($('<div class="pull-right">').text(moment(cal.airDateUtc).fromNow()))
       )
-
       $('#calendar_table_body').append(row);
+      j++;
     });
-    if (i === 0) {
+    if (j === 0) {
       row = $('<tr>');
       row.append($('<td>').attr("colspan", 2).append('<div class="text-center"><small>No future episodes in Sonarr calendar</small></div>'))
       $('#calendar_table_body').append(row);
