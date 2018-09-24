@@ -84,48 +84,55 @@ class Ombi(object):
             logger.debug('ping ok, now trying credentials')
             url = 'api/v1/Settings/about'
             res = self._ombi_get(url)
-            if res != 'False':
+            if res != False:
                 logger.debug('Successful Ombi test')
-                return 'True'
+                return True
             logger.error('Ombi test failed: %s' % res)
-        return
+        return False
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
     @require(member_of(htpc.role_admin))
     def content_sync(self, source, mode, **kwargs):
+        url = ''
         if source == 'plex':
-            if self.get_plex_enabled() == 'True':
+            if self.get_plex_enabled() != False:
                 if mode == 'full':
                     url = 'api/v1/Job/plexcontentcacher'
                 else:
                     url = 'api/v1/Job/plexrecentlyadded'
         if source == 'emby':
-            if self.get_emby_enabled() == 'True':
+            if self.get_emby_enabled() != False:
                 url = 'api/v1/Job/embycontentcacher'
-        d = self._ombi_post(url)
-        if d != 'False':
+        if url == '':
+            logger.debug('Sync called but no idea what to do')
+            return False
+        d = str(self._ombi_post(url))
+        if d != False:
             logger.debug('%s %s sync triggered' % (source, mode))
-            return 'True'
+            return True
         logger.debug('%s %s sync failed' % (source, mode))
-        return 'False'
+        return False
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
     @require()
     def get_emby_enabled(self):
         d = self._ombi_get('api/v1/Settings/emby')
-        if d != 'False':
+        if d != False:
             return str(d['enable'])
         logger.debug('Couldnt get Ombi settings for Emby')
-        return 'False'
+        return False
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
     @require()
     def get_plex_enabled(self):
         d = self._ombi_get('api/v1/Settings/plex')
-        if d != 'False':
+        if d != False:
             return str(d['enable'])
         logger.debug('Couldnt get Ombi settings for Plex')
-        return 'False'
+        return False
 
     def _ombi_get(self, url):
         """
@@ -148,7 +155,7 @@ class Ombi(object):
             d = r.json()
             return d
         logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
-        return 'False'
+        return False
 
     def _ombi_post(self, url, data=''):
         """
@@ -159,9 +166,9 @@ class Ombi(object):
         :return: the response data in json format or 'False'
         """
         logger.debug('Doing POST request to %s:\n%s' % (url, data) )
-        if self.auth() == 'False':
+        if self.auth() == False:
             logger.error('POST request died - auth failed')
-            return 'False'
+            return False
         ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
         ip = htpc.settings.get('ombi_host')
         port = htpc.settings.get('ombi_port')
@@ -175,7 +182,7 @@ class Ombi(object):
             logger.debug('Ombi POST successful:\n%s' % r.json())
             return r
         logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
-        return 'False'
+        return False
 
     def _ombi_post_plaintext(self, url, data=''):
         """
@@ -186,9 +193,9 @@ class Ombi(object):
         : return: the response data in json format or 'False'
         """
         logger.debug('Doing POST request to %s:\n%s' % (url, data) )
-        if self.auth() == 'False':
+        if self.auth() == False:
             logger.error('POST request died - auth failed')
-            return 'False'
+            return False
         ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
         ip = htpc.settings.get('ombi_host')
         port = htpc.settings.get('ombi_port')
@@ -202,7 +209,7 @@ class Ombi(object):
             logger.debug('Ombi POST successful:\n%s' % r.json())
             return r
         logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
-        return 'False'
+        return False
 
     def _ombi_put(self, url, data=''):
         """
@@ -213,9 +220,9 @@ class Ombi(object):
         :return: the response data in json format or 'False'
         """
         logger.debug('Doing PUT request to %s:\n%s' % (url, data) )
-        if self.auth() == 'False':
+        if self.auth() == False:
             logger.error('PUT request died - auth failed')
-            return 'False'
+            return False
         ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
         ip = htpc.settings.get('ombi_host')
         port = htpc.settings.get('ombi_port')
@@ -227,7 +234,7 @@ class Ombi(object):
             logger.debug('Ombi PUT successful:\n%s' % r.json())
             return r
         logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
-        return 'False'
+        return False
 
     def _ombi_delete(self, url):
         """
@@ -237,9 +244,9 @@ class Ombi(object):
         :return: the json response content or 'False'
         """
         logger.debug('Doing DELETE request to %s' % url )
-        if self.auth() == 'False':
+        if self.auth() == False:
             logger.error('DELETE request died - auth failed')
-            return 'False'
+            return False
         ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
         ip = htpc.settings.get('ombi_host')
         port = htpc.settings.get('ombi_port')
@@ -250,12 +257,12 @@ class Ombi(object):
         if r.status_code == 200:
             return r
         logger.error('Request failed %s %s %s' % (u, str(r.status_code), r.reason))
-        return 'False'
+        return False
 
     def auth(self, authtry = 0):
         if authtry >= 2:
             logger.error('Auth attempts exceeded')
-            return 'False'
+            return False
         ssl = 's' if htpc.settings.get('ombi_ssl', False) else ''
         ip = htpc.settings.get('ombi_host')
         port = htpc.settings.get('ombi_port')
@@ -273,11 +280,11 @@ class Ombi(object):
                 d = r.json()
                 self._token = 'Bearer ' + str(d['access_token'])
                 logger.info('Ombi auth successful')
-                return 'True'
+                return True
             else:
                 self._token = ''
                 logger.error('Could not get auth token from Ombi: %s %s' % ( str(r.status_code), str(r.reason) ))
-                return 'False'
+                return False
         else:
             # Test the existing token
             url = 'api/v1/Settings/about'
@@ -292,9 +299,9 @@ class Ombi(object):
                 return self.auth(authtry)
             elif r.status_code == 200:
                 # logger.debug('Existing token is OK')
-                return 'True'
+                return True
         logger.error('Unable to authenticate on try %s: Response %s %s' % (authtry, str(r.status_code), str(r.reason)))
-        return 'False'
+        return False
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
@@ -303,11 +310,11 @@ class Ombi(object):
         u = 'api/v1/Request/movie'
         logger.debug('Fetching all movie requests via %s' % u)
         d = self._ombi_get(u)
-        if d != 'False':
+        if d != False:
             return d
         else:
             logger.error('Unable to get movies requests')
-            return 'False'
+            return False
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
@@ -329,7 +336,7 @@ class Ombi(object):
         else:
             return '{ status: 500}'
         d = self._ombi_get(u)
-        if d != 'False':
+        if d != False:
             return d
 
     @cherrypy.tools.json_out()
@@ -339,11 +346,11 @@ class Ombi(object):
         u = 'api/v1/Request/tvlite'
         logger.debug('Fetching all tv requests via %s' % u)
         d = self._ombi_get(u)
-        if d != 'False':
+        if d != False:
             return d
         else:
             logger.error('Unable to get tv requests')
-            return 'False'
+            return False
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
@@ -352,11 +359,11 @@ class Ombi(object):
         u = 'api/v1/Request/tv/%s' % id
         # logger.debug('Fetching request details via %s' % u)
         d = self._ombi_get(u)
-        if d != 'False':
+        if d != False:
             return d
         else:
             logger.error('Unable to get request details')
-            return 'False'
+            return False
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
@@ -371,11 +378,11 @@ class Ombi(object):
             return 'False'
         # logger.debug('Fetching %s details via %s' % (l,u))
         d = self._ombi_get(u)
-        if d != 'False':
+        if d != False:
             return d
         else:
             logger.error('Unable to get tvshow details for %s' % id)
-            return 'False'
+            return False
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
@@ -396,10 +403,10 @@ class Ombi(object):
                     u = 'api/v1/Search/'+t+'/'+q
         if u != '':
             d = self._ombi_get(u)
-            if d != 'False':
+            if d != False:
                 return d
         logger.debug('Bad %s hint' % l)
-        return 'False'
+        return False
 
     @cherrypy.tools.json_out()
     @cherrypy.expose()
@@ -407,13 +414,13 @@ class Ombi(object):
     def get_extrainfo(self, t, q, k=''):
         u = 'api/v1/Search/'+t+'/info/'+q
         d = self._ombi_get(u)
-        if d != 'False':
+        if d != False:
             if k == '':
                 return d
             else:
                 return d[k]
         logger.debug('Bad question: %s %s' % (q,k))
-        return '' # return empty string on error, in case real return value is 'False' :)
+        return False
 
     @cherrypy.expose()
     @require()
@@ -424,10 +431,10 @@ class Ombi(object):
         d = dict()
         d.update({ 'theMovieDbId':id })
         r = self._ombi_post(u, d)
-        if r != 'False':
+        if r != False:
             return r.json()
         logger.debug('Bad request')
-        return 'False'
+        return False
 
     @cherrypy.expose()
     @require()
@@ -476,7 +483,7 @@ class Ombi(object):
         if r != 'False':
             return r.json()
         logger.debug('Request was rejected by API web engine')
-        return 'False'
+        return False
 
     @cherrypy.expose()
     @require(member_of(htpc.role_user))
@@ -503,10 +510,10 @@ class Ombi(object):
             r = self._ombi_put(u, d)
         else:
             r = self._ombi_post(u, d)
-        if r != 'False':
+        if r != False:
             return r
         logger.error('Bad request to api')
-        return 'False'
+        return False
 
     @cherrypy.expose()
     @require(member_of(htpc.role_user))
@@ -533,8 +540,8 @@ class Ombi(object):
             r = self._ombi_put(u, d)
         else:
             r = self._ombi_post(u, d)
-        if r != 'False':
+        if r != False:
             return r
         logger.error('Bad request to api')
-        return 'False'
+        return False
 

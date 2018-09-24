@@ -260,7 +260,6 @@ function loadMSearch(hint='popular', lookup='suggest') {
       }
       var i = 0;
       $.each(result, function (showname, movie) {
-        // $.getJSON(WEBDIR + 'ombi/get_extrainfo?t=movie&q='+movie.theMovieDbId+'&k=digitalReleaseDate', function(digitalReleaseDate) {
         var row = $('<tr>');
         var summaryicon = makeIcon('fa fa-info-circle fa-fw', movie.overview);
         if (movie.releaseDate == null) {
@@ -307,8 +306,11 @@ function loadMSearch(hint='popular', lookup='suggest') {
   });
 }
 
-function loadTVRequests2(viewReq='') {
+function loadTVRequests2(initial='') {
   $('.spinner').show();
+  if (initial) {
+    alert('Open overlay for request '+initial);
+  }
   var url = WEBDIR + 'ombi/tv_requests';
   $.ajax({
     url: url,
@@ -813,8 +815,7 @@ function get_extrainfo_key(ctype,cid,key) {
     type: 'get',
     dataType: 'text',
     success: function(result) {
-      if (result.length > 0) { dfrd.resolve(result); }
-        else { dfrd.resolve(''); }
+      dfrd.resolve(result);
     }
   });
   return dfrd.promise();
@@ -845,7 +846,7 @@ function loadFunctionMenu() {
   $.ajax({
     url: WEBDIR + 'ombi/get_plex_enabled',
     type: 'get',
-    dataType: 'text',
+    dataType: 'json',
     success: function(result) {
       if (result == 'True') {
         $('#sync_plex_part').click(function () {
@@ -862,7 +863,7 @@ function loadFunctionMenu() {
   $.ajax({
     url: WEBDIR + 'ombi/get_emby_enabled',
     type: 'get',
-    dataType: 'text',
+    dataType: 'json',
     success: function(result) {
       if (result == 'True') {
         $('#sync_emby_full').click(function () {
@@ -1131,9 +1132,9 @@ function syncContent(source, mode) {
   $.ajax({
     url: WEBDIR + 'ombi/content_sync?source=' + source + '&mode=' + mode,
     type: 'post',
-    dataType: 'text',
+    dataType: 'json',
     success: function(result) {
-      if (result != 'True') {
+      if (result != true) {
         notify('Ombi', 'Sync for ' + source + ' returned ' + result, 'error');
       } else {
         notify('Ombi', 'Sync for ' + source + ' initiated', 'success');
