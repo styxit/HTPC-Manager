@@ -19,7 +19,7 @@ $(document).ready(function () {
     case "#msearch_tab":
       loadMSearch('popular', 'suggest');
       break;
-    case "#tvrequests2_tab":
+    case "#tvrequests_tab":
       loadTVRequests2();
       break;
     case "#tvsearch_tab":
@@ -35,7 +35,7 @@ $(document).ready(function () {
   // Tab contents to load when clicked rather than on page load
   $('a[href="#mrequests_tab"]').on('show.bs.tab', function (e) { loadMRequests(); });
   $('a[href="#msearch_tab"]').on('show.bs.tab', function (e) { loadMSearch('popular', 'suggest'); });
-  $('a[href="#tvrequests2_tab"]').on('show.bs.tab', function (e) { loadTVRequests2(); });
+  $('a[href="#tvrequests_tab"]').on('show.bs.tab', function (e) { loadTVRequests2(); });
   $('a[href="#tvsearch_tab"]').on('show.bs.tab', function (e) { loadTVSearch('popular', 'suggest'); });
 
   $( document ).on( 'keydown', function ( e ) {
