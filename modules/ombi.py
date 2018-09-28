@@ -171,9 +171,9 @@ class Ombi(object):
         port = htpc.settings.get('ombi_port')
         u = 'http%s://%s:%s/%s' % (ssl, ip, port, url)
         h = dict()
-        h.update({ 'Authorization': self._token})
-        h.update({ 'Accept': 'application/json' })
-        h.update({ 'Content-Type': 'application/json' })
+        h = {'Authorization': self._token,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'}
         r = requests.post( u, headers=h, json=data )
         if r.status_code == 200:
             logger.debug('Ombi POST successful:\n%s' % r.json())
