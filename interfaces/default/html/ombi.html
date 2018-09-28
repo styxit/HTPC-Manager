@@ -1,0 +1,119 @@
+<%inherit file="base.html"/>
+<% settings = self.attr.settings %>
+  <div class="container-fluid">
+    <div class="content maincontent">
+      <h1 class="page-header page-title">
+        <a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'} title="Open native Ombi interface">${settings.get('ombi_name', 'Ombi')}</a>
+        <div class="btn-group pull-right">
+          <a href="#" class="btn dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i class="fa fa-wrench fa-lg"></i>
+                <i class="fa fa-chevron-down fa-fw"></i></a>
+          <ul class="dropdown-menu pull-right">
+            <!-- Skeleton -->
+			<li class="fmenu_plex"><a class="fmenu_plex" id="sync_plex_part" href="#" title="Plex sync recently added"><i class="fa fa-refresh fa-fw fmenu_plex"></i> Plex sync recently added</a></li>
+			<li class="fmenu_plex"><a class="fmenu_plex" id="sync_plex_full" href="#" title="Plex sync full scan"><i class="fa fa-refresh fa-fw fmenu_plex"></i> Plex sync full scan</a></li>
+			<li class="fmenu_emby"><a class="fmenu_emby" id="sync_emby_full" href="#" title="Emby manual cacher run"><i class="fa fa-refresh fa-fw fmenu_emby"></i> Emby manual cacher run</a></li>
+          </ul>
+        </div>
+      </h1>
+	  
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#mrequests_tab" data-toggle="tab">Movie Requests</a></li>
+        <li><a href="#msearch_tab" data-toggle="tab">Movie Search</a></li>
+        <li><a href="#tvrequests_tab" data-toggle="tab">TV Requests</a></li>
+        <li><a href="#tvsearch_tab" data-toggle="tab">TV Search</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div id="mrequests_tab" class="tab-pane active">
+
+          <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
+            <thead>
+              <tr>
+                <th class="span3" data-ignore-articles="en" data-sorter="ignoreArticles">Movie Title</th>
+                <th class="span1">Release Status</th>
+                <th class="span1">Request Status</th>
+                <th class="span1">Requester</th>
+              </tr>
+            </thead>
+            <tbody id="mrequests_table_body"></tbody>
+          </table>
+        </div>
+
+        <div id="msearch_tab" class="tab-pane">
+					<div class="well form-inline">
+						<div style="display: inline-block; margin-top: 2px; margin-bottom: 2px;" class="span5">
+							<input id="search_movie_name" name="search_movie_name" type="text" style="width: 220px;" />
+							<button class="btn btn-success" type="button" id="search_movie_button"><i class="fa fa-search fa-inverse fa-fw"></i></button>
+						</div>
+						<div style="display: inline-block;">
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_popular_button"><i class="fa fa-search fa-inverse fa-fw"></i> Popular</button>
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_upcoming_button"><i class="fa fa-search fa-inverse fa-fw"></i> Upcoming</button>
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_toprated_button"><i class="fa fa-search fa-inverse fa-fw"></i> Top Rated</button>
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_nowplaying_button"><i class="fa fa-search fa-inverse fa-fw"></i> Now Playing</button>
+						</div>
+					</div>
+          <table class="table table-striped table-sortable" data-sortlist="[[0,0]]">
+            <thead>
+              <tr>
+                <th class="span3" data-ignore-articles="en" data-sorter="ignoreArticles">Movie Title</th>
+                <th class="span1">Theatre Release</th>
+                <th class="span1">Status</th>
+                <th class="span1">&nbsp;</th> <!-- Search for similar -->
+              </tr>
+            </thead>
+            <tbody id="msearch_table_body"></tbody>
+          </table>
+        </div>
+
+        <div id="tvrequests_tab" class="tab-pane">
+					<div id="tvrequests2_tab_table">
+						<table class="table table-striped table-sortable" data-sortlist="[[2,1]]">
+							<thead>
+								<tr>
+									<th class="span3" data-ignore-articles="en" data-sorter="ignoreArticles">TV Show Title</th>
+									<th class="span1">Show Status</th>
+									<th class="span1">Release Date</th>
+									<th class="span1">&nbsp;</th> <!-- View button -->
+								</tr>
+							</thead>
+							<tbody id="tvrequests2_table_body"></tbody>
+						</table>
+					</div>
+					<div id="tv_req_overlay" class="ombi-req-overlay"></div>
+        </div>
+
+        <div id="tvsearch_tab" class="tab-pane">
+					<div class="well form-inline">
+						<div style="display: inline-block; margin-top: 2px; margin-bottom: 2px;" class="span5 btn-group">
+							<input id="search_tvshow_name" name="search_tvshow_name" type="text" style="width: 250px;" />
+							<button class="btn btn-success" type="button" id="search_tvshow_button"><i class="fa fa-search fa-inverse fa-fw"></i></button>
+						</div>
+						<div style="display: inline-block;">
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_tvpopular_button"><i class="fa fa-search fa-inverse fa-fw"></i> Popular</button>
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_trending_button"><i class="fa fa-search fa-inverse fa-fw"></i> Trending</button>
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_mostwatched_button"><i class="fa fa-search fa-inverse fa-fw"></i> Most Watched</button>
+							<button class="btn btn-info btn-ombi-suggestion" type="button" id="search_anticipated_button"><i class="fa fa-search fa-inverse fa-fw"></i> Most Anticipated</button>
+						</div>
+					</div>
+					<div id="tvsearch_tab_table">
+						<!-- <table class="table table-striped table-sortable" data-sortlist="[[0,0]]"> -->
+						<table class="table table-striped table-sortable">
+							<thead>
+								<tr>
+									<th class="span3" data-ignore-articles="en" data-sorter="ignoreArticles">Show Title</th>
+									<th class="span1">Status</th>
+									<th class="span1">First Aired</th>
+									<th class="span1">&nbsp;</th> <!-- Request -->
+								</tr>
+							</thead>
+							<tbody id="tvsearch_table_body"></tbody>
+						</table>
+					</div>
+					<div id="tv_newreq_overlay" class="ombi-req-overlay"></div>
+        </div>
+
+        <div class="spinner"></div>
+				
+      </div>
+    </div>
+  </div>

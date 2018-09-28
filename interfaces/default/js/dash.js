@@ -529,8 +529,6 @@ function loadRadarrCalendar(options) {
   });
 }
 
-
-
 function loadsonarrCalendar(options) {
   if (!$('#calendar_table_body').length) return
   $.getJSON(WEBDIR + 'sonarr/oldCalendar', function(result) {
@@ -586,6 +584,105 @@ function loadNextAiredSickrage(options) {
 
     })
   })
+}
+
+function loadOmbiMovieRequests(options) {
+  if (!$('#ombi_movies_table_body').length) return
+  $.getJSON(WEBDIR + 'ombi/dashboard?t=movies', function(result) {
+    if (result === null) {
+      dasherror('dash_ombi_movies', "Ombi didn\'t return anything.. Is it still talking to us?")
+      return false
+    }
+    if (result === null || result.total == 0) {
+      var row = $('<tr>')
+      row.append($('<td>').attr("colspan", 2)
+        .append('<div class="text-center"><small>No outstanding requests</small></div>'))
+      $('#ombi_movies_table_body').append(row);
+      return true
+    }
+    $.each(result.collection, function(i, show) {
+      if (i >= 5) return true
+      var name = $('<span>').html(' ' + show.title);
+      if (!(show.releaseDate == null || show.releaseDate == "")) {
+        name.append(' (' + show.releaseDate.substr(0,4) + ') ');
+      }
+      // var number;
+      var img = makeIcon('fa fa-info-circle', show.overview);
+      var row = $('<tr>')
+      row.append(
+        $('<td>').append(img).append(name)//,
+        // $('<td>').append($('<div">').text(show.requestedUser.alias))
+      )
+      $('#ombi_movies_table_body').append(row);
+    });
+    return true;
+  });
+}
+
+function loadOmbiTVRequests(options) {
+  if (!$('#ombi_tv_table_body').length) return
+  $.getJSON(WEBDIR + 'ombi/dashboard?t=tvlite', function(result) {
+    if (result === null) {
+      dasherror('dash_ombi_tv', "Ombi didn\'t return anything.. Is it still talking to us?")
+      return false
+    }
+    if (result === null) { // result.total seems to always be 0
+      var row = $('<tr>')
+      row.append($('<td>')
+        .append('<div class="text-center"><small>No outstanding requests</small></div>'))
+      $('#ombi_tv_table_body').append(row);
+      return true
+    }
+    $.each(result.collection, function(i, show) {
+      if (i >= 5) return true
+      var name = $('<span>').html(' ' + show.title);
+      if (!(show.year == null || show.year == "")) {
+        name.append(' (' + show.year + ') ');
+      }
+      // var number;
+      var img = makeIcon('fa fa-info-circle', show.overview);
+      var row = $('<tr>')
+      row.append(
+        $('<td class="span4">').append(img).append(name)
+        // $('<td>').append($('<div">').text(show.requestedUser.alias))
+      )
+      $('#ombi_tv_table_body').append(row);
+    });
+    return true;
+  });
+}
+
+function loadOmbiMusicRequests(options) {
+  if (!$('#ombi_music_table_body').length) return
+  $.getJSON(WEBDIR + 'ombi/dashboard?t=music', function(result) {
+    if (result === null) {
+      dasherror('dash_ombi_music', "Ombi didn\'t return anything.. Is it still talking to us?")
+      return false
+    }
+    if (result === null) { // result.total seems to always be 0
+      var row = $('<tr>')
+      row.append($('<td>')
+        .append('<div class="text-center"><small>No outstanding requests</small></div>'))
+      $('#ombi_music_table_body').append(row);
+      return true
+    }
+    $.each(result.collection, function(i, album) {
+      if (i >= 5) return true
+      var name = $('<span>').html(' ' + album.title);
+      if (!(album.year == null || album.year == "")) {
+        name.append(' (' + album.year + ') ');
+      }
+      // var number;
+      var img = makeIcon('fa fa-info-circle', show.overview);
+      var row = $('<tr>')
+      row.append(
+        $('<td>').append($('<div">').text(album.artist)),
+        $('<td class="span2">').append(img).append(name)
+      )
+      $('#ombi_music_table_body').append(row);
+    });
+    return true;
+  });
 }
 
 function dasherror(i, msg) {
@@ -791,7 +888,7 @@ function loaduTorrent() {
           var max = 4;
         }
         $.each(downloads, function(index, torrent) {
-          tr = $('<tr>');
+          var tr = $('<tr>');
           numberofloop += 1;
           if (numberofloop <= max) {
             tr.append(
@@ -806,7 +903,7 @@ function loaduTorrent() {
           }
         });
       } else {
-        tr = $('<tr>');
+        var tr = $('<tr>');
         tr.append($('<td>').attr("colspan", 2).append('<div class="text-center"><small>No active uTorrent downloads</small></div>'))
         $('#dash_uTorrent_table_body').append(tr);
         return false;

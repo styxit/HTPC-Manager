@@ -1,0 +1,146 @@
+.spinner {
+	top:	50%;
+	left:	50%;
+	transform:	translate(-50%,-50%);
+    -ms-transform:	translate(-50%,-50%);
+	display:	none;
+	position:	fixed;
+	z-index:	9999;
+}
+
+.btn-ombiblue {
+	background-color:	hsl(194, 87%, 44%) !important;
+}
+.btn-ombiblue:hover {
+	background-color:	hsl(194, 77%, 39%) !important;
+}
+
+.btn-ombi-close {
+	 float: right;
+	 border: solid white 0.7px;
+}
+
+.ombi-actions {
+	display: inline-block;
+	position: absolute;
+	border-radius: 5px !important;
+	/* background-color: hsla(24, 5%, 5%, 0.85); */
+	background-color: hsla(24, 0%, 25%, 1);
+	padding: 5px;
+	display: none;
+	margin-top: -2px;
+	margin-left: 0px;
+}
+
+.accordion {
+	overflow:	auto;
+}
+
+.ombi-tvrequest-detail {
+	position: absolute;
+	border-radius: 5px !important;
+	background-color: hsla(24, 0%, 25%, 1);
+	padding: 4px;
+	visibility: hidden;
+	/* display: none; */
+	/* width: 94%; */
+    /* top: 155px; */
+    left: -5px;
+	z-index: 2030;
+	overflow: auto;
+}
+
+.ombi-req-overlay {
+	border: solid 2px; /* #df691a  */
+	width:	80%;
+	height:	92%;
+	top:	50%;
+	left:	50%;
+	transform:	translate(-50%,-50%);
+    -ms-transform:	translate(-50%,-50%);
+	display:	none;
+	position:	fixed;
+	padding:	5px;
+	/* overflow:	auto; */
+	z-index:	2030;
+}
+
+.pseudoheader {
+		padding-top:	0px !important;
+		padding-bottom:	2px !important;
+}
+
+.pseudoheader-toggle {
+	padding-top:	2px !important;
+	text-align:	right !important;
+}
+
+.seasonTabs {
+	overflow-y: auto !important;
+}
+
+.ombi-tvshow-request {
+	display:	none;
+	width:	100%;
+}
+
+@media (max-width: 767px) {
+	.ombi-tvrequest-detail {
+		padding: 2px;
+		border-radius: 0px !important;
+		width: 100%;
+		left: 0px;
+	}
+
+	.ombi-req-overlay {
+		width: 	96%;
+		height:	96%;
+	}
+}
+
+.btn-ombi-suggestion {
+	 margin-top: 2px;
+	 margin-bottom: 2px;
+}
+
+.ombi-menu-disabled {
+	color: gray !important;
+}
+h1.page-header.page-title a.ombi-menu-disabled {
+	color: gray !important;
+}
+
+.btn-ombi {
+	border-radius:	5px !important;
+	padding-top:	3px;
+	padding-bottom:	3px;
+	padding-left:	4px;
+	padding-right:	8px;
+	margin-right:	3px;
+	margin-top:		0px;
+	margin-bottom:	0px;
+}
+
+td.ombi-btn-td {
+	padding-top:	4px !important;
+	padding-bottom:	4px !important;
+}
+
+.btn-ombi.disabled {
+	 color: darkgrey !important;
+	 cursor: not-allowed;
+}
+
+.fa-slightlybigger {
+	font-size:	125%;
+}
+
+.label-ombi-quality {
+	font-weight:	bolder;
+	border-radius:	3px !important;
+}
+
+.tooltip.in {
+	opacity: 0.95;
+	font-size: 90%;
+}

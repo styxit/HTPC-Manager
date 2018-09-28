@@ -22,3 +22,9 @@ htpc_manager.log
 config.codekit
 .flux
 .python-version
+
+# Ignore themes from other projects
+
+# http://www.openflixr.com
+interfaces/default/css/themes/openflixr/
+

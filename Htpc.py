@@ -111,6 +111,8 @@ def load_modules():
     htpc.ROOT.rtorrent = RTorrent()
     from modules.plexpy import Plexpy
     htpc.ROOT.plexpy = Plexpy()
+    from modules.ombi import Ombi
+    htpc.ROOT.ombi = Ombi()
 
 def init_sched():
     from apscheduler.schedulers.background import BackgroundScheduler
