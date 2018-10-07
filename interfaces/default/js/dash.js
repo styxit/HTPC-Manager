@@ -593,7 +593,7 @@ function loadOmbiMovieRequests(options) {
       dasherror('dash_ombi_movies', "Ombi didn\'t return anything.. Is it still talking to us?")
       return false
     }
-    if (result === null || result.total == 0) {
+    if (result.total == 0) {
       var row = $('<tr>')
       row.append($('<td>').attr("colspan", 2)
         .append('<div class="text-center"><small>No outstanding requests</small></div>'))
@@ -626,7 +626,7 @@ function loadOmbiTVRequests(options) {
       dasherror('dash_ombi_tv', "Ombi didn\'t return anything.. Is it still talking to us?")
       return false
     }
-    if (result === null) { // result.total seems to always be 0
+    if (result.collection === null) { // result.total seems to always be 0, use collection instead
       var row = $('<tr>')
       row.append($('<td>')
         .append('<div class="text-center"><small>No outstanding requests</small></div>'))
