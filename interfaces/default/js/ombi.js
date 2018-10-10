@@ -432,23 +432,23 @@ function loadTVSearch(hint='popular', lookup='suggest') {
         } else {
           row.append($('<td nowrap>').append(show.firstAired.substr(0,10)));
         }
-        var reqStatus = $('<td nowrap id="reqStatus'+showId+'">').append('&nbsp;+ Request');
+        var reqStatus = $('<td nowrap id="reqStatus'+showId+'">');
+        reqStatus.addClass('ombi-btn-td');
+        reqStatus.append( $('<button class="btn btn-ombi btn-warning" type="button">)')
+          .append($('<li>').addClass('fa fa-plus fa-fw fa-slightlybigger"'))
+          .append(' Request').attr('title','Request '+show.title)
+        );
         row.append(reqStatus);
+        reqKey = 'false'
         reqStatusAvail.done(function(reqKey) {
           if (reqKey == 'true') {
             reqStatus.empty();
             reqStatus.append('&nbsp;').append($('<li>')
               .addClass('fa fa-check fa-fw fa-slightlybigger"')).append('Available');
           } else {
-            reqStatus.empty();
-            reqStatus.addClass('ombi-btn-td');
-            reqStatus.append( $('<button class="btn btn-ombi btn-warning" type="button">)')
-              .append($('<li>').addClass('fa fa-plus fa-fw fa-slightlybigger"'))
-              .append(' Request').attr('title','Request '+show.title)
-              .click( function(){
-                open_tv_newreq_panel(req_show$showId,show);
-              } )
-            );
+            reqStatus.click( function(){
+              open_tv_newreq_panel(req_show$showId,show);
+            } )
           }
         });
 
