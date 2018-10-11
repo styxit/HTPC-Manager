@@ -217,7 +217,7 @@ function loadMRequests(mreq_col=1, mreq_ord=1 ) {
         }
         row.append(
           $('<td>').append( '<nobr>'+movie.requestedDate.substr(0,10)+'</nobr>' )
-          .append('<br />').append(movie.requestedUser.alias)
+          .append('<br />').append(movie.requestedUser.userAlias)
         );
         $('#mrequests_table_body').append(row);
         i+=1;
@@ -552,7 +552,7 @@ function tv_req_form(showDiv, reqInfo) {
         .append( $('<tr>')
           .append( $('<td width="50%">')
             .append( $('<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordianTVReq'+showId+'">')
-              .append('<b>Request from:</b> '+childReq.requestedUser.alias+'<br />')
+              .append('<b>Request from:</b> '+childReq.requestedUser.userAlias+'<br />')
               .append('<b>Request state:</b> ').append(childReqStatus).append('<br />')
               .append(' &nbsp; ').append( $('<li id="childReqTabIcon'+childReqId+'" class="fa fa-chevron-down childReqTabIcon'+showId+'">') )
               .append(' Expand for details')
