@@ -593,7 +593,7 @@ function loadOmbiMovieRequests(options) {
       dasherror('dash_ombi_movies', "Ombi didn\'t return anything.. Is it still talking to us?")
       return false
     }
-    if (result === null || result.total == 0) {
+    if (result.total == 0) {
       var row = $('<tr>')
       row.append($('<td>').attr("colspan", 2)
         .append('<div class="text-center"><small>No outstanding requests</small></div>'))
@@ -606,13 +606,12 @@ function loadOmbiMovieRequests(options) {
       if (!(show.releaseDate == null || show.releaseDate == "")) {
         name.append(' (' + show.releaseDate.substr(0,4) + ') ');
       }
-      // var number;
       var img = makeIcon('fa fa-info-circle', show.overview);
       var row = $('<tr>')
       row.append(
-        $('<td>').append(img).append(name)//,
-        // $('<td>').append($('<div">').text(show.requestedUser.alias))
-      )
+        $('<td class="span3">').append(img).append(name),
+        $('<td class="span1">').text(show.status)
+      );
       $('#ombi_movies_table_body').append(row);
     });
     return true;
@@ -626,7 +625,7 @@ function loadOmbiTVRequests(options) {
       dasherror('dash_ombi_tv', "Ombi didn\'t return anything.. Is it still talking to us?")
       return false
     }
-    if (result === null) { // result.total seems to always be 0
+    if (result.collection === null) { // result.total seems to always be 0, use collection instead
       var row = $('<tr>')
       row.append($('<td>')
         .append('<div class="text-center"><small>No outstanding requests</small></div>'))
@@ -636,16 +635,15 @@ function loadOmbiTVRequests(options) {
     $.each(result.collection, function(i, show) {
       if (i >= 5) return true
       var name = $('<span>').html(' ' + show.title);
-      if (!(show.year == null || show.year == "")) {
-        name.append(' (' + show.year + ') ');
+      if (!(show.releaseDate == null || show.releaseDate == "")) {
+        name.append(' (' + show.releaseDate.substr(0,4) + ') ');
       }
-      // var number;
       var img = makeIcon('fa fa-info-circle', show.overview);
       var row = $('<tr>')
       row.append(
-        $('<td class="span4">').append(img).append(name)
-        // $('<td>').append($('<div">').text(show.requestedUser.alias))
-      )
+        $('<td class="span3">').append(img).append(name),
+        $('<td class="span1">').text(show.status)
+      );
       $('#ombi_tv_table_body').append(row);
     });
     return true;

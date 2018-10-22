@@ -217,7 +217,7 @@ function loadMRequests(mreq_col=1, mreq_ord=1 ) {
         }
         row.append(
           $('<td>').append( '<nobr>'+movie.requestedDate.substr(0,10)+'</nobr>' )
-          .append('<br />').append(movie.requestedUser.alias)
+          .append('<br />').append(movie.requestedUser.userAlias)
         );
         $('#mrequests_table_body').append(row);
         i+=1;
@@ -327,8 +327,8 @@ function loadTVRequests2(initial='') {
       }
       $('#tv_req_overlay').empty();
       $('#tv_req_overlay').css('background-color',get_themeBgColor()).css('border-color',get_themeActiveBG())
-        .append( $('<button class="btn btn-danger btn-small btn-ombi-close" name="close">')
-          .attr('title','Esc to close').append( $('<li class="fa fa-times fa-fw">') )
+        .append( $('<button class="btn btn-small btn-ombi-close" name="close">')
+          .attr('title','Esc to close').append( $('<li class="fa fa-times fa-fw fa-slightlybigger">') )
           .click( function(){ $('.ombi-tvshow-request').hide(); toggle_req_div($('#tv_req_overlay')); })
         );
       $.each(result, function (showix, show) {
@@ -403,8 +403,8 @@ function loadTVSearch(hint='popular', lookup='suggest') {
       }
       $('#tv_newreq_overlay').empty();
       $('#tv_newreq_overlay').css('background-color',get_themeBgColor()).css('border-color',get_themeActiveBG())
-        .append( $('<button class="btn btn-danger btn-small btn-ombi-close" name="close">')
-          .attr('title','Esc to close').append( $('<li class="fa fa-times fa-fw">') )
+        .append( $('<button class="btn btn-small btn-ombi-close" name="close">')
+          .attr('title','Esc to close').append( $('<li class="fa fa-times fa-fw fa-slightlybigger">') )
           .click( function(){ $('.ombi-tvshow-request').hide(); toggle_req_div($('#tv_newreq_overlay')); })
         );
       $.each(result, function (showix, show) {
@@ -432,23 +432,23 @@ function loadTVSearch(hint='popular', lookup='suggest') {
         } else {
           row.append($('<td nowrap>').append(show.firstAired.substr(0,10)));
         }
-        var reqStatus = $('<td nowrap id="reqStatus'+showId+'">').append('&nbsp;+ Request');
+        var reqStatus = $('<td nowrap id="reqStatus'+showId+'">');
+        reqStatus.addClass('ombi-btn-td');
+        reqStatus.append( $('<button class="btn btn-ombi btn-warning" type="button">)')
+          .append($('<li>').addClass('fa fa-plus fa-fw fa-slightlybigger"'))
+          .append(' Request').attr('title','Request '+show.title)
+        );
         row.append(reqStatus);
+        reqKey = 'false'
         reqStatusAvail.done(function(reqKey) {
           if (reqKey == 'true') {
             reqStatus.empty();
             reqStatus.append('&nbsp;').append($('<li>')
               .addClass('fa fa-check fa-fw fa-slightlybigger"')).append('Available');
           } else {
-            reqStatus.empty();
-            reqStatus.addClass('ombi-btn-td');
-            reqStatus.append( $('<button class="btn btn-ombi btn-warning" type="button">)')
-              .append($('<li>').addClass('fa fa-plus fa-fw fa-slightlybigger"'))
-              .append(' Request').attr('title','Request '+show.title)
-              .click( function(){
-                open_tv_newreq_panel(req_show$showId,show);
-              } )
-            );
+            reqStatus.click( function(){
+              open_tv_newreq_panel(req_show$showId,show);
+            } )
           }
         });
 
@@ -552,7 +552,7 @@ function tv_req_form(showDiv, reqInfo) {
         .append( $('<tr>')
           .append( $('<td width="50%">')
             .append( $('<a class="accordion-toggle" data-toggle="collapse" data-parent="#accordianTVReq'+showId+'">')
-              .append('<b>Request from:</b> '+childReq.requestedUser.alias+'<br />')
+              .append('<b>Request from:</b> '+childReq.requestedUser.userAlias+'<br />')
               .append('<b>Request state:</b> ').append(childReqStatus).append('<br />')
               .append(' &nbsp; ').append( $('<li id="childReqTabIcon'+childReqId+'" class="fa fa-chevron-down childReqTabIcon'+showId+'">') )
               .append(' Expand for details')
@@ -633,14 +633,14 @@ function tv_newreq_form(showDiv, showInfo) {
   showDiv.append( $('<table width="100%">').append( $('<tr>').append( $('<td>')
     .append( $('<div class="btn-toolbar">').css('float','right')
     .append( $('<div class="btn-group">')
-      .append( $('<button class="btn">').css('margin-bottom','4px').append('All Seasons')
+      .append( $('<button class="btn btn-warning btn-group-ombi">').css('margin-bottom','4px').append('<li class="fa fa-plus fa-fw"></li>All Seasons')
         .click(function(){ombi_tvrequest(showId,sList,'requestAll');}))
-      .append( $('<button class="btn">').css('margin-bottom','4px').append('First Season')
+      .append( $('<button class="btn btn-warning btn-group-ombi">').css('margin-bottom','4px').append('<li class="fa fa-plus fa-fw"></li>First Season')
         .click(function(){ombi_tvrequest(showId,sList,'firstSeason');}))
-      .append( $('<button class="btn">').css('margin-bottom','4px').append('Last Season')
+      .append( $('<button class="btn btn-warning btn-group-ombi">').css('margin-bottom','4px').append('<li class="fa fa-plus fa-fw"></li>Last Season')
         .click(function(){ombi_tvrequest(showId,sList,'latestSeason');}))
-    ).append( $('<button class="btn">').css('margin-bottom','4px').css('margin-left','8px')
-      .append('Request Selected')
+    ).append( $('<button class="btn btn-warning btn-ombi">').css('margin-bottom','4px').css('margin-left','8px')
+      .append('<li class="fa fa-plus fa-fw"></li> Selected')
         .click(function(){ombi_tvrequest(showId,sList,get_checks('cBox'+showId));}))
     )
   )));

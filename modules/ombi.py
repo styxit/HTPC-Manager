@@ -75,17 +75,18 @@ class Ombi(object):
 
     @cherrypy.expose()
     @require(member_of(htpc.role_admin))
+    @cherrypy.tools.json_out()
     def test(self, **kwargs):
         # Fuller version of ping(). Includes auth test.
         if self.ping(**kwargs):
-            logger.debug('ping ok, now trying credentials')
+            logger.debug('Ombi running, checking credentials')
             url = 'api/v1/Settings/about'
             res = self._ombi_get(url)
             if res != False:
-                logger.debug('Successful Ombi test')
-                return True
+                logger.debug('Successful Ombi test. Ombi version %s' % res["version"])
+                return res
             logger.error('Ombi test failed: %s' % res)
-        return False
+            return
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
