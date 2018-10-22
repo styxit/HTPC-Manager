@@ -327,8 +327,8 @@ function loadTVRequests2(initial='') {
       }
       $('#tv_req_overlay').empty();
       $('#tv_req_overlay').css('background-color',get_themeBgColor()).css('border-color',get_themeActiveBG())
-        .append( $('<button class="btn btn-danger btn-small btn-ombi-close" name="close">')
-          .attr('title','Esc to close').append( $('<li class="fa fa-times fa-fw">') )
+        .append( $('<button class="btn btn-small btn-ombi-close" name="close">')
+          .attr('title','Esc to close').append( $('<li class="fa fa-times fa-fw fa-slightlybigger">') )
           .click( function(){ $('.ombi-tvshow-request').hide(); toggle_req_div($('#tv_req_overlay')); })
         );
       $.each(result, function (showix, show) {
@@ -403,8 +403,8 @@ function loadTVSearch(hint='popular', lookup='suggest') {
       }
       $('#tv_newreq_overlay').empty();
       $('#tv_newreq_overlay').css('background-color',get_themeBgColor()).css('border-color',get_themeActiveBG())
-        .append( $('<button class="btn btn-danger btn-small btn-ombi-close" name="close">')
-          .attr('title','Esc to close').append( $('<li class="fa fa-times fa-fw">') )
+        .append( $('<button class="btn btn-small btn-ombi-close" name="close">')
+          .attr('title','Esc to close').append( $('<li class="fa fa-times fa-fw fa-slightlybigger">') )
           .click( function(){ $('.ombi-tvshow-request').hide(); toggle_req_div($('#tv_newreq_overlay')); })
         );
       $.each(result, function (showix, show) {
@@ -633,14 +633,14 @@ function tv_newreq_form(showDiv, showInfo) {
   showDiv.append( $('<table width="100%">').append( $('<tr>').append( $('<td>')
     .append( $('<div class="btn-toolbar">').css('float','right')
     .append( $('<div class="btn-group">')
-      .append( $('<button class="btn">').css('margin-bottom','4px').append('All Seasons')
+      .append( $('<button class="btn btn-warning btn-group-ombi">').css('margin-bottom','4px').append('<li class="fa fa-plus fa-fw"></li>All Seasons')
         .click(function(){ombi_tvrequest(showId,sList,'requestAll');}))
-      .append( $('<button class="btn">').css('margin-bottom','4px').append('First Season')
+      .append( $('<button class="btn btn-warning btn-group-ombi">').css('margin-bottom','4px').append('<li class="fa fa-plus fa-fw"></li>First Season')
         .click(function(){ombi_tvrequest(showId,sList,'firstSeason');}))
-      .append( $('<button class="btn">').css('margin-bottom','4px').append('Last Season')
+      .append( $('<button class="btn btn-warning btn-group-ombi">').css('margin-bottom','4px').append('<li class="fa fa-plus fa-fw"></li>Last Season')
         .click(function(){ombi_tvrequest(showId,sList,'latestSeason');}))
-    ).append( $('<button class="btn">').css('margin-bottom','4px').css('margin-left','8px')
-      .append('Request Selected')
+    ).append( $('<button class="btn btn-warning btn-ombi">').css('margin-bottom','4px').css('margin-left','8px')
+      .append('<li class="fa fa-plus fa-fw"></li> Selected')
         .click(function(){ombi_tvrequest(showId,sList,get_checks('cBox'+showId));}))
     )
   )));

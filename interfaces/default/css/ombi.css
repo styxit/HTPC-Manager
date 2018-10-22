@@ -16,8 +16,12 @@
 }
 
 .btn-ombi-close {
-	 float: right;
-	 border: solid white 0.7px;
+	float: 			right;
+	border: 		solid white 0.7px;
+	padding-top:	2px;
+	padding-bottom:	0px;
+	padding-left:	4px;
+	padding-right:	4px;
 }
 
 .ombi-actions {
@@ -117,6 +121,18 @@ h1.page-header.page-title a.ombi-menu-disabled {
 	padding-left:	4px;
 	padding-right:	8px;
 	margin-right:	3px;
+	margin-top:		0px;
+	margin-bottom:	0px;
+}
+
+.btn-group-ombi {
+	border-radius:	5px !important;
+	padding-top:	3px;
+	padding-bottom:	3px;
+	padding-left:	4px;
+	padding-right:	8px;
+	margin-right:	-5px;
+	margin-left:	-5px;
 	margin-top:		0px;
 	margin-bottom:	0px;
 }
