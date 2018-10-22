@@ -234,11 +234,54 @@ class Sonarr(object):
             data['name'] = k['method']
             if k['par'] == 'episodeIds':
                 k['id'] = [int(k['id'])]
-            data[k['par']] = k['id']
+                data[k['par']] = k['id']
+            if k['par'] == 'seriesId':
+                data['seriesId'] = k['id']
+                data['seasonNumber'] = k['sNum']
         except KeyError:
             pass
-
         return self.fetch(path='command', data=data, type='post')
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    @require(member_of(htpc.role_admin))
+    def ToggleMonitor(self, id):
+        cherrypy.response.headers['Content-Type'] = 'application/json'
+        self.logger.debug('Toggling monitored status for id %s' % id)
+        m = self.fetch(path='series/%s' % id, type='get')
+        if m['monitored'] == True:
+            m.update({"monitored": False})
+        else:
+            m.update({"monitored": True})
+        r = self.fetch(path='series', data=m, type='put')
+        return self.fetch(path='series/%s' % id, type='get')
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    @require(member_of(htpc.role_admin))
+    def ToggleMonitorSeason(self, id, sn):
+        cherrypy.response.headers['Content-Type'] = 'application/json'
+        sn = int(sn)
+        self.logger.debug('Toggling monitored status for id %s season %s' % (id,sn))
+        m = self.fetch(path='series/%s' % id, type='get')
+        if m['seasons'][sn]['monitored'] == True:
+            m['seasons'][sn]['monitored'] = False
+        else:
+            m['seasons'][sn]['monitored'] = True
+        r = self.fetch(path='series', data=m, type='put')
+        return self.fetch(path='series/%s' % id, type='get')
+
+    @cherrypy.expose()
+    @require(member_of(htpc.role_admin))
+    def DeleteContent(self, **kwargs):
+        k = kwargs
+        cherrypy.response.headers['Content-Type'] = 'application/json'
+        data = {}
+        # deleteFiles = True appears to not work, wrong format?
+        # data['deleteFiles'] = k['deleteFiles']
+        data['deleteFiles'] = False
+        self.logger.debug('Deleting id %s' % k['id'])
+        return self.fetch(path='series/%s' % k['id'], data=data, type='delete')
 
     @cherrypy.expose()
     @require()

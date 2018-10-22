@@ -107,10 +107,21 @@ function loadShows() {
           $('<td>').html(sonarrStatusLabel(tvshow.status)),
           $('<td>').html(nextair),
           $('<td>').html(progress),
-
           $('<td>').html(tvshow.network),
-          $('<td>').html(sonarrStatusLabel(qname)));
+          $('<td>').html(sonarrStatusLabel(qname)),
+          $('<td>').html(sonarrActions(tvshow.id,(tvshow.seasons.length-1)))
+        );
         $('#tvshows_table_body').append(row);
+        if (!tvshow.monitored) {
+          $('#mon'+tvshow.id).removeClass("fa-bookmark").addClass("fa-bookmark-o");
+          $('#mon'+tvshow.id).attr("title","Series: Unmonitored\nClick to toggle");
+          $('#monssnb'+tvshow.id).addClass("disabled");
+        }
+        if (!tvshow.seasons[(tvshow.seasons.length-1)].monitored) {
+          $('#monssnb'+tvshow.id).attr("title","Latest Season: Unmonitored\nClick to toggle");
+          $('#monssnt'+tvshow.id).removeClass("fa-bookmark").addClass("fa-bookmark-o");
+          $('#monssnl'+tvshow.id).removeClass("fa-inverse");
+        }
       });
       $('#tvshows_table_body').parent().trigger('update');
       $('#tvshows_table_body').parent().trigger("sorton", [
@@ -181,6 +192,60 @@ function sonarrStatusLabel(text) {
     label.prepend(' ').prepend(icon);
   }
   return label;
+}
+
+function sonarrActions(id,ssn) {
+	var btns = $('<div>').css("display","inline-block");
+	btns.append( $('<li class="fa fa-search fa-fw fa-lg" id="q'+id+'">')
+    .attr("title","Latest Season:\nSearch missing episodes").click(function(){
+      $.when(ForceSearch(id,ssn)).done(function(){
+        // Nothing to do
+      }); //done
+    }) //click
+  );
+  btns.append( $('<li class="fa fa-bookmark fa-lg" id="mon'+id+'">')
+    .attr("title","Series: Monitored\nClick to toggle").click(function(){
+      $.when(ToggleMonitor(id)).done(function(bMon){
+        $('#mon'+id).removeClass("fa-spinner").removeClass("fa-pulse");
+        if (bMon) {
+          $('#mon'+id).attr("title","Series: Monitored\nClick to toggle")
+            .removeClass("fa-bookmark-o").addClass("fa-bookmark");
+          $('#monssnb'+id).removeClass("disabled");
+        } else {
+          $('#mon'+id).attr("title","Series: Unmonitored\nClick to toggle")
+            .removeClass("fa-bookmark").addClass("fa-bookmark-o");
+          $('#monssnb'+id).addClass("disabled");
+        }
+      }); //done
+    }) //click
+  );
+  btns.append( $('<span class="fa-stack fa-lg icon-sonarr" id="monssnb'+id+'" style="width: 16px; height: 14px; margin-left: 5px; margin-right: 5px;">')
+    .append( $('<i class="fa fa-stack-1x fa-bookmark" id="monssnt'+id+'" style="top: -13px;">') )
+    .append( $('<i class="fa fa-stack-1x fa-inverse" id="monssnl'+id+'" style="mix-blend-mode: difference; top: -14px;">').html('<sup style="font-size: 55%;">#</sup>') )
+    .attr("title","Latest Season: Monitored\nClick to toggle")
+      .click(function(){if ($(this).hasClass("disabled")) return;
+        $.when(ToggleMonitorSeason(id,ssn)).done(function(bMonSsn){
+          $('#monssnt'+id).removeClass("fa-spinner").removeClass("fa-pulse");
+          if (bMonSsn) {
+            $('#monssnt'+id).attr("title","Latest Season: Monitored\nClick to toggle")
+              .removeClass("fa-bookmark-o").addClass("fa-bookmark");
+            $('#monssnl'+id).addClass("fa-inverse");
+          } else {
+            $('#monssnt'+id).attr("title","Latest Season: Unmonitored\nClick to toggle")
+              .removeClass("fa-bookmark").addClass("fa-bookmark-o");
+            $('#monssnl'+id).removeClass("fa-inverse");
+          }
+        }); //done
+    }) //click
+  );
+	btns.append( $('<li class="fa fa-trash-o fa-lg" id="del'+id+'">')
+    .attr("title","Delete Series\n(keeps existing files/folders)").click(function(){
+      $.when(DeleteContent(id)).done(function(result){
+        if (result) { loadShows(); }
+      }); //done
+    }) //click
+  );
+  return btns;
 }
 
 function profile(qualityProfileId) {
@@ -479,4 +544,76 @@ function Scanfolder() {
       }
     });
   }
+}
+
+function ForceSearch(id,ssn) {
+  $('#q'+id).addClass("fa-spinner fa-pulse");
+  data = {
+    "method": "SeasonSearch",
+    "par": "seriesId",
+    "id": id,
+    "sNum": ssn
+  };
+  var done = jQuery.Deferred();
+  $.getJSON(WEBDIR + 'sonarr/Command', data, function(r) {
+    //We don't get back the actual result of the job, just whether the API call was successful or not
+    setTimeout(function(){
+      //Return after a brief pause to make it look like we did something :)
+      $('#q'+id).removeClass("fa-spinner").removeClass("fa-pulse").addClass("fa-search");
+    },500);
+    if (r.state) {
+      notify('sonarr', 'Search started', 'success');
+      done.resolve(true);
+    } else {
+      notify('sonarr', 'Search not started, check logs', 'error');
+      done.fail(false);
+    }
+  });
+  return done;
+}
+
+function ToggleMonitor(id) {
+  var iWidth = $('#mon'+id).css("width"); // hack to stop element reflow whilst
+  $('#mon'+id).css("width",iWidth);       // avoiding extra whitespace of fa-fw icons
+  $('#mon'+id).addClass("fa-spinner fa-pulse")
+  data = {
+    "id": id
+  };
+  var done = jQuery.Deferred();
+  $.get(WEBDIR + 'sonarr/ToggleMonitor', data, function (r) {
+    done.resolve(r.monitored);
+  });
+  return done;
+}
+
+function ToggleMonitorSeason(id,ssn) {
+  $('#monssnt'+id).addClass("fa-spinner fa-pulse")
+  data = {
+    "id": id,
+    "sn": ssn
+  };
+  var done = jQuery.Deferred();
+  $.get(WEBDIR + 'sonarr/ToggleMonitorSeason', data, function (r) {
+    done.resolve(r.seasons[ssn].monitored);
+  });
+  return done;
+}
+
+function DeleteContent(id) {
+  $('#del'+id).removeClass().addClass("fa fa-spinner fa-pulse fa-fw");
+  data = {
+    "id": id
+  };
+  var done = jQuery.Deferred();
+  $.get(WEBDIR + 'sonarr/DeleteContent', data, function (r) {
+    if (r.message) {
+      done.fail(false);
+      $('#del'+id).removeClass().addClass("fa fa-trash-o fa-fw");
+      notify('sonarr',r.message,'error');
+    } else {
+      done.resolve(true);
+      notify('sonarr','Deleted','info');
+    }
+  });
+  return done;
 }
