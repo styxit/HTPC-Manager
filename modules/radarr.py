@@ -228,6 +228,32 @@ class Radarr(object):
         return self.fetch(path='command', data=data, type='post')
 
     @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    @require(member_of(htpc.role_admin))
+    def ToggleMonitor(self, id):
+        cherrypy.response.headers['Content-Type'] = 'application/json'
+        self.logger.debug('Toggling monitored status for id %s' % id)
+        m = self.fetch(path='movie/%s' % id, type='get')
+        if m['monitored'] == True:
+            m.update({"monitored": False})
+        else:
+            m.update({"monitored": True})
+        r = self.fetch(path='movie', data=m, type='put')
+        return self.fetch(path='movie/%s' % id, type='get')
+
+    @cherrypy.expose()
+    @require(member_of(htpc.role_admin))
+    def DeleteContent(self, **kwargs):
+        k = kwargs
+        cherrypy.response.headers['Content-Type'] = 'application/json'
+        data = {}
+        # deleteFiles = True appears to not work, wrong format?
+        # data['deleteFiles'] = k['deleteFiles']
+        data['deleteFiles'] = False
+        self.logger.debug('Deleting id %s' % k['id'])
+        return self.fetch(path='movie/%s' % k['id'], data=data, type='delete')
+
+    @cherrypy.expose()
     @require()
     @cherrypy.tools.json_out()
     def Lookup(self, q):

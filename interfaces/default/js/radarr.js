@@ -73,9 +73,14 @@ function loadMovies() {
           $('<td>').html(radarrStatusLabel(movie.status)),
           $('<td>').html(moment(movie.inCinemas).calendar()),
           $('<td>').html(movie.studio),
-            $('<td>').append(movie.downloaded ? radarrStatusLabel(movie.movieFile.quality.quality.name) : radarrStatusLabel('Missing')),
-          $('<td>').html(radarrStatusLabel(qname)));
+          $('<td>').append(movie.downloaded ? radarrStatusLabel(movie.movieFile.quality.quality.name) : radarrStatusLabel('Missing')),
+          $('<td>').html(radarrStatusLabel(qname)),
+          $('<td>').html(radarrActions(movie.id)));
         $('#tvshows_table_body').append(row);
+        if (!movie.monitored) {
+          $('#mon'+movie.id).removeClass("fa-bookmark").addClass("fa-bookmark-o");
+          $('#mon'+movie.id).attr("title","Unmonitored\nClick to toggle");
+        }
       });
       $('#tvshows_table_body').parent().trigger('update');
       $('#tvshows_table_body').parent().trigger("sorton", [
@@ -146,6 +151,39 @@ function radarrStatusLabel(text) {
     label.prepend(' ').prepend(icon);
   }
   return label;
+}
+
+function radarrActions(id) {
+	var btns = $('<div>');
+	btns.append( $('<li class="fa fa-search fa-fw fa-lg" id="q'+id+'">')
+    .attr("title","Force Search").click(function(){
+      $.when(ForceSearch(id)).done(function(){
+        // Nothing to do
+      }); //done
+    }) //click
+  );
+  btns.append( $('<li class="fa fa-bookmark fa-lg" id="mon'+id+'">')
+    .attr("title","Monitored\nClick to toggle").click(function(){
+      $.when(ToggleMonitor(id)).done(function(bMon){
+        $('#mon'+id).removeClass("fa-spinner").removeClass("fa-pulse");
+        if (bMon) {
+          $('#mon'+id).attr("title","Monitored\nClick to toggle")
+            .removeClass("fa-bookmark-o").addClass("fa-bookmark");
+        } else {
+          $('#mon'+id).attr("title","Unmonitored\nClick to toggle")
+            .removeClass("fa-bookmark").addClass("fa-bookmark-o");
+        }
+      }); //done
+    }) //click
+  );
+	btns.append( $('<li class="fa fa-trash-o fa-fw fa-lg" id="del'+id+'">')
+    .attr("title","Delete movie\n(keeps existing files/folders)").click(function(){
+      $.when(DeleteContent(id)).done(function(result){
+        if (result) { loadMovies(); }
+      }); //done
+    }) //click
+  );
+	return btns;
 }
 
 function profile(qualityProfileId) {
@@ -441,4 +479,63 @@ function Scanfolder() {
       }
     });
   }
+}
+
+function ForceSearch(id) {
+  $('#q'+id).removeClass().addClass("fa fa-spinner fa-pulse fa-fw");
+  data = {
+    "method": "MoviesSearch",
+    "par": "movieIds",
+    "id": id
+  };
+  var done = jQuery.Deferred();
+  $.getJSON(WEBDIR + 'radarr/Command', data, function(r) {
+    //We don't get back the actual result of the job, just whether the API call was successful or not
+    //Return after a brief pause if the API call was ok
+    if (r.state) {
+      notify('radarr', 'Search started', 'success');
+      done.resolve(true);
+      setTimeout(function(){
+        $('#q'+id).removeClass().addClass("fa fa-search fa-fw");
+      },500);
+    } else {
+      done.fail(false);
+      notify('radarr', 'Search not started, check logs', 'error');
+      $('#q'+id).removeClass().addClass("fa fa-search fa-fw");
+    }
+  });
+  return done;
+}
+
+function ToggleMonitor(id) {
+  var iWidth = $('#mon'+id).css("width"); // hack to stop element reflow whilst
+  $('#mon'+id).css("width",iWidth);       // avoiding extra whitespace of fa-fw icons
+  $('#mon'+id).addClass("fa-spinner fa-pulse")
+  data = {
+    "id": id
+  };
+  var done = jQuery.Deferred();
+  $.get(WEBDIR + 'radarr/ToggleMonitor', data, function (r) {
+    done.resolve(r.monitored);
+  });
+  return done;
+}
+
+function DeleteContent(id) {
+  $('#del'+id).removeClass().addClass("fa fa-spinner fa-pulse fa-fw");
+  data = {
+    "id": id
+  };
+  var done = jQuery.Deferred();
+  $.get(WEBDIR + 'radarr/DeleteContent', data, function (r) {
+    if (r.message) {
+      done.fail(false);
+      $('#del'+id).removeClass().addClass("fa fa-trash-o fa-fw");
+      notify('radarr',r.message,'error');
+    } else {
+      done.resolve(true);
+      notify('radarr','Deleted','info');
+    }
+  });
+  return done;
 }
