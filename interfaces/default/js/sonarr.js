@@ -43,7 +43,11 @@ $(document).ready(function() {
        $('#scanfolder').click(function (e) {
            e.preventDefault();
            Scanfolder()
+ 
        });
+ 
+       loadAlerts();
+       setInterval(function(){ loadAlerts(); }, 30000);
    });
 });
 
@@ -107,10 +111,21 @@ function loadShows() {
           $('<td>').html(sonarrStatusLabel(tvshow.status)),
           $('<td>').html(nextair),
           $('<td>').html(progress),
-
           $('<td>').html(tvshow.network),
-          $('<td>').html(sonarrStatusLabel(qname)));
+          $('<td>').html(sonarrStatusLabel(qname)),
+          $('<td>').html(sonarrActions(tvshow.id,(tvshow.seasons.length-1)))
+        );
         $('#tvshows_table_body').append(row);
+        if (!tvshow.monitored) {
+          $('#mon'+tvshow.id).removeClass("fa-bookmark").addClass("fa-bookmark-o");
+          $('#mon'+tvshow.id).attr("title","Series: Unmonitored\nClick to toggle");
+          $('#monssnb'+tvshow.id).addClass("disabled");
+        }
+        if (!tvshow.seasons[(tvshow.seasons.length-1)].monitored) {
+          $('#monssnb'+tvshow.id).attr("title","Latest Season: Unmonitored\nClick to toggle");
+          $('#monssnt'+tvshow.id).removeClass("fa-bookmark").addClass("fa-bookmark-o");
+          $('#monssnl'+tvshow.id).removeClass("fa-inverse");
+        }
       });
       $('#tvshows_table_body').parent().trigger('update');
       $('#tvshows_table_body').parent().trigger("sorton", [
@@ -181,6 +196,60 @@ function sonarrStatusLabel(text) {
     label.prepend(' ').prepend(icon);
   }
   return label;
+}
+
+function sonarrActions(id,ssn) {
+	var btns = $('<div>').css("display","inline-block");
+	btns.append( $('<li class="fa fa-search fa-fw fa-lg" id="q'+id+'">')
+    .attr("title","Latest Season:\nSearch missing episodes").css("cursor","pointer").click(function(){
+      $.when(ForceSearch(id,ssn)).done(function(){
+        // Nothing to do
+      }); //done
+    }) //click
+  );
+  btns.append( $('<li class="fa fa-bookmark fa-lg" id="mon'+id+'">')
+    .attr("title","Series: Monitored\nClick to toggle").css("cursor","pointer").click(function(){
+      $.when(ToggleMonitor(id)).done(function(bMon){
+        $('#mon'+id).removeClass("fa-spinner").removeClass("fa-pulse");
+        if (bMon) {
+          $('#mon'+id).attr("title","Series: Monitored\nClick to toggle")
+            .removeClass("fa-bookmark-o").addClass("fa-bookmark");
+          $('#monssnb'+id).removeClass("disabled");
+        } else {
+          $('#mon'+id).attr("title","Series: Unmonitored\nClick to toggle")
+            .removeClass("fa-bookmark").addClass("fa-bookmark-o");
+          $('#monssnb'+id).addClass("disabled");
+        }
+      }); //done
+    }) //click
+  );
+  btns.append( $('<span class="fa-stack fa-lg icon-sonarr" id="monssnb'+id+'" style="width: 16px; height: 14px; margin-left: 5px; margin-right: 5px;">')
+    .append( $('<i class="fa fa-stack-1x fa-bookmark" id="monssnt'+id+'" style="top: -13px;">') )
+    .append( $('<i class="fa fa-stack-1x fa-inverse" id="monssnl'+id+'" style="mix-blend-mode: difference; top: -14px;">').html('<sup style="font-size: 55%;">#</sup>') )
+    .attr("title","Latest Season: Monitored\nClick to toggle").css("cursor","pointer")
+      .click(function(){if ($(this).hasClass("disabled")) return;
+        $.when(ToggleMonitorSeason(id,ssn)).done(function(bMonSsn){
+          $('#monssnt'+id).removeClass("fa-spinner").removeClass("fa-pulse");
+          if (bMonSsn) {
+            $('#monssnt'+id).attr("title","Latest Season: Monitored\nClick to toggle")
+              .removeClass("fa-bookmark-o").addClass("fa-bookmark");
+            $('#monssnl'+id).addClass("fa-inverse");
+          } else {
+            $('#monssnt'+id).attr("title","Latest Season: Unmonitored\nClick to toggle")
+              .removeClass("fa-bookmark").addClass("fa-bookmark-o");
+            $('#monssnl'+id).removeClass("fa-inverse");
+          }
+        }); //done
+    }) //click
+  );
+	btns.append( $('<li class="fa fa-trash-o fa-lg" id="del'+id+'">')
+    .attr("title","Delete Series\n(keeps existing files/folders)").css("cursor","pointer").click(function(){
+      $.when(DeleteContent(id)).done(function(result){
+        if (result) { loadShows(); }
+      }); //done
+    }) //click
+  );
+  return btns;
 }
 
 function profile(qualityProfileId) {
@@ -479,4 +548,190 @@ function Scanfolder() {
       }
     });
   }
+}
+
+function ForceSearch(id,ssn) {
+  $('#q'+id).addClass("fa-spinner fa-pulse");
+  data = {
+    "method": "SeasonSearch",
+    "par": "seriesId",
+    "id": id,
+    "sNum": ssn
+  };
+  var done = jQuery.Deferred();
+  $.getJSON(WEBDIR + 'sonarr/Command', data, function(r) {
+    //We don't get back the actual result of the job, just whether the API call was successful or not
+    setTimeout(function(){
+      //Return after a brief pause to make it look like we did something :)
+      $('#q'+id).removeClass("fa-spinner").removeClass("fa-pulse").addClass("fa-search");
+    },500);
+    if (r.state) {
+      notify('sonarr', 'Search started', 'success');
+      done.resolve(true);
+    } else {
+      notify('sonarr', 'Search not started, check logs', 'error');
+      done.fail(false);
+    }
+  });
+  return done;
+}
+
+function ToggleMonitor(id) {
+  var iWidth = $('#mon'+id).css("width"); // hack to stop element reflow whilst
+  $('#mon'+id).css("width",iWidth);       // avoiding extra whitespace of fa-fw icons
+  $('#mon'+id).addClass("fa-spinner fa-pulse")
+  data = {
+    "id": id
+  };
+  var done = jQuery.Deferred();
+  $.get(WEBDIR + 'sonarr/ToggleMonitor', data, function (r) {
+    done.resolve(r.monitored);
+  });
+  return done;
+}
+
+function ToggleMonitorSeason(id,ssn) {
+  $('#monssnt'+id).addClass("fa-spinner fa-pulse")
+  data = {
+    "id": id,
+    "sn": ssn
+  };
+  var done = jQuery.Deferred();
+  $.get(WEBDIR + 'sonarr/ToggleMonitorSeason', data, function (r) {
+    done.resolve(r.seasons[ssn].monitored);
+  });
+  return done;
+}
+
+function DeleteContent(id) {
+  $('#del'+id).removeClass().addClass("fa fa-spinner fa-pulse fa-fw");
+  data = {
+    "id": id
+  };
+  var done = jQuery.Deferred();
+  $.get(WEBDIR + 'sonarr/DeleteContent', data, function (r) {
+    if (r.message) {
+      done.fail(false);
+      $('#del'+id).removeClass().addClass("fa fa-trash-o fa-fw");
+      notify('sonarr',r.message,'error');
+    } else {
+      done.resolve(true);
+      notify('sonarr','Deleted','info');
+    }
+  });
+  return done;
+}
+
+function loadAlerts() {
+  var alerts = 0;
+  $.ajax({
+    url: WEBDIR + 'sonarr/Alerts',
+    type: 'get',
+    dataType: 'json',
+    success: function(result) {
+      $('#alerts_table_body').empty();
+      $('#alerts_tab').empty(); // try to hide the nav tab if no alert
+      var error_alert = false;
+      var warning_alert = false;
+      var info_alert = false;
+      $.each(result, function(alertix, alertitem) {
+        alerts++;
+        var alerticon = $('<li class="fa">');
+        if (alertitem.type == "error") {
+          error_alert = true;
+          alerticon.addClass("fa-exclamation-triangle text-error");
+        } else if (alertitem.type == "warning") {
+          warning_alert = true;
+          alerticon.addClass("fa-exclamation-circle text-warning");
+        } else if (alertitem.type == "information") {
+          info_alert = true;
+          alerticon.addClass("fa-info-circle");
+        } else {
+          error_alert = true;
+          alerticon.addClass("fa-question-circle");
+          alerticon.append(' '+alertitem.type);
+        }
+        
+        if (alertitem.wikiUrl.length > 0) {
+          var alertmsg = $('<a>').attr('href', alertitem.wikiUrl).attr('target', "_blank").text(alertitem.message + ' ').append($('<li class="fa fa-fw fa-external-link">'));
+        } else {
+          var alertmsg = $('<span>').text(alertitem.message);
+        }
+        var row = $('<tr>');
+        row.append(
+          $('<td>').css("text-align","center").append(alerticon),
+          $('<td>').html(alertmsg)
+        );
+        $('#alerts_table_body').append(row);
+      });
+        
+      // Repeat for Queue items that have issues
+      $.ajax({
+        url: WEBDIR + 'sonarr/Queue',
+        type: 'get',
+        dataType: 'json',
+        success: function(queue) {
+          $.each(queue, function(queueix, queueitem) {
+            var alerticon = $('<li class="fa">');
+            if (queueitem.status.toLowerCase() == "delayed") {
+              info_alert = true;
+              alerticon.addClass("fa-info-circle");
+            } else if (queueitem.trackedDownloadStatus.toLowerCase() == "error") {
+              error_alert = true;
+              alerticon.addClass("fa-exclamation-triangle text-error");
+            } else if (queueitem.trackedDownloadStatus.toLowerCase() == "warning") {
+              warning_alert = true;
+              alerticon.addClass("fa-exclamation-circle text-warning");
+            } else if (queueitem.trackedDownloadStatus.toLowerCase() == "ok") {
+              info_alert = true;
+              alerticon.addClass("fa-info-circle");
+            } else {
+              error_alert = true;
+              alerticon.addClass("fa-question-circle");
+              alerticon.append(' '+queueitem.trackedDownloadStatus);
+            }
+            var alertmsg = queueitem.status + " "
+            $.each(queueitem.statusMessages, function(msgix, msg) {
+              if (msgix > 0) { alertmsg += "<br />"; }
+              alertmsg += msg.messages;
+            });
+
+            var row = $('<tr>');
+            row.append(
+              $('<td>').css("text-align","center").append(alerticon),
+              $('<td>').html(queueitem.series.title +
+                " " + queueitem.episode.seasonNumber +
+                "x" + queueitem.episode.episodeNumber),
+              $('<td>').html(alertmsg)
+            );
+            if (!info_alert) { //add the row unless it's an OK state
+              alerts++;
+              $('#alerts_table_body').append(row);
+            }
+          });
+
+          if (alerts == 0) {
+            var row = $('<tr>');
+            row.append($('<td>').css("text-align","center").append($('<li class="fa fa-question-circle">')));
+            row.append($('<td colspan="2">').html('No current alerts'));
+            $('#alerts_table_body').append(row);
+            $('#alerts_tab').append(" &nbsp; ");
+            $('#alerts_li').addClass("disabled");
+          } else {
+            if (error_alert) {
+              $('#alerts_tab').append( $('<li class="fa fa-exclamation-triangle fa-lg text-error">') );
+            } else if (warning_alert) {
+              $('#alerts_tab').append( $('<li class="fa fa-exclamation-circle fa-lg text-warning">') );
+            } else if (info_alert) {
+              $('#alerts_tab').append( $('<li class="fa fa-info-circle fa-lg">') );
+            } else {
+              $('#alerts_tab').append( $('<li class="fa fa-question-circle fa-lg">') );
+            }
+            $('#alerts_tab').append(" " + alerts).addClass("nav");
+            $('#alerts_li').removeClass("disabled");
+          }
+        }
+      });
+    }
+  });
 }

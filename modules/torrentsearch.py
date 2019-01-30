@@ -50,6 +50,7 @@ class Torrentsearch(object):
                 {'type': 'text', 'label': 'Jackett port', 'name': 'torrents_jackett_port'},
                 {'type': 'bool', 'label': 'Jackett ssl', 'name': 'torrents_jackett_ssl'},
                 {'type': 'password', 'label': 'Jackett apikey', 'name': 'torrents_jackett_apikey'},
+                {'type': 'text', 'label': 'Reverse proxy link', 'placeholder': '/jackett', 'desc': 'Page title link. E.g /jackett or https://rarbg.to/', 'name': 'torrents_reverse_proxy_link'}
 
             ]
         })
@@ -57,7 +58,11 @@ class Torrentsearch(object):
     @cherrypy.expose()
     @require()
     def index(self, query='', **kwargs):
-        return htpc.LOOKUP.get_template('torrentsearch.html').render(query=query, scriptname='torrentsearch', torrentproviders=self.torrentproviders())
+        return htpc.LOOKUP.get_template('torrentsearch.html').render(query=query, scriptname='torrentsearch', torrentproviders=self.torrentproviders(), webinterface=self.webinterface())
+
+    def webinterface(self):
+    # Return the reverse proxy url if specified
+        return htpc.settings.get('torrents_reverse_proxy_link')
 
     @cherrypy.expose()
     @require()

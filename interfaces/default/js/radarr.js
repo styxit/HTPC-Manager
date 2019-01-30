@@ -41,7 +41,10 @@ $(document).ready(function() {
         e.preventDefault();
         Scanfolder()
     });
-});
+    
+    loadAlerts();
+    setInterval(function(){ loadAlerts(); }, 30000);
+  });
 
 });
 
@@ -73,9 +76,14 @@ function loadMovies() {
           $('<td>').html(radarrStatusLabel(movie.status)),
           $('<td>').html(moment(movie.inCinemas).calendar()),
           $('<td>').html(movie.studio),
-            $('<td>').append(movie.downloaded ? radarrStatusLabel(movie.movieFile.quality.quality.name) : radarrStatusLabel('Missing')),
-          $('<td>').html(radarrStatusLabel(qname)));
+          $('<td>').append(movie.downloaded ? radarrStatusLabel(movie.movieFile.quality.quality.name) : radarrStatusLabel('Missing')),
+          $('<td>').html(radarrStatusLabel(qname)),
+          $('<td>').html(radarrActions(movie.id)));
         $('#tvshows_table_body').append(row);
+        if (!movie.monitored) {
+          $('#mon'+movie.id).removeClass("fa-bookmark").addClass("fa-bookmark-o");
+          $('#mon'+movie.id).attr("title","Unmonitored\nClick to toggle");
+        }
       });
       $('#tvshows_table_body').parent().trigger('update');
       $('#tvshows_table_body').parent().trigger("sorton", [
@@ -146,6 +154,39 @@ function radarrStatusLabel(text) {
     label.prepend(' ').prepend(icon);
   }
   return label;
+}
+
+function radarrActions(id) {
+	var btns = $('<div>');
+	btns.append( $('<li class="fa fa-search fa-fw fa-lg" id="q'+id+'">')
+    .attr("title","Force Search").css("cursor","pointer").click(function(){
+      $.when(ForceSearch(id)).done(function(){
+        // Nothing to do
+      }); //done
+    }) //click
+  );
+  btns.append( $('<li class="fa fa-bookmark fa-lg" id="mon'+id+'">')
+    .attr("title","Monitored\nClick to toggle").css("cursor","pointer").click(function(){
+      $.when(ToggleMonitor(id)).done(function(bMon){
+        $('#mon'+id).removeClass("fa-spinner").removeClass("fa-pulse");
+        if (bMon) {
+          $('#mon'+id).attr("title","Monitored\nClick to toggle")
+            .removeClass("fa-bookmark-o").addClass("fa-bookmark");
+        } else {
+          $('#mon'+id).attr("title","Unmonitored\nClick to toggle")
+            .removeClass("fa-bookmark").addClass("fa-bookmark-o");
+        }
+      }); //done
+    }) //click
+  );
+	btns.append( $('<li class="fa fa-trash-o fa-fw fa-lg" id="del'+id+'">')
+    .attr("title","Delete movie\n(keeps existing files/folders)").css("cursor","pointer").click(function(){
+      $.when(DeleteContent(id)).done(function(result){
+        if (result) { loadMovies(); }
+      }); //done
+    }) //click
+  );
+	return btns;
 }
 
 function profile(qualityProfileId) {
@@ -441,4 +482,174 @@ function Scanfolder() {
       }
     });
   }
+}
+
+function ForceSearch(id) {
+  $('#q'+id).removeClass().addClass("fa fa-spinner fa-pulse fa-fw fa-lg");
+  data = {
+    "method": "MoviesSearch",
+    "par": "movieIds",
+    "id": id
+  };
+  var done = jQuery.Deferred();
+  $.getJSON(WEBDIR + 'radarr/Command', data, function(r) {
+    //We don't get back the actual result of the job, just whether the API call was successful or not
+    //Return after a brief pause if the API call was ok
+    if (r.state) {
+      notify('radarr', 'Search started', 'success');
+      done.resolve(true);
+      setTimeout(function(){
+        $('#q'+id).removeClass().addClass("fa fa-search fa-fw fa-lg");
+      },500);
+    } else {
+      done.fail(false);
+      notify('radarr', 'Search not started, check logs', 'error');
+      $('#q'+id).removeClass().addClass("fa fa-search fa-fw fa-lg");
+    }
+  });
+  return done;
+}
+
+function ToggleMonitor(id) {
+  var iWidth = $('#mon'+id).css("width"); // hack to stop element reflow whilst
+  $('#mon'+id).css("width",iWidth);       // avoiding extra whitespace of fa-fw icons
+  $('#mon'+id).addClass("fa-spinner fa-pulse")
+  data = {
+    "id": id
+  };
+  var done = jQuery.Deferred();
+  $.get(WEBDIR + 'radarr/ToggleMonitor', data, function (r) {
+    done.resolve(r.monitored);
+  });
+  return done;
+}
+
+function DeleteContent(id) {
+  $('#del'+id).removeClass().addClass("fa fa-spinner fa-pulse fa-fw");
+  data = {
+    "id": id
+  };
+  var done = jQuery.Deferred();
+  $.get(WEBDIR + 'radarr/DeleteContent', data, function (r) {
+    if (r.message) {
+      done.fail(false);
+      $('#del'+id).removeClass().addClass("fa fa-trash-o fa-fw");
+      notify('radarr',r.message,'error');
+    } else {
+      done.resolve(true);
+      notify('radarr','Deleted','info');
+    }
+  });
+  return done;
+}
+
+function loadAlerts() {
+  var alerts = 0;
+  $.ajax({
+    url: WEBDIR + 'radarr/Alerts',
+    type: 'get',
+    dataType: 'json',
+    success: function(result) {
+      $('#alerts_table_body').empty();
+      $('#alerts_tab').empty();
+      var error_alert = false;
+      var warning_alert = false;
+      var info_alert = false;
+      $.each(result, function(alertix, alertitem) {
+        alerts++;
+        var alerticon = $('<li class="fa">');
+        if (alertitem.type.toLowerCase() == "error") {
+          error_alert = true;
+          alerticon.addClass("fa-exclamation-triangle text-error");
+        } else if (alertitem.type.toLowerCase() == "warning") {
+          warning_alert = true;
+          alerticon.addClass("fa-exclamation-circle text-warning");
+        } else if (alertitem.type.toLowerCase() == "information") {
+          info_alert = true;
+          alerticon.addClass("fa-info-circle");
+        } else {
+          error_alert = true;
+          alerticon.addClass("fa-question-circle");
+          alerticon.append(' '+alertitem.type);
+        }
+        
+        if (alertitem.wikiUrl.length > 0) {
+          var alertmsg = $('<a>').attr('href', alertitem.wikiUrl).attr('target', "_blank").text(alertitem.message + ' ').append($('<li class="fa fa-fw fa-external-link">'));
+        } else {
+          var alertmsg = $('<span>').text(alertitem.message);
+        }
+        var row = $('<tr>');
+        row.append(
+          $('<td>').css("text-align","center").append(alerticon),
+          $('<td colspan="2">').html(alertmsg)
+        );
+        $('#alerts_table_body').append(row);
+      });
+
+      // Repeat for Queue items that have issues
+      $.ajax({
+        url: WEBDIR + 'radarr/Queue',
+        type: 'get',
+        dataType: 'json',
+        success: function(queue) {
+          $.each(queue, function(queueix, queueitem) {
+            if (queueitem.status.toLowerCase() != "pending") {
+              var alerticon = $('<li class="fa">');
+              if (queueitem.trackedDownloadStatus.toLowerCase() == "error") {
+                error_alert = true;
+                alerticon.addClass("fa-exclamation-triangle text-error");
+              } else if (queueitem.trackedDownloadStatus.toLowerCase() == "warning") {
+                warning_alert = true;
+                alerticon.addClass("fa-exclamation-circle text-warning");
+              } else if (queueitem.trackedDownloadStatus.toLowerCase() == "ok") {
+                info_alert = true;
+                alerticon.addClass("fa-info-circle");
+              } else {
+                error_alert = true;
+                alerticon.addClass("fa-question-circle");
+                alerticon.append(' '+queueitem.trackedDownloadStatus);
+              }
+              var alertmsg = ""
+              $.each(queueitem.statusMessages, function(msgix, msg) {
+                if (msgix > 0) { alertmsg += "<br />"; }
+                alertmsg += msg.messages;
+              });
+
+              var row = $('<tr>');
+              row.append(
+                $('<td>').css("text-align","center").append(alerticon),
+                $('<td>').html(queueitem.movie.title),
+                $('<td>').html(alertmsg)
+              );
+              if (!info_alert) { //add the row unless it's an OK state
+                alerts++;
+                $('#alerts_table_body').append(row);
+              }
+            }
+          });
+          
+          if (alerts == 0) {
+            var row = $('<tr>');
+            row.append($('<td>').css("text-align","center").append($('<li class="fa fa-question-circle">')));
+            row.append($('<td colspan="2">').html('No current alerts'));
+            $('#alerts_table_body').append(row);
+            $('#alerts_tab').append(" &nbsp; ");
+            $('#alerts_li').addClass("disabled");
+          } else {
+            if (error_alert) {
+              $('#alerts_tab').append( $('<li class="fa fa-exclamation-triangle fa-lg text-error">') );
+            } else if (warning_alert) {
+              $('#alerts_tab').append( $('<li class="fa fa-exclamation-circle fa-lg text-warning">') );
+            } else if (info_alert) {
+              $('#alerts_tab').append( $('<li class="fa fa-info-circle fa-lg">') );
+            } else {
+              $('#alerts_tab').append( $('<li class="fa fa-question-circle fa-lg">') );
+            }
+            $('#alerts_tab').append(" " + alerts).addClass("nav");
+            $('#alerts_li').removeClass("disabled");
+          }
+        }
+      });
+    }
+  });
 }

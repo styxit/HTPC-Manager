@@ -3,7 +3,11 @@
 <div class="container-fluid">
     <div class="content">
       <h1 class="page-header page-title">
+				% if webinterface:
+					<a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'} title="Open ${webinterface}">${settings.get('torrentsearch_name', 'Torrent Search')}</a>
+				% else:
           ${settings.get('torrentsearch_name', 'Torrent Search')}
+				% endif
       </h1>
 
       <form class="well form-inline">

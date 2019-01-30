@@ -7,7 +7,11 @@ webdir = htpc.WEBDIR
 <div class="container-fluid">
   <div class="content">
     <h1 class="page-header page-title">
+		% if webinterface:
+      <a href="${webinterface}" ${'class="useiframe"' if settings.get('app_open_otherlink_in_iframe') else 'target="_blank"'} title="Open ${webinterface}">${settings.get('stats_name', 'Stats')}</a>
+		% else:
       <span>${settings.get('stats_name', 'Stats')}</span>
+    % endif
 	% if settings.get('stats_psutil_enabled'):
       <small>
         <i class="fa fa-arrow-down"></i><span id="stat-recv"></span>

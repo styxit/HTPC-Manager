@@ -1,4 +1,5 @@
-var row_n = 0
+var row_n = 0;
+var stats_dash_message_enabled = false;
 
 function dash_radarr_calendar() {
 
@@ -511,7 +512,8 @@ function loadNextAired(options) {
 }
 
 function loadRadarrCalendar(options) {
-  if (!$('#radarr_calendar_table_body').length) return
+  if (!$('#dash_radarr_table_body').length) return
+  start_refresh('radarr', 'loadRadarrCalendar');
   $.getJSON(WEBDIR + 'radarr/oldCalendar', function(result) {
     $.each(result, function(i, cal) {
       if (i >= 5) return
@@ -523,14 +525,58 @@ function loadRadarrCalendar(options) {
         $('<td>').append(name).append(img),
         $('<td>').append($('<div class="pull-right">').text(moment(cal.inCinemas).fromNow()))
       )
-      $('#radarr_calendar_table_body').append(row);
+      $('#dash_radarr_table_body').append(row);
     });
 
+  }).always(function() {
+    end_refresh('radarr');
   });
+  var alerts = 0;
+  $.ajax({
+    url: WEBDIR + 'radarr/Alerts',
+    type: 'get',
+    dataType: 'json',
+    success: function(result) {
+      $.each(result, function(alertix, alertitem) {
+        alerts++;
+      });
+    }
+  }).always(function(){
+      // Repeat for Queue items that have issues
+      $.ajax({
+        url: WEBDIR + 'radarr/Queue',
+        type: 'get',
+        dataType: 'json',
+        success: function(queue) {
+          $.each(queue, function(queueix, queueitem) {
+            if (queueitem.status.toLowerCase() != "pending") {
+              if (queueitem.trackedDownloadStatus.toLowerCase() == "ok") {
+                info_alert = true;
+              } else {
+                info_alert = false;
+              }
+              if (!info_alert) { //add the row unless it's an OK state
+                alerts++;
+              }
+            }
+          });
+          
+        if (alerts) {
+          $('#dash_radarr_message').html(
+            $('<a href="radarr/#alerts">').append(
+              $('<i class="fa fa-warning fa-fw text-warning">') )
+              .append(alerts) );
+        } else {
+          $('#dash_radarr_message').empty()
+        }
+      }
+    });
+  }); //always
 }
 
 function loadsonarrCalendar(options) {
-  if (!$('#calendar_table_body').length) return
+  if (!$('#dash_sonarr_table_body').length) return
+  start_refresh('sonarr', 'loadsonarrCalendar');
   $.getJSON(WEBDIR + 'sonarr/oldCalendar', function(result) {
     j = 0;
     $.each(result, function(i, cal) {
@@ -544,17 +590,60 @@ function loadsonarrCalendar(options) {
         $('<td>').html('S' + pad(cal.seasonNumber, 2) + 'E' + pad(cal.episodeNumber, 2) + '&nbsp').append(img),
         $('<td>').append($('<div class="pull-right">').text(moment(cal.airDateUtc).fromNow()))
       )
-      $('#calendar_table_body').append(row);
+      $('#dash_sonarr_table_body').append(row);
       j++;
     });
     if (j === 0) {
       row = $('<tr>');
       row.append($('<td>').attr("colspan", 2).append('<div class="text-center"><small>No future episodes in Sonarr calendar</small></div>'))
-      $('#calendar_table_body').append(row);
+      $('#dash_sonarr_table_body').append(row);
       return false;
     }
 
+  }).always(function() {
+    end_refresh('sonarr');
   });
+
+  alerts = 0;
+  $.ajax({
+    url: WEBDIR + 'sonarr/Alerts',
+    type: 'get',
+    dataType: 'json',
+    success: function(result) {
+      $.each(result, function(alertix, alertitem) {
+        alerts++;
+      });
+    }
+  }).always(function() {
+    // Repeat for Queue items that have issues
+    $.ajax({
+      url: WEBDIR + 'sonarr/Queue',
+      type: 'get',
+      dataType: 'json',
+      success: function(queue) {
+        $.each(queue, function(queueix, queueitem) {
+          if (queueitem.status.toLowerCase() == "delayed") {
+            info_alert = true;
+          }
+          if (queueitem.trackedDownloadStatus.toLowerCase() == "ok") {
+            info_alert = true;
+          }
+          if (!info_alert) { //add the row unless it's an OK state
+            alerts++;
+          }
+        });
+
+        if (alerts) {
+          $('#dash_sonarr_message').html(
+            $('<a href="sonarr/#alerts">').append(
+              $('<i class="fa fa-warning fa-fw text-warning">') )
+              .append(alerts) );
+        } else {
+          $('#dash_sonarr_message').empty()
+        }
+      }
+    });
+  }); //always
 }
 
 function loadNextAiredSickrage(options) {
@@ -725,7 +814,11 @@ function loadsysinfo(options) {
       )
 
       // add one more with current user and login?
-    )
+    );
+		
+    if (stats_dash_message_enabled) {
+      $('#dash_sysinfo_message').html("@ " + moment().format('HH:mm:ss'));
+    }
 
   }).always(function() {
     end_refresh('sysinfo');
@@ -912,9 +1005,13 @@ function loaduTorrent() {
 
 function start_refresh(module, fn) {
   if ($('#dash_' + module).children('h3:first-child').has('.refresh-btns').length == 0) {
-    $('#dash_' + module).children('h3:first-child').append('<span class="refresh-btns">' +
-      '<i id="' + module + '-refresh"  style="font-size:0.6em" class="btn fa fa-refresh" title="Refresh" onclick="' + fn + '();"></i>' +
-      '<i class="fa fa-spinner fa-pulse" style="font-size:0.7em" id="' + module + '-spinner"></i></span>');
+    $('#dash_' + module).children('h3:first-child')
+      .append( $('<div class="pull-right">')
+        .append('<span id="dash_' + module + '_message" style="font-size: 13px;">')
+        .append('&nbsp;<span class="refresh-btns">' +
+        '<i id="' + module + '-refresh"  style="font-size:0.7em" class="btn fa fa-refresh fa-fw" title="Refresh" onclick="' + fn + '();"></i>' +
+        '<i class="fa fa-spinner fa-pulse fa-fw" style="font-size:0.7em" id="' + module + '-spinner"></i></span>')
+      );
   }
   $('#' + module + '-refresh').hide();
   $('#dash_' + module + '_table_body').html("");
@@ -995,6 +1092,12 @@ $(document).ready(function() {
     jQuery("#notConfigured").detach().appendTo("#dash-content"); //display setup msg if no modules enabled
   } else {
     var modules_per_row = 0;
+    //Fetch any page display settings
+    $.getJSON(WEBDIR + "stats/return_settings", function (return_settings) {
+      if (return_settings.stats_dash_message_enabled == true) {
+        stats_dash_message_enabled = true;
+      }
+    });
     if (dash_order != '0' && dash_order != 'False') { // create modules if dash_order is set
       rows_to_build = dash_order.split(";");
       for (i = 0; i < rows_to_build.length; i++) { //loop rows
@@ -1036,6 +1139,8 @@ if ( dash_refresh_interval > 0 ) {
     loadsysinfo();
     loaddiskinfo();
     loadsmartinfo();
+    loadsonarrCalendar();
+    loadRadarrCalendar();
   }, 1000 * dash_refresh_interval ) // timer uses miliseconds
 }
 

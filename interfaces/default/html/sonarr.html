@@ -50,7 +50,7 @@
         <li class="active"><a href="#tvshows" data-toggle="tab">TV Shows</a></li>
         <li><a href="#calendar_tab" data-toggle="tab">Calendar</a></li>
         <li><a href="#history" data-toggle="tab">History</a></li>
-        <!--<li><a href="#log" data-toggle="tab">Log</a></li>-->
+        <li id="alerts_li" class="disabled"><a href="#alerts" data-toggle="tab" id="alerts_tab"></a></li>
       </ul>
       <div class="tab-content">
         <div id="tvshows" class="tab-pane mofa active">
@@ -59,10 +59,11 @@
               <tr>
                 <th data-ignore-articles="en" data-sorter="ignoreArticles">Showname</th>
                 <th>Status</th>
-                <th>Next ep</th>
+                <th>Next Ep</th>
                 <th>Downloads</th>
                 <th>Network</th>
                 <th>Quality</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="tvshows_table_body"></tbody>
@@ -99,16 +100,18 @@
             <tbody id="history_table_body"></tbody>
           </table>
         </div>
-        <!--<div id="log" class="tab-pane mofa">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Logitem</th>
-                        </tr>
-                    </thead>
-                    <tbody id="log_table_body"></tbody>
-                </table>
-            </div>-->
+        <div id="alerts" class="tab-pane">
+					<table class="table table-striped">
+							<thead>
+									<tr>
+											<th class="span1">Severity</th>
+											<th class="span4">Message</th>
+											<th></th>
+									</tr>
+							</thead>
+							<tbody id="alerts_table_body"></tbody>
+					</table>
+        </div>
         <div class="spinner"></div>
       </div>
     </div>

@@ -19,3 +19,13 @@
     width: 100%;
     color: black;
 }
+
+span.icon-sonarr {
+	cursor: default;
+}
+
+span.disabled {
+	cursor: not-allowed!important;
+    opacity: 0.7;
+	color: grey;
+}
