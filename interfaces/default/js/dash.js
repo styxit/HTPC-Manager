@@ -782,7 +782,8 @@ function dasherror(i, msg) {
 
 function loadsysinfo(options) {
   start_refresh('sysinfo', 'loadsysinfo');
-  $.getJSON(WEBDIR + 'stats/sysinfodash', function(result) {
+  // delay function by a few ms else cpu usage displays high due to other things refreshing
+  setTimeout( function(){ $.getJSON(WEBDIR + 'stats/sysinfodash', function(result) {
     $('#dash_sysinfo_table_body').append(
       $('<tr>').append(
         $('<td>').html('CPU'),
@@ -823,6 +824,7 @@ function loadsysinfo(options) {
   }).always(function() {
     end_refresh('sysinfo');
   });
+  }, 50);
 }
 
 function loaddiskinfo() {
@@ -1136,11 +1138,11 @@ if ( dash_refresh_interval > 0 ) {
   setInterval(function () {
     loaduTorrent();
     loadqbit();
-    loadsysinfo();
     loaddiskinfo();
     loadsmartinfo();
     loadsonarrCalendar();
     loadRadarrCalendar();
+    loadsysinfo();
   }, 1000 * dash_refresh_interval ) // timer uses miliseconds
 }
 
