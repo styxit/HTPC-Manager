@@ -41,7 +41,10 @@ $(document).ready(function() {
         e.preventDefault();
         Scanfolder()
     });
-});
+    
+    loadAlerts();
+    setInterval(function(){ loadAlerts(); }, 30000);
+  });
 
 });
 
@@ -156,14 +159,14 @@ function radarrStatusLabel(text) {
 function radarrActions(id) {
 	var btns = $('<div>');
 	btns.append( $('<li class="fa fa-search fa-fw fa-lg" id="q'+id+'">')
-    .attr("title","Force Search").click(function(){
+    .attr("title","Force Search").css("cursor","pointer").click(function(){
       $.when(ForceSearch(id)).done(function(){
         // Nothing to do
       }); //done
     }) //click
   );
   btns.append( $('<li class="fa fa-bookmark fa-lg" id="mon'+id+'">')
-    .attr("title","Monitored\nClick to toggle").click(function(){
+    .attr("title","Monitored\nClick to toggle").css("cursor","pointer").click(function(){
       $.when(ToggleMonitor(id)).done(function(bMon){
         $('#mon'+id).removeClass("fa-spinner").removeClass("fa-pulse");
         if (bMon) {
@@ -177,7 +180,7 @@ function radarrActions(id) {
     }) //click
   );
 	btns.append( $('<li class="fa fa-trash-o fa-fw fa-lg" id="del'+id+'">')
-    .attr("title","Delete movie\n(keeps existing files/folders)").click(function(){
+    .attr("title","Delete movie\n(keeps existing files/folders)").css("cursor","pointer").click(function(){
       $.when(DeleteContent(id)).done(function(result){
         if (result) { loadMovies(); }
       }); //done
@@ -482,7 +485,7 @@ function Scanfolder() {
 }
 
 function ForceSearch(id) {
-  $('#q'+id).removeClass().addClass("fa fa-spinner fa-pulse fa-fw");
+  $('#q'+id).removeClass().addClass("fa fa-spinner fa-pulse fa-fw fa-lg");
   data = {
     "method": "MoviesSearch",
     "par": "movieIds",
@@ -496,12 +499,12 @@ function ForceSearch(id) {
       notify('radarr', 'Search started', 'success');
       done.resolve(true);
       setTimeout(function(){
-        $('#q'+id).removeClass().addClass("fa fa-search fa-fw");
+        $('#q'+id).removeClass().addClass("fa fa-search fa-fw fa-lg");
       },500);
     } else {
       done.fail(false);
       notify('radarr', 'Search not started, check logs', 'error');
-      $('#q'+id).removeClass().addClass("fa fa-search fa-fw");
+      $('#q'+id).removeClass().addClass("fa fa-search fa-fw fa-lg");
     }
   });
   return done;
@@ -538,4 +541,115 @@ function DeleteContent(id) {
     }
   });
   return done;
+}
+
+function loadAlerts() {
+  var alerts = 0;
+  $.ajax({
+    url: WEBDIR + 'radarr/Alerts',
+    type: 'get',
+    dataType: 'json',
+    success: function(result) {
+      $('#alerts_table_body').empty();
+      $('#alerts_tab').empty();
+      var error_alert = false;
+      var warning_alert = false;
+      var info_alert = false;
+      $.each(result, function(alertix, alertitem) {
+        alerts++;
+        var alerticon = $('<li class="fa">');
+        if (alertitem.type.toLowerCase() == "error") {
+          error_alert = true;
+          alerticon.addClass("fa-exclamation-triangle text-error");
+        } else if (alertitem.type.toLowerCase() == "warning") {
+          warning_alert = true;
+          alerticon.addClass("fa-exclamation-circle text-warning");
+        } else if (alertitem.type.toLowerCase() == "information") {
+          info_alert = true;
+          alerticon.addClass("fa-info-circle");
+        } else {
+          error_alert = true;
+          alerticon.addClass("fa-question-circle");
+          alerticon.append(' '+alertitem.type);
+        }
+        
+        if (alertitem.wikiUrl.length > 0) {
+          var alertmsg = $('<a>').attr('href', alertitem.wikiUrl).attr('target', "_blank").text(alertitem.message + ' ').append($('<li class="fa fa-fw fa-external-link">'));
+        } else {
+          var alertmsg = $('<span>').text(alertitem.message);
+        }
+        var row = $('<tr>');
+        row.append(
+          $('<td>').css("text-align","center").append(alerticon),
+          $('<td colspan="2">').html(alertmsg)
+        );
+        $('#alerts_table_body').append(row);
+      });
+
+      // Repeat for Queue items that have issues
+      $.ajax({
+        url: WEBDIR + 'radarr/Queue',
+        type: 'get',
+        dataType: 'json',
+        success: function(queue) {
+          $.each(queue, function(queueix, queueitem) {
+            if (queueitem.status.toLowerCase() != "pending") {
+              var alerticon = $('<li class="fa">');
+              if (queueitem.trackedDownloadStatus.toLowerCase() == "error") {
+                error_alert = true;
+                alerticon.addClass("fa-exclamation-triangle text-error");
+              } else if (queueitem.trackedDownloadStatus.toLowerCase() == "warning") {
+                warning_alert = true;
+                alerticon.addClass("fa-exclamation-circle text-warning");
+              } else if (queueitem.trackedDownloadStatus.toLowerCase() == "ok") {
+                info_alert = true;
+                alerticon.addClass("fa-info-circle");
+              } else {
+                error_alert = true;
+                alerticon.addClass("fa-question-circle");
+                alerticon.append(' '+queueitem.trackedDownloadStatus);
+              }
+              var alertmsg = ""
+              $.each(queueitem.statusMessages, function(msgix, msg) {
+                if (msgix > 0) { alertmsg += "<br />"; }
+                alertmsg += msg.messages;
+              });
+
+              var row = $('<tr>');
+              row.append(
+                $('<td>').css("text-align","center").append(alerticon),
+                $('<td>').html(queueitem.movie.title),
+                $('<td>').html(alertmsg)
+              );
+              if (!info_alert) { //add the row unless it's an OK state
+                alerts++;
+                $('#alerts_table_body').append(row);
+              }
+            }
+          });
+          
+          if (alerts == 0) {
+            var row = $('<tr>');
+            row.append($('<td>').css("text-align","center").append($('<li class="fa fa-question-circle">')));
+            row.append($('<td colspan="2">').html('No current alerts'));
+            $('#alerts_table_body').append(row);
+            $('#alerts_tab').append(" &nbsp; ");
+            $('#alerts_li').addClass("disabled");
+          } else {
+            if (error_alert) {
+              $('#alerts_tab').append( $('<li class="fa fa-exclamation-triangle fa-lg text-error">') );
+            } else if (warning_alert) {
+              $('#alerts_tab').append( $('<li class="fa fa-exclamation-circle fa-lg text-warning">') );
+            } else if (info_alert) {
+              $('#alerts_tab').append( $('<li class="fa fa-info-circle fa-lg">') );
+            } else {
+              $('#alerts_tab').append( $('<li class="fa fa-question-circle fa-lg">') );
+            }
+            $('#alerts_tab').append(" " + alerts).addClass("nav");
+            $('#alerts_li').removeClass("disabled");
+          }
+        }
+      });
+    }
+  });
 }
