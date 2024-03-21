@@ -132,7 +132,7 @@ If all went well, PIL has been installed. Check the install message to see jpeg 
 ---------------------------------------------------------------
 {% endhighlight %}
 
-#Configuration
+# Configuration
 
 ## Reverse proxy
 HTPC Manager supports the use of a reverse proxy. To use a reverse proxy HTPC Manager must run on a different webdir. By default HTPC Manager runs on it's ow port, in the root. If you want to use a reverse proxy you might want to set the webdir to /htpc. In the settings you can configure a custom webdir/basepath (restart required).
